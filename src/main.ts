@@ -24,6 +24,7 @@ class Window{
 
     public constructor(config: any){
         Window.window = new BrowserWindow(config);
+        Window.window.setMenu(null)
         Window.window.on("closed", this.onClose);
     }
 }

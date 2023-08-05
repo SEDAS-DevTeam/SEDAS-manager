@@ -7,9 +7,26 @@
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
-  "author": "Daniel Pojhan",
+  "author": "Daniel Pojhan <danpojhan@gmail.com>",
+  "homepage": "https://github.com/HelloWorld7894/SEDAC",
   "license": "GPL-3.0",
   "scripts": {
-    "dev": "npx tsc main.ts && electron ."
+    "dev": "npx tsc main.ts && electron .",
+    "build": "electron-builder build -wl",
+    "clear": "rm -rf ./build/*"
+  },
+  "build": {
+    "appId": "com.sedacmanager.app",
+    "directories":{
+      "output": "./build/"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "./res/sedac-manager-logo.ico"
+    },
+    "linux":{
+      "target": "deb",
+      "icon": "./res/sedac-manager-logo.png"
+    }
   }
 }

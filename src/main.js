@@ -14,6 +14,7 @@ var main_menu_settings = {
 var Window = /** @class */ (function () {
     function Window(config) {
         Window.window = new electron_1.BrowserWindow(config);
+        Window.window.setMenu(null);
         Window.window.on("closed", this.onClose);
     }
     Window.prototype.onClose = function () {

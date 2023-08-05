@@ -20,13 +20,19 @@
     "directories":{
       "output": "./build/"
     },
+    "extraResources": [
+      {
+        "from": "./res/img/",
+        "to": "img"
+      }
+    ],
     "win": {
       "target": "nsis",
-      "icon": "./res/sedac-manager-logo.ico"
+      "icon": "./res/img/sedac-manager-logo.ico"
     },
     "linux":{
       "target": "deb",
-      "icon": "./res/sedac-manager-logo.png"
+      "icon": "./res/img/sedac-manager-logo.png"
     }
   }
 }

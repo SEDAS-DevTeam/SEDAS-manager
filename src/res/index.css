@@ -1,0 +1,22 @@
+h1, h2, p{
+    color: #5271ff;
+    user-select: none;
+}
+
+.menubutton{
+    display: inline-block;
+    background-color: rgba(255, 255, 255, 0.836);
+    color: #5271ff;
+    border-color: #5271ff;
+    text-align: center;
+    text-decoration: none;
+    font-size: 24px;
+    padding: 8px 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+}
+
+img{
+    pointer-events: none;
+    user-select: none;
+}

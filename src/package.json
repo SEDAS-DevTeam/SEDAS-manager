@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "@types/electron": "^1.6.10",
+    "typescript": "^5.1.6"
+  },
+  "name": "SEDAC-manager",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "author": "Daniel Pojhan",
+  "license": "GPL-3.0",
+  "scripts": {
+    "dev": "npx tsc main.ts && electron ."
+  }
+}

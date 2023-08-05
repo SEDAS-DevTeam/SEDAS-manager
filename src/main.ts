@@ -1,6 +1,12 @@
-import {app, BrowserWindow} from "electron"
+import {app, BrowserWindow, ipcMain } from "electron"
 
-const main_menu_settings = {
+//window variable declarations
+var mainMenu: Window;
+var settings: Window;
+var controllerWindow: Window;
+var workerWindow: Window;
+
+const main_menu_dict = {
     width: 800,
     height: 600,
     title: "SEDAC manager",
@@ -11,30 +17,93 @@ const main_menu_settings = {
     resizable: false
 }
 
+const settings_dict = {
+    width: 1920,
+    height: 1080,
+    title: "SEDAC manager - settings",
+    webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false
+    },
+    resizable: true
+}
+
+const controller_dict = {
+    width: 1920,
+    height: 1080,
+    title: "SEDAC manager - control",
+    webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false
+    },
+    resizable: true
+}
+
+const worker_dict = {
+    width: 1920,
+    height: 1080,
+    title: "SEDAC",
+    webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false
+    },
+    resizable: false
+}
+
 class Window{
     static window: BrowserWindow;
+    static path_load: string
+
+
+    public close(){
+        Window.window.close()
+    }
 
     private onClose(){
-        Window.window = null;
+        Window.window = null
     }
 
     public show(){
-        Window.window.loadFile("./res/index.html");
+        Window.window.loadFile(Window.path_load);
     }
 
-    public constructor(config: any){
+    public constructor(config: any, path: string){
         Window.window = new BrowserWindow(config);
         Window.window.setMenu(null);
-        //Window.window.webContents.openDevTools();
         Window.window.on("closed", this.onClose);
-    }
-}
 
-function start_app(){
-    var mainMenu: any = new Window(main_menu_settings)
-    mainMenu.show()
+        Window.path_load = path
+    }
 }
 
 app.on("ready", () => {
-    start_app()
+    mainMenu = new Window(main_menu_dict, "./res/index.html")
+    mainMenu.show()
+})
+
+ipcMain.on("redirect", (event, data) => {
+    //redirect event handler from menu
+
+    mainMenu.close()
+    if (data == "settings"){
+        settings = new Window(settings_dict, "./res/settings.html")
+        settings.show()
+
+    }
+    else if (data == "main-program"){
+
+        controllerWindow = new Window(controller_dict, "./res/controller.html")
+        workerWindow = new Window(worker_dict, "./res/worker.html")
+
+        controllerWindow.show()
+        workerWindow.show()
+    }
+})
+
+ipcMain.on("redirect-settings", (event, data) => {
+    settings.close() //TODO: this doesnt seem to work for some reason
+    if (data == "menu"){
+        mainMenu = new Window(main_menu_dict, "./res/index.html")
+        mainMenu.show()
+    }
 })

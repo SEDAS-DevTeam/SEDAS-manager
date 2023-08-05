@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "npx tsc main.ts && electron .",
     "build": "electron-builder build -wl",
-    "clear": "rm -rf ./build/*"
+    "clear": "rm -rf ./build/* && touch ./build/.gitkeep"
   },
   "build": {
     "appId": "com.sedacmanager.app",

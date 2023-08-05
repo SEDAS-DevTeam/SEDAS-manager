@@ -1,0 +1,7 @@
+#generic node.js config
+/src/node_modules
+/src/package-lock.json
+
+#clear useless build files
+/src/build/*
+!/src/build/.gitkeep

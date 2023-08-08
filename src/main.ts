@@ -59,10 +59,6 @@ class Window{
         Window.window.close()
     }
 
-    private onClose(){
-        Window.window = null
-    }
-
     public show(){
         Window.window.loadFile(Window.path_load);
     }
@@ -70,7 +66,7 @@ class Window{
     public constructor(config: any, path: string){
         Window.window = new BrowserWindow(config);
         Window.window.setMenu(null);
-        Window.window.on("closed", this.onClose);
+        //Window.window.on("closed", this.onClose);
 
         Window.path_load = path
     }

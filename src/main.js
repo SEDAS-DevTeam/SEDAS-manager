@@ -50,14 +50,11 @@ var Window = /** @class */ (function () {
     function Window(config, path) {
         Window.window = new electron_1.BrowserWindow(config);
         Window.window.setMenu(null);
-        Window.window.on("closed", this.onClose);
+        //Window.window.on("closed", this.onClose);
         Window.path_load = path;
     }
     Window.prototype.close = function () {
         Window.window.close();
-    };
-    Window.prototype.onClose = function () {
-        Window.window = null;
     };
     Window.prototype.show = function () {
         Window.window.loadFile(Window.path_load);
@@ -83,9 +80,10 @@ electron_1.ipcMain.on("redirect", function (event, data) {
     }
 });
 electron_1.ipcMain.on("redirect-settings", function (event, data) {
+    console.log(settings);
+    settings.close(); //TODO: this doesnt seem to work for some reason
     if (data == "menu") {
         mainMenu = new Window(main_menu_dict, "./res/index.html");
         mainMenu.show();
-        settings.close();
     }
 });

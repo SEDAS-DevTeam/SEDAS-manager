@@ -1,4 +1,6 @@
-import {app, BrowserWindow, ipcMain } from "electron"
+import {app, BrowserWindow, ipcMain, screen} from "electron"
+
+//TODO: work with screens
 
 //window variable declarations
 var mainMenu: Window;
@@ -14,7 +16,8 @@ const main_menu_dict = {
         nodeIntegration: true,
         contextIsolation: false
     },
-    resizable: false
+    resizable: false,
+    icon: "./res/img/sedac-manager-logo.png"
 }
 
 const settings_dict = {
@@ -25,7 +28,8 @@ const settings_dict = {
         nodeIntegration: true,
         contextIsolation: false
     },
-    resizable: true
+    resizable: true,
+    icon: "./res/img/sedac-manager-logo.png"
 }
 
 const controller_dict = {
@@ -36,7 +40,8 @@ const controller_dict = {
         nodeIntegration: true,
         contextIsolation: false
     },
-    resizable: true
+    resizable: true,
+    icon: "./res/img/sedac-manager-logo.png"
 }
 
 const worker_dict = {
@@ -47,7 +52,8 @@ const worker_dict = {
         nodeIntegration: true,
         contextIsolation: false
     },
-    resizable: false
+    resizable: false,
+    icon: "./res/img/sedac-manager-logo.png"
 }
 
 class Window{
@@ -66,7 +72,6 @@ class Window{
     public constructor(config: any, path: string){
         Window.window = new BrowserWindow(config);
         Window.window.setMenu(null);
-        //Window.window.on("closed", this.onClose);
 
         Window.path_load = path
     }

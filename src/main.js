@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var electron_1 = require("electron");
+//TODO: work with screens
 //window variable declarations
 var mainMenu;
 var settings;
@@ -14,7 +15,8 @@ var main_menu_dict = {
         nodeIntegration: true,
         contextIsolation: false
     },
-    resizable: false
+    resizable: false,
+    icon: "./res/img/sedac-manager-logo.png"
 };
 var settings_dict = {
     width: 1920,
@@ -24,7 +26,8 @@ var settings_dict = {
         nodeIntegration: true,
         contextIsolation: false
     },
-    resizable: true
+    resizable: true,
+    icon: "./res/img/sedac-manager-logo.png"
 };
 var controller_dict = {
     width: 1920,
@@ -34,7 +37,8 @@ var controller_dict = {
         nodeIntegration: true,
         contextIsolation: false
     },
-    resizable: true
+    resizable: true,
+    icon: "./res/img/sedac-manager-logo.png"
 };
 var worker_dict = {
     width: 1920,
@@ -44,13 +48,13 @@ var worker_dict = {
         nodeIntegration: true,
         contextIsolation: false
     },
-    resizable: false
+    resizable: false,
+    icon: "./res/img/sedac-manager-logo.png"
 };
 var Window = /** @class */ (function () {
     function Window(config, path) {
         Window.window = new electron_1.BrowserWindow(config);
         Window.window.setMenu(null);
-        //Window.window.on("closed", this.onClose);
         Window.path_load = path;
     }
     Window.prototype.close = function () {
@@ -80,7 +84,6 @@ electron_1.ipcMain.on("redirect", function (event, data) {
     }
 });
 electron_1.ipcMain.on("redirect-settings", function (event, data) {
-    console.log(settings);
     settings.close(); //TODO: this doesnt seem to work for some reason
     if (data == "menu") {
         mainMenu = new Window(main_menu_dict, "./res/index.html");

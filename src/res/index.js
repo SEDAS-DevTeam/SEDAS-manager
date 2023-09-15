@@ -14,3 +14,8 @@ function start(){
 function to_menu(){
     ipcRender.send("redirect-settings", "menu")
 }
+
+//WORKER x CONTROLLER COMMUNICATION
+function send_message(message, sender){
+    ipcRender.send("message-redirect", [sender, message])
+}

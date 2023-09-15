@@ -108,3 +108,12 @@ ipcMain.on("redirect-settings", (event, data) => {
         mainMenu.show()
     }
 })
+
+ipcMain.on("message-redirect", (event, data) => {
+    if(data[0] == "worker"){
+
+    }
+    else if (data[0] == "controller"){
+        
+    }
+})

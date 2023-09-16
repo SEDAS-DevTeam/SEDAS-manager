@@ -26,6 +26,10 @@
       {
         "from": "./res/img/",
         "to": "img"
+      },
+      {
+        "from": "./res/data/",
+        "to": "data"
       }
     ],
     "win": {

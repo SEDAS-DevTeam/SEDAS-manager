@@ -9,6 +9,7 @@ var controllerWindow;
 var workerWindow;
 //other declarations
 var sender_win_name = "";
+var displays = [];
 var main_menu_dict = {
     width: 800,
     height: 600,
@@ -54,12 +55,15 @@ var worker_dict = {
     icon: "./res/img/sedac-manager-logo.png"
 };
 var Window = /** @class */ (function () {
-    function Window(config, path) {
+    function Window(config, path, _a) {
+        var x = _a[0], y = _a[1];
+        config.x = x;
+        config.y = y;
+        console.log(config.x, config.y);
         this.window = new electron_1.BrowserWindow(config);
         this.window.setMenu(null);
         this.window.webContents.openDevTools();
         this.path_load = path;
-        //this.show()
     }
     Window.prototype.close = function () {
         this.window.close();
@@ -73,27 +77,55 @@ var Window = /** @class */ (function () {
     return Window;
 }());
 electron_1.app.on("ready", function () {
-    mainMenu = new Window(main_menu_dict, "./res/index.html");
+    //get screen info
+    var displays_info = electron_1.screen.getAllDisplays();
+    var displays_mod = [];
+    for (var i = 0; i < displays_info.length; i++) {
+        displays_mod.push(displays_info[i].bounds);
+    }
+    displays_mod.sort(function (a, b) { return a.x - b.x; });
+    displays = displays_mod;
+    //calculate x, y
+    //leftmost tactic
+    var x = displays[displays.length - 1].x;
+    var y = displays[displays.length - 1].y;
+    console.log(x, y);
+    mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y]);
     mainMenu.show();
 });
 electron_1.ipcMain.on("redirect", function (event, data) {
     //redirect event handler from menu
     mainMenu.close();
     if (data == "settings") {
-        settings = new Window(settings_dict, "./res/settings.html");
+        //calculate x, y
+        //leftmost tactic
+        var x = displays[displays.length - 1].x;
+        var y = displays[displays.length - 1].y;
+        settings = new Window(settings_dict, "./res/settings.html", [x, y]);
         settings.show();
     }
     else if (data == "main-program") {
-        controllerWindow = new Window(controller_dict, "./res/controller.html");
-        workerWindow = new Window(worker_dict, "./res/worker.html");
+        //calculate x, y
+        //leftmost tactic
+        var x1 = displays[displays.length - 2].x;
+        var y1 = displays[displays.length - 2].y;
+        var x2 = displays[displays.length - 3].x;
+        var y2 = displays[displays.length - 3].y;
+        controllerWindow = new Window(controller_dict, "./res/controller.html", [x1, y1]);
+        workerWindow = new Window(worker_dict, "./res/worker.html", [x2, y2]);
         controllerWindow.show();
         workerWindow.show();
     }
 });
 electron_1.ipcMain.on("redirect-settings", function (event, data) {
     settings.close(); //TODO: this doesnt seem to work for some reason
+    //calculate x, y
+    //leftmost tactic
+    var x = displays[displays.length - 1].x;
+    var y = displays[displays.length - 1].y;
     if (data == "menu") {
-        mainMenu = new Window(main_menu_dict, "./res/index.html");
+        mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y]);
+        mainMenu.show();
     }
 });
 electron_1.ipcMain.on("message-redirect", function (event, data) {
@@ -109,7 +141,6 @@ electron_1.ipcMain.on("message-redirect", function (event, data) {
     }
     else if (data[0] == "validate") { //validation arrived from receiver
         console.log("msg received!");
-        console.log(data[1]);
         if (sender_win_name == "worker") {
             workerWindow.send_message("valid", "success");
         }

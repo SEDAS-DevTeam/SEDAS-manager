@@ -10,6 +10,7 @@ var workerWindow: Window;
 
 //other declarations
 var sender_win_name: string = "";
+var displays = [];
 
 const main_menu_dict = {
     width: 800,
@@ -76,18 +77,38 @@ class Window{
         this.window.webContents.postMessage(channel, message)
     }
 
-    public constructor(config: any, path: string){
+    public constructor(config: any, path: string, [x, y]: [number, number]){
+        config.x = x
+        config.y = y
+
+        console.log(config.x, config.y)
+
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
-        //this.show()
     }
 }
 
 app.on("ready", () => {
-    mainMenu = new Window(main_menu_dict, "./res/index.html")
+    //get screen info
+    var displays_info: any = screen.getAllDisplays()
+    var displays_mod = []
+    for(let i: number = 0; i < displays_info.length; i++){
+        displays_mod.push(displays_info[i].bounds)
+    }
+    displays_mod.sort((a, b) => a.x - b.x);
+    displays = displays_mod
+
+    //calculate x, y
+    //leftmost tactic
+    let x: number = displays[displays.length - 1].x
+    let y: number = displays[displays.length - 1].y
+
+    console.log(x, y)
+
+    mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
     mainMenu.show()
 })
 
@@ -96,13 +117,26 @@ ipcMain.on("redirect", (event, data) => {
 
     mainMenu.close()
     if (data == "settings"){
-        settings = new Window(settings_dict, "./res/settings.html")
+        //calculate x, y
+        //leftmost tactic
+        let x: number = displays[displays.length - 1].x
+        let y: number = displays[displays.length - 1].y
+
+        settings = new Window(settings_dict, "./res/settings.html", [x, y])
         settings.show()
     }
     else if (data == "main-program"){
 
-        controllerWindow = new Window(controller_dict, "./res/controller.html")
-        workerWindow = new Window(worker_dict, "./res/worker.html")
+        //calculate x, y
+        //leftmost tactic
+        let x1: number = displays[displays.length - 2].x
+        let y1: number = displays[displays.length - 2].y
+
+        let x2: number = displays[displays.length - 3].x
+        let y2: number = displays[displays.length - 3].y
+
+        controllerWindow = new Window(controller_dict, "./res/controller.html", [x1, y1])
+        workerWindow = new Window(worker_dict, "./res/worker.html", [x2, y2])
 
         controllerWindow.show()
         workerWindow.show()
@@ -111,8 +145,15 @@ ipcMain.on("redirect", (event, data) => {
 
 ipcMain.on("redirect-settings", (event, data) => {
     settings.close() //TODO: this doesnt seem to work for some reason
+
+    //calculate x, y
+    //leftmost tactic
+    let x: number = displays[displays.length - 1].x
+    let y: number = displays[displays.length - 1].y
+
     if (data == "menu"){
-        mainMenu = new Window(main_menu_dict, "./res/index.html")
+        mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
+        mainMenu.show()
     }
 })
 

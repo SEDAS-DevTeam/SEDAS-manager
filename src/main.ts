@@ -21,7 +21,7 @@ const main_menu_dict = {
         contextIsolation: false
     },
     resizable: false,
-    icon: "./res/img/sedac-manager-logo.png"
+    icon: "./res/img/sedac-manager-logo.png",
 }
 
 const settings_dict = {
@@ -33,7 +33,7 @@ const settings_dict = {
         contextIsolation: false
     },
     resizable: true,
-    icon: "./res/img/sedac-manager-logo.png"
+    icon: "./res/img/sedac-manager-logo.png",
 }
 
 const controller_dict = {
@@ -45,7 +45,8 @@ const controller_dict = {
         contextIsolation: false
     },
     resizable: true,
-    icon: "./res/img/sedac-manager-logo.png"
+    icon: "./res/img/sedac-manager-logo.png",
+    frame: true
 }
 
 const worker_dict = {
@@ -57,7 +58,9 @@ const worker_dict = {
         contextIsolation: false
     },
     resizable: false,
-    icon: "./res/img/sedac-manager-logo.png"
+    icon: "./res/img/sedac-manager-logo.png",
+    fullscreen: false,
+    frame: false
 }
 
 class Window{
@@ -83,7 +86,6 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
 
         this.path_load = path
     }

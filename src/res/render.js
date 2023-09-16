@@ -1,7 +1,9 @@
 function main() {
     const canvas = document.querySelector("#glcanvas");
+
     canvas.width = window.screen.width
     canvas.height = window.screen.height
+
     //resize canvas
 
     // Initialize the GL context

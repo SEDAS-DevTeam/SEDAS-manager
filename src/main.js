@@ -19,7 +19,7 @@ var main_menu_dict = {
         contextIsolation: false
     },
     resizable: false,
-    icon: "./res/img/sedac-manager-logo.png"
+    icon: "./res/img/sedac-manager-logo.png",
 };
 var settings_dict = {
     width: 1920,
@@ -30,7 +30,7 @@ var settings_dict = {
         contextIsolation: false
     },
     resizable: true,
-    icon: "./res/img/sedac-manager-logo.png"
+    icon: "./res/img/sedac-manager-logo.png",
 };
 var controller_dict = {
     width: 1920,
@@ -41,7 +41,8 @@ var controller_dict = {
         contextIsolation: false
     },
     resizable: true,
-    icon: "./res/img/sedac-manager-logo.png"
+    icon: "./res/img/sedac-manager-logo.png",
+    frame: true
 };
 var worker_dict = {
     width: 1920,
@@ -52,7 +53,9 @@ var worker_dict = {
         contextIsolation: false
     },
     resizable: false,
-    icon: "./res/img/sedac-manager-logo.png"
+    icon: "./res/img/sedac-manager-logo.png",
+    fullscreen: false,
+    frame: false
 };
 var Window = /** @class */ (function () {
     function Window(config, path, _a) {

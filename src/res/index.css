@@ -1,5 +1,15 @@
 /*GENERIC*/
 
+html{
+    height: 100%;
+}
+
+body{
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
 h1, h2, p, a{
     color: #5271ff;
     user-select: none;
@@ -21,10 +31,6 @@ button{
 img{
     pointer-events: none;
     user-select: none;
-}
-
-body{
-    margin: 0;
 }
 
 

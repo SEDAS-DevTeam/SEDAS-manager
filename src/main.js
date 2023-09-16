@@ -59,10 +59,9 @@ var Window = /** @class */ (function () {
         var x = _a[0], y = _a[1];
         config.x = x;
         config.y = y;
-        console.log(config.x, config.y);
         this.window = new electron_1.BrowserWindow(config);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools();
+        //this.window.webContents.openDevTools()
         this.path_load = path;
     }
     Window.prototype.close = function () {
@@ -86,10 +85,9 @@ electron_1.app.on("ready", function () {
     displays_mod.sort(function (a, b) { return a.x - b.x; });
     displays = displays_mod;
     //calculate x, y
-    //leftmost tactic
+    //leftmost tactic //TODO: finish by loading JSON
     var x = displays[displays.length - 1].x;
     var y = displays[displays.length - 1].y;
-    console.log(x, y);
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y]);
     mainMenu.show();
 });
@@ -118,7 +116,7 @@ electron_1.ipcMain.on("redirect", function (event, data) {
     }
 });
 electron_1.ipcMain.on("redirect-settings", function (event, data) {
-    settings.close(); //TODO: this doesnt seem to work for some reason
+    settings.close();
     //calculate x, y
     //leftmost tactic
     var x = displays[displays.length - 1].x;

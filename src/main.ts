@@ -81,8 +81,6 @@ class Window{
         config.x = x
         config.y = y
 
-        console.log(config.x, config.y)
-
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
         //this.window.webContents.openDevTools()
@@ -102,11 +100,9 @@ app.on("ready", () => {
     displays = displays_mod
 
     //calculate x, y
-    //leftmost tactic
+    //leftmost tactic //TODO: finish by loading JSON
     let x: number = displays[displays.length - 1].x
     let y: number = displays[displays.length - 1].y
-
-    console.log(x, y)
 
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
     mainMenu.show()
@@ -144,7 +140,7 @@ ipcMain.on("redirect", (event, data) => {
 })
 
 ipcMain.on("redirect-settings", (event, data) => {
-    settings.close() //TODO: this doesnt seem to work for some reason
+    settings.close()
 
     //calculate x, y
     //leftmost tactic

@@ -61,7 +61,7 @@ var Window = /** @class */ (function () {
         config.y = y;
         this.window = new electron_1.BrowserWindow(config);
         this.window.setMenu(null);
-        //this.window.webContents.openDevTools()
+        this.window.webContents.openDevTools();
         this.path_load = path;
     }
     Window.prototype.close = function () {

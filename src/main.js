@@ -7,6 +7,8 @@ var mainMenu;
 var settings;
 var controllerWindow;
 var workerWindow;
+//other declarations
+var sender_win_name = "";
 var main_menu_dict = {
     width: 800,
     height: 600,
@@ -53,15 +55,20 @@ var worker_dict = {
 };
 var Window = /** @class */ (function () {
     function Window(config, path) {
-        Window.window = new electron_1.BrowserWindow(config);
-        Window.window.setMenu(null);
-        Window.path_load = path;
+        this.window = new electron_1.BrowserWindow(config);
+        this.window.setMenu(null);
+        this.window.webContents.openDevTools();
+        this.path_load = path;
+        //this.show()
     }
     Window.prototype.close = function () {
-        Window.window.close();
+        this.window.close();
     };
     Window.prototype.show = function () {
-        Window.window.loadFile(Window.path_load);
+        this.window.loadFile(this.path_load);
+    };
+    Window.prototype.send_message = function (channel, message) {
+        this.window.webContents.postMessage(channel, message);
     };
     return Window;
 }());
@@ -87,6 +94,27 @@ electron_1.ipcMain.on("redirect-settings", function (event, data) {
     settings.close(); //TODO: this doesnt seem to work for some reason
     if (data == "menu") {
         mainMenu = new Window(main_menu_dict, "./res/index.html");
-        mainMenu.show();
+    }
+});
+electron_1.ipcMain.on("message-redirect", function (event, data) {
+    console.log(data);
+    if (data[0] == "worker") {
+        workerWindow.send_message("recv", data[1]);
+        sender_win_name = "controller";
+    }
+    if (data[0] == "controller") {
+        console.log("from worker");
+        controllerWindow.send_message("recv", data[1]);
+        sender_win_name = "worker";
+    }
+    else if (data[0] == "validate") { //validation arrived from receiver
+        console.log("msg received!");
+        console.log(data[1]);
+        if (sender_win_name == "worker") {
+            workerWindow.send_message("valid", "success");
+        }
+        if (sender_win_name == "controller") {
+            controllerWindow.send_message("valid", "success");
+        }
     }
 });

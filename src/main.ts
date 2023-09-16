@@ -8,6 +8,9 @@ var settings: Window;
 var controllerWindow: Window;
 var workerWindow: Window;
 
+//other declarations
+var sender_win_name: string = "";
+
 const main_menu_dict = {
     width: 800,
     height: 600,
@@ -57,23 +60,29 @@ const worker_dict = {
 }
 
 class Window{
-    static window: BrowserWindow;
-    static path_load: string
+    private window: BrowserWindow;
+    private path_load: string
 
 
     public close(){
-        Window.window.close()
+        this.window.close()
     }
 
     public show(){
-        Window.window.loadFile(Window.path_load);
+        this.window.loadFile(this.path_load);
+    }
+
+    public send_message(channel: string, message: string){
+        this.window.webContents.postMessage(channel, message)
     }
 
     public constructor(config: any, path: string){
-        Window.window = new BrowserWindow(config);
-        Window.window.setMenu(null);
+        this.window = new BrowserWindow(config);
+        this.window.setMenu(null);
+        this.window.webContents.openDevTools()
 
-        Window.path_load = path
+        this.path_load = path
+        //this.show()
     }
 }
 
@@ -89,7 +98,6 @@ ipcMain.on("redirect", (event, data) => {
     if (data == "settings"){
         settings = new Window(settings_dict, "./res/settings.html")
         settings.show()
-
     }
     else if (data == "main-program"){
 
@@ -105,15 +113,28 @@ ipcMain.on("redirect-settings", (event, data) => {
     settings.close() //TODO: this doesnt seem to work for some reason
     if (data == "menu"){
         mainMenu = new Window(main_menu_dict, "./res/index.html")
-        mainMenu.show()
     }
 })
 
 ipcMain.on("message-redirect", (event, data) => {
-    if(data[0] == "worker"){
+    console.log(data)
 
+    if(data[0] == "worker"){
+        workerWindow.send_message("recv", data[1])
+        sender_win_name = "controller"
     }
-    else if (data[0] == "controller"){
-        
+    if (data[0] == "controller"){
+        console.log("from worker")
+        controllerWindow.send_message("recv", data[1])
+        sender_win_name = "worker"
+    }
+    else if (data[0] == "validate"){ //validation arrived from receiver
+        console.log("msg received!")
+        if (sender_win_name == "worker"){
+            workerWindow.send_message("valid", "success")
+        }
+        if (sender_win_name == "controller"){
+            controllerWindow.send_message("valid", "success")
+        }
     }
 })

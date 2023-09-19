@@ -1,3 +1,5 @@
 {
-    
+    "controller-loc": "rightmost",
+    "worker-spawn": 1,
+    "alignment": "set"
 }

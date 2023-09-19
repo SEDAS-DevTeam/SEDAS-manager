@@ -1,4 +1,5 @@
-import {app, BrowserWindow, ipcMain, screen} from "electron"
+import {app, BrowserWindow, ipcMain, screen} from "electron";
+import * as fs from "fs";
 
 //TODO: work with screens
 
@@ -11,6 +12,11 @@ var workerWindow: Window;
 //other declarations
 var sender_win_name: string = "";
 var displays = [];
+var workers = [];
+
+//read JSON
+const JSON_raw = fs.readFileSync("./res/data/settings.json", "utf-8")
+const app_settings = JSON.parse(JSON_raw);
 
 const main_menu_dict = {
     width: 800,
@@ -60,7 +66,52 @@ const worker_dict = {
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
     fullscreen: false,
-    frame: false
+    frame: false,
+    focusable: false
+}
+
+function get_window_coords(idx: number){
+    let x: number
+    let y: number
+
+    if (app_settings["alignment"] == "free"){
+        x = undefined
+        y = undefined
+        return [x, y]
+    }
+
+    if (idx == -1){
+        if (app_settings["controller-loc"] == "leftmost"){
+            x = displays[0].x
+            y = displays[0].y
+        }
+        else if (app_settings["controller-loc"] == "rightmost"){
+            x = displays[displays.length - 1].x
+            y = displays[displays.length - 1].y
+        }
+    }
+    else{ //idx != -1: other worker windows
+        if (app_settings["controller-loc"] == "leftmost"){
+            if (displays.length == idx + 1){
+                return [-2, -2]
+            }
+
+            x = displays[idx + 1].x
+            y = displays[idx + 1].y
+        }
+        else if (app_settings["controller-loc"] == "rightmost"){
+            if (displays.length == idx){
+                return [-2, -2] //signalizes "break"
+            }
+            if(idx == 0){
+                return [-3, -3] //signalizes "skip"
+            }
+
+            x = displays[idx - 1].x
+            y = displays[idx - 1].y
+        }
+    }
+    return [x, y]
 }
 
 class Window{
@@ -88,6 +139,7 @@ class Window{
         this.window.setMenu(null);
 
         this.path_load = path
+        this.window.maximize()
     }
 }
 
@@ -102,9 +154,7 @@ app.on("ready", () => {
     displays = displays_mod
 
     //calculate x, y
-    //leftmost tactic //TODO: finish by loading JSON
-    let x: number = displays[displays.length - 1].x
-    let y: number = displays[displays.length - 1].y
+    let [x, y] = get_window_coords(-1)
 
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
     mainMenu.show()
@@ -116,9 +166,7 @@ ipcMain.on("redirect", (event, data) => {
     mainMenu.close()
     if (data == "settings"){
         //calculate x, y
-        //leftmost tactic
-        let x: number = displays[displays.length - 1].x
-        let y: number = displays[displays.length - 1].y
+        let [x, y] = get_window_coords(-1)
 
         settings = new Window(settings_dict, "./res/settings.html", [x, y])
         settings.show()
@@ -127,17 +175,29 @@ ipcMain.on("redirect", (event, data) => {
 
         //calculate x, y
         //leftmost tactic
-        let x1: number = displays[displays.length - 2].x
-        let y1: number = displays[displays.length - 2].y
+        console.log(displays)
+        for(let i = 0; i < displays.length; i++){
+            let [x, y] = get_window_coords(i)
+            //stop sequence (display limit reached)
+            if (x == -2 && y == -2){
+                break
+            }
+            if (x == -3 && x == -3){
+                continue
+            }
 
-        let x2: number = displays[displays.length - 3].x
-        let y2: number = displays[displays.length - 3].y
+            workerWindow = new Window(worker_dict, "./res/worker.html", [x, y])
+            workers.push(workerWindow)
+        }
 
-        controllerWindow = new Window(controller_dict, "./res/controller.html", [x1, y1])
-        workerWindow = new Window(worker_dict, "./res/worker.html", [x2, y2])
+        let [x, y] = get_window_coords(-1)
 
+        controllerWindow = new Window(controller_dict, "./res/controller.html", [x, y])
+        
+        for (let i = 0; i < workers.length; i++){
+            workers[i].show()
+        }
         controllerWindow.show()
-        workerWindow.show()
     }
 })
 
@@ -145,9 +205,7 @@ ipcMain.on("redirect-settings", (event, data) => {
     settings.close()
 
     //calculate x, y
-    //leftmost tactic
-    let x: number = displays[displays.length - 1].x
-    let y: number = displays[displays.length - 1].y
+    let [x, y] = get_window_coords(-1)
 
     if (data == "menu"){
         mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])

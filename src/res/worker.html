@@ -7,11 +7,16 @@
     </head>
     <body>
         <div class="topnav">
-            <a href="#home">Control 1</a>
-            <a href="#news">Control 2</a>
-            <a href="#contact">Control 3</a>
-            <a href="#about">Control 4</a>
-            <a onclick='send_message("controller", "sex?")'>Click me!</a>
+            <div class="leftalign">
+                <a href="#home">Control 1</a>
+                <a href="#news">Control 2</a>
+                <a href="#contact">Control 3</a>
+                <a href="#about">Control 4</a>
+                <a onclick='send_message("controller", "sex?")'>Click me!</a>
+            </div>
+            <div class="rightalign">
+                <a onclick='send_message("controller", "exit")'>exit</a>
+            </div>
         </div>
         <canvas id="glcanvas" width="640" height="480"></canvas>
     </body>

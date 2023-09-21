@@ -71,6 +71,11 @@ function get_window_coords(idx) {
         y = undefined;
         return [x, y];
     }
+    if (displays.length == 1) {
+        x = displays[0].x;
+        y = displays[0].y;
+        return [x, y];
+    }
     if (idx == -1) {
         if (app_settings["controller-loc"] == "leftmost") {
             x = displays[0].x;

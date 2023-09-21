@@ -65,7 +65,6 @@ const worker_dict = {
     },
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
-    fullscreen: false,
     frame: false,
     focusable: false
 }
@@ -77,6 +76,12 @@ function get_window_coords(idx: number){
     if (app_settings["alignment"] == "free"){
         x = undefined
         y = undefined
+        return [x, y]
+    }
+
+    if (displays.length == 1){
+        x = displays[0].x
+        y = displays[0].y
         return [x, y]
     }
 

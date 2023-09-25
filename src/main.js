@@ -59,7 +59,6 @@ var worker_dict = {
     },
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
-    fullscreen: false,
     frame: false,
     focusable: false
 };
@@ -186,22 +185,33 @@ electron_1.ipcMain.on("redirect-settings", function (event, data) {
 });
 electron_1.ipcMain.on("message-redirect", function (event, data) {
     console.log(data);
-    if (data[0] == "worker") {
-        workerWindow.send_message("recv", data[1]);
-        sender_win_name = "controller";
-    }
-    if (data[0] == "controller") {
-        console.log("from worker");
-        controllerWindow.send_message("recv", data[1]);
-        sender_win_name = "worker";
-    }
-    else if (data[0] == "validate") { //validation arrived from receiver
-        console.log("msg received!");
-        if (sender_win_name == "worker") {
-            workerWindow.send_message("valid", "success");
-        }
-        if (sender_win_name == "controller") {
-            controllerWindow.send_message("valid", "success");
-        }
+    switch (data[0]) {
+        case "worker":
+            workerWindow.send_message("recv", data[1]);
+            sender_win_name = "controller";
+            break;
+        case "controller":
+            console.log("from worker");
+            controllerWindow.send_message("recv", data[1]);
+            sender_win_name = "worker";
+            break;
+        case "main":
+            console.log("program message");
+            if (data[1] == "exit") {
+                //exiting workers
+                for (var i = 0; i < workers.length; i++) {
+                    workers[i].close();
+                }
+            }
+            break;
+        case "validate":
+            console.log("msg received!");
+            if (sender_win_name == "worker") {
+                workerWindow.send_message("valid", "success");
+            }
+            if (sender_win_name == "controller") {
+                controllerWindow.send_message("valid", "success");
+            }
+            break;
     }
 });

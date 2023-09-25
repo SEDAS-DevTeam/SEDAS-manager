@@ -17,7 +17,7 @@ function to_menu(){
 
 //WORKER x CONTROLLER COMMUNICATION
 function send_message(send_to, message){
-    glob_send_to = send_to
+    //glob_send_to = send_to
 
     ipcRender.send("message-redirect", [send_to, message])
     console.log("sent message")

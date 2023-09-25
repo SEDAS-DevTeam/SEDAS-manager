@@ -12,7 +12,21 @@ function start(){
 
 //settings window code
 function to_menu(){
-    ipcRender.send("redirect-settings", "menu")
+    ipcRender.send("redirect-settings", ["menu"])
+}
+
+//save settings
+function save_settings(){
+    //parse form data
+    let loc_data = document.getElementById("location").value
+    let limit_data = document.getElementById("limit").value
+    let align_data = document.getElementById("alignment").value
+
+    ipcRender.send("redirect-settings", ["save-settings", {
+        "controller-loc": loc_data,
+        "worker-spawn": limit_data,
+        "alignment": align_data
+    }])
 }
 
 //WORKER x CONTROLLER COMMUNICATION

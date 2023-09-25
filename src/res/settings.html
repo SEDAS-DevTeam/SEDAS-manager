@@ -13,7 +13,22 @@
         <h1>SEDAC manager settings</h1>
 
         <div style="margin-left: 20px;">
-            <h2>Idk...</h2>
+            <form action="/action_page.php">
+                <label for="location">Controller window location</label>
+                <select id="location" name="location">
+                  <option value="volvo">leftmost</option>
+                  <option value="saab">rigthmost</option>
+                </select>
+                <br>
+                <label for="limit">Worker spawn limit</label>
+                <input type="text" name="limit" id="limit"> 
+                <br>
+                <label for="alignment">window alignment</label>
+                <select id="alignment" name="alignment">
+                  <option value="volvo">set</option>
+                  <option value="saab">free</option>
+                </select>
+            </form>
         </div>
     </body>
 </html>

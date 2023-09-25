@@ -207,14 +207,18 @@ ipcMain.on("redirect", (event, data) => {
 })
 
 ipcMain.on("redirect-settings", (event, data) => {
-    settings.close()
-
     //calculate x, y
     let [x, y] = get_window_coords(-1)
 
-    if (data == "menu"){
-        mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
-        mainMenu.show()
+    switch(data[0]){
+        case "menu":
+            settings.close()
+            mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
+            mainMenu.show()
+            break
+        case "save-settings":
+            fs.writeFileSync("./res/data/settings.json", data[1])
+            break
     }
 })
 

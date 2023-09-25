@@ -175,12 +175,17 @@ electron_1.ipcMain.on("redirect", function (event, data) {
     }
 });
 electron_1.ipcMain.on("redirect-settings", function (event, data) {
-    settings.close();
     //calculate x, y
     var _a = get_window_coords(-1), x = _a[0], y = _a[1];
-    if (data == "menu") {
-        mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y]);
-        mainMenu.show();
+    switch (data[0]) {
+        case "menu":
+            settings.close();
+            mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y]);
+            mainMenu.show();
+            break;
+        case "save-settings":
+            fs.writeFileSync("./res/data/settings.json", data[1]);
+            break;
     }
 });
 electron_1.ipcMain.on("message-redirect", function (event, data) {

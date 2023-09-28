@@ -1,5 +1,9 @@
+//system imports
 import {app, BrowserWindow, ipcMain, screen} from "electron";
 import * as fs from "fs";
+
+//own imports
+import * as Acai from "./acai"
 
 //TODO: work with screens
 
@@ -149,6 +153,7 @@ class Window{
 }
 
 app.on("ready", () => {
+
     //get screen info
     var displays_info: any = screen.getAllDisplays()
     var displays_mod = []
@@ -253,6 +258,21 @@ ipcMain.on("message-redirect", (event, data) => {
             if (sender_win_name == "controller"){
                 controllerWindow.send_message("valid", "success")
             }
+            break
+    }
+})
+
+ipcMain.on("invoke", (event, data) => {
+    switch(data){
+        case "gen-terrain":
+            Acai.speech_rec.test()
+            break
+    }
+})
+
+ipcMain.on("invoke-acai", (event, data) => {
+    switch(data){
+        case "comm":
             break
     }
 })

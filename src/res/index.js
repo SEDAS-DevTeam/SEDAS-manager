@@ -22,11 +22,13 @@ function save_settings(){
     let limit_data = document.getElementById("limit").value
     let align_data = document.getElementById("alignment").value
 
-    ipcRender.send("redirect-settings", ["save-settings", {
+    let data = {
         "controller-loc": loc_data,
         "worker-spawn": limit_data,
         "alignment": align_data
-    }])
+    }
+
+    ipcRender.send("redirect-settings", ["save-settings", JSON.stringify(data, null, 2)])
 }
 
 //WORKER x CONTROLLER COMMUNICATION

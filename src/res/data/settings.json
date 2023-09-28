@@ -1,5 +1,5 @@
 {
-    "controller-loc": "rightmost",
-    "worker-spawn": 1,
-    "alignment": "set"
+  "controller-loc": "volvo",
+  "worker-spawn": "2",
+  "alignment": "volvo"
 }

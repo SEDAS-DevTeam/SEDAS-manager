@@ -4,6 +4,7 @@ import * as fs from "fs";
 
 //own imports
 import * as backend from "./controller_backend"
+import * as comm from "./res/communication" //importing communication module 
 
 //TODO: work with screens
 
@@ -140,12 +141,13 @@ class Window{
         this.window.webContents.postMessage(channel, message)
     }
 
-    public constructor(config: any, path: string, [x, y]: [number, number]){
-        config.x = x
-        config.y = y
+    public constructor(config: any, path: string, coords: number[]){
+        config.x = coords[0]
+        config.y = coords[1]
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
+        this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -153,7 +155,6 @@ class Window{
 }
 
 app.on("ready", () => {
-
     //get screen info
     var displays_info: any = screen.getAllDisplays()
     var displays_mod = []
@@ -170,109 +171,85 @@ app.on("ready", () => {
     mainMenu.show()
 })
 
-ipcMain.on("redirect", (event, data) => {
-    //redirect event handler from menu
+ipcMain.on("message", (event, data) => {
+    let coords = [0, 0]
 
-    mainMenu.close()
-    if (data == "settings"){
-        //calculate x, y
-        let [x, y] = get_window_coords(-1)
-
-        settings = new Window(settings_dict, "./res/settings.html", [x, y])
-        settings.show()
-    }
-    else if (data == "main-program"){
-
-        //calculate x, y
-        //leftmost tactic
-        console.log(displays)
-        for(let i = 0; i < displays.length; i++){
-            let [x, y] = get_window_coords(i)
-            //stop sequence (display limit reached)
-            if (x == -2 && y == -2){
-                break
-            }
-            if (x == -3 && x == -3){
-                continue
-            }
-
-            workerWindow = new Window(worker_dict, "./res/worker.html", [x, y])
-            workers.push(workerWindow)
-        }
-
-        let [x, y] = get_window_coords(-1)
-
-        controllerWindow = new Window(controller_dict, "./res/controller.html", [x, y])
-        
-        for (let i = 0; i < workers.length; i++){
-            workers[i].show()
-        }
-        controllerWindow.show()
-    }
-})
-
-ipcMain.on("redirect-settings", (event, data) => {
-    //calculate x, y
-    let [x, y] = get_window_coords(-1)
-
-    switch(data[0]){
-        case "menu":
+    switch(data[1][0]){
+        case "redirect-to-menu":
+            //message call to redirect to main menu
             settings.close()
-            mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
+
+            //calculate x, y
+            coords = get_window_coords(-1)
+
+            mainMenu = new Window(main_menu_dict, "./res/index.html", coords)
             mainMenu.show()
             break
         case "save-settings":
-            fs.writeFileSync("./res/data/settings.json", data[1])
+            fs.writeFileSync("./res/data/settings.json", data[1][1])
             break
-    }
-})
+        case "redirect-to-settings":
+            //message call to redirect to settings
 
+            mainMenu.close()
 
-//TODO: rework message-redirect method
-ipcMain.on("message-redirect", (event, data) => {
-    console.log(data)
-    switch(data[0]){
-        case "worker":
-            workerWindow.send_message("recv", data[1])
-            sender_win_name = "controller"
+            //calculate x, y
+            coords = get_window_coords(-1)
+
+            settings = new Window(settings_dict, "./res/settings.html", coords)
+            settings.show()
             break
-        case "controller":
-            console.log("from worker")
-            controllerWindow.send_message("recv", data[1])
-            sender_win_name = "worker"
-            break
-        case "main":
-            console.log("program message")
-            if (data[1] == "exit"){
-                //exiting workers
-                for(let i = 0; i < workers.length; i++){
-                    workers[i].close()
+        case "redirect-to-main":
+            //message call to redirect to main program (start)
+
+            mainMenu.close()
+
+            //calculate x, y
+            //leftmost tactic
+            console.log(displays)
+            for(let i = 0; i < displays.length; i++){
+                coords = get_window_coords(i)
+                //stop sequence (display limit reached)
+                if (coords[0] == -2){
+                    break
                 }
+                if (coords[0] == -3){
+                    continue
+                }
+
+                workerWindow = new Window(worker_dict, "./res/worker.html", coords)
+                workers.push(workerWindow)
+            }
+
+            coords = get_window_coords(-1)
+
+            controllerWindow = new Window(controller_dict, "./res/controller.html", coords)
+            
+            for (let i = 0; i < workers.length; i++){
+                workers[i].show()
+            }
+            controllerWindow.show()
+            break
+        case "exit":
+            controllerWindow.close()
+            for(let i = 0; i < workers.length; i++){
+                workers[i].close()
             }
             break
-        case "validate":
-            console.log("msg received!")
-            if (sender_win_name == "worker"){
-                workerWindow.send_message("valid", "success")
-            }
-            if (sender_win_name == "controller"){
-                controllerWindow.send_message("valid", "success")
-            }
+        case "invoke":
             break
+        
     }
 })
 
-ipcMain.on("invoke", (event, data) => {
-    switch(data){
-        case "gen-terrain":
-            backend.speech_rec.test()
-            break
+ipcMain.on("message-redirect", (event, data) => {
+    if (data[0] == "controller"){
+        console.log("from worker")
+        controllerWindow.send_message("message-redirect", data[1][0])
+        sender_win_name = "worker"
     }
-})
-
-ipcMain.on("invoke-acai", (event, data) => {
-    switch(data){
-        case "comm":
-            break
+    else if (data[0] == "worker"){
+        workers[0].send_message("message-redirect", data[1][0])
+        sender_win_name = "worker"
     }
 })

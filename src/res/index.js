@@ -1,22 +1,13 @@
 //generic code for every window
 const ipcRender = require("electron").ipcRenderer
+comm = require("./communication")
 
-//main menu code
-function to_settings(){
-    ipcRender.send("redirect", "settings")
-}
-
-function start(){
-    ipcRender.send("redirect", "main-program")
-}
-
-//settings window code
-function to_menu(){
-    ipcRender.send("redirect-settings", ["menu"])
+function comm_callback(data){
+    console.log("data arrived")
 }
 
 //save settings
-function save_settings(){
+function save_settings(send_as){
     //parse form data
     let loc_data = document.getElementById("location").value
     let limit_data = document.getElementById("limit").value
@@ -28,29 +19,15 @@ function save_settings(){
         "alignment": align_data
     }
 
-    ipcRender.send("redirect-settings", ["save-settings", JSON.stringify(data, null, 2)])
-}
-
-//WORKER x CONTROLLER COMMUNICATION
-function send_message(send_to, message){
-    //glob_send_to = send_to
-
-    ipcRender.send("message-redirect", [send_to, message])
-    console.log("sent message")
+    comm.send_message(send_as, ['save-settings', JSON.stringify(data, null, 2)])
 }
 
 window.addEventListener("load", () => {
     //when receiving incoming messages from other processes
-    ipcRender.on("recv", (event, data) => {
+    ipcRender.on("message-redirect", (event, data) => {
         console.log("received message!")
         console.log(data)
 
         ipcRender.send("message-redirect", ["validate"])
-    })
-    //when receiving validation responses from other processes
-    ipcRender.on("valid", (event, data) => {
-        if("success"){
-            console.log("success!")
-        }
     })
 })

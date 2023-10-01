@@ -7,8 +7,8 @@
     </head>
     <body style="margin-left: 20px; margin-top: 20px;">
         <div>
-            <button onclick="to_menu()" style="margin-top: 20px;"><i class="fa-solid fa-arrow-left"></i> Back to menu</button>
-            <button onclick="save_settings()" style="margin-top: 20px;">Save</button>
+            <button onclick="comm.send_message('settings', ['redirect-to-menu'])" style="margin-top: 20px;"><i class="fa-solid fa-arrow-left"></i> Back to menu</button>
+            <button onclick="save_settings('settings')" style="margin-top: 20px;">Save</button>
         </div>
         <h1>SEDAC manager settings</h1>
 

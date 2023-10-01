@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+//system imports
 var electron_1 = require("electron");
 var fs = require("fs");
 //TODO: work with screens
@@ -107,12 +108,12 @@ function get_window_coords(idx) {
     return [x, y];
 }
 var Window = /** @class */ (function () {
-    function Window(config, path, _a) {
-        var x = _a[0], y = _a[1];
-        config.x = x;
-        config.y = y;
+    function Window(config, path, coords) {
+        config.x = coords[0];
+        config.y = coords[1];
         this.window = new electron_1.BrowserWindow(config);
         this.window.setMenu(null);
+        this.window.webContents.openDevTools();
         this.path_load = path;
         this.window.maximize();
     }
@@ -141,82 +142,71 @@ electron_1.app.on("ready", function () {
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y]);
     mainMenu.show();
 });
-electron_1.ipcMain.on("redirect", function (event, data) {
-    //redirect event handler from menu
-    mainMenu.close();
-    if (data == "settings") {
-        //calculate x, y
-        var _a = get_window_coords(-1), x = _a[0], y = _a[1];
-        settings = new Window(settings_dict, "./res/settings.html", [x, y]);
-        settings.show();
-    }
-    else if (data == "main-program") {
-        //calculate x, y
-        //leftmost tactic
-        console.log(displays);
-        for (var i = 0; i < displays.length; i++) {
-            var _b = get_window_coords(i), x_1 = _b[0], y_1 = _b[1];
-            //stop sequence (display limit reached)
-            if (x_1 == -2 && y_1 == -2) {
-                break;
-            }
-            if (x_1 == -3 && x_1 == -3) {
-                continue;
-            }
-            workerWindow = new Window(worker_dict, "./res/worker.html", [x_1, y_1]);
-            workers.push(workerWindow);
-        }
-        var _c = get_window_coords(-1), x = _c[0], y = _c[1];
-        controllerWindow = new Window(controller_dict, "./res/controller.html", [x, y]);
-        for (var i = 0; i < workers.length; i++) {
-            workers[i].show();
-        }
-        controllerWindow.show();
-    }
-});
-electron_1.ipcMain.on("redirect-settings", function (event, data) {
-    //calculate x, y
-    var _a = get_window_coords(-1), x = _a[0], y = _a[1];
-    switch (data[0]) {
-        case "menu":
+electron_1.ipcMain.on("message", function (event, data) {
+    var coords = [0, 0];
+    switch (data[1][0]) {
+        case "redirect-to-menu":
+            //message call to redirect to main menu
             settings.close();
-            mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y]);
+            //calculate x, y
+            coords = get_window_coords(-1);
+            mainMenu = new Window(main_menu_dict, "./res/index.html", coords);
             mainMenu.show();
             break;
         case "save-settings":
-            fs.writeFileSync("./res/data/settings.json", data[1]);
+            fs.writeFileSync("./res/data/settings.json", data[1][1]);
+            break;
+        case "redirect-to-settings":
+            //message call to redirect to settings
+            mainMenu.close();
+            //calculate x, y
+            coords = get_window_coords(-1);
+            settings = new Window(settings_dict, "./res/settings.html", coords);
+            settings.show();
+            break;
+        case "redirect-to-main":
+            //message call to redirect to main program (start)
+            mainMenu.close();
+            //calculate x, y
+            //leftmost tactic
+            console.log(displays);
+            for (var i = 0; i < displays.length; i++) {
+                coords = get_window_coords(i);
+                //stop sequence (display limit reached)
+                if (coords[0] == -2) {
+                    break;
+                }
+                if (coords[0] == -3) {
+                    continue;
+                }
+                workerWindow = new Window(worker_dict, "./res/worker.html", coords);
+                workers.push(workerWindow);
+            }
+            coords = get_window_coords(-1);
+            controllerWindow = new Window(controller_dict, "./res/controller.html", coords);
+            for (var i = 0; i < workers.length; i++) {
+                workers[i].show();
+            }
+            controllerWindow.show();
+            break;
+        case "exit":
+            controllerWindow.close();
+            for (var i = 0; i < workers.length; i++) {
+                workers[i].close();
+            }
+            break;
+        case "invoke":
             break;
     }
 });
 electron_1.ipcMain.on("message-redirect", function (event, data) {
-    console.log(data);
-    switch (data[0]) {
-        case "worker":
-            workerWindow.send_message("recv", data[1]);
-            sender_win_name = "controller";
-            break;
-        case "controller":
-            console.log("from worker");
-            controllerWindow.send_message("recv", data[1]);
-            sender_win_name = "worker";
-            break;
-        case "main":
-            console.log("program message");
-            if (data[1] == "exit") {
-                //exiting workers
-                for (var i = 0; i < workers.length; i++) {
-                    workers[i].close();
-                }
-            }
-            break;
-        case "validate":
-            console.log("msg received!");
-            if (sender_win_name == "worker") {
-                workerWindow.send_message("valid", "success");
-            }
-            if (sender_win_name == "controller") {
-                controllerWindow.send_message("valid", "success");
-            }
-            break;
+    if (data[0] == "controller") {
+        console.log("from worker");
+        controllerWindow.send_message("message-redirect", data[1][0]);
+        sender_win_name = "worker";
+    }
+    else if (data[0] == "worker") {
+        workers[0].send_message("message-redirect", data[1][0]);
+        sender_win_name = "worker";
     }
 });

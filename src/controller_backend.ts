@@ -10,7 +10,7 @@ class SpeechRecognition {
     }
 }
 
-class EventGeneration {
+class Acai {
     private name: string;
 
     public constructor(name: string){
@@ -28,7 +28,7 @@ class TerrainGeneration {
 
 /*OBJECTS*/
 const speech_rec = new SpeechRecognition("balls")
-const event_gen = new EventGeneration("balls")
+const event_gen = new Acai("balls")
 const terrain_gen = new TerrainGeneration("balls")
 
 export {speech_rec, event_gen, terrain_gen}

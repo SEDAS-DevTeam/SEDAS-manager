@@ -3,7 +3,7 @@ import {app, BrowserWindow, ipcMain, screen} from "electron";
 import * as fs from "fs";
 
 //own imports
-import * as Acai from "./acai"
+import * as backend from "./controller_backend"
 
 //TODO: work with screens
 
@@ -227,10 +227,10 @@ ipcMain.on("redirect-settings", (event, data) => {
     }
 })
 
+
+//TODO: rework message-redirect method
 ipcMain.on("message-redirect", (event, data) => {
     console.log(data)
-
-
     switch(data[0]){
         case "worker":
             workerWindow.send_message("recv", data[1])
@@ -265,7 +265,7 @@ ipcMain.on("message-redirect", (event, data) => {
 ipcMain.on("invoke", (event, data) => {
     switch(data){
         case "gen-terrain":
-            Acai.speech_rec.test()
+            backend.speech_rec.test()
             break
     }
 })

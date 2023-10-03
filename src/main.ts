@@ -1,9 +1,9 @@
 //system imports
 import {app, BrowserWindow, ipcMain, screen} from "electron";
 import * as fs from "fs";
+import {Worker} from "worker_threads"
 
 //own imports
-import * as backend from "./controller_backend"
 import * as comm from "./res/communication" //importing communication module 
 
 //TODO: work with screens
@@ -154,7 +154,21 @@ class Window{
     }
 }
 
+function Checker(){
+    console.log("check sent")
+    worker.postMessage("are you alive?")
+
+    worker.on("message", (message) => {
+        console.log("message from worker")
+        console.log(message)
+    })
+}
+//test
+const worker = new Worker("./controller_backend.js")
+setInterval(Checker, 2000)
+
 app.on("ready", () => {
+
     //get screen info
     var displays_info: any = screen.getAllDisplays()
     var displays_mod = []

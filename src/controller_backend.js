@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.terrain_gen = exports.event_gen = exports.speech_rec = void 0;
+var worker_threads_1 = require("worker_threads");
 var SpeechRecognition = /** @class */ (function () {
     function SpeechRecognition(name) {
         this.name = name;
@@ -24,8 +24,10 @@ var TerrainGeneration = /** @class */ (function () {
 }());
 /*OBJECTS*/
 var speech_rec = new SpeechRecognition("balls");
-exports.speech_rec = speech_rec;
 var event_gen = new Acai("balls");
-exports.event_gen = event_gen;
 var terrain_gen = new TerrainGeneration("balls");
-exports.terrain_gen = terrain_gen;
+console.log("Check did not arrive");
+worker_threads_1.parentPort.on("message", function (message) {
+    console.log(message);
+    worker_threads_1.parentPort.postMessage("I am alive");
+});

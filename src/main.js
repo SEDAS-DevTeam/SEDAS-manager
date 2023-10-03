@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 //system imports
 var electron_1 = require("electron");
 var fs = require("fs");
+var worker_threads_1 = require("worker_threads");
 //TODO: work with screens
 //window variable declarations
 var mainMenu;
@@ -128,6 +129,17 @@ var Window = /** @class */ (function () {
     };
     return Window;
 }());
+function Checker() {
+    console.log("check sent");
+    worker.postMessage("are you alive?");
+    worker.on("message", function (message) {
+        console.log("message from worker");
+        console.log(message);
+    });
+}
+//test
+var worker = new worker_threads_1.Worker("./controller_backend.js");
+setInterval(Checker, 2000);
 electron_1.app.on("ready", function () {
     //get screen info
     var displays_info = electron_1.screen.getAllDisplays();

@@ -1,3 +1,5 @@
+import {parentPort} from "worker_threads"
+
 class SpeechRecognition {
     private name: string;
 
@@ -31,4 +33,7 @@ const speech_rec = new SpeechRecognition("balls")
 const event_gen = new Acai("balls")
 const terrain_gen = new TerrainGeneration("balls")
 
-export {speech_rec, event_gen, terrain_gen}
+parentPort.on("message", (message) => {
+    console.log(message)
+    parentPort.postMessage("I am alive")
+})

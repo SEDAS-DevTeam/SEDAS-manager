@@ -4,6 +4,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var electron_1 = require("electron");
 var fs = require("fs");
 var worker_threads_1 = require("worker_threads");
+//own imports
+//import * as comm from "./res/communication" //importing communication module 
 //TODO: work with screens
 //window variable declarations
 var mainMenu;
@@ -129,18 +131,8 @@ var Window = /** @class */ (function () {
     };
     return Window;
 }());
-function Checker() {
-    console.log("check sent");
-    worker.postMessage("are you alive?");
-    worker.on("message", function (message) {
-        console.log("message from worker");
-        console.log(message);
-    });
-}
-//test
-var worker = new worker_threads_1.Worker("./controller_backend.js");
-setInterval(Checker, 2000);
 electron_1.app.on("ready", function () {
+    BackendMessager();
     //get screen info
     var displays_info = electron_1.screen.getAllDisplays();
     var displays_mod = [];
@@ -152,8 +144,26 @@ electron_1.app.on("ready", function () {
     //calculate x, y
     var _a = get_window_coords(-1), x = _a[0], y = _a[1];
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y]);
-    mainMenu.show();
+    //mainMenu.show()
+    //voice recognition setup
+    voice_worker.postMessage("start-recognition");
+    //worker interval loops
+    //setInterval(VoiceMessager, 1000)
 });
+function BackendMessager() {
+    worker.postMessage("event1");
+}
+function VoiceMessager() {
+    voice_worker.postMessage("There is that curiosity beside me");
+}
+//communication workers
+var worker = new worker_threads_1.Worker("./controller_backend.js");
+var voice_worker = new worker_threads_1.Worker("./voice_backend.js");
+//worker listeners
+worker.on("message", function (message) {
+    console.log(message);
+});
+//IPC listeners
 electron_1.ipcMain.on("message", function (event, data) {
     var coords = [0, 0];
     switch (data[1][0]) {

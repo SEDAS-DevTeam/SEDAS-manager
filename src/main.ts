@@ -4,7 +4,7 @@ import * as fs from "fs";
 import {Worker} from "worker_threads"
 
 //own imports
-import * as comm from "./res/communication" //importing communication module 
+//import * as comm from "./res/communication" //importing communication module 
 
 //TODO: work with screens
 
@@ -154,20 +154,8 @@ class Window{
     }
 }
 
-function Checker(){
-    console.log("check sent")
-    worker.postMessage("are you alive?")
-
-    worker.on("message", (message) => {
-        console.log("message from worker")
-        console.log(message)
-    })
-}
-//test
-const worker = new Worker("./controller_backend.js")
-setInterval(Checker, 2000)
-
 app.on("ready", () => {
+    //BackendMessager()
 
     //get screen info
     var displays_info: any = screen.getAllDisplays()
@@ -182,9 +170,33 @@ app.on("ready", () => {
     let [x, y] = get_window_coords(-1)
 
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
-    mainMenu.show()
+    //mainMenu.show()
+
+    //voice recognition setup
+    voice_worker.postMessage("start-recognition")
+
+    //worker interval loops
+    //setInterval(VoiceMessager, 1000)
 })
 
+function BackendMessager(){
+    worker.postMessage("event1")
+}
+
+function VoiceMessager(){
+    voice_worker.postMessage("There is that curiosity beside me")
+}
+
+//communication workers
+const worker = new Worker("./controller_backend.js")
+const voice_worker = new Worker("./voice_backend.js")
+
+//worker listeners
+worker.on("message", (message) => {
+    console.log(message)
+})
+
+//IPC listeners
 ipcMain.on("message", (event, data) => {
     let coords = [0, 0]
 

@@ -26,7 +26,6 @@ var TerrainGeneration = /** @class */ (function () {
 var speech_rec = new SpeechRecognition("balls");
 var event_gen = new Acai("balls");
 var terrain_gen = new TerrainGeneration("balls");
-console.log("Check did not arrive");
 worker_threads_1.parentPort.on("message", function (message) {
     console.log(message);
     worker_threads_1.parentPort.postMessage("I am alive");

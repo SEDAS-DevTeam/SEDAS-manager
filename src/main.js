@@ -132,7 +132,7 @@ var Window = /** @class */ (function () {
     return Window;
 }());
 electron_1.app.on("ready", function () {
-    BackendMessager();
+    //BackendMessager()
     //get screen info
     var displays_info = electron_1.screen.getAllDisplays();
     var displays_mod = [];
@@ -146,7 +146,8 @@ electron_1.app.on("ready", function () {
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y]);
     //mainMenu.show()
     //voice recognition setup
-    voice_worker.postMessage("start-recognition");
+    voice_worker.postMessage("start");
+    //setInterval(VoiceMessager, 1000)
     //worker interval loops
     //setInterval(VoiceMessager, 1000)
 });

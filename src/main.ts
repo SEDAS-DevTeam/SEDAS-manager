@@ -173,7 +173,8 @@ app.on("ready", () => {
     //mainMenu.show()
 
     //voice recognition setup
-    voice_worker.postMessage("start-recognition")
+    voice_worker.postMessage("start")
+    //setInterval(VoiceMessager, 1000)
 
     //worker interval loops
     //setInterval(VoiceMessager, 1000)

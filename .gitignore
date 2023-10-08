@@ -5,3 +5,16 @@
 #clear useless build files
 /src/build/*
 !/src/build/.gitkeep
+
+#typescript files (are automatically generated)
+/src/controller_backend.js
+/src/controller_backend.js.map
+
+/src/voice_backend.js
+/src/voice_backend.js.map
+
+/src/main.js
+/src/main.js.map
+
+#redist files
+/src/dump.rdb

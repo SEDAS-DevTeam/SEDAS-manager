@@ -2,6 +2,7 @@
 import {app, BrowserWindow, ipcMain, screen} from "electron";
 import * as fs from "fs";
 import {Worker} from "worker_threads"
+import {spawn} from "node:child_process"
 
 //own imports
 //import * as comm from "./res/communication" //importing communication module 
@@ -22,6 +23,9 @@ var workers = [];
 //read JSON
 const JSON_raw = fs.readFileSync("./res/data/settings.json", "utf-8")
 const app_settings = JSON.parse(JSON_raw);
+
+//run RedisDB
+const database = spawn("redis-server")
 
 const main_menu_dict = {
     width: 800,
@@ -170,23 +174,8 @@ app.on("ready", () => {
     let [x, y] = get_window_coords(-1)
 
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
-    //mainMenu.show()
-
-    //voice recognition setup
-    voice_worker.postMessage("start")
-    //setInterval(VoiceMessager, 1000)
-
-    //worker interval loops
-    //setInterval(VoiceMessager, 1000)
+    mainMenu.show()
 })
-
-function BackendMessager(){
-    worker.postMessage("event1")
-}
-
-function VoiceMessager(){
-    voice_worker.postMessage("There is that curiosity beside me")
-}
 
 //communication workers
 const worker = new Worker("./controller_backend.js")
@@ -194,6 +183,10 @@ const voice_worker = new Worker("./voice_backend.js")
 
 //worker listeners
 worker.on("message", (message) => {
+    console.log(message)
+})
+
+voice_worker.on("message", (message) => {
     console.log(message)
 })
 
@@ -256,12 +249,26 @@ ipcMain.on("message", (event, data) => {
                 workers[i].show()
             }
             controllerWindow.show()
+
+            //setup voice recognition and ACAI backend
+            voice_worker.postMessage("start")
+
             break
         case "exit":
+            //disable voice recognition and ACAI backend
+            voice_worker.postMessage("stop")
+            //kill voice recognition
+            voice_worker.postMessage("interrupt")
+            
+            //close windows
             controllerWindow.close()
             for(let i = 0; i < workers.length; i++){
                 workers[i].close()
             }
+
+            //stop database
+            database.kill("SIGINT")
+
             break
         case "invoke":
             break

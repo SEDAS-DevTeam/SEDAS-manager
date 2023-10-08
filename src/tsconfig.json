@@ -1,6 +1,6 @@
 { 
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2017",
     "module": "commonjs",
     "moduleResolution": "node",
     "sourceMap": true,
@@ -9,5 +9,10 @@
     "removeComments": false,
     "noImplicitAny": false
   },
-  "exclude": [ "node_modules" ] 
+  "exclude": [ "node_modules" ],
+  "files": [
+    "controller_backend.ts",
+    "voice_backend.ts",
+    "main.ts"
+  ]
 }

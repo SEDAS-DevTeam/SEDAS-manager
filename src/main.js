@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 //system imports
-var electron_1 = require("electron");
-var fs = require("fs");
-var worker_threads_1 = require("worker_threads");
+const electron_1 = require("electron");
+const fs = require("fs");
+const worker_threads_1 = require("worker_threads");
 //own imports
 //import * as comm from "./res/communication" //importing communication module 
 //TODO: work with screens
@@ -17,9 +17,9 @@ var sender_win_name = "";
 var displays = [];
 var workers = [];
 //read JSON
-var JSON_raw = fs.readFileSync("./res/data/settings.json", "utf-8");
-var app_settings = JSON.parse(JSON_raw);
-var main_menu_dict = {
+const JSON_raw = fs.readFileSync("./res/data/settings.json", "utf-8");
+const app_settings = JSON.parse(JSON_raw);
+const main_menu_dict = {
     width: 800,
     height: 600,
     title: "SEDAC manager",
@@ -30,7 +30,7 @@ var main_menu_dict = {
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
 };
-var settings_dict = {
+const settings_dict = {
     width: 1920,
     height: 1080,
     title: "SEDAC manager - settings",
@@ -41,7 +41,7 @@ var settings_dict = {
     resizable: true,
     icon: "./res/img/sedac-manager-logo.png",
 };
-var controller_dict = {
+const controller_dict = {
     width: 1920,
     height: 1080,
     title: "SEDAC manager - control",
@@ -53,7 +53,7 @@ var controller_dict = {
     icon: "./res/img/sedac-manager-logo.png",
     frame: true
 };
-var worker_dict = {
+const worker_dict = {
     width: 1920,
     height: 1080,
     title: "SEDAC",
@@ -67,8 +67,8 @@ var worker_dict = {
     focusable: false
 };
 function get_window_coords(idx) {
-    var x;
-    var y;
+    let x;
+    let y;
     if (app_settings["alignment"] == "free") {
         x = undefined;
         y = undefined;
@@ -110,8 +110,17 @@ function get_window_coords(idx) {
     }
     return [x, y];
 }
-var Window = /** @class */ (function () {
-    function Window(config, path, coords) {
+class Window {
+    close() {
+        this.window.close();
+    }
+    show() {
+        this.window.loadFile(this.path_load);
+    }
+    send_message(channel, message) {
+        this.window.webContents.postMessage(channel, message);
+    }
+    constructor(config, path, coords) {
         config.x = coords[0];
         config.y = coords[1];
         this.window = new electron_1.BrowserWindow(config);
@@ -120,33 +129,23 @@ var Window = /** @class */ (function () {
         this.path_load = path;
         this.window.maximize();
     }
-    Window.prototype.close = function () {
-        this.window.close();
-    };
-    Window.prototype.show = function () {
-        this.window.loadFile(this.path_load);
-    };
-    Window.prototype.send_message = function (channel, message) {
-        this.window.webContents.postMessage(channel, message);
-    };
-    return Window;
-}());
-electron_1.app.on("ready", function () {
+}
+electron_1.app.on("ready", () => {
     //BackendMessager()
     //get screen info
     var displays_info = electron_1.screen.getAllDisplays();
     var displays_mod = [];
-    for (var i = 0; i < displays_info.length; i++) {
+    for (let i = 0; i < displays_info.length; i++) {
         displays_mod.push(displays_info[i].bounds);
     }
-    displays_mod.sort(function (a, b) { return a.x - b.x; });
+    displays_mod.sort((a, b) => a.x - b.x);
     displays = displays_mod;
     //calculate x, y
-    var _a = get_window_coords(-1), x = _a[0], y = _a[1];
+    let [x, y] = get_window_coords(-1);
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y]);
     //mainMenu.show()
     //voice recognition setup
-    voice_worker.postMessage("start");
+    //voice_worker.postMessage("start")
     //setInterval(VoiceMessager, 1000)
     //worker interval loops
     //setInterval(VoiceMessager, 1000)
@@ -158,15 +157,15 @@ function VoiceMessager() {
     voice_worker.postMessage("There is that curiosity beside me");
 }
 //communication workers
-var worker = new worker_threads_1.Worker("./controller_backend.js");
-var voice_worker = new worker_threads_1.Worker("./voice_backend.js");
+const worker = new worker_threads_1.Worker("./controller_backend.js");
+const voice_worker = new worker_threads_1.Worker("./voice_backend.js");
 //worker listeners
-worker.on("message", function (message) {
+worker.on("message", (message) => {
     console.log(message);
 });
 //IPC listeners
-electron_1.ipcMain.on("message", function (event, data) {
-    var coords = [0, 0];
+electron_1.ipcMain.on("message", (event, data) => {
+    let coords = [0, 0];
     switch (data[1][0]) {
         case "redirect-to-menu":
             //message call to redirect to main menu
@@ -193,7 +192,7 @@ electron_1.ipcMain.on("message", function (event, data) {
             //calculate x, y
             //leftmost tactic
             console.log(displays);
-            for (var i = 0; i < displays.length; i++) {
+            for (let i = 0; i < displays.length; i++) {
                 coords = get_window_coords(i);
                 //stop sequence (display limit reached)
                 if (coords[0] == -2) {
@@ -207,14 +206,14 @@ electron_1.ipcMain.on("message", function (event, data) {
             }
             coords = get_window_coords(-1);
             controllerWindow = new Window(controller_dict, "./res/controller.html", coords);
-            for (var i = 0; i < workers.length; i++) {
+            for (let i = 0; i < workers.length; i++) {
                 workers[i].show();
             }
             controllerWindow.show();
             break;
         case "exit":
             controllerWindow.close();
-            for (var i = 0; i < workers.length; i++) {
+            for (let i = 0; i < workers.length; i++) {
                 workers[i].close();
             }
             break;
@@ -222,7 +221,7 @@ electron_1.ipcMain.on("message", function (event, data) {
             break;
     }
 });
-electron_1.ipcMain.on("message-redirect", function (event, data) {
+electron_1.ipcMain.on("message-redirect", (event, data) => {
     if (data[0] == "controller") {
         console.log("from worker");
         controllerWindow.send_message("message-redirect", data[1][0]);
@@ -233,3 +232,4 @@ electron_1.ipcMain.on("message-redirect", function (event, data) {
         sender_win_name = "worker";
     }
 });
+//# sourceMappingURL=main.js.map

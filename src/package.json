@@ -12,13 +12,13 @@
   "homepage": "https://github.com/HelloWorld7894/SEDAC",
   "license": "GPL-3.0",
   "scripts": {
-    "dev": "npx tsc main.ts controller_backend.ts voice_backend.ts && electron .",
+    "dev": "npx tsc --project ./tsconfig.json && electron .",
     "build": "electron-builder build -wl",
     "clear": "rm -rf ./build/* && touch ./build/.gitkeep"
   },
   "build": {
     "appId": "com.sedacmanager.app",
-    "directories":{
+    "directories": {
       "output": "./build/",
       "buildResources": "resources"
     },
@@ -36,9 +36,12 @@
       "target": "nsis",
       "icon": "./res/img/sedac-manager-logo.ico"
     },
-    "linux":{
+    "linux": {
       "target": "deb",
       "icon": "./res/img/sedac-manager-logo.png"
     }
+  },
+  "dependencies": {
+    "redis": "^4.6.10"
   }
 }

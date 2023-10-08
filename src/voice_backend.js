@@ -1,28 +1,33 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var worker_threads_1 = require("worker_threads");
-var node_child_process_1 = require("node:child_process");
+const worker_threads_1 = require("worker_threads");
+const node_child_process_1 = require("node:child_process");
+const redis_1 = require("redis");
+//redis for communication
+const client = (0, redis_1.createClient)();
+client.connect();
+client.set("start-voice", "false"); //set default on start
 var process;
 var start = false;
 var PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/test.py";
-//recognition script init
-process = (0, node_child_process_1.spawn)("python3", ["".concat(PATH_TO_PROCESS)]);
-worker_threads_1.parentPort.on("message", function (message) {
+process = (0, node_child_process_1.spawn)("python3", [`${PATH_TO_PROCESS}`]);
+async function db_check() {
+    let value = await client.get("out-voice");
+    console.log(value);
+}
+worker_threads_1.parentPort.on("message", async (message) => {
     switch (message) {
         case "start":
             //going to start recognition
-            process.stdin.write("start\n");
+            client.set("start-voice", "true");
             console.log("recognition start");
             break;
         case "stop":
             //going to stop recognition
-            process.stdin.write("stop\n");
+            client.set("start-voice", "false");
             break;
     }
 });
-process.stdout.on("data", function (data) {
-    console.log("data " + data.toString());
-});
-process.stderr.on('data', function (data) {
-    console.error("stderr: ".concat(data));
-});
+client.on('error', err => console.log('Redis Client Error', err));
+setInterval(db_check, 1000);
+//# sourceMappingURL=voice_backend.js.map

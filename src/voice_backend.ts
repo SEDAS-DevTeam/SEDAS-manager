@@ -1,32 +1,37 @@
 import {parentPort} from "worker_threads"
 import {spawn} from "node:child_process"
+import { createClient } from 'redis';
+
+//redis for communication
+const client = createClient()
+client.connect()
+
+client.set("start-voice", "false") //set default on start
 
 var process: any
 var start: boolean = false;
 var PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/test.py"
 
-//recognition script init
 process = spawn("python3", [`${PATH_TO_PROCESS}`])
 
-parentPort.on("message", (message) => {
+async function db_check(){
+    let value: string = await client.get("out-voice")
+    console.log(value)
+}
+
+parentPort.on("message", async (message) => {
     switch(message){
         case "start":
             //going to start recognition
-            process.stdin.write("start\n")
-
-            console.log("recognition start")
+            client.set("start-voice", "true")
             break
         case "stop":
             //going to stop recognition
-            process.stdin.write("stop\n")
+            client.set("start-voice", "false")
             break
     }
 })
 
-process.stdout.on("data", (data) => {
-    console.log("data " + data.toString())
-})
+client.on('error', err => console.log('Redis Client Error', err));
 
-process.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-});
+setInterval(db_check, 1000)

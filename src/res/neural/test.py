@@ -1,13 +1,15 @@
 import sys
 import time
-import fileinput
+import redis
 
-sys.stdout.flush()
-sys.stdin.flush()
+#init setup
+r_instance = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 while True:
-    
-
-    sys.stdout.write("Data")
-    sys.stdout.flush()
+    value = r_instance.get("start-voice")
+    if value == "true": #start recognition
+        
+        r_instance.set("out-voice", "test string")
+    elif value == "false": #stop recognition
+        r_instance.set("out-voice", "none")
     time.sleep(1)

@@ -1,32 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var worker_threads_1 = require("worker_threads");
-var SpeechRecognition = /** @class */ (function () {
-    function SpeechRecognition(name) {
+const worker_threads_1 = require("worker_threads");
+class SpeechRecognition {
+    constructor(name) {
         this.name = name;
     }
-    SpeechRecognition.prototype.test = function () {
+    test() {
         console.log(this.name);
-    };
-    return SpeechRecognition;
-}());
-var Acai = /** @class */ (function () {
-    function Acai(name) {
+    }
+}
+class Acai {
+    constructor(name) {
         this.name = name;
     }
-    return Acai;
-}());
-var TerrainGeneration = /** @class */ (function () {
-    function TerrainGeneration(name) {
+}
+class TerrainGeneration {
+    constructor(name) {
         this.name = name;
     }
-    return TerrainGeneration;
-}());
+}
 /*OBJECTS*/
-var speech_rec = new SpeechRecognition("balls");
-var event_gen = new Acai("balls");
-var terrain_gen = new TerrainGeneration("balls");
-worker_threads_1.parentPort.on("message", function (message) {
+const speech_rec = new SpeechRecognition("balls");
+const event_gen = new Acai("balls");
+const terrain_gen = new TerrainGeneration("balls");
+worker_threads_1.parentPort.on("message", (message) => {
     console.log(message);
     worker_threads_1.parentPort.postMessage("I am alive");
 });
+//# sourceMappingURL=controller_backend.js.map

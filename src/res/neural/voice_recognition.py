@@ -13,25 +13,35 @@ for index, name in enumerate(sr.Microphone.list_microphone_names()):
     print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
 
 Recognizer = sr.Recognizer()
-model = whisper.load_model("small.en")
 running = False
 data_queue = Queue()
 
-def transcribe_data(spec_queue):
-    while True:
-        if not spec_queue.empty():
-            numpydata = spec_queue.get()
+#Speech Recognition models
+class Whisper:
+    def __init__(self, type):
+        self.type = type
+        self.model = whisper.load_model(type)
 
-            numpydata = whisper.pad_or_trim(numpydata)
+    def process(self, spec_queue):
+        while True:
+            if not spec_queue.empty():
+                numpydata = spec_queue.get()
 
-            result = model.transcribe(numpydata, language="en", fp16=True, verbose=False)
-            print("decoded text: " + result["text"])
-            r_instance.set("out-voice", result["text"])
+                numpydata = whisper.pad_or_trim(numpydata)
 
-#init setup
+                result = self.model.transcribe(numpydata, language="en", fp16=True, verbose=False)
+                print("decoded text: " + result["text"])
+                r_instance.set("out-voice", result["text"])
+
+class CMUSphinx:
+    pass
+
+#redis
 r_instance = redis.Redis(host='localhost', port=6379, decode_responses=True)
+#model
+model = Whisper("small.en")
 #transcription queue
-WhisperThread = threading.Thread(target=transcribe_data, args=(data_queue, ))
+WhisperThread = threading.Thread(target=model.transcribe_data, args=(data_queue, ))
 
 with sr.Microphone() as source:
     while True:

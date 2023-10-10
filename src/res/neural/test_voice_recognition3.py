@@ -13,11 +13,12 @@ model = whisper.load_model("tiny")
 data_queue = Queue()
 
 def transcribe_data(spec_queue):
-    numpydata = spec_queue.get()
-    print(numpydata)
+    while True:
+        if not spec_queue.empty():
+            numpydata = spec_queue.get()
 
-    result = model.transcribe(numpydata, language="en", fp16=False, verbose=False)
-    print("decoded text: " + result["text"])
+            result = model.transcribe(numpydata, language="en", fp16=False, verbose=False)
+            print("decoded text: " + result["text"])
 
 #transcription queue
 WhisperThread = threading.Thread(target=transcribe_data, args=(data_queue, ))

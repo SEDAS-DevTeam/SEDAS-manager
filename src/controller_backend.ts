@@ -1,16 +1,5 @@
 import {parentPort} from "worker_threads"
-
-class SpeechRecognition {
-    private name: string;
-
-    public constructor(name: string){
-        this.name = name;
-    }
-
-    public test(){
-        console.log(this.name)
-    }
-}
+import {spawn} from "node:child_process"
 
 class Acai {
     private name: string;
@@ -26,14 +15,22 @@ class TerrainGeneration {
     public constructor(name: string){
         this.name = name;
     }
+
+    public gen_terrain(): string{
+        return "test"
+    }
 }
 
 /*OBJECTS*/
-const speech_rec = new SpeechRecognition("balls")
 const event_gen = new Acai("balls")
 const terrain_gen = new TerrainGeneration("balls")
 
 parentPort.on("message", (message) => {
-    console.log(message)
-    parentPort.postMessage("I am alive")
+    if(message == "acai"){
+
+    }
+    else if(message == "terrain"){
+        let out = terrain_gen.gen_terrain()
+        parentPort.postMessage(out)
+    }
 })

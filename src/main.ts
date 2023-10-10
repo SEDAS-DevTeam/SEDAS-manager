@@ -175,6 +175,8 @@ app.on("ready", () => {
 
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
     mainMenu.show()
+
+    worker.postMessage("terrain")
 })
 
 //communication workers
@@ -186,7 +188,7 @@ worker.on("message", (message) => {
     console.log(message)
 })
 
-voice_worker.on("message", (message) => {
+voice_worker.on("message", (message) => { //messages from microphone
     console.log(message)
 })
 
@@ -226,7 +228,6 @@ ipcMain.on("message", (event, data) => {
 
             //calculate x, y
             //leftmost tactic
-            console.log(displays)
             for(let i = 0; i < displays.length; i++){
                 coords = get_window_coords(i)
                 //stop sequence (display limit reached)
@@ -271,6 +272,7 @@ ipcMain.on("message", (event, data) => {
 
             break
         case "invoke":
+            worker.postMessage(data[1][1])
             break
         
     }

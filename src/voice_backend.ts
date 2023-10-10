@@ -9,7 +9,7 @@ client.connect()
 client.set("start-voice", "false") //set default on start
 
 var start: boolean = false;
-var PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/test.py"
+var PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/voice_recognition.py"
 
 const voice_process = spawn("python3", [`${PATH_TO_PROCESS}`])
 

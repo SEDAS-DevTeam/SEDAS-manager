@@ -4,15 +4,16 @@ import speech_recognition as sr
 import whisper
 import numpy as np
 from pocketsphinx import LiveSpeech
+import sys
 
 from queue import Queue
 import threading
+from time import sleep
 
 #for index, name in enumerate(sr.Microphone.list_microphone_names()):
 #    print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
 
 Recognizer = sr.Recognizer()
-running = False
 data_queue = Queue()
 
 #Speech Recognition models
@@ -65,21 +66,21 @@ class Whisper:
                 r_instance.set("out-voice", result["text"])
 
 class CMUSphinx:
+    def __init__(self):
+        self.running = False
+
     def run_recognition(self):
         ModelThread = threading.Thread(target=self.process, args=(data_queue, r_instance))
         while True:
-
             value = r_instance.get("start-voice")
-
-            #recognition check
-            if value == "true": #start recognition
-                running = True
+            if value == "true" and not self.running:# and not self.running:
                 ModelThread.start()
-                r_instance.set("start-voice", "none") #prevents invoking random functions
-            elif value == "false": #stop recognition
-                running = False
-                r_instance.set("start-voice", "none")
+                self.running = True
+
+                r_instance.set("out-voice", "recog-start")
+            elif value == "false":
                 ModelThread.join()
+                self.running = False
 
     def process(self):
         for phrase in LiveSpeech():

@@ -20,6 +20,10 @@ async function db_check(){
     parentPort.postMessage(value)
 }
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 parentPort.on("message", async (message) => {
     switch(message){
         case "start":
@@ -35,6 +39,10 @@ parentPort.on("message", async (message) => {
             break
     }
 })
+
+voice_process.stdout.on('data', (data) => {
+    console.error(`stdout: ${data}`);
+});
 
 client.on('error', err => console.log('Redis Client Error', err));
 

@@ -173,8 +173,12 @@ app.on("ready", () => {
     //calculate x, y
     let [x, y] = get_window_coords(-1)
 
-    mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
-    mainMenu.show()
+    //mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
+    //mainMenu.show()
+
+    //TODO: for testing!
+    //setup voice recognition and ACAI backend
+    voice_worker.postMessage("start")
 
     worker.postMessage("terrain")
 })
@@ -189,7 +193,7 @@ worker.on("message", (message) => {
 })
 
 voice_worker.on("message", (message) => { //messages from microphone
-    console.log(message)
+    console.log("voic: " + message)
 })
 
 //IPC listeners
@@ -206,6 +210,7 @@ ipcMain.on("message", (event, data) => {
 
             mainMenu = new Window(main_menu_dict, "./res/index.html", coords)
             mainMenu.show()
+
             break
         case "save-settings":
             fs.writeFileSync("./res/data/settings.json", data[1][1])

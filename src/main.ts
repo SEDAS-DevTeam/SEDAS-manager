@@ -176,7 +176,7 @@ app.on("ready", () => {
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
     mainMenu.show()
 
-    voice_worker.postMessage("start")
+    worker.postMessage("start")
 
     //TODO: for testing!
     //setup voice recognition and ACAI backend
@@ -194,7 +194,7 @@ worker.on("message", (message) => {
 })
 
 voice_worker.on("message", (message) => { //messages from microphone
-    console.log("voic: " + message)
+    console.log("voice output: " + message)
 })
 
 //IPC listeners

@@ -26,11 +26,16 @@ const event_gen = new Acai("balls")
 const terrain_gen = new TerrainGeneration("balls")
 
 parentPort.on("message", (message) => {
+    switch(message){
+        case "terrain":
+            let out = terrain_gen.gen_terrain() //generate terrain 
+            parentPort.postMessage(out)
+        case "acai":
+            break
+    }
     if(message == "acai"){
 
     }
     else if(message == "terrain"){
-        let out = terrain_gen.gen_terrain()
-        parentPort.postMessage(out)
     }
 })

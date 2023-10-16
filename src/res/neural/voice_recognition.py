@@ -88,26 +88,19 @@ class CMUSphinx:
             ModelThread.start()
 
     def recognize(self, debug):
-        #TODO just for test
-        while True:
-            letters = string.ascii_lowercase
-            result_str = ''.join(random.choice(letters) for i in range(8))
-            self.db_instance.set("out-voice", str(result_str))
-
-        #for phrase in LiveSpeech():
-        #    self.db_instance.set("out-voice", str(phrase))
+        for phrase in LiveSpeech():
+            self.db_instance.set("out-voice", str(phrase))
         
 
 class DeepSpeech:
     def __init__(self, type):
         pass
 
-
-#redis
-r_instance = redis.Redis(host='localhost', port=6379, decode_responses=True)
-#model
-#m_instance = Whisper("small.en")
-m_instance = CMUSphinx(r_instance)
-
 if __name__ == "__main__":
+    #redis
+    r_instance = redis.Redis(host='localhost', port=6379, decode_responses=True)
+    #model
+    #m_instance = Whisper("small.en")
+    m_instance = CMUSphinx(r_instance)
+
     m_instance.run_recognition()

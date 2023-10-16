@@ -4,7 +4,8 @@ import speech_recognition as sr
 import whisper
 import numpy as np
 from pocketsphinx import LiveSpeech
-import sys
+import random
+import string
 
 from queue import Queue
 import threading
@@ -86,9 +87,15 @@ class CMUSphinx:
         else: #debug == False
             ModelThread.start()
 
-    def recognize(self, debug, database):
-        for phrase in LiveSpeech():
-            self.db_instance.set("out-voice", str(phrase))
+    def recognize(self, debug):
+        #TODO just for test
+        while True:
+            letters = string.ascii_lowercase
+            result_str = ''.join(random.choice(letters) for i in range(8))
+            self.db_instance.set("out-voice", str(result_str))
+
+        #for phrase in LiveSpeech():
+        #    self.db_instance.set("out-voice", str(phrase))
         
 
 class DeepSpeech:
@@ -102,5 +109,5 @@ r_instance = redis.Redis(host='localhost', port=6379, decode_responses=True)
 #m_instance = Whisper("small.en")
 m_instance = CMUSphinx(r_instance)
 
-#if __name__ == "__main__":
-#    m_instance.run_recognition(True)
+if __name__ == "__main__":
+    m_instance.run_recognition()

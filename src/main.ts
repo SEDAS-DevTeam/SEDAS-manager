@@ -176,6 +176,8 @@ app.on("ready", () => {
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
     mainMenu.show()
 
+    voice_worker.postMessage("start")
+
     //TODO: for testing!
     //setup voice recognition and ACAI backend
     //voice_worker.postMessage("stop")

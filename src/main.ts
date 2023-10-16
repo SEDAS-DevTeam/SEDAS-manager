@@ -173,14 +173,13 @@ app.on("ready", () => {
     //calculate x, y
     let [x, y] = get_window_coords(-1)
 
-    //mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
-    //mainMenu.show()
+    mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
+    mainMenu.show()
 
     //TODO: for testing!
     //setup voice recognition and ACAI backend
-    voice_worker.postMessage("start")
-
-    worker.postMessage("terrain")
+    //voice_worker.postMessage("stop")
+    //voice_worker.postMessage("start")
 })
 
 //communication workers
@@ -258,6 +257,7 @@ ipcMain.on("message", (event, data) => {
 
             //setup voice recognition and ACAI backend
             voice_worker.postMessage("start")
+            worker.postMessage("terrain") //generate terrain
 
             break
         case "exit":

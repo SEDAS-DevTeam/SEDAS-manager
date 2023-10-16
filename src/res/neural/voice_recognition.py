@@ -13,14 +13,15 @@ from time import sleep
 #for index, name in enumerate(sr.Microphone.list_microphone_names()):
 #    print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
 
-Recognizer = sr.Recognizer()
 data_queue = Queue()
 
 #Speech Recognition models
 class Whisper:
-    def __init__(self, type):
+    def __init__(self, type, db_instance):
         self.type = type
         self.model = whisper.load_model(type)
+        self.Recognizer = sr.Recognizer()
+        self.db_instance = db_instance
 
     def run_recognition(self):
         #transcription queue
@@ -44,7 +45,7 @@ class Whisper:
                 #the recognizer part
                 try:
                     if running == True:
-                        audio = Recognizer.listen(source, phrase_time_limit=4)
+                        audio = self.Recognizer.listen(source, phrase_time_limit=4)
                         audio_data = audio.get_wav_data()
 
                         numpydata = np.frombuffer(audio_data, np.int16).copy()
@@ -66,26 +67,29 @@ class Whisper:
                 r_instance.set("out-voice", result["text"])
 
 class CMUSphinx:
-    def __init__(self):
+    def __init__(self, db_instance):
         self.running = False
+        self.db_instance = db_instance
 
-    def run_recognition(self):
-        ModelThread = threading.Thread(target=self.process, args=(data_queue, r_instance))
-        while True:
-            value = r_instance.get("start-voice")
-            if value == "true" and not self.running:# and not self.running:
-                ModelThread.start()
-                self.running = True
+    def run_recognition(self, debug = False):
+        ModelThread = threading.Thread(target=self.recognize, args=(debug,))
+        if not debug:
+            while True:
+                value = r_instance.get("start-voice")
+                if value == "true" and not self.running:# and not self.running:
+                    ModelThread.start()
+                    self.running = True
 
-                r_instance.set("out-voice", "recog-start")
-            elif value == "false":
-                ModelThread.join()
-                self.running = False
+                elif value == "false":
+                    ModelThread.join()
+                    self.running = False
+        else: #debug == False
+            ModelThread.start()
 
-    def process(self):
+    def recognize(self, debug, database):
         for phrase in LiveSpeech():
-            print(phrase)
-            r_instance.set("out-voice", phrase)
+            self.db_instance.set("out-voice", str(phrase))
+        
 
 class DeepSpeech:
     def __init__(self, type):
@@ -96,6 +100,7 @@ class DeepSpeech:
 r_instance = redis.Redis(host='localhost', port=6379, decode_responses=True)
 #model
 #m_instance = Whisper("small.en")
-m_instance = CMUSphinx()
+m_instance = CMUSphinx(r_instance)
 
-m_instance.run_recognition()
+#if __name__ == "__main__":
+#    m_instance.run_recognition(True)

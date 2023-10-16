@@ -33,6 +33,9 @@ parentPort.on("message", async (message) => {
         case "stop":
             //going to stop recognition
             client.set("start-voice", "false")
+
+            //reset all values
+            client.set("out-voice", "test")
             break
         case "interrupt":
             voice_process.kill("SIGINT")

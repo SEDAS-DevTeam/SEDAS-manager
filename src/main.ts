@@ -159,7 +159,6 @@ class Window{
 }
 
 app.on("ready", () => {
-    //BackendMessager()
 
     //get screen info
     var displays_info: any = screen.getAllDisplays()
@@ -176,7 +175,7 @@ app.on("ready", () => {
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
     mainMenu.show()
 
-    worker.postMessage("start")
+    worker.postMessage("terrain")
 
     //TODO: for testing!
     //setup voice recognition and ACAI backend
@@ -190,7 +189,7 @@ const voice_worker = new Worker("./voice_backend.js")
 
 //worker listeners
 worker.on("message", (message) => {
-    console.log(message)
+    console.log("backend output: " + message)
 })
 
 voice_worker.on("message", (message) => { //messages from microphone

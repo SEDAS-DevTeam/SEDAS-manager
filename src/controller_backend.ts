@@ -6,6 +6,10 @@ import { createClient } from 'redis';
 const client = createClient()
 client.connect()
 
+//set default on start
+client.set("in-terrain", "")
+client.set("out-terrain", "")
+
 const PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/generate_terrain.py"
 
 async function db_check(){
@@ -38,11 +42,9 @@ class Acai {
 }
 
 class TerrainGeneration {
-    public gen_terrain(seed: string): string{
+    public gen_terrain(seed: string): void{
         const generation_process = spawn("python3", [`${PATH_TO_PROCESS}`])
         client.set("in-terrain", seed)
-
-        return "balls"
     }
 }
 
@@ -56,7 +58,7 @@ parentPort.on("message", (message) => {
             //for test
 
             let seed = gen_random_nums(16)
-            let out = terrain_gen.gen_terrain(seed) //generate terrain 
+            terrain_gen.gen_terrain(seed) //generate terrain 
             //parentPort.postMessage(out)
             break
         case "acai":

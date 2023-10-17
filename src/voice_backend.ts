@@ -6,7 +6,9 @@ import { createClient } from 'redis';
 const client = createClient()
 client.connect()
 
-client.set("start-voice", "false") //set default on start
+//set default on start
+client.set("start-voice", "false")
+client.set("out-voice", "test")
 
 const PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/voice_recognition.py"
 

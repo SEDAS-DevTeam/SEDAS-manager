@@ -10,7 +10,7 @@ body{
     overflow: hidden;
 }
 
-h1, h2, p, a{
+h1, h2, h3, p, a{
     color: #5271ff;
     user-select: none;
 }
@@ -69,4 +69,30 @@ img{
 
 .rightalign{
     float: right;
+}
+
+.inline-but{
+    margin-right: 15px;
+}
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+.tablebutton{
+    font-size: medium;
+    color: black;
+    border: solid 2px black;
 }

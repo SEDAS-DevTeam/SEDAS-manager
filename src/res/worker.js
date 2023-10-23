@@ -7,7 +7,7 @@ window.onload = () => {
         renderPlane(50, 50)
     })
     
-    document.querySelector("a#exit").addEventListener(() => {
+    document.querySelector("a#exit").addEventListener("click", () => {
         send_message("worker", ["exit"])
     })
 }

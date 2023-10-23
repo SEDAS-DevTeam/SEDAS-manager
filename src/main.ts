@@ -151,7 +151,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -177,10 +177,6 @@ app.on("ready", () => {
 
     worker.postMessage("terrain")
 
-    //TODO: for testing!
-    //setup voice recognition and ACAI backend
-    //voice_worker.postMessage("stop")
-    //voice_worker.postMessage("start")
 })
 
 //communication workers

@@ -151,7 +151,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        //this.window.webContents.openDevTools()
+        this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -175,22 +175,22 @@ app.on("ready", () => {
     mainMenu = new Window(main_menu_dict, "./res/index.html", [x, y])
     mainMenu.show()
 
-    worker.postMessage("terrain")
+    //worker.postMessage("terrain")
 
 })
 
 //communication workers
-const worker = new Worker("./controller_backend.js")
-const voice_worker = new Worker("./voice_backend.js")
+//const worker = new Worker("./controller_backend.js")
+//const voice_worker = new Worker("./voice_backend.js")
 
 //worker listeners
-worker.on("message", (message) => {
-    console.log("backend output: " + message)
-})
+//worker.on("message", (message) => {
+//    console.log("backend output: " + message)
+//})
 
-voice_worker.on("message", (message) => { //messages from microphone
-    console.log("voice output: " + message)
-})
+//voice_worker.on("message", (message) => { //messages from microphone
+//    console.log("voice output: " + message)
+//})
 
 //IPC listeners
 ipcMain.on("message", (event, data) => {
@@ -253,15 +253,15 @@ ipcMain.on("message", (event, data) => {
             controllerWindow.show()
 
             //setup voice recognition and ACAI backend
-            voice_worker.postMessage("start")
-            worker.postMessage("terrain") //generate terrain
+            //voice_worker.postMessage("start")
+            //worker.postMessage("terrain") //generate terrain
 
             break
         case "exit":
             //disable voice recognition and ACAI backend
-            voice_worker.postMessage("stop")
+            //voice_worker.postMessage("stop")
             //kill voice recognition
-            voice_worker.postMessage("interrupt")
+            //voice_worker.postMessage("interrupt")
             
             //close windows
             controllerWindow.close()
@@ -274,7 +274,7 @@ ipcMain.on("message", (event, data) => {
 
             break
         case "invoke":
-            worker.postMessage(data[1][1])
+            //worker.postMessage(data[1][1])
             break
         
     }

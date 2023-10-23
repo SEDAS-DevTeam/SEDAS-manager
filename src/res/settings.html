@@ -3,17 +3,18 @@
     <head>
         <link rel="stylesheet" href="index.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-        <script src="index.js"></script> 
+        <script src="index.js"></script>
+        <script src="settings.js"></script> 
     </head>
     <body style="margin-left: 20px; margin-top: 20px;">
         <div>
-            <button onclick="comm.send_message('settings', ['redirect-to-menu'])" style="margin-top: 20px;"><i class="fa-solid fa-arrow-left"></i> Back to menu</button>
-            <button onclick="save_settings('settings')" style="margin-top: 20px;">Save</button>
+            <button id="redir_to_menu" style="margin-top: 20px;"><i class="fa-solid fa-arrow-left"></i> Back to menu</button>
+            <button id="save_settings" style="margin-top: 20px;">Save</button>
         </div>
         <h1>SEDAC manager settings</h1>
 
         <div style="margin-left: 20px;">
-            <form action="/action_page.php">
+            <form>
                 <label for="location">Controller window location</label>
                 <select id="location" name="location">
                   <option value="leftmost">leftmost</option>

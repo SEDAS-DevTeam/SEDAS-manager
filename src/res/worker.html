@@ -2,22 +2,23 @@
 <html>
     <head>
         <link rel="stylesheet" href="index.css">
-        <script src="render.js"></script> 
-        <script src="index.js"></script> 
+        <script src="render.js"></script>
+        <script src="worker.js"></script>
     </head>
     <body>
         <div class="topnav">
             <div class="leftalign">
-                <a href="#home">Control 1</a>
+                <a id="plankmsg2">Control 1</a>
                 <a href="#news">Control 2</a>
                 <a href="#contact">Control 3</a>
                 <a href="#about">Control 4</a>
-                <a onclick='comm.send_message_redir("controller", ["sex?"])'>Click me!</a>
+                <a id="plankmsg">Click me!</a>
             </div>
             <div class="rightalign">
-                <a onclick='comm.send_message("worker", ["exit"])'>exit</a>
+                <a id="exit">exit</a>
             </div>
         </div>
         <canvas id="glcanvas" width="640" height="480"></canvas>
+        <script src="index.js"></script>
     </body>
 </html>

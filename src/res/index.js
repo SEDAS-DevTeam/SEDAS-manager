@@ -33,12 +33,14 @@ function save_settings(send_as){
     comm.send_message(send_as, ['save-settings', JSON.stringify(data, null, 2)])
 }
 
-window.addEventListener("load", () => {
-    //when receiving incoming messages from other processes
-    ipcRender.on("message-redirect", (event, data) => {
-        console.log("received message!")
-        console.log(data)
+function airport_change(){
+    alert("changed")
+}
 
-        ipcRender.send("message-redirect", ["validate"])
-    })
+//when receiving incoming messages from other processes
+ipcRender.on("message-redirect", (event, data) => {
+    console.log("received message!")
+    console.log(data)
+
+    //ipcRender.send("message-redirect", ["validate"])
 })

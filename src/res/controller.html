@@ -2,6 +2,8 @@
 <html>
     <head>
         <link rel="stylesheet" href="index.css">
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
         <script src="index.js"></script>
         <script src="controller.js"></script>
     </head>
@@ -19,8 +21,7 @@
                 <th>Country</th>
                 <th>City</th>
                 <th>
-                    <form><input type="text" placeholder="Search.." name="search">
-                    </form>
+                    <form><input type="text" placeholder="Search.." name="search"></form>
                 </th>
             </tr>
             <tr>
@@ -48,9 +49,8 @@
         <p>Data was gathered from the World Bank International airports dataset</p>
 
         <hr>
-        <div style="margin-left: 20px;">
-            <h2>Idk...</h2>
-        </div>
+
+        <hr>
         <button id="send_message_redir">Click me!</button>
     </body>
 </html>

@@ -2,16 +2,18 @@
 <html>
     <head>
         <link rel="stylesheet" href="index.css">
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self';">
         <script src="index.js"></script>
         <script src="index_main.js"></script>
     </head>
     <body>
-        <div style="text-align: center;">
+        <div id="center">
             <img src="./img/sedac-manager-logo.png" width="50%", height="auto">
             <h2>SEDAC manager</h2>
             <p>ATC control, simple</p>
         </div>
-        <div style="text-align: center; overflow: hidden;">
+        <div id="center-overflow">
             <button class="menubutton">Start</button>
             <button class="menubutton">Settings</button>
         </div>

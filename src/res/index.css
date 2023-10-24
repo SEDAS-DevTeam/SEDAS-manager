@@ -12,7 +12,6 @@ body{
 
 h1, h2, h3, p, a{
     color: #5271ff;
-    user-select: none;
 }
 
 button{
@@ -30,7 +29,6 @@ button{
 
 img{
     pointer-events: none;
-    user-select: none;
 }
 
 
@@ -95,4 +93,16 @@ tr:nth-child(even) {
     font-size: medium;
     color: black;
     border: solid 2px black;
+}
+
+/*
+Generic declarations
+*/
+#center{
+    text-align: center;
+}
+
+#center-overflow{
+    text-align: center;
+    overflow: hidden;
 }

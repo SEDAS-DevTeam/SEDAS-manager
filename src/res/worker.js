@@ -1,6 +1,9 @@
 window.onload = () => {
     //render all essential things
     renderCanvas()
+    renderPlane(150, 150, 45)
+
+    renderAirspace([[50, 50], [50, 150], [350, 100], [200, 50], [50, 50]])
 
     document.querySelector("a#plankmsg").addEventListener("click", () => {
         window.electronAPI.send_message_redir("controller", ["test msg2"])

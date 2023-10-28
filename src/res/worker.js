@@ -1,6 +1,6 @@
 window.onload = () => {
     document.querySelector("a#plankmsg").addEventListener("click", () => {
-        send_message_redir("controller", ["sex?"])
+        window.electronAPI.send_message_redir("controller", ["test msg2"])
     })
     
     document.querySelector("a#plankmsg2").addEventListener("click", () => {
@@ -8,6 +8,12 @@ window.onload = () => {
     })
     
     document.querySelector("a#exit").addEventListener("click", () => {
-        send_message("worker", ["exit"])
+        window.electronAPI.send_message("worker", ["exit"])
     })
 }
+
+function airport_change(){
+    alert("changed")
+}
+
+window.electronAPI.on_message_redir()

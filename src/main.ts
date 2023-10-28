@@ -3,6 +3,7 @@ import {app, BrowserWindow, ipcMain, screen} from "electron";
 import * as fs from "fs";
 import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
+import * as path from "path"
 
 //own imports
 //import * as comm from "./res/communication" //importing communication module 
@@ -31,52 +32,48 @@ const main_menu_dict = {
     width: 800,
     height: 600,
     title: "SEDAC manager",
-    webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false
-    },
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
+    webPreferences: {
+        preload: path.join(__dirname, "res/preload.js")
+    }
 }
 
 const settings_dict = {
     width: 1920,
     height: 1080,
     title: "SEDAC manager - settings",
-    webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false
-    },
     resizable: true,
     icon: "./res/img/sedac-manager-logo.png",
+    webPreferences: {
+        preload: path.join(__dirname, "res/preload.js")
+    }
 }
 
 const controller_dict = {
     width: 1920,
     height: 1080,
     title: "SEDAC manager - control",
-    webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false
-    },
     resizable: true,
     icon: "./res/img/sedac-manager-logo.png",
     frame: true,
-    focusable: false
+    focusable: false,
+    webPreferences: {
+        preload: path.join(__dirname, "res/preload.js")
+    }
 }
 
 const worker_dict = {
     width: 1920,
     height: 1080,
     title: "SEDAC",
-    webPreferences: {
-        nodeIntegration: true,
-        contextIsolation: false
-    },
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
     frame: false,
-    focusable: false
+    focusable: false,
+    webPreferences: {
+        preload: path.join(__dirname, "res/preload.js")
+    }
 }
 
 function get_window_coords(idx: number){
@@ -194,7 +191,7 @@ app.on("ready", () => {
 //})
 
 //IPC listeners
-ipcMain.on("message", (event, data) => {
+ipcMain.handle("message", (event, data) => {
     let coords = [0, 0]
 
     switch(data[1][0]){
@@ -288,7 +285,8 @@ ipcMain.on("message-redirect", (event, data) => {
         sender_win_name = "worker"
     }
     else if (data[0] == "worker"){
+        console.log("from controller")
         workers[0].send_message("message-redirect", data[1][0])
-        sender_win_name = "worker"
+        sender_win_name = "controller"
     }
 })

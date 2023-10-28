@@ -1,4 +1,7 @@
 window.onload = () => {
+    //render all essential things
+    renderCanvas()
+
     document.querySelector("a#plankmsg").addEventListener("click", () => {
         window.electronAPI.send_message_redir("controller", ["test msg2"])
     })
@@ -12,8 +15,4 @@ window.onload = () => {
     })
 }
 
-function airport_change(){
-    alert("changed")
-}
-
-window.electronAPI.on_message_redir()
+window.electronAPI.on_message_redir() //for handling all message redirects

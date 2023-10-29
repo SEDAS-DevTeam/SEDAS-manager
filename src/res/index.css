@@ -106,3 +106,21 @@ Generic declarations
     text-align: center;
     overflow: hidden;
 }
+
+/*
+Canvases
+*/
+#canvas1{
+    position: absolute;
+    z-index: 0;
+}
+
+#canvas2{
+    position: absolute;
+    z-index: 1;
+}
+
+#canvas3{
+    position: absolute;
+    z-index: 2;
+}

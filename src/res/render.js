@@ -1,7 +1,24 @@
 //constants
-const PLANE_HEADING_MARKER = 50
+
+//PLANE DEFS
+const PLANE_HEADING_MARKER = 25
 const MARKER_COLOR = "white"
-const STD_LINE_WIDTH = 5
+const STD_LINE_WIDTH = 3
+const PLANE_MARKER_RADIUS = 5
+
+//PLANE PATH DEFS
+const PLANE_PATH_RADIUS = 3
+
+//AIRSPACE DEFS
+const AIRSPACE_COLOR = "#3a367e"
+
+//No-fly ZONE DEFS
+const NO_FLY_ZONE_LINE_WIDTH = 2
+const NO_FLY_ZONE_COLOR = "#e0433c"
+
+//RUNWAY DEFS
+const STD_RUNWAY_WIDTH = 2
+const RUNWAY_COLOR = "#17213a"
 
 //low level functions
 function deg_to_rad(deg){
@@ -12,28 +29,55 @@ function rad_to_deg(rad){
   return Math.round(rad * (180 / Math.PI))
 }
 
-function renderCanvas(){
-  var canvas = document.querySelector("#glcanvas");
+function renderCanvas(canvas_id){
+  var canvas = document.querySelector("#canvas" + canvas_id.toString());
   var ctx = canvas.getContext("2d");
-  ctx.fillStyle = "black"
 
-  //canvas resize
-  canvas.width = window.screen.width
-  canvas.height = window.screen.height
+  switch(canvas_id){
+    case 1:
+      //low-level canvas (airspace, no-fly zone, background, terrain)
+      ctx.fillStyle = "black"
 
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+      //canvas resize
+      canvas.width = window.screen.width
+      canvas.height = window.screen.height
+    
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      break
+    case 2:
+      //mid-level canvas (airplanes, airplane paths)
+      //canvas resize
+      canvas.width = window.screen.width
+      canvas.height = window.screen.height
+      break
+    case 3:
+      //top-level canvas (airplane info, selected labels, selected paths)
+      //canvas resize
+      canvas.width = window.screen.width
+      canvas.height = window.screen.height
+      break
+  }
 }
 
-function renderPlane(x, y, angle){ //0 - 360 degrees
-  let radius = 5;
+function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
+  /*
+  plane_info example:
+  plane_info = {
+    "callsign": "LX123",
+    "level": 120, [in ft]
+    "speed": 150 [in kts],
+    "code": undefined/7500/7600/7700 [squawks reserved by international law]
+  }
+  */
 
-  var canvas = document.querySelector("#glcanvas");
+  var canvas = document.querySelector("#canvas2");
   var context = canvas.getContext('2d');
 
   //plane rendering
 
   context.beginPath();
-  context.arc(x, y, radius, 0, 2 * Math.PI, false);
+  context.arc(x, y, PLANE_MARKER_RADIUS, 0, 2 * Math.PI, false);
   context.fillStyle = 'white';
   context.fill();
 
@@ -79,32 +123,78 @@ function renderPlane(x, y, angle){ //0 - 360 degrees
   context.strokeStyle = MARKER_COLOR
   context.lineWidth = STD_LINE_WIDTH
   context.stroke()
-
 }
 
-function renderPlanePath(){
+function renderPlanePath(...coordinates){
+  var canvas = document.querySelector("#canvas2");
+  var context = canvas.getContext('2d');
 
+  context.beginPath();
+
+  for (let i = 0; i < coordinates.length; i++){
+    context.moveTo(coordinates[i][0], coordinates[i][1])
+    context.arc(coordinates[i][0], coordinates[i][1], PLANE_PATH_RADIUS, 0, 2 * Math.PI, false);
+    context.fillStyle = 'white';
+    context.fill();
+  }
 }
 
 function renderAirspace(...coordinates){
   //coordinates are in [x, y] format
 
-  var canvas = document.querySelector("#glcanvas");
+  var canvas = document.querySelector("#canvas1");
   var context = canvas.getContext('2d');
 
   let startX = coordinates[0][0]
   let startY = coordinates[0][1]
 
-  context.beginPath();
+  let coordinates_mod = coordinates.shift()
 
-  for (let i = 0; i < coordinates.length; i++){
-    
+  context.beginPath();
+  context.moveTo(startX, startY)
+
+  for (let i = 0; i < coordinates_mod.length; i++){
+    context.lineTo(coordinates_mod[i][0], coordinates_mod[i][1])
+    context.stroke()
   }
 
+  context.fillStyle = AIRSPACE_COLOR
+  context.fill()
+
+}
+
+function renderNoFlyZone(...coordinates){
+  //coordinates are in [x, y] format
+
+  var canvas = document.querySelector("#canvas1");
+  var context = canvas.getContext('2d');
+
+  let startX = coordinates[0][0]
+  let startY = coordinates[0][1]
+
+  let coordinates_mod = coordinates.shift()
+
+  context.beginPath();
+  context.moveTo(startX, startY)
+
+  context.lineWidth = NO_FLY_ZONE_LINE_WIDTH
+  context.strokeStyle = NO_FLY_ZONE_COLOR
+
+  for (let i = 0; i < coordinates_mod.length; i++){
+    context.lineTo(coordinates_mod[i][0], coordinates_mod[i][1])
+    context.stroke()
+  }
 }
 
 function renderRunway(x1, y1, x2, y2){
+  var canvas = document.querySelector("#canvas1");
+  var context = canvas.getContext('2d');
 
+  context.beginPath()
+  context.moveTo(x1, y1)
+  context.lineTo(x2, y2)
+
+  context.strokeStyle = RUNWAY_COLOR
+  context.lineWidth = STD_RUNWAY_WIDTH
+  context.stroke()
 }
-
-window.addEventListener("load", renderCanvas)

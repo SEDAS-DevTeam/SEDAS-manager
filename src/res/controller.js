@@ -1,6 +1,6 @@
 window.onload = () => {
     document.getElementById("send_message_redir").addEventListener("click", () => {
-        window.electronAPI.send_message_redir("worker", ["test msg"])
+        window.electronAPI.send_message_redir("worker0", ["test msg"])
     })
 }
 

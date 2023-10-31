@@ -284,9 +284,11 @@ ipcMain.on("message-redirect", (event, data) => {
         controllerWindow.send_message("message-redirect", data[1][0])
         sender_win_name = "worker"
     }
-    else if (data[0] == "worker"){
+    else if (data[0].includes("worker")){
         console.log("from controller")
-        workers[0].send_message("message-redirect", data[1][0])
+        
+        let idx = parseInt(data[0].substring(6, 7))
+        workers[idx].send_message("message-redirect", data[1][0])
         sender_win_name = "controller"
     }
 })

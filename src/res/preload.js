@@ -17,5 +17,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
             console.log("received message!")
             console.log(data)
         })
+    },
+    on_window_info: (callback) => {
+        ipcRenderer.on("window-", (event, data) => {
+            console.log("received window info")
+            callback(data)
+        })
     }
 })

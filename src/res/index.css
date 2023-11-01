@@ -107,6 +107,14 @@ Generic declarations
     overflow: hidden;
 }
 
+#main-header{
+    display: inline-block;
+}
+
+#main-header-button{
+    display: inline-block;
+}
+
 /*
 Canvases
 */

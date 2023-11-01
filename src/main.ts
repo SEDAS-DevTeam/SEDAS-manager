@@ -57,7 +57,7 @@ const controller_dict = {
     resizable: true,
     icon: "./res/img/sedac-manager-logo.png",
     frame: true,
-    focusable: false,
+    focusable: true,
     webPreferences: {
         preload: path.join(__dirname, "res/preload.js")
     }
@@ -236,7 +236,7 @@ ipcMain.handle("message", (event, data) => {
                 if (coords[0] == -3){
                     continue
                 }
-
+                
                 workerWindow = new Window(worker_dict, "./res/worker.html", coords)
                 workers.push(workerWindow)
             }
@@ -253,6 +253,11 @@ ipcMain.handle("message", (event, data) => {
             //setup voice recognition and ACAI backend
             voice_worker.postMessage("start")
             worker.postMessage("terrain") //generate terrain
+
+            //send workers info to controller
+            console.log("worker data")
+            console.log(workers)
+            //mainMenu.send_message()
 
             break
         case "exit":

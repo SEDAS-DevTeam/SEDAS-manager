@@ -139,7 +139,7 @@ class Window{
         this.window.loadFile(this.path_load);
     }
 
-    public send_message(channel: string, message: string){
+    public send_message(channel: string, message: string | string[]){
         this.window.webContents.postMessage(channel, message)
     }
 
@@ -253,12 +253,6 @@ ipcMain.handle("message", (event, data) => {
             //setup voice recognition and ACAI backend
             voice_worker.postMessage("start")
             worker.postMessage("terrain") //generate terrain
-
-            //send workers info to controller
-            console.log("worker data")
-            console.log(workers)
-            //mainMenu.send_message()
-
             break
         case "exit":
             //disable voice recognition and ACAI backend
@@ -278,6 +272,12 @@ ipcMain.handle("message", (event, data) => {
             break
         case "invoke":
             worker.postMessage(data[1][1])
+            break
+        case "send-info":
+            //send initial info to controller
+            console.log("worker data")
+            let worker_data_message = JSON.stringify(workers)
+            controllerWindow.send_message("init-info", ["window-info", worker_data_message])
             break
         
     }

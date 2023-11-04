@@ -36,7 +36,7 @@ img{
 .topnav {
     background-color: #c9c9c9;
     overflow: hidden;
-  }
+}
   
 /* Style the links inside the navigation bar */
 .topnav a {
@@ -131,4 +131,16 @@ Canvases
 #canvas3{
     position: absolute;
     z-index: 2;
+}
+
+/*topnav for controller*/
+#controller-topnav {
+    background-color: white;
+    overflow: hidden;
+    border: solid 3px #5271ff;
+}
+
+#controller-topnav a.active {
+    background-color: gray;
+    color: white;
 }

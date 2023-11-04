@@ -18,10 +18,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
             console.log(data)
         })
     },
-    on_window_info: (callback) => {
-        ipcRenderer.on("window-", (event, data) => {
-            console.log("received window info")
-            callback(data)
-        })
+    //getting initial info (number of monitors, etc.) from backend
+    on_init_info: (callback) => {
+        ipcRenderer.on('init-info', function (event, data) {
+            switch(data[0]){
+                case "window-info":
+                    callback(data[1])
+                    break
+                
+            }
+        });
     }
 })

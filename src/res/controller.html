@@ -6,53 +6,61 @@
         <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
         <script src="controller.js"></script>
     </head>
-    <body style="margin-left: 20px;">
+    <body style="margin-left: 20px; margin-right: 20px;">
         <div>
             <h1 id="main-header">SEDAC manager Controller</h1>
             <button id="main-header-button">Exit</button>
         </div>
         <hr>
-        <h2>Main Panel</h2>
-        <h3><button class="inline-but">Regenerate map</button>randomized regeneration</h3>
-        
-        <h3>or search for any airport in pregenerated search:</h3>
-        <table>
-            <tr>
-                <th>Airport</th>
-                <th>Code</th>
-                <th>Country</th>
-                <th>City</th>
-                <th>
-                    <form><input type="text" placeholder="Search.." name="search"></form>
-                </th>
-            </tr>
-            <tr>
-                <td>Seattle-Tacoma Intl.</td>
-                <td>SEA</td>
-                <td>United States</td>
-                <td>Seattle</td>
-                <td><button class="tablebutton">Select</button></td>
-            </tr>
-            <tr>
-                <td>Ruzyne Airport</td>
-                <td>PRG</td>
-                <td>Czech republic</td>
-                <td>Prague</td>
-                <td><button class="tablebutton">Select</button></td>
-            </tr>
-            <tr>
-                <td>Pardubice Airport</td>
-                <td>PED</td>
-                <td>Czech republic</td>
-                <td>Pardubice</td>
-                <td><button class="tablebutton">Select</button></td>
-            </tr>
-        </table>
-        <p>Data was gathered from the World Bank International airports dataset</p>
+        <div class="topnav" id="controller-topnav">
+            <a class="active">Generation</a>
+            <a href="#news">Monitors</a>
+            <a href="#contact">Simulation</a>
+            <a href="#about">About</a>
+        </div>
+        <div style="margin-left: 20px; margin-right: 20px;">
+            <h2>Generation setup</h2>
+            <h3><button class="inline-but">Regenerate map</button>randomized regeneration</h3>
+            
+            <h3>or search for any airport in pregenerated search:</h3>
+            <table>
+                <tr>
+                    <th>Airport</th>
+                    <th>Code</th>
+                    <th>Country</th>
+                    <th>City</th>
+                    <th>
+                        <form><input type="text" placeholder="Search.." name="search"></form>
+                    </th>
+                </tr>
+                <tr>
+                    <td>Seattle-Tacoma Intl.</td>
+                    <td>SEA</td>
+                    <td>United States</td>
+                    <td>Seattle</td>
+                    <td><button class="tablebutton">Select</button></td>
+                </tr>
+                <tr>
+                    <td>Ruzyne Airport</td>
+                    <td>PRG</td>
+                    <td>Czech republic</td>
+                    <td>Prague</td>
+                    <td><button class="tablebutton">Select</button></td>
+                </tr>
+                <tr>
+                    <td>Pardubice Airport</td>
+                    <td>PED</td>
+                    <td>Czech republic</td>
+                    <td>Pardubice</td>
+                    <td><button class="tablebutton">Select</button></td>
+                </tr>
+            </table>
+            <p>Data was gathered from the World Bank International airports dataset</p>
 
-        <hr>
+            <hr>
 
-        <hr>
-        <button id="send_message_redir">Click me!</button>
+            <hr>
+            <button id="send_message_redir">Click me!</button>
+        </div>
     </body>
 </html>

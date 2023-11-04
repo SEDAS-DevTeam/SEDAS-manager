@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="index.css">
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
+        <script src="monitor_control.js"></script>
+        <script src="controller.js"></script>
+    </head>
+    <body style="margin-left: 20px; margin-right: 20px;">
+        <div id="top-content">
+            <div>
+                <h1 id="main-header">SEDAC manager Controller</h1>
+                <button id="main-header-button">Exit</button>
+            </div>
+            <hr>
+            <div class="topnav" id="controller-topnav">
+                <a href="controller_gen.html">Generation</a>
+                <a href="controller_mon.html" class="active">Monitors</a>
+                <a href="controller_sim.html">Simulation</a>
+                <a href="#about">About</a>
+            </div>
+        </div>
+        <div style="margin-left: 20px; margin-right: 20px;" id="page-content">
+            <h2>Monitors setup</h2>
+            <button style="margin-bottom: 15px;">reset to default</button>
+            <button style="margin-bottom: 15px;">Apply</button>
+
+            <svg height="70%" width="100%" style="background-color:rgb(218, 215, 215)">
+            </svg>
+
+            <div id="monitor-content">
+                <!-- Include a header DIV with the same name as the draggable DIV, followed by "header" -->
+                <div id="monitor-header">Monitor 1</div>
+                <select id="functions" name="functions">
+                    <option value="TWR">TWR control</option>
+                    <option value="APP">APP control</option>
+                    <option value="ACC">ACC control</option>
+                    <option value="weather">weather forecast</option>
+                    <option value="departures">departure list</option>
+                </select>
+            </div>
+        </div>
+    </body>
+</html>

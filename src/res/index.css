@@ -141,6 +141,22 @@ Canvases
 }
 
 #controller-topnav a.active {
-    background-color: gray;
-    color: white;
+    background-color:rgb(218, 215, 215);
+    color: black;
+}
+
+#monitor-content {
+    position: absolute;
+    z-index: 9;
+    background-color: #f1f1f1;
+    border: 1px solid #d3d3d3;
+    text-align: center;
+}
+
+#monitor-header {
+    padding: 10px;
+    cursor: move;
+    z-index: 10;
+    background-color: #2196F3;
+    color: #fff;
 }

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="index.css">
+        <meta charset="utf-8" />
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
+        <script src="controller.js"></script>
+    </head>
+    <body style="margin-left: 20px; margin-right: 20px;">
+        <div id="top-content">
+            <div>
+                <h1 id="main-header">SEDAC manager Controller</h1>
+                <button id="main-header-button">Exit</button>
+            </div>
+            <hr>
+            <div class="topnav" id="controller-topnav">
+                <a href="controller_gen.html">Generation</a>
+                <a href="controller_mon.html">Monitors</a>
+                <a href="controller_sim.html" class="active">Simulation</a>
+                <a href="#about">About</a>
+            </div>
+        </div>
+        <div style="margin-left: 20px; margin-right: 20px;">
+            <h2>Simulation control</h2>
+            <hr>
+            <button id="send_message_redir">Click me!</button>
+        </div>
+    </body>
+</html>

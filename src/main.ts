@@ -243,7 +243,7 @@ ipcMain.handle("message", (event, data) => {
 
             coords = get_window_coords(-1)
 
-            controllerWindow = new Window(controller_dict, "./res/controller.html", coords)
+            controllerWindow = new Window(controller_dict, "./res/controller_gen.html", coords)
             
             for (let i = 0; i < workers.length; i++){
                 workers[i].show()

@@ -1,0 +1,25 @@
+body{
+    background-color: black;
+}
+
+h1, h2, h3, p, a{
+    color: white;
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td, th{
+    color: white;
+    border: 1px solid white;
+    text-align: center;
+    width: 20%;
+    height: 50px
+}
+
+#top-time-header{
+    width: 100%;
+    text-align: center;
+}

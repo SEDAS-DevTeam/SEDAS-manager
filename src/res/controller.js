@@ -30,7 +30,10 @@ window.onload = () => {
 
             //set all the monitor elements to draggable
             let monitor = document.getElementById("monitor-content")
+            
+            element_init(monitor)
             drag_element(monitor)
+            draw_connection()
 
             //event listeners
             break

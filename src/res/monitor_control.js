@@ -1,6 +1,10 @@
+//ELEMENT DRAGGING DEFS
 var pos_init_X = 0, pos_init_Y = 0, pos_new_X = 0, pos_new_Y = 0
 var dragged_element = undefined
 
+//ELEMENT INIT DEFS
+
+//ELEMENT DRAGGING
 function drag_element(element){
   document.getElementById("monitor-header").onmousedown = (event) => {
     event.preventDefault()
@@ -30,4 +34,14 @@ function drag_elem_to_loc(event){
 
   dragged_element.style.top = (dragged_element.offsetTop - pos_new_Y) + "px"
   dragged_element.style.left = (dragged_element.offsetLeft - pos_new_X) + "px"
+}
+
+//ELEMENT INIT
+
+function element_init(element){
+  //align to specified x and y
+}
+
+function draw_connection(){
+  
 }

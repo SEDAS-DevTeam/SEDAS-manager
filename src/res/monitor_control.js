@@ -1,38 +1,33 @@
-function dragElement(elmnt) {
-    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    if (document.getElementById(elmnt.id + "header")) {
-      /* if present, the header is where you move the DIV from:*/
-      document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
-    } else {
-      /* otherwise, move the DIV from anywhere inside the DIV:*/
-      elmnt.onmousedown = dragMouseDown;
-    }
-  
-    function dragMouseDown(e) {
-      e.preventDefault();
-      // get the mouse cursor position at startup:
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      document.onmouseup = closeDragElement;
-      // call a function whenever the cursor moves:
-      document.onmousemove = elementDrag;
-    }
-  
-    function elementDrag(e) {
-      e.preventDefault();
-      // calculate the new cursor position:
-      pos1 = pos3 - e.clientX;
-      pos2 = pos4 - e.clientY;
-      pos3 = e.clientX;
-      pos4 = e.clientY;
-      // set the element's new position:
-      elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-      elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    }
-  
-    function closeDragElement() {
-      /* stop moving when mouse button is released:*/
-      document.onmouseup = null;
-      document.onmousemove = null;
-    }
+var pos_init_X = 0, pos_init_Y = 0, pos_new_X = 0, pos_new_Y = 0
+var dragged_element = undefined
+
+function drag_element(element){
+  document.getElementById("monitor-header").onmousedown = (event) => {
+    event.preventDefault()
+
+    dragged_element = element
+
+    pos_init_X = event.clientX
+    pos_init_Y = event.clientY
+
+    document.onmouseup = stop_drag
+    document.onmousemove = drag_elem_to_loc
   }
+}
+
+function stop_drag(){
+  document.onmouseup = null
+  document.onmousemove = null
+}
+
+function drag_elem_to_loc(event){
+  event.preventDefault()
+
+  pos_new_X = pos_init_X - event.clientX
+  pos_new_Y = pos_init_Y - event.clientY
+  pos_init_X = event.clientX;
+  pos_init_Y = event.clientY;
+
+  dragged_element.style.top = (dragged_element.offsetTop - pos_new_Y) + "px"
+  dragged_element.style.left = (dragged_element.offsetLeft - pos_new_X) + "px"
+}

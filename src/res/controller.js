@@ -7,6 +7,15 @@ function process_init_data(data, reset = false){
         INIT_DATA = data //save it into global variable
     }
 
+    if (reset){
+        //delete all monitors
+        monitor_objects.forEach(elem => {
+            elem.remove()
+        })
+
+        monitor_objects = []
+    }
+
     if (data.length == 0){
         alert("FATAL ERROR: There is nothing to process, no data sent")
     }

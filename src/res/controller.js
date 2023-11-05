@@ -1,7 +1,41 @@
 var Windows = []
+var monitor_objects = []
+var INIT_DATA = [] //to store it for this session
 
-function process_window_data(data){
-    console.log(data)
+function process_init_data(data, reset = false){
+    if (!reset){
+        INIT_DATA = data //save it into global variable
+    }
+
+    if (data.length == 0){
+        alert("FATAL ERROR: There is nothing to process, no data sent")
+    }
+
+    var path = window.location.pathname;
+    var page = path.split("/").pop();
+
+    if (page.includes("controller_mon")){
+        //when the controller page is redirected to monitors
+
+        if (data[0] == "window-info"){
+            var monitor_data = JSON.parse(data[1])
+
+            //initialize all the monitor objects
+            for (let i = 0; i < monitor_data.length; i++){
+                element_init(monitor_data[i], i)
+            }
+            
+            //retrieve all monitors again, set them to draggable and draw connections
+            let DOM_monitor_objects = document.getElementsByClassName("monitor-content")
+            for (let i = 0; i < DOM_monitor_objects.length; i++){
+                monitor_objects.push(DOM_monitor_objects[i])
+                drag_element(monitor_objects[i], i)
+                draw_connection()
+            }
+                    
+            //drag_element(monitor)
+        }
+    }
 }
 
 window.onload = () => {
@@ -25,17 +59,12 @@ window.onload = () => {
             let top_height = top_content.offsetHeight
 
             page_content.setAttribute("style",`height:${absolute_height - top_height}px`);
-            
-            //set all the monitor elements
-
-            //set all the monitor elements to draggable
-            let monitor = document.getElementById("monitor-content")
-            
-            element_init(monitor)
-            drag_element(monitor)
-            draw_connection()
 
             //event listeners
+            document.getElementById("res_to_def").addEventListener("click", () => {
+                process_init_data(INIT_DATA, true)
+            })
+
             break
 
         case "controller_sim.html":
@@ -55,6 +84,6 @@ window.onload = () => {
 
     window.electronAPI.on_message_redir()
     window.electronAPI.on_init_info((data) => {
-        process_window_data(data)
+        process_init_data(data)
     })
 }

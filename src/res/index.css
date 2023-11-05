@@ -145,7 +145,7 @@ Canvases
     color: black;
 }
 
-#monitor-content {
+.monitor-content {
     position: absolute;
     z-index: 10;
     background-color: #f1f1f1;
@@ -153,7 +153,7 @@ Canvases
     text-align: center;
 }
 
-#monitor-header {
+.monitor-header {
     padding: 10px;
     cursor: move;
     z-index: 10;

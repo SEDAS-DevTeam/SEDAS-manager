@@ -51,6 +51,8 @@ function drag_elem_to_loc(event){
   dragged_element.style.top = (dragged_element.offsetTop - pos_new_Y) + "px"
   dragged_element.style.left = (dragged_element.offsetLeft - pos_new_X) + "px"
 
+  draw_connection() //redraw connection again
+
 }
 
 //ELEMENT INIT
@@ -101,5 +103,46 @@ function element_init(element_data, idx){
 }
 
 function draw_connection(){
-  
+  let field = document.getElementById("field")
+  let offset_x = field.getBoundingClientRect().left
+  let offset_y = field.getBoundingClientRect().top
+
+  let object_offsets = []
+
+  for (let i = 0; i < monitor_objects.length; i++){
+    let x1 = monitor_objects[i].getBoundingClientRect().left - offset_x
+    let x2 = x1 + monitor_objects[i].clientWidth - offset_x
+    
+    let y_top = monitor_objects[i].getBoundingClientRect().top - offset_y
+    let y_bot =  monitor_objects[i].getBoundingClientRect().bottom - offset_y
+
+    object_offsets.push({
+      "x1": Math.round(x1),
+      "x2": Math.round(x2),
+      "y": Math.round(y_bot - y_top / 2)
+    })
+  }
+
+  //erase connections
+  field.innerHTML = ""
+
+  //write connections
+  let path_str_start = '<path d="'
+  let path_str = ""
+  let path_str_end = '"/>'
+  let line_width = 2
+  for(let i = 0; i < object_offsets.length; i++){
+
+    if(i == 0){ //first
+      path_str += `M ${object_offsets[i].x2} ${object_offsets[i].y} `
+    }
+    else{
+      path_str += `L ${object_offsets[i].x1} ${object_offsets[i].y} `
+    }
+  }
+
+  path_str += `V ${object_offsets[0].y + line_width} `
+  path_str += `L ${object_offsets[0].x2} ${object_offsets[0].y + line_width} `
+
+  field.innerHTML = (path_str_start + path_str + path_str_end)
 }

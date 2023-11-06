@@ -5,12 +5,18 @@ window.onload = () => {
 function update_time(){
     let time_elem = document.getElementById("top-time-header")
     let date = new Date()
-    let date_utc = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(),
-    date.getUTCDate(), date.getUTCHours(),
-    date.getUTCMinutes(), date.getUTCSeconds());
 
-    let innerhtml = "Time: " + new Date(date_utc).toUTCString()
+    let innerhtml = "Time: " + new Date(date)
 
     time_elem.innerHTML = innerhtml
 
 }
+
+function update_row(idx){
+
+}
+
+function clear_row(idx){
+
+}
+

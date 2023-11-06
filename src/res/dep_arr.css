@@ -7,19 +7,28 @@ h1, h2, h3, p, a{
 }
 
 table{
-    width: 100%;
     border-collapse: collapse;
+    width: 100%;
 }
 
-td, th{
+td, th, tr{
     color: white;
     border: 1px solid white;
     text-align: center;
-    width: 20%;
-    height: 50px
+    height: 50px;
+    width: 25%;
 }
 
 #top-time-header{
     width: 100%;
     text-align: center;
+}
+
+.block{
+    width: 49%;
+    display: inline-block;
+}
+
+.aligner{
+    margin-left: 1%;
 }

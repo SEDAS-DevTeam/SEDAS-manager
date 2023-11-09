@@ -1,6 +1,8 @@
 import urllib.request
-import sys
 import os
+
+URL = "https://raw.githubusercontent.com/HelloWorld7894/SEDAC-networks/main/src/"
+
 
 #PATH formatting
 PATH = os.getcwd()
@@ -9,14 +11,39 @@ idx = PATH.index("SEDAC")
 if idx == -1:
     print("ERR: directory mismatch")
     exit(1)
-PATH = PATH[:idx] + "SEDAC/src/res/neural/cache/"
+else:
+    PATH = PATH[:idx] + "SEDAC/src/res/neural/cache"
 
-args = sys.argv[1:]
+#Removing all contents from cache
+try:
+    files = os.listdir(PATH)
+    for file in files:
+        file_path = os.path.join(PATH, file)
+        if file != ".gitkeep" and os.path.isfile(file_path):
+            os.remove(file_path)
+except OSError as e:
+    print(e)
+    print("Error while updating cache")
 
-def download_newest(type, name):
+print("All files deleted")
+print("Updating cache")
+
+def download_newest(type):
     #model download
-    urllib.request.urlretrieve(args[0] + type, PATH + name)
+    main_url = URL + type
 
-download_newest("map_gen", "map_gen.pth")
-download_newest("acai", "acai.pth")
-download_newest("voice_rec", "voice_rec.pth")
+    if type == "VoiceRecognition":
+        urllib.request.urlretrieve(os.path.join(main_url, "voice_models.py"), PATH + "/voice_models.py")
+    elif type == "SpeechSynthesis":
+        urllib.request.urlretrieve(os.path.join(main_url, "speech_models.py"), PATH + "/speech_models.py")
+    elif type == "ACAI":
+        urllib.request.urlretrieve(os.path.join(main_url, "main_control.py"), PATH + "/main_control.py")
+    elif type == "gen_map":
+        urllib.request.urlretrieve(os.path.join(main_url, "main_terrain.py"), PATH + "/main_terrain.py")
+
+download_newest("VoiceRecognition")
+download_newest("SpeechSynthesis")
+download_newest("ACAI")
+download_newest("gen_map")
+
+print("Done")

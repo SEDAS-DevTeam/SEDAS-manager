@@ -22,8 +22,14 @@ var displays = [];
 var workers = [];
 
 //read JSON
-const JSON_raw = fs.readFileSync("./res/data/settings.json", "utf-8")
-const app_settings = JSON.parse(JSON_raw);
+const app_settings_raw = fs.readFileSync("./res/data/settings.json", "utf-8")
+const app_settings = JSON.parse(app_settings_raw);
+
+const acai_settings_raw = fs.readFileSync("./res/data/acai_settings.json", "utf-8")
+const acai_settings = JSON.parse(acai_settings_raw);
+
+const voice_settings_raw = fs.readFileSync("./res/data/voice_settings.json", "utf-8")
+const voice_settings = JSON.parse(acai_settings_raw);
 
 //run RedisDB
 const database = spawn("redis-server")

@@ -4,7 +4,13 @@ import * as fs from "fs";
 import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
 import * as path from "path"
+import * as read_map from "./read_map"
 
+
+read_map.read_map_from_file("maze.smmr")
+process.exit()
+
+/*
 //own imports
 //import * as comm from "./res/communication" //importing communication module 
 
@@ -308,3 +314,4 @@ ipcMain.on("message-redirect", (event, data) => {
         sender_win_name = "controller"
     }
 })
+*/

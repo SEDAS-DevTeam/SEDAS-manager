@@ -4,12 +4,12 @@ window.onload = () => {
     })
     
     document.getElementById("save_settings").addEventListener("click", () => {
-        window.electronAPI.save_settings('settings')
+        save_settings()
     })
 }
 
 //save settings
-function save_settings(send_as){
+function save_settings(){
     //parse form data
     let loc_data = document.getElementById("location").value
     let limit_data = document.getElementById("limit").value
@@ -20,6 +20,8 @@ function save_settings(send_as){
         "worker-spawn": limit_data,
         "alignment": align_data
     }
+    let data_str = JSON.stringify(data)
+    console.log(data_str.length)
 
-    send_message(send_as, ['save-settings', JSON.stringify(data, null, 2)])
+    window.electronAPI.send_message('settings', ['save-settings', data_str])
 }

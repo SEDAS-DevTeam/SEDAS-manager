@@ -13,6 +13,7 @@
   "files": [
     "controller_backend.ts",
     "voice_backend.ts",
-    "main.ts"
+    "main.ts",
+    "read_map.ts"
   ]
 }

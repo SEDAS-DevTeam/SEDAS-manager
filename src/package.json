@@ -14,7 +14,8 @@
   "scripts": {
     "dev": "npx tsc --project ./tsconfig.json && export ELECTRON_ENABLE_LOGGING=1 && electron main.js",
     "build": "electron-builder build -wl",
-    "clear": "rm -rf ./build/* && touch ./build/.gitkeep"
+    "clear": "rm -rf ./build/* && touch ./build/.gitkeep",
+    "dev-load-map": "npx tsc --project ./tsconfig.json && node read_map.ts"
   },
   "build": {
     "appId": "com.sedacmanager.app",

@@ -7,8 +7,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
         console.log("sent message")
     },
     //controller/worker (inherit) to main communication
-    send_message: (send_as, message) => {
-        ipcRenderer.invoke("message", [send_as, message])
+    send_message: (message_info, message) => {
+        ipcRenderer.invoke("message", [message_info, message])
         console.log("sent message to main")
     },
     //when receiving incoming messages from other processes

@@ -21,6 +21,8 @@ var sender_win_name: string = "";
 var displays = [];
 var workers = [];
 
+const PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/fetch.py"
+
 //read JSON
 const app_settings_raw = fs.readFileSync("./res/data/settings.json", "utf-8")
 const app_settings = JSON.parse(app_settings_raw);
@@ -33,6 +35,9 @@ const voice_settings = JSON.parse(acai_settings_raw);
 
 //run RedisDB
 const database = spawn("redis-server")
+
+//fetch all python backend files
+const fetch_process = spawn("python3", [`${PATH_TO_PROCESS}`])
 
 const main_menu_dict = {
     width: 800,
@@ -76,7 +81,7 @@ const worker_dict = {
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
     frame: false,
-    focusable: false,
+    focusable: true,
     webPreferences: {
         preload: path.join(__dirname, "res/preload.js")
     }
@@ -213,7 +218,7 @@ ipcMain.handle("message", (event, data) => {
 
             break
         case "save-settings":
-            fs.writeFileSync("./res/data/settings.json", data[1][1])
+            fs.writeFileSync("./res/data/settings.json", JSON.parse(data[1][1]))
             break
         case "redirect-to-settings":
             //message call to redirect to settings

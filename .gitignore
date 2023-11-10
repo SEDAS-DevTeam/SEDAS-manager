@@ -16,8 +16,17 @@
 /src/main.js
 /src/main.js.map
 
+/src/read_map.js
+/src/read_map.js.map
+
 #redist files
 /src/dump.rdb
 
 #pycache files
 /src/res/neural/cache/__pycache__/
+
+#cache files
+/src/res/neural/cache/voice_models.py
+/src/res/neural/cache/speech_models.py
+/src/res/neural/cache/main_control.py
+/src/res/neural/cache/main_terrain.py

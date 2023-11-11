@@ -8,9 +8,9 @@ import * as read_map from "./read_map"
 
 
 read_map.read_map_from_file("maze.smmr")
-process.exit()
+//process.exit()
 
-/*
+
 //own imports
 //import * as comm from "./res/communication" //importing communication module 
 
@@ -87,7 +87,7 @@ const worker_dict = {
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
     frame: false,
-    focusable: true,
+    focusable: false,
     webPreferences: {
         preload: path.join(__dirname, "res/preload.js")
     }
@@ -145,8 +145,8 @@ function get_window_coords(idx: number){
 
 class Window{
     public window: BrowserWindow;
-    private path_load: string
-
+    public win_type: string = "none";
+    private path_load: string;
 
     public close(){
         this.window.close()
@@ -160,9 +160,12 @@ class Window{
         this.window.webContents.postMessage(channel, message)
     }
 
-    public constructor(config: any, path: string, coords: number[]){
+    public constructor(config: any, path: string, coords: number[], window_type: string = "none"){
         config.x = coords[0]
         config.y = coords[1]
+
+        //retype window_type
+        this.win_type = window_type
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
@@ -254,13 +257,13 @@ ipcMain.handle("message", (event, data) => {
                     continue
                 }
                 
-                workerWindow = new Window(worker_dict, "./res/worker.html", coords)
+                workerWindow = new Window(worker_dict, "./res/worker.html", coords, "ACC")
                 workers.push(workerWindow)
             }
 
             coords = get_window_coords(-1)
 
-            controllerWindow = new Window(controller_dict, "./res/controller_gen.html", coords)
+            controllerWindow = new Window(controller_dict, "./res/controller_gen.html", coords, "controller")
             
             for (let i = 0; i < workers.length; i++){
                 workers[i].show()
@@ -314,4 +317,3 @@ ipcMain.on("message-redirect", (event, data) => {
         sender_win_name = "controller"
     }
 })
-*/

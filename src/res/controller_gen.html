@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link rel="stylesheet" href="index.css">
         <meta charset="utf-8" />
         <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
@@ -31,6 +32,7 @@
                     <th>Code</th>
                     <th>Country</th>
                     <th>City</th>
+                    <th>Description</th>
                     <th>
                         <form><input type="text" placeholder="Search.." name="search"></form>
                     </th>
@@ -40,6 +42,12 @@
                     <td>SEA</td>
                     <td>United States</td>
                     <td>Seattle</td>
+                    <td>
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        <div class="popup-box">
+                            <p class="desc"></p>
+                        </div>
+                    </td>
                     <td><button class="tablebutton">Select</button></td>
                 </tr>
                 <tr>
@@ -47,6 +55,12 @@
                     <td>PRG</td>
                     <td>Czech republic</td>
                     <td>Prague</td>
+                    <td>
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        <div class="popup-box">
+                            <p class="desc"></p>
+                        </div>
+                    </td>
                     <td><button class="tablebutton">Select</button></td>
                 </tr>
                 <tr>
@@ -54,12 +68,38 @@
                     <td>PED</td>
                     <td>Czech republic</td>
                     <td>Pardubice</td>
+                    <td>
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        <div class="popup-box">
+                            <p class="desc"></p>
+                        </div>
+                    </td>
+                    <td><button class="tablebutton">Select</button></td>
+                </tr>
+                <tr>
+                    <td>MAZE</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                        <div class="popup-box">
+                            <p class="desc">Training map for all ATC beginners, goal of this map is to teach ATC trainees plane coordination etc.</p>
+                        </div>
+                    </td>
                     <td><button class="tablebutton">Select</button></td>
                 </tr>
             </table>
             <p>Data was gathered from the World Bank International airports dataset</p>
 
             <hr>
+            <h3>Selected maps:</h3>
+            <div class="window-block">
+                <p>window1:</p>
+                <select id="maps" name="maps">
+                    <option value="default" selected>None</option>
+                </select>
+            </div>
         </div>
     </body>
 </html>

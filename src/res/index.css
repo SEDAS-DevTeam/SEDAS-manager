@@ -160,3 +160,30 @@ Canvases
     background-color: #2196F3;
     color: #fff;
 }
+
+/*Controller elements*/
+.window-block p, select{
+    display: inline-block;
+}
+
+td i{
+    cursor: pointer;
+}
+
+td i:hover{
+    color: #5271ff;
+}
+
+div.popup-box{
+    visibility: hidden;
+    z-index: 2;
+    position: absolute;
+    background-color: gray;
+    padding: 8px 8px;
+    border-radius: 4px;
+    width: 20%;
+}
+
+div.popup-box p{
+    color: white;
+}

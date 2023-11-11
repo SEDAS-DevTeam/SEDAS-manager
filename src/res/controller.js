@@ -2,10 +2,32 @@ var Windows = []
 var monitor_objects = []
 var INIT_DATA = [] //to store it for this session
 
+var desc_rendered = false
+var curr_desc = -1
+
+/*
+CHOOSING WHICH MAP TO GENERATE ON WHICH MONITOR
+*/
+
+function process_window_data_gen(data){
+    //function to process window data in generation tab in the controller window
+    INIT_DATA = data //save it into global variable
+}
+
+function render_on_selection(){
+
+}
+
+function show_description(idx){
+    let desc_data = document.querySelectorAll("div.popup-box")
+    desc_data[idx].style.visibility = "visible"
+
+    desc_rendered = true
+    curr_desc = idx
+}
+
 function process_init_data(data, reset = false){
-    if (!reset){
-        INIT_DATA = data //save it into global variable
-    }
+    INIT_DATA = data //save it into global variable
 
     if (reset){
         //delete all monitors
@@ -43,6 +65,12 @@ function process_init_data(data, reset = false){
             draw_connection()
         }
     }
+    else if (page.includes("controller_gen")){
+        if (data[0] == "window-info"){
+            var monitor_data = JSON.parse(data[1])
+            process_window_data_gen(monitor_data)
+        }
+    }
 }
 
 window.onload = () => {
@@ -55,6 +83,22 @@ window.onload = () => {
     //didn't want to put it into separated files for better organisation
     switch(page_name){
         case "controller_gen.html":
+            //add event listener for every description button 
+            var desc_elem = document.querySelectorAll("td i")
+            for(let i = 0; i < desc_elem.length; i++){
+                desc_elem[i].addEventListener("click", () => {
+                    show_description(i)
+                })
+            }
+
+            document.addEventListener("click", () => {
+                if (desc_rendered){
+                    desc_rendered = false
+                }
+                else{
+                    document.querySelectorAll("div.popup-box")[curr_desc].style.visibility = "hidden"
+                }
+            })
             break
 
         case "controller_mon.html":

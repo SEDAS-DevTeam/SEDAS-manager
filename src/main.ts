@@ -33,7 +33,7 @@ const acai_settings_raw = fs.readFileSync("./res/data/acai_settings.json", "utf-
 const acai_settings = JSON.parse(acai_settings_raw);
 
 const voice_settings_raw = fs.readFileSync("./res/data/voice_settings.json", "utf-8")
-const voice_settings = JSON.parse(acai_settings_raw);
+const voice_settings = JSON.parse(voice_settings_raw);
 
 //run RedisDB
 const database = spawn("redis-server")
@@ -296,6 +296,7 @@ ipcMain.handle("message", (event, data) => {
             let worker_data_message = JSON.stringify(workers)
 
             //sending airport map data
+            map_config = []
             var map_files = read_map.list_map_files()
             for (let i = 0; i < map_files.length; i++){
                 console.log(map_files[i])

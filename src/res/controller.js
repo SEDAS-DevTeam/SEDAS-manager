@@ -17,6 +17,47 @@ function generate_airports_from_sources(){
     let airport_data = INIT_DATA[2]
     for (let i = 0; i < airport_data.length; i++){
         console.log(airport_data[i])
+        let record = document.createElement("tr")
+
+        let i2 = 0;
+        for (const [key, value] of Object.entries(airport_data[i])) {
+            if (i2 == Object.keys(airport_data[i]).length - 1){
+                //skip DESC
+                break
+            }
+
+            record.innerHTML += `<td>${value}</td>`
+            i2 += 1
+        }
+
+        let desc_obj = document.createElement("td")
+        let select_obj = document.createElement("td")
+        let logo = document.createElement("i")
+        let popup_box = document.createElement("div")
+        let desc = document.createElement("p")
+        let select_button = document.createElement("button")
+
+        logo.classList.add("fa");
+        logo.classList.add("fa-search")
+        logo.setAttribute('aria-hidden', 'true');
+
+        popup_box.classList.add("popup-box");
+        select_button.classList.add("tablebutton")
+        select_button.innerHTML = "Select"
+
+        desc.classList.add("desc");
+        desc.innerHTML = airport_data[i]["DESC"]
+
+        popup_box.appendChild(desc)
+
+        desc_obj.appendChild(logo)
+        desc_obj.appendChild(popup_box)
+        select_obj.appendChild(select_button)
+
+        record.appendChild(desc_obj)
+        record.appendChild(select_obj)
+
+        document.querySelector("table").appendChild(record)
     }
 }
 
@@ -73,6 +114,22 @@ function process_init_data(data, reset = false){
     }
     else if (page.includes("controller_gen")){
         generate_airports_from_sources() //initial airport data generation from configs sent through IPC
+
+        //add listeners to select buttons
+        let select_buttons = document.getElementsByClassName("tablebutton")
+        for (let i = 0; i < select_buttons.length; i++){
+            select_buttons[i].addEventListener("click", () => {
+                selection(i)
+            })
+        }
+
+        //add event listener for every description button 
+        var desc_elem = document.querySelectorAll("td i")
+        for(let i = 0; i < desc_elem.length; i++){
+            desc_elem[i].addEventListener("click", () => {
+                show_description(i)
+            })
+        }
     }
 }
 
@@ -87,13 +144,6 @@ window.onload = () => {
     switch(page_name){
         case "controller_gen.html":
             //event listeners
-            //add event listener for every description button 
-            var desc_elem = document.querySelectorAll("td i")
-            for(let i = 0; i < desc_elem.length; i++){
-                desc_elem[i].addEventListener("click", () => {
-                    show_description(i)
-                })
-            }
 
             document.addEventListener("click", () => {
                 if (desc_rendered){
@@ -103,13 +153,6 @@ window.onload = () => {
                     document.querySelectorAll("div.popup-box")[curr_desc].style.visibility = "hidden"
                 }
             })
-
-            let select_buttons = document.getElementsByClassName("tablebutton")
-            for (let i = 0; i < select_buttons.length; i++){
-                select_buttons[i].addEventListener("click", () => {
-                    selection(i)
-                })
-            }
             break
 
         case "controller_mon.html":

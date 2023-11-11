@@ -162,8 +162,12 @@ Canvases
 }
 
 /*Controller elements*/
-.window-block p, select{
-    display: inline-block;
+.result p, button{
+    display: inline;
+}
+
+.result button{
+    margin-left: 50px;
 }
 
 td i{

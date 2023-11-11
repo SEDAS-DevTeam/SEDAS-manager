@@ -7,14 +7,8 @@ import * as path from "path"
 import * as read_map from "./read_map"
 
 
-read_map.read_map_from_file("maze.smmr")
-//process.exit()
-
-
 //own imports
 //import * as comm from "./res/communication" //importing communication module 
-
-//TODO: work with screens
 
 //window variable declarations
 var mainMenu: Window;
@@ -26,6 +20,8 @@ var workerWindow: Window;
 var sender_win_name: string = "";
 var displays = [];
 var workers = [];
+var map_config = []
+
 
 const PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/fetch.py"
 
@@ -156,7 +152,7 @@ class Window{
         this.window.loadFile(this.path_load);
     }
 
-    public send_message(channel: string, message: string | string[]){
+    public send_message(channel: string, message: any){
         this.window.webContents.postMessage(channel, message)
     }
 
@@ -295,11 +291,22 @@ ipcMain.handle("message", (event, data) => {
             break
         case "send-info":
             //send initial info to controller
-            console.log("worker data")
+
+            //sending monitor data
             let worker_data_message = JSON.stringify(workers)
-            controllerWindow.send_message("init-info", ["window-info", worker_data_message])
+
+            //sending airport map data
+            var map_files = read_map.list_map_files()
+            for (let i = 0; i < map_files.length; i++){
+                console.log(map_files[i])
+                let map = read_map.read_map_from_file(map_files[i])
+                if (map_files[i].includes("config")){
+                    map_config.push(map)
+                }
+            }
+
+            controllerWindow.send_message("init-info", ["window-info", worker_data_message, map_config])
             break
-        
     }
 })
 

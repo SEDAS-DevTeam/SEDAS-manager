@@ -150,7 +150,11 @@ window.onload = () => {
                     desc_rendered = false
                 }
                 else{
-                    document.querySelectorAll("div.popup-box")[curr_desc].style.visibility = "hidden"
+                    try{
+                        document.querySelectorAll("div.popup-box")[curr_desc].style.visibility = "hidden"
+                    } catch(error){
+                        //do nothing (TODO, remove try catch
+                    }
                 }
             })
             break

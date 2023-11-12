@@ -1,6 +1,8 @@
 {
     "ACC": {
-        "ARP": "none",
+        "ARP": [
+            {"x": 55, "y": 65}
+        ],
         "POINTS": [
             {"x": 300, "y": 300, "name": "VEPOT"},
             {"x": 700, "y": 300, "name": "AFIS"}
@@ -13,12 +15,31 @@
             {"x": 900, "y": 250},
             {"x": 750, "y": 600},
             {"x": 200, "y": 500}
-        ]
+        ],
+        "TERRAIN": "none",
+        "RESTRICTED_AREA": "none"
     },
     "APP": {
-        "ARP": "none",
-        "POINTS": 
-        [
+        "ARP": [
+            {"x": 55, "y": 65}
+        ],
+        "SID": "none",
+        "STAR": "none",
+        "SECTOR": [
+            {"x": 150, "y": 150},
+            {"x": 500, "y": 80},
+            {"x": 900, "y": 250},
+            {"x": 750, "y": 600},
+            {"x": 200, "y": 500}
+        ],
+        "TERRAIN": "none",
+        "RESTRICTED_AREA": "none"
+    },
+    "TWR": {
+        "RUNWAY": [
+            {"x1": 60, "y1": 80, "x2": 50, "y2": 50}
+        ],
+        "POINTS": [ 
             {"x": 60, "y": 70, "name": "VEPOT"},
             {"x": 700, "y": 300, "name": "AFIS"}
         ],
@@ -30,22 +51,8 @@
             {"x": 900, "y": 250},
             {"x": 750, "y": 600},
             {"x": 200, "y": 500}
-        ]
-    },
-    "TWR": {
-        "ARP": "none",
-        "POINTS": [ 
-            {"x": "60", "y": "70", "name": "VEPOT"},
-            {"x": "700", "y": "300", "name": "AFIS"}
         ],
-        "SID": "none",
-        "STAR": "none",
-        "SECTOR": [
-            {"x": 150, "y": 150},
-            {"x": 500, "y": 80},
-            {"x": 900, "y": 250},
-            {"x": 750, "y": 600},
-            {"x": 200, "y": 500}
-        ]
+        "TERRAIN": "none",
+        "RESTRICTED_AREA": "none"
     }
 }

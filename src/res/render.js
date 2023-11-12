@@ -20,6 +20,12 @@ const NO_FLY_ZONE_COLOR = "#e0433c"
 const STD_RUNWAY_WIDTH = 2
 const RUNWAY_COLOR = "#17213a"
 
+//POINT DEFS
+const POINT_TRIAG_LENGTH = 5
+
+//AIRPORT DEFS
+const ARP_POINT_DIAM = 4
+
 //low level functions
 function deg_to_rad(deg){
   return deg * (Math.PI / 180)
@@ -197,4 +203,38 @@ function renderRunway(x1, y1, x2, y2){
   context.strokeStyle = RUNWAY_COLOR
   context.lineWidth = STD_RUNWAY_WIDTH
   context.stroke()
+}
+
+function renderPoint(x, y, name, color){
+  var canvas = document.querySelector("#canvas3");
+  var context = canvas.getContext('2d');
+
+  context.beginPath();
+  context.moveTo(x, y)
+  context.lineTo(x + POINT_TRIAG_LENGTH, y)
+  context.lineTo(x, y - POINT_TRIAG_LENGTH)
+  context.lineTo(x - POINT_TRIAG_LENGTH, y)
+  
+  context.fillStyle = color;
+  context.fill();
+}
+
+function renderAirport(x, y, name){
+  var canvas = document.querySelector("#canvas3");
+  var context = canvas.getContext('2d');
+
+  context.beginPath()
+  context.moveTo(x, y)
+  context.arc(x, y, ARP_POINT_DIAM, 0, 2 * Math.PI, false);
+  context.fillStyle = 'white';
+  context.fill();
+}
+
+function renderText(x, y, text, color){
+  var canvas = document.querySelector("#canvas3");
+  var context = canvas.getContext('2d');
+
+  context.font = "48px serif"
+  context.fillStyle = color
+  context.fillText(text, x, y)
 }

@@ -20,8 +20,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
     //getting initial info (number of monitors, etc.) from backend
     on_init_info: (callback) => {
-        ipcRenderer.on('init-info', function (event, data) {
+        ipcRenderer.on('init-info', (event, data) => {
             callback(data)
         });
+    },
+    on_map_data: (callback) => {
+        ipcRenderer.on("map-data", (event, data) => {
+            callback(data)
+        })
     }
 })

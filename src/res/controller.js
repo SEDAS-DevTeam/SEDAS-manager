@@ -4,23 +4,43 @@ var INIT_DATA = [] //store it in this session
 
 var desc_rendered = false
 var curr_desc = -1
+var selected_map = ""
 
 /*
 CHOOSING WHICH MAP TO GENERATE ON WHICH MONITOR
 */
 
 function selection(idx){
-    console.log(INIT_DATA)
+    let sel_map = INIT_DATA[2][idx]["FILENAME"]
+    let sel_map_name = INIT_DATA[2][idx]["AIRPORT_NAME"]
+
+    document.getElementById("confirmresult").innerHTML = sel_map_name
+    selected_map = sel_map
+
+}
+
+function render_map(){
+    if (selected_map.length == 0){
+        alert("You did not select any of these maps!")
+        return
+    }
+    
+    window.electronAPI.send_message("controller", ["render-map", selected_map])
+
 }
 
 function generate_airports_from_sources(){
     let airport_data = INIT_DATA[2]
     for (let i = 0; i < airport_data.length; i++){
-        console.log(airport_data[i])
         let record = document.createElement("tr")
 
         let i2 = 0;
         for (const [key, value] of Object.entries(airport_data[i])) {
+            if (i2 == 0){
+                //skip first FILENAME record
+                i2 += 1
+                continue
+            }
             if (i2 == Object.keys(airport_data[i]).length - 1){
                 //skip DESC
                 break
@@ -153,9 +173,13 @@ window.onload = () => {
                     try{
                         document.querySelectorAll("div.popup-box")[curr_desc].style.visibility = "hidden"
                     } catch(error){
-                        //do nothing (TODO, remove try catch
+                        //do nothing (TODO, remove try catch)
                     }
                 }
+            })
+
+            document.getElementById("confirm").addEventListener("click", () => {
+                render_map()
             })
             break
 

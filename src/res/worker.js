@@ -1,3 +1,7 @@
+function process_map_data(data){
+    console.log(data)
+}
+
 window.onload = () => {
     //render all essential things
     renderCanvas(1)
@@ -21,6 +25,19 @@ window.onload = () => {
     document.querySelector("a#exit").addEventListener("click", () => {
         window.electronAPI.send_message("worker", ["exit"])
     })
+
+    document.querySelector("a#stopbutton").addEventListener("click", () => {
+        let elem = document.querySelector("a#stopbutton")
+        if (elem.className == "stopsim"){
+            elem.className = "startsim"
+        }
+        else if (elem.className == "startsim"){
+            elem.className = "stopsim"
+        }
+    })
 }
 
 window.electronAPI.on_message_redir() //for handling all message redirects
+window.electronAPI.on_map_data((data) => {
+    process_map_data(data)
+})

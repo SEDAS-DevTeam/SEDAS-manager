@@ -308,6 +308,18 @@ ipcMain.handle("message", (event, data) => {
 
             controllerWindow.send_message("init-info", ["window-info", worker_data_message, map_config])
             break
+        case "render-map":
+            //retrieve all airport data
+            let filename = data[1][1]
+            let map_data = read_map.read_map_from_file(filename)
+
+            //render to workers
+            console.log(map_data)
+            //set map data to all workers
+            for (let i = 0; i < workers.length; i++){
+                workers[i].send_message("map-data", [map_data])
+            }
+            break
     }
 })
 

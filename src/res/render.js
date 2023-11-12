@@ -10,7 +10,7 @@ const PLANE_MARKER_RADIUS = 5
 const PLANE_PATH_RADIUS = 3
 
 //AIRSPACE DEFS
-const AIRSPACE_COLOR = "#3a367e"
+const AIRSPACE_SECTOR_COLOR = "#3a367e"
 
 //No-fly ZONE DEFS
 const NO_FLY_ZONE_LINE_WIDTH = 2
@@ -145,7 +145,7 @@ function renderPlanePath(...coordinates){
   }
 }
 
-function renderAirspace(...coordinates){
+function renderAirspace(color, ...coordinates){
   //coordinates are in [x, y] format
 
   var canvas = document.querySelector("#canvas1");
@@ -164,7 +164,7 @@ function renderAirspace(...coordinates){
     context.stroke()
   }
 
-  context.fillStyle = AIRSPACE_COLOR
+  context.fillStyle = AIRSPACE_SECTOR_COLOR
   context.fill()
 
 }

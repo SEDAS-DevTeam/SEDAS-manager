@@ -47,18 +47,27 @@ function process_map_data(data, type){
                     for (let i = 0; i < value.length; i++){
                         SECTOR_points.push([value[i]["x"], value[i]["y"]])
                     }
-                    renderAirspace(SECTOR_points)
+                    renderAirspace(AIRSPACE_SECTOR_COLOR, SECTOR_points)
 
                     break
                 case "TERRAIN":
                     //rendering terrain
+                    let TERRAIN_points = []
+                    for (let i = 0; i < value.length; i++){
+                        TERRAIN_points.push([value[i]["x"], value[i]["y"]])
+                    }
+                    renderAirspace("black", TERRAIN_points)
                     break
                 case "RESTRICTED_AREA":
                     //rendering no-fly zones
+                    let AREA_points = []
+                    for (let i = 0; i < value.length; i++){
+                        AREA_points.push([value[i]["x"], value[i]["y"]])
+                    }
+                    renderAirspace("black", AREA_points)
                     break
             }
         }
-        console.log(key, value);
     }
 }
 
@@ -84,6 +93,8 @@ window.onload = () => {
     })
 
     document.querySelector("a#stopbutton").addEventListener("click", () => {
+
+
         let elem = document.querySelector("a#stopbutton")
         if (elem.className == "stopsim"){
             elem.className = "startsim"
@@ -93,10 +104,6 @@ window.onload = () => {
             elem.className = "stopsim"
             elem.innerHTML = "STOP"
         }
-    })
-
-    document.querySelector("a#exit").addEventListener("click", () => {
-
     })
 }
 

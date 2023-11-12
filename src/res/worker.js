@@ -69,6 +69,14 @@ function process_map_data(data, type){
             }
         }
     }
+
+    //TEST
+    renderPlane(150, 350, 50, {
+        "callsign": "LX123",
+        "level": 120,
+        "speed": 150,
+        "code": undefined
+    })
 }
 
 window.onload = () => {
@@ -78,7 +86,7 @@ window.onload = () => {
     renderCanvas(3)
 
     //render empty map placeholder on init
-    renderText(50, 100, "Empty map placeholder", "white")
+    renderText(50, 100, "Empty map placeholder", "white", "48px")
 
     document.querySelector("a#plankmsg").addEventListener("click", () => {
         window.electronAPI.send_message_redir("controller", ["test msg2"])
@@ -93,7 +101,7 @@ window.onload = () => {
     })
 
     document.querySelector("a#stopbutton").addEventListener("click", () => {
-
+        window.electronAPI.send_message()
 
         let elem = document.querySelector("a#stopbutton")
         if (elem.className == "stopsim"){

@@ -81,7 +81,6 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
   var context = canvas.getContext('2d');
 
   //plane rendering
-
   context.beginPath();
   context.arc(x, y, PLANE_MARKER_RADIUS, 0, 2 * Math.PI, false);
   context.fillStyle = 'white';
@@ -129,6 +128,17 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
   context.strokeStyle = MARKER_COLOR
   context.lineWidth = STD_LINE_WIDTH
   context.stroke()
+
+  //plane info rendering
+  let proc_x = x + 50;
+  let proc_y = y - 50;
+  for (const [key, value] of Object.entries(plane_info)) {
+    if (value == undefined){
+      continue
+    }
+    renderText(proc_x, proc_y, `${key}: ${value}`, "white", "12px")
+    proc_y -= 10
+  }
 }
 
 function renderPlanePath(...coordinates){
@@ -206,21 +216,23 @@ function renderRunway(x1, y1, x2, y2){
 }
 
 function renderPoint(x, y, name, color){
-  var canvas = document.querySelector("#canvas3");
-  var context = canvas.getContext('2d');
+  var canvas3 = document.querySelector("#canvas1");
+  var context3 = canvas3.getContext('2d');
 
-  context.beginPath();
-  context.moveTo(x, y)
-  context.lineTo(x + POINT_TRIAG_LENGTH, y)
-  context.lineTo(x, y - POINT_TRIAG_LENGTH)
-  context.lineTo(x - POINT_TRIAG_LENGTH, y)
+  context3.beginPath();
+  context3.moveTo(x, y)
+  context3.lineTo(x + POINT_TRIAG_LENGTH, y)
+  context3.lineTo(x, y - POINT_TRIAG_LENGTH)
+  context3.lineTo(x - POINT_TRIAG_LENGTH, y)
   
-  context.fillStyle = color;
-  context.fill();
+  context3.fillStyle = color;
+  context3.fill();
+
+  renderText(x + 15, y - 15, name, "white", "12px")
 }
 
 function renderAirport(x, y, name){
-  var canvas = document.querySelector("#canvas3");
+  var canvas = document.querySelector("#canvas1");
   var context = canvas.getContext('2d');
 
   context.beginPath()
@@ -230,11 +242,11 @@ function renderAirport(x, y, name){
   context.fill();
 }
 
-function renderText(x, y, text, color){
+function renderText(x, y, text, color, weight){
   var canvas = document.querySelector("#canvas3");
   var context = canvas.getContext('2d');
 
-  context.font = "48px serif"
+  context.font = weight + " serif"
   context.fillStyle = color
   context.fillText(text, x, y)
 }

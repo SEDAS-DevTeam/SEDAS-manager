@@ -1,5 +1,14 @@
 {
     "ACC": {
+        "SECTOR": [
+            {"x": 150, "y": 150},
+            {"x": 500, "y": 80},
+            {"x": 900, "y": 250},
+            {"x": 750, "y": 600},
+            {"x": 200, "y": 500}
+        ],
+        "TERRAIN": "none",
+        "RESTRICTED_AREA": "none",
         "ARP": [
             {"x": 55, "y": 65}
         ],
@@ -8,7 +17,9 @@
             {"x": 700, "y": 300, "name": "AFIS"}
         ],
         "SID": "none",
-        "STAR": "none",
+        "STAR": "none"
+    },
+    "APP": {
         "SECTOR": [
             {"x": 150, "y": 150},
             {"x": 500, "y": 80},
@@ -17,14 +28,14 @@
             {"x": 200, "y": 500}
         ],
         "TERRAIN": "none",
-        "RESTRICTED_AREA": "none"
-    },
-    "APP": {
+        "RESTRICTED_AREA": "none",
         "ARP": [
             {"x": 55, "y": 65}
         ],
         "SID": "none",
-        "STAR": "none",
+        "STAR": "none"
+    },
+    "TWR": {
         "SECTOR": [
             {"x": 150, "y": 150},
             {"x": 500, "y": 80},
@@ -33,9 +44,7 @@
             {"x": 200, "y": 500}
         ],
         "TERRAIN": "none",
-        "RESTRICTED_AREA": "none"
-    },
-    "TWR": {
+        "RESTRICTED_AREA": "none",
         "RUNWAY": [
             {"x1": 60, "y1": 80, "x2": 50, "y2": 50}
         ],
@@ -44,15 +53,6 @@
             {"x": 700, "y": 300, "name": "AFIS"}
         ],
         "SID": "none",
-        "STAR": "none",
-        "SECTOR": [
-            {"x": 150, "y": 150},
-            {"x": 500, "y": 80},
-            {"x": 900, "y": 250},
-            {"x": 750, "y": 600},
-            {"x": 200, "y": 500}
-        ],
-        "TERRAIN": "none",
-        "RESTRICTED_AREA": "none"
+        "STAR": "none"
     }
 }

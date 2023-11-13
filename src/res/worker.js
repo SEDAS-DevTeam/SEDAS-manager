@@ -26,19 +26,19 @@ function process_map_data(data, type){
                 case "POINTS":
                     //rendering all other route points
                     for (let i = 0; i < value.length; i++){
-                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], "white")
+                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], POINT_COLOR, POINT_TRIAG_LENGTH)
                     }
                     break
                 case "SID":
                     //rendering SID instruments
                     for (let i = 0; i < value.length; i++){
-                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], "white")
+                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], SID_COLOR, SID_TRIAG_LENGTH)
                     }
                     break
                 case "STAR":
                     //rendering STAR instruments
                     for (let i = 0; i < value.length; i++){
-                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], "white")
+                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], STAR_COLOR, STAR_TRIAG_LENGTH)
                     }
                     break
                 case "SECTOR":
@@ -47,7 +47,7 @@ function process_map_data(data, type){
                     for (let i = 0; i < value.length; i++){
                         SECTOR_points.push([value[i]["x"], value[i]["y"]])
                     }
-                    renderAirspace(AIRSPACE_SECTOR_COLOR, SECTOR_points)
+                    renderAirspace(SECTOR_COLOR, SECTOR_BORDER_COLOR, SECTOR_BORDER_WIDTH, SECTOR_points)
 
                     break
                 case "TERRAIN":
@@ -56,7 +56,7 @@ function process_map_data(data, type){
                     for (let i = 0; i < value.length; i++){
                         TERRAIN_points.push([value[i]["x"], value[i]["y"]])
                     }
-                    renderAirspace("black", TERRAIN_points)
+                    renderAirspace(TERRAIN_COLOR, TERRAIN_BORDER_COLOR, TERRAIN_BORDER_WIDTH, TERRAIN_points)
                     break
                 case "RESTRICTED_AREA":
                     //rendering no-fly zones
@@ -64,7 +64,7 @@ function process_map_data(data, type){
                     for (let i = 0; i < value.length; i++){
                         AREA_points.push([value[i]["x"], value[i]["y"]])
                     }
-                    renderAirspace("black", AREA_points)
+                    renderAirspace(NO_FLY_ZONE_COLOR, NO_FLY_ZONE_BORDER_COLOR, NO_FLY_ZONE_BORDER_WIDTH, AREA_points)
                     break
             }
         }

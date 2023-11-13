@@ -1,8 +1,11 @@
 //constants
 
+//BACKROUND
+const BACKROUND_COLOR = "black"
+
 //PLANE DEFS
-const PLANE_HEADING_MARKER = 25
 const MARKER_COLOR = "white"
+const PLANE_HEADING_MARKER = 25
 const STD_LINE_WIDTH = 3
 const PLANE_MARKER_RADIUS = 5
 const PLANE_POINTER_WIDTH = 2
@@ -16,21 +19,39 @@ const INFO_TEXT_SIZE = 12
 const PLANE_PATH_RADIUS = 3
 
 //AIRSPACE DEFS
-const AIRSPACE_SECTOR_COLOR = "#3a367e"
+const SECTOR_COLOR = "#171414"
+const SECTOR_BORDER_COLOR = "#9B5151"
+const SECTOR_BORDER_WIDTH = 4
 
 //No-fly ZONE DEFS
-const NO_FLY_ZONE_LINE_WIDTH = 2
-const NO_FLY_ZONE_COLOR = "#e0433c"
+const NO_FLY_ZONE_COLOR = "#404040"
+const NO_FLY_ZONE_BORDER_COLOR = "#FAFF00"
+const NO_FLY_ZONE_BORDER_WIDTH = 1
+
+//TERRAIN DEFS
+const TERRAIN_COLOR = "#171414"
+const TERRAIN_BORDER_COLOR = "#9B5151"
+const TERRAIN_BORDER_WIDTH = 2
 
 //RUNWAY DEFS
-const STD_RUNWAY_WIDTH = 2
-const RUNWAY_COLOR = "#17213a"
+const RUNWAY_COLOR = "#9D9D9D"
+const RUNWAY_WIDTH = 3
 
 //POINT DEFS
-const POINT_TRIAG_LENGTH = 5
+const POINT_TRIAG_LENGTH = 6
+const POINT_COLOR = "#9D9D9D"
 
-//AIRPORT DEFS
-const ARP_POINT_DIAM = 4
+//AIRPORT DEFS (ARP)
+const ARP_TRIAG_LENGTH = 6
+const ARP_COLOR = "#EDEDED"
+
+//SID DEFS
+const SID_TRIAG_LENGTH = 12
+const SID_COLOR = "#7B85DA"
+
+//STAR DEFS
+const STAR_TRIAG_LENGTH = 12
+const STAR_COLOR = "#C38B8B"
 
 //low level functions
 function deg_to_rad(deg){
@@ -48,7 +69,7 @@ function renderCanvas(canvas_id){
   switch(canvas_id){
     case 1:
       //low-level canvas (airspace, no-fly zone, background, terrain)
-      ctx.fillStyle = "black"
+      ctx.fillStyle = BACKROUND_COLOR
 
       //canvas resize
       canvas.width = window.screen.width
@@ -166,7 +187,7 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
   context1.beginPath()
 
   //info bounding box rendering
-  context1.rect(x1_text - BBOX_PAD, y1_text - BBOX_PAD, width + BBOX_PAD, height + BBOX_PAD)
+  //context1.rect(x1_text - BBOX_PAD, y1_text - BBOX_PAD, width + BBOX_PAD, height + BBOX_PAD)
 
   context1.moveTo(x, y)
 
@@ -207,7 +228,7 @@ function renderPlanePath(...coordinates){
   }
 }
 
-function renderAirspace(color, ...coordinates){
+function renderAirspace(fill_style, stroke_style, line_width, ...coordinates){
   //coordinates are in [x, y] format
 
   var canvas = document.querySelector("#canvas1");
@@ -219,39 +240,17 @@ function renderAirspace(color, ...coordinates){
   let coordinates_mod = coordinates.shift()
 
   context.beginPath();
+  context.fillStyle = fill_style
+  context.strokeStyle = stroke_style
+  context.lineWidth = line_width;
   context.moveTo(startX, startY)
 
   for (let i = 0; i < coordinates_mod.length; i++){
     context.lineTo(coordinates_mod[i][0], coordinates_mod[i][1])
-    context.stroke()
   }
-
-  context.fillStyle = AIRSPACE_SECTOR_COLOR
+  context.lineTo(coordinates_mod[0][0], coordinates_mod[0][1])
+  context.stroke()
   context.fill()
-
-}
-
-function renderNoFlyZone(...coordinates){
-  //coordinates are in [x, y] format
-
-  var canvas = document.querySelector("#canvas1");
-  var context = canvas.getContext('2d');
-
-  let startX = coordinates[0][0]
-  let startY = coordinates[0][1]
-
-  let coordinates_mod = coordinates.shift()
-
-  context.beginPath();
-  context.moveTo(startX, startY)
-
-  context.lineWidth = NO_FLY_ZONE_LINE_WIDTH
-  context.strokeStyle = NO_FLY_ZONE_COLOR
-
-  for (let i = 0; i < coordinates_mod.length; i++){
-    context.lineTo(coordinates_mod[i][0], coordinates_mod[i][1])
-    context.stroke()
-  }
 }
 
 function renderRunway(x1, y1, x2, y2){
@@ -263,24 +262,24 @@ function renderRunway(x1, y1, x2, y2){
   context.lineTo(x2, y2)
 
   context.strokeStyle = RUNWAY_COLOR
-  context.lineWidth = STD_RUNWAY_WIDTH
+  context.lineWidth = RUNWAY_WIDTH
   context.stroke()
 }
 
-function renderPoint(x, y, name, color){
+function renderPoint(x, y, name, color, triag_len){
   var canvas3 = document.querySelector("#canvas1");
   var context3 = canvas3.getContext('2d');
 
   context3.beginPath();
   context3.moveTo(x, y)
-  context3.lineTo(x + POINT_TRIAG_LENGTH, y)
-  context3.lineTo(x, y - POINT_TRIAG_LENGTH)
-  context3.lineTo(x - POINT_TRIAG_LENGTH, y)
+  context3.lineTo(x + triag_len, y)
+  context3.lineTo(x, y - triag_len)
+  context3.lineTo(x - triag_len, y)
   
   context3.fillStyle = color;
   context3.fill();
 
-  renderText(x + 15, y - 15, name, "white", "12px")
+  renderText(x + 15, y - 15, name, color, "12px")
 }
 
 function renderAirport(x, y, name){
@@ -289,8 +288,11 @@ function renderAirport(x, y, name){
 
   context.beginPath()
   context.moveTo(x, y)
-  context.arc(x, y, ARP_POINT_DIAM, 0, 2 * Math.PI, false);
-  context.fillStyle = 'white';
+  context3.moveTo(x, y)
+  context3.lineTo(x + ARP_TRIAG_LENGTH, y)
+  context3.lineTo(x, y - ARP_TRIAG_LENGTH)
+  context3.lineTo(x - ARP_TRIAG_LENGTH, y)
+  context.fillStyle = ARP_COLOR;
   context.fill();
 }
 

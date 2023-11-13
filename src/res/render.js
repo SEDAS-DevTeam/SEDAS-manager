@@ -5,6 +5,12 @@ const PLANE_HEADING_MARKER = 25
 const MARKER_COLOR = "white"
 const STD_LINE_WIDTH = 3
 const PLANE_MARKER_RADIUS = 5
+const PLANE_POINTER_WIDTH = 2
+const BBOX_PAD = 5
+const POINTER_INDENT = 15
+const MAX_RECT_WIDTH = 100
+const LINE_INDENT = 15
+const INFO_TEXT_SIZE = 12
 
 //PLANE PATH DEFS
 const PLANE_PATH_RADIUS = 3
@@ -80,6 +86,9 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
   var canvas = document.querySelector("#canvas2");
   var context = canvas.getContext('2d');
 
+  var canvas1 = document.querySelector("#canvas1")
+  var context1 = canvas1.getContext("2d")
+
   //plane rendering
   context.beginPath();
   context.arc(x, y, PLANE_MARKER_RADIUS, 0, 2 * Math.PI, false);
@@ -132,13 +141,56 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
   //plane info rendering
   let proc_x = x + 50;
   let proc_y = y - 50;
+
+  let width = MAX_RECT_WIDTH;
+  let height = 0;
+
   for (const [key, value] of Object.entries(plane_info)) {
     if (value == undefined){
       continue
     }
-    renderText(proc_x, proc_y, `${key}: ${value}`, "white", "12px")
-    proc_y -= 10
+
+    renderText(proc_x, proc_y, `${key}: ${value}`, "white", INFO_TEXT_SIZE + "px")
+    proc_y -= LINE_INDENT
+    height += (INFO_TEXT_SIZE + LINE_INDENT / 2) //This feels illegal
   }
+
+  let x1_text = proc_x
+  let y1_text = proc_y
+
+
+  context1.strokeStyle = "white"
+  context1.lineWidth = PLANE_POINTER_WIDTH
+
+  //plane pointer rendering
+  context1.beginPath()
+
+  //info bounding box rendering
+  context1.rect(x1_text - BBOX_PAD, y1_text - BBOX_PAD, width + BBOX_PAD, height + BBOX_PAD)
+
+  context1.moveTo(x, y)
+
+  let x2 = 0;
+  let y2 = 0;
+  if (proc_x < x){
+    //label is on the left
+    x2 = x1_text + width
+  }
+  else{
+    //label is on the right
+    x2 = x1_text
+  }
+  if (proc_y < y){
+    //label is on the top
+    y2 = y1_text + height
+  }
+  else{
+    //label is ont the bot
+    y2 = y1_text
+  }
+
+  context1.lineTo(x2, y2)
+  context1.stroke()
 }
 
 function renderPlanePath(...coordinates){
@@ -246,7 +298,7 @@ function renderText(x, y, text, color, weight){
   var canvas = document.querySelector("#canvas3");
   var context = canvas.getContext('2d');
 
-  context.font = weight + " serif"
+  context.font = weight + " Arial"
   context.fillStyle = color
   context.fillText(text, x, y)
 }

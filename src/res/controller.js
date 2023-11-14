@@ -6,6 +6,8 @@ var desc_rendered = false
 var curr_desc = -1
 var selected_map = ""
 
+var slider_values = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
+
 /*
 CHOOSING WHICH MAP TO GENERATE ON WHICH MONITOR
 */
@@ -28,6 +30,18 @@ function render_map(){
     window.electronAPI.send_message("controller", ["render-map", selected_map])
 
 }
+
+/*
+Controller_SIM features
+*/
+
+function MoveSlider(){
+
+}
+
+/*
+Controller_GEN features
+*/
 
 function generate_airports_from_sources(){
     let airport_data = INIT_DATA[2]

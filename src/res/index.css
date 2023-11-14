@@ -215,7 +215,7 @@ div.popup-box p{
     color: black;
 }
 
-.plane-block p, div, input, form {
+.plane-block p, .plane-block div, .plane-block input, .plane-block form {
     display: inline-block;
 }/*TODO: this does not seem to work*/
 

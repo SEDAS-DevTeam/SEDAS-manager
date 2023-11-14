@@ -6,8 +6,6 @@ var desc_rendered = false
 var curr_desc = -1
 var selected_map = ""
 
-var slider_values = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
-
 /*
 CHOOSING WHICH MAP TO GENERATE ON WHICH MONITOR
 */
@@ -35,8 +33,15 @@ function render_map(){
 Controller_SIM features
 */
 
-function MoveSlider(){
+function MoveSlider(idx){
+    let range_value = document.getElementsByClassName("val-range")[idx].value
+    let range_header = document.getElementsByClassName("val-out")[idx]
 
+    range_header.innerHTML = range_value
+}
+
+function OnInput(elem){
+    elem.value = elem.value.toUpperCase()
 }
 
 /*
@@ -165,6 +170,22 @@ function process_init_data(data, reset = false){
             })
         }
     }
+    else if (page.includes("controller_sim")){
+
+        //event listeners
+        let ranges = document.getElementsByClassName("val-range")
+        for (let i = 0; i < ranges.length; i++){
+            ranges[i].addEventListener("input", () => {
+                MoveSlider(i)
+            })
+        }
+
+        document.getElementsByClassName("choice-text")[0].addEventListener("input", (event) => {
+            OnInput(event.target)
+        })
+
+        document.getElements
+    }
 }
 
 window.onload = () => {
@@ -215,11 +236,6 @@ window.onload = () => {
             break
 
         case "controller_sim.html":
-            
-            //event listeners
-            document.getElementById("send_message_redir").addEventListener("click", () => {
-                window.electronAPI.send_message_redir("worker0", ["test msg"])
-            })
             break
         
     }

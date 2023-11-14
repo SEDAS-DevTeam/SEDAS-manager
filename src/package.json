@@ -42,6 +42,7 @@
     }
   },
   "dependencies": {
-    "redis": "^4.6.10"
+    "redis": "^4.6.10",
+    "sqlite3": "^5.1.6"
   }
 }

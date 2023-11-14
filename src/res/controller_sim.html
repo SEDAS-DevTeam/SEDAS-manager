@@ -36,20 +36,21 @@
                         <button class="choice-but">LX123</button>
                     </div>
                     <button class="randomize-but">Randomize</button>
-                    <form><input type="text" placeholder="Type name..." name="name"></form>
+                    <form><input type="text" placeholder="Type callsign..." name="callsign" class="choice-text"></form>
                 </div>
                 <div class="plane-block">
-                    <p class="header">HEADING:</p>
-                    <input type="range" min="1", max="100", value="50" class="val-range">
+                    <p class="header">HEADING: <span class="val-out">100</span></p>
+                    <input type="range" min="100", max="200", value="100" step="10" class="val-range" list="markers">
                 </div>
                 <div class="plane-block">
-                    <p class="header">LEVEL: </p>
-                    <input type="range" min="1", max="100", value="50" class="val-range">
+                    <p class="header">LEVEL: <span class="val-out">100</span></p>
+                    <input type="range" min="100", max="200", value="100" step="10" class="val-range">
                 </div>
                 <div class="plane-block">
-                    <p class="header">SPEED: </p>
-                    <input type="range" min="1", max="100", value="50" class="val-range">
+                    <p class="header">SPEED: <span class="val-out">100</span></p>
+                    <input type="range" min="100", max="200", value="100" step="10" class="val-range">
                 </div>
+                <button id="confirm-button-plane">Confirm</button>
             </div>
             <h3>Plane control</h3>
             <hr>

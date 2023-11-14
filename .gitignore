@@ -10,17 +10,18 @@
 /src/controller_backend.js
 /src/controller_backend.js.map
 
+/src/*.map
+
 /src/voice_backend.js
-/src/voice_backend.js.map
-
 /src/main.js
-/src/main.js.map
-
 /src/read_map.js
-/src/read_map.js.map
+/src/database.js
 
-#redist files
+#redis files
 /src/dump.rdb
+
+#sqlite db file
+/src/:plane_info:
 
 #pycache files
 /src/res/neural/cache/__pycache__/

@@ -12,6 +12,7 @@ body{
 
 h1, h2, h3, p, a{
     color: #5271ff;
+    font-family: 'Montserrat', sans-serif;
 }
 
 button{
@@ -214,9 +215,9 @@ div.popup-box p{
     color: black;
 }
 
-.plane-block p, div, input {
+.plane-block p, div, input, form {
     display: inline-block;
-}
+}/*TODO: this does not seem to work*/
 
 .plane-block {
     display: block;
@@ -231,4 +232,8 @@ div.popup-box p{
 
 .val-range{
     width: 98%;
+}
+
+.header{
+    font-weight: bold;
 }

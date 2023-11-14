@@ -3,8 +3,10 @@
     <head>
         <link rel="stylesheet" href="index.css">
         <meta charset="utf-8" />
-        <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
         <script src="controller.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inria+Sans&family=Montserrat:wght@300&family=Saira&display=swap" rel="stylesheet"> 
     </head>
     <body style="margin-left: 20px; margin-right: 20px;">
         <div id="top-content">
@@ -26,7 +28,7 @@
             <h3>Plane spawn</h3>
             <div class="plane-cell">
                 <div class="plane-block">
-                    <p>NAME: </p>
+                    <p class="header">NAME: </p>
                     <div id="rand-gen-but">
                         <button class="choice-but">LX123</button>
                         <button class="choice-but">LX123</button>
@@ -34,17 +36,18 @@
                         <button class="choice-but">LX123</button>
                     </div>
                     <button class="randomize-but">Randomize</button>
+                    <form><input type="text" placeholder="Type name..." name="name"></form>
                 </div>
                 <div class="plane-block">
-                    <p>HEADING: </p>
+                    <p class="header">HEADING:</p>
                     <input type="range" min="1", max="100", value="50" class="val-range">
                 </div>
                 <div class="plane-block">
-                    <p>LEVEL: </p>
+                    <p class="header">LEVEL: </p>
                     <input type="range" min="1", max="100", value="50" class="val-range">
                 </div>
                 <div class="plane-block">
-                    <p>SPEED: </p>
+                    <p class="header">SPEED: </p>
                     <input type="range" min="1", max="100", value="50" class="val-range">
                 </div>
             </div>

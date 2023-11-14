@@ -213,3 +213,22 @@ div.popup-box p{
     background-color: green;
     color: black;
 }
+
+.plane-block p, div, input {
+    display: inline-block;
+}
+
+.plane-block {
+    display: block;
+}
+
+.plane-cell{
+    padding-left: 15px;
+    border: 2px solid #5271ff;
+    padding-top: 5px;
+    padding-right: 5px;
+}
+
+.val-range{
+    width: 98%;
+}

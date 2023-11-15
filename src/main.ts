@@ -5,6 +5,7 @@ import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
 import * as path from "path"
 import * as read_map from "./read_map"
+import { CreateDatabase, InsertRecord, DeleteRecord, SelectRecord, CloseDatabase } from "./database";
 
 
 //own imports
@@ -89,6 +90,22 @@ const worker_dict = {
     }
 }
 
+/*
+DATABASE FUNCTIONS (READY TO IMPLEMENT)
+
+async function run(){
+    CreateDatabase()
+    InsertRecord(5, "amogus", 180, 180, 180, "vepot", "afis")
+    InsertRecord(3, "fix", 180, 180, 180, "vepot", "afis")
+    let out = await SelectRecord(5)
+    console.log(out)
+
+    setTimeout(() => console.log("timeout"), 5000)
+    CloseDatabase()
+}
+
+run()
+*/
 function get_window_coords(idx: number){
     let x: number
     let y: number

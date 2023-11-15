@@ -22,7 +22,3 @@ export function list_map_files(){
     }
     return files
 }
-
-export function generate_map(){
-    console.log("TODO")
-}

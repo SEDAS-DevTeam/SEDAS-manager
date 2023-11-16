@@ -5,8 +5,7 @@ import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
 import * as path from "path"
 import * as read_map from "./read_map"
-import { CreateDatabase, InsertRecord, DeleteRecord, SelectRecord, CloseDatabase, SelectAll} from "./database";
-
+import { BackupDB, PlaneDB } from "./database";
 
 //own imports
 //import * as comm from "./res/communication" //importing communication module 
@@ -39,8 +38,12 @@ const voice_settings = JSON.parse(voice_settings_raw);
 //run RedisDB
 const database = spawn("redis-server")
 
-//run SQLite db
-CreateDatabase()
+//run SQLite DB
+var BackupDatabase = new BackupDB();
+BackupDatabase.create_database()
+
+//run local plane DB
+var PlaneDatabase = new PlaneDB();
 
 //fetch all python backend files
 const fetch_process = spawn("python3", [`${PATH_TO_PROCESS}`])

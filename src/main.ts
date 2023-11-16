@@ -5,7 +5,7 @@ import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
 import * as path from "path"
 import * as read_map from "./read_map"
-import { CreateDatabase, InsertRecord, DeleteRecord, SelectRecord, CloseDatabase } from "./database";
+import { CreateDatabase, InsertRecord, DeleteRecord, SelectRecord, CloseDatabase, SelectAll} from "./database";
 
 
 //own imports
@@ -38,6 +38,9 @@ const voice_settings = JSON.parse(voice_settings_raw);
 
 //run RedisDB
 const database = spawn("redis-server")
+
+//run SQLite db
+CreateDatabase()
 
 //fetch all python backend files
 const fetch_process = spawn("python3", [`${PATH_TO_PROCESS}`])
@@ -92,20 +95,20 @@ const worker_dict = {
 
 /*
 DATABASE FUNCTIONS (READY TO IMPLEMENT)
-
 async function run(){
     CreateDatabase()
     InsertRecord(5, "amogus", 180, 180, 180, "vepot", "afis")
     InsertRecord(3, "fix", 180, 180, 180, "vepot", "afis")
     let out = await SelectRecord(5)
+    DeleteRecord(5)
     console.log(out)
 
     setTimeout(() => console.log("timeout"), 5000)
     CloseDatabase()
 }
-
-run()
 */
+
+
 function get_window_coords(idx: number){
     let x: number
     let y: number
@@ -299,8 +302,11 @@ ipcMain.handle("message", (event, data) => {
                 workers[i].close()
             }
 
-            //stop database
+            //stop redis database
             database.kill("SIGINT")
+
+            //stop SQLite database
+            CloseDatabase()
 
             break
         case "invoke":
@@ -353,4 +359,10 @@ ipcMain.on("message-redirect", (event, data) => {
         workers[idx].send_message("message-redirect", data[1][0])
         sender_win_name = "controller"
     }
+})
+
+//channel for sending created plane data
+ipcMain.on("plane-info", (event, data) => {
+    console.log("got data from process")
+    console.log(data)
 })

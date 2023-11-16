@@ -111,6 +111,21 @@ function show_description(idx){
     curr_desc = idx
 }
 
+function process_plane_data(){
+
+}
+
+function random_generate_names(n){
+    if (n < 5){
+        //random generate only one button
+        let button = document.getElementsByClassName("choice-but")[n]
+    }
+    else{
+        //random generate all buttons
+        
+    }
+}
+
 function process_init_data(data, reset = false){
 
     if (reset){
@@ -183,8 +198,6 @@ function process_init_data(data, reset = false){
         document.getElementsByClassName("choice-text")[0].addEventListener("input", (event) => {
             OnInput(event.target)
         })
-
-        document.getElements
     }
 }
 
@@ -236,8 +249,18 @@ window.onload = () => {
             break
 
         case "controller_sim.html":
-            break
-        
+            //event listeners
+            document.getElementById("confirm-button-plane").addEventListener("click", () => {
+                process_plane_data()
+            })
+
+            let choice_buttons = document.getElementsByClassName("choice-but")
+            for (let i = 0; i < choice_buttons.length; i++){
+                random_generate_names(i)
+            }
+
+            //running init code
+            random_generate_names(choice_buttons.length)
     }
 
     //set for all pages

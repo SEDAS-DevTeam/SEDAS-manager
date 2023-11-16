@@ -11,6 +11,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ipcRenderer.invoke("message", [message_info, message])
         console.log("sent message to main")
     },
+    send_plane_info: (plane_info) => {
+        ipcRenderer.invoke("plane-info", plane_info)
+        console.log(plane_info)
+    },
+    on_plane_info: (callback) => {
+        ipcRenderer.on("plane-info", (event, data) => {
+            callback(data)
+        })
+    },
     //when receiving incoming messages from other processes
     on_message_redir: () => {
         ipcRenderer.on("message-redirect", (event, data) => {

@@ -48,14 +48,15 @@ export function DeleteRecord(id: number){
             }
             else{
                 resolve()
+                console.log("deleted a record")
             }
         })
     })
 }
 
-export async function SelectRecord(id: number){
+export function SelectRecord(id: number){
     return new Promise((resolve, reject) => {
-        DB.each(`SELECT * FROM PLANES WHERE id=${id}`, (err, row) => {
+        DB.each(`SELECT * FROM PLANES WHERE id=${id}`, (err: any, row: any) => {
             if (err){
                 reject(err)
             }
@@ -63,6 +64,19 @@ export async function SelectRecord(id: number){
                 resolve(row)
             }
         });
+    })
+}
+
+export function SelectAll(){
+    return new Promise((resolve, reject) => {
+        DB.each("SELECT * FROM PLANES", (err: any, data: any) => {
+            if (err){
+                reject(err)
+            }
+            else{
+                resolve(data)
+            }
+        })
     })
 }
 

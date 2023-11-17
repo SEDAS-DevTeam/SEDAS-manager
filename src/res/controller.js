@@ -54,72 +54,6 @@ function OnInput(elem){
     }
 }
 
-/*
-Controller_GEN features
-*/
-
-function generate_airports_from_sources(){
-    let airport_data = INIT_DATA[2]
-    for (let i = 0; i < airport_data.length; i++){
-        let record = document.createElement("tr")
-
-        let i2 = 0;
-        for (const [key, value] of Object.entries(airport_data[i])) {
-            if (i2 == 0){
-                //skip first FILENAME record
-                i2 += 1
-                continue
-            }
-            if (i2 == Object.keys(airport_data[i]).length - 1){
-                //skip DESC
-                break
-            }
-
-            record.innerHTML += `<td>${value}</td>`
-            i2 += 1
-        }
-
-        let desc_obj = document.createElement("td")
-        let select_obj = document.createElement("td")
-        let logo = document.createElement("i")
-        let popup_box = document.createElement("div")
-        let desc = document.createElement("p")
-        let select_button = document.createElement("button")
-
-        logo.classList.add("fa");
-        logo.classList.add("fa-search")
-        logo.setAttribute('aria-hidden', 'true');
-
-        popup_box.classList.add("popup-box");
-        select_button.classList.add("tablebutton")
-        select_button.innerHTML = "Select"
-
-        desc.classList.add("desc");
-        desc.innerHTML = airport_data[i]["DESC"]
-
-        popup_box.appendChild(desc)
-
-        desc_obj.appendChild(logo)
-        desc_obj.appendChild(popup_box)
-        select_obj.appendChild(select_button)
-
-        record.appendChild(desc_obj)
-        record.appendChild(select_obj)
-
-        document.querySelector("table").appendChild(record)
-    }
-}
-
-function show_description(idx){
-    let desc_data = document.querySelectorAll("div.popup-box")
-    for (let i = 0; i < desc_data.length; i++){
-        desc_data[i].style.visibility = "hidden"
-    }
-    desc_data[idx].style.visibility = "visible"
-
-    desc_rendered = true
-    curr_desc = idx
-}
 
 function process_plane_data(){
 
@@ -187,6 +121,73 @@ function random_generate_names(){
             }
         }
     }
+}
+
+/*
+Controller_GEN features
+*/
+
+function generate_airports_from_sources(){
+    let airport_data = INIT_DATA[2]
+    for (let i = 0; i < airport_data.length; i++){
+        let record = document.createElement("tr")
+
+        let i2 = 0;
+        for (const [key, value] of Object.entries(airport_data[i])) {
+            if (i2 == 0){
+                //skip first FILENAME record
+                i2 += 1
+                continue
+            }
+            if (i2 == Object.keys(airport_data[i]).length - 1){
+                //skip DESC
+                break
+            }
+
+            record.innerHTML += `<td>${value}</td>`
+            i2 += 1
+        }
+
+        let desc_obj = document.createElement("td")
+        let select_obj = document.createElement("td")
+        let logo = document.createElement("i")
+        let popup_box = document.createElement("div")
+        let desc = document.createElement("p")
+        let select_button = document.createElement("button")
+
+        logo.classList.add("fa");
+        logo.classList.add("fa-search")
+        logo.setAttribute('aria-hidden', 'true');
+
+        popup_box.classList.add("popup-box");
+        select_button.classList.add("tablebutton")
+        select_button.innerHTML = "Select"
+
+        desc.classList.add("desc");
+        desc.innerHTML = airport_data[i]["DESC"]
+
+        popup_box.appendChild(desc)
+
+        desc_obj.appendChild(logo)
+        desc_obj.appendChild(popup_box)
+        select_obj.appendChild(select_button)
+
+        record.appendChild(desc_obj)
+        record.appendChild(select_obj)
+
+        document.querySelector("table").appendChild(record)
+    }
+}
+
+function show_description(idx){
+    let desc_data = document.querySelectorAll("div.popup-box")
+    for (let i = 0; i < desc_data.length; i++){
+        desc_data[i].style.visibility = "hidden"
+    }
+    desc_data[idx].style.visibility = "visible"
+
+    desc_rendered = true
+    curr_desc = idx
 }
 
 function process_init_data(data, reset = false){

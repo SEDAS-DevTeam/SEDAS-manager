@@ -215,7 +215,7 @@ div.popup-box p{
     color: black;
 }
 
-.plane-block p, .plane-block div, .plane-block input, .plane-block form {
+.plane-block p, .plane-block div, .plane-block input, .plane-block form, .plane-block button, .plane-block h3{
     display: inline-block;
 }/*TODO: this does not seem to work*/
 
@@ -274,4 +274,37 @@ div.popup-box p{
 .selected-choice{
     background-color: #5271ff;
     color: white;
+}
+
+.plane-search{
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    margin: 0;
+    border: solid 2px #5271ff;
+    color: #5271ff;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+#scrollable{
+    overflow-y: scroll;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: auto auto auto auto auto auto auto auto auto auto auto auto;
+    background-color: #2196F3;
+    padding: 10px;
+}
+.grid-item {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    font-size: 30px;
+    text-align: center;
+    cursor: pointer;
 }

@@ -309,7 +309,7 @@ ipcMain.handle("message", (event, data) => {
             database.kill("SIGINT")
 
             //stop SQLite database
-            CloseDatabase()
+            BackupDatabase.close_database()
 
             break
         case "invoke":

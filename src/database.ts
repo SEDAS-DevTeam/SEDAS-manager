@@ -33,7 +33,7 @@ export class BackupDB{
             })
         })
     }
-    public DeleteRecord(id: number){
+    public delete_record(id: number){
         return new Promise<void>((resolve, reject) => {
             this.DB.run(`DELETE FROM PLANES WHERE id='${id}'`, (err: any) => {
                 if (err){
@@ -47,7 +47,7 @@ export class BackupDB{
             })
         })
     }
-    public SelectRecord(id: number){
+    public select_record(id: number){
         return new Promise((resolve, reject) => {
             this.DB.each(`SELECT * FROM PLANES WHERE id=${id}`, (err: any, row: any) => {
                 if (err){
@@ -59,7 +59,7 @@ export class BackupDB{
             });
         })
     }
-    public SelectAll(){
+    public select_all(){
         return new Promise((resolve, reject) => {
             this.DB.each("SELECT * FROM PLANES", (err: any, data: any) => {
                 if (err){
@@ -71,13 +71,13 @@ export class BackupDB{
             })
         })
     }
-    public CloseDatabase(){
+    public close_database(){
         return new Promise<void>((resolve, reject) => {
             this.DB.close()
             resolve()
         })
     }
-    public DeleteDatabase(){
+    public delete_database(){
         return new Promise<void>((resolve, reject) => {
             this.DB.run(`DROP TABLE PLANES`, (err: any) => {
                 if (err){
@@ -95,7 +95,7 @@ export class BackupDB{
 
 export class PlaneDB{
     /*Just an array with methods - for storing planes*/
-    public DB: any;
+    public DB: any = []
 
     public add_record(id: number, callsign: string, heading: number, level: number,
         speed: number, departure: string, arrival: string, x: number, y: number){

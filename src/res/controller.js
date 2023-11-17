@@ -6,6 +6,9 @@ var desc_rendered = false
 var curr_desc = -1
 var selected_map = ""
 
+var already_generated_names = []
+
+
 /*
 CHOOSING WHICH MAP TO GENERATE ON WHICH MONITOR
 */
@@ -42,6 +45,13 @@ function MoveSlider(idx){
 
 function OnInput(elem){
     elem.value = elem.value.toUpperCase()
+
+    if(elem.value.length == 0){
+        elem.id = ""
+    }
+    else{
+        elem.id = "selected-choice-text"
+    }
 }
 
 /*
@@ -115,14 +125,67 @@ function process_plane_data(){
 
 }
 
-function random_generate_names(n){
-    if (n < 5){
-        //random generate only one button
-        let button = document.getElementsByClassName("choice-but")[n]
+function on_choice_select(n){
+    let buttons = document.getElementsByClassName("choice-but")
+    if (document.getElementsByClassName("choice-text")[0].value.length != 0){
+        return
     }
-    else{
-        //random generate all buttons
-        
+
+    if(buttons[n].classList.contains("selected-choice")){
+        //this button was already selected
+        buttons[n].classList.remove("selected-choice")
+        return
+    }
+
+    for (let i = 0; i < buttons.length; i++){
+        if (buttons[i].classList.contains("selected-choice")){
+            buttons[i].classList.remove("selected-choice")
+        }
+    }
+    buttons[n].classList.add("selected-choice")
+}
+
+function random_generate_names(){
+    /*
+    CALLSIGN GENERATION RULES
+    * must not exceed 7 characters
+    * not any alphabet haracter after numericals
+    * ICAO airline designators have to be used
+    * 3 letters ICAO code and 4 is unique call sign
+    */
+    let generated_callsigns = []
+
+    let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let nums = "0123456789"
+
+    //random generate all buttons
+    var choice_buttons = document.getElementsByClassName("choice-but")
+    for (let i = 0; i < choice_buttons.length; i++){
+        while(true){
+            let out = ""
+
+            for (let i_code = 0; i_code < 3; i_code++){
+                out += chars.charAt(Math.floor(Math.random() * chars.length))
+            }
+
+            //randomize selection of 4 or 3 digits
+            var rand_len = Math.floor(Math.random() * 2)
+            let i_sign_max = 0
+
+            if (rand_len == 1) i_sign_max = 3
+            else i_sign_max = 4
+
+            for (let i_sign = 0; i_sign < i_sign_max; i_sign++){
+                out += nums.charAt(Math.floor(Math.random() * nums.length))
+            }
+            
+            if (!generated_callsigns.includes(out)){
+                generated_callsigns.push(out)
+                choice_buttons[i].innerHTML = out
+
+                break
+            }
+        }
     }
 }
 
@@ -249,6 +312,9 @@ window.onload = () => {
             break
 
         case "controller_sim.html":
+            //running init code
+            random_generate_names()
+
             //event listeners
             document.getElementById("confirm-button-plane").addEventListener("click", () => {
                 process_plane_data()
@@ -256,11 +322,10 @@ window.onload = () => {
 
             let choice_buttons = document.getElementsByClassName("choice-but")
             for (let i = 0; i < choice_buttons.length; i++){
-                random_generate_names(i)
+                choice_buttons[i].addEventListener("click", () => {
+                    on_choice_select(i)
+                })
             }
-
-            //running init code
-            random_generate_names(choice_buttons.length)
     }
 
     //set for all pages

@@ -50,6 +50,28 @@
                     <p class="header">SPEED: <span class="val-out">100</span></p>
                     <input type="range" min="100", max="200", value="100" step="10" class="val-range">
                 </div>
+                <div class="plane-block">
+                    <p class="header">MONITOR</p>
+                    <select id="departure_point" name="dep_point">
+                        <option value="monit1">Monitor 1 (ACC)</option>
+                        <option value="monit2">Monitor 2 (APP)</option>
+                    </select>
+                </div>
+                <div class="plane-block" style="margin-left: 20px;">
+                    <p class="header">DEPARTURE POINT</p>
+                    <select id="departure_point" name="dep_point">
+                        <option value="monit1">Monitor 1 (ACC)</option>
+                        <option value="monit2">Monitor 2 (APP)</option>
+                    </select>
+                </div>
+                <div class="plane-block" style="margin-left: 20px;">
+                    <p class="header">ARRIVAL POINT</p>
+                    <select id="departure_point" name="dep_point">
+                        <option value="monit1">Monitor 1 (ACC)</option>
+                        <option value="monit2">Monitor 2 (APP)</option>
+                    </select>
+                </div>
+
                 <button id="confirm-button-plane">Confirm</button>
             </div>
             <h3>Plane control</h3>
@@ -84,7 +106,7 @@
                         <div class="grid-item">190</div>
                         <div class="grid-item">200</div>
                         <div class="grid-item">Speed</div>
-                        <div class="grid-item">100</div>
+                        <div class="grid-item selected">100</div>
                         <div class="grid-item">110</div>  
                         <div class="grid-item">120</div>
                         <div class="grid-item">130</div>

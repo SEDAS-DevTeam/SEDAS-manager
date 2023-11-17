@@ -7,7 +7,7 @@ var curr_desc = -1
 var selected_map = ""
 
 var already_generated_names = []
-
+var selected_name = ""
 
 /*
 CHOOSING WHICH MAP TO GENERATE ON WHICH MONITOR
@@ -56,7 +56,18 @@ function OnInput(elem){
 
 
 function process_plane_data(){
+    //name
+    let name = selected_name
 
+    let val_spans = document.getElementsByClassName("val-out")
+    //heading
+    let heading = val_spans[0].innerHTML
+
+    //level
+    let level = val_spans[1].innerHTML
+
+    //speed
+    let speed = val_spans[2].innerHTML
 }
 
 function on_choice_select(n){
@@ -113,10 +124,10 @@ function random_generate_names(){
                 out += nums.charAt(Math.floor(Math.random() * nums.length))
             }
             
-            if (!generated_callsigns.includes(out)){
+            if (!generated_callsigns.includes(out) && !already_generated_names.includes(out)){
                 generated_callsigns.push(out)
                 choice_buttons[i].innerHTML = out
-
+                selected_name = out
                 break
             }
         }

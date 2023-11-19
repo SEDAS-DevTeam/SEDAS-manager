@@ -51,6 +51,7 @@ function OnInput(elem){
     }
     else{
         elem.id = "selected-choice-text"
+        selected_name = elem.value
     }
 }
 
@@ -58,6 +59,10 @@ function OnInput(elem){
 function process_plane_data(){
     //name
     let name = selected_name
+    if (selected_name == ""){
+        alert("You did not select any planes!")
+        return
+    }
 
     let val_spans = document.getElementsByClassName("val-out")
     //heading
@@ -68,6 +73,20 @@ function process_plane_data(){
 
     //speed
     let speed = val_spans[2].innerHTML
+
+    //on which monitor to spawn
+    let spawn_elem = document.getElementById("monitor_spawn")
+    let spawn_on  = spawn_elem.options[spawn_elem.selectedIndex].text;
+
+    //departure point
+    let dep_elem = document.getElementById("departure_point")
+    let dep_point = dep_elem.options[dep_elem.selectedIndex].text;
+
+    //monitor_spawn
+    let arr_elem = document.getElementById("arrival_point")
+    let arr_point = dep_elem.options[dep_elem.selectedIndex].text;
+
+    console.log(name, heading, level, speed)
 }
 
 function on_choice_select(n){
@@ -79,6 +98,7 @@ function on_choice_select(n){
     if(buttons[n].classList.contains("selected-choice")){
         //this button was already selected
         buttons[n].classList.remove("selected-choice")
+        selected_name = ""
         return
     }
 
@@ -88,6 +108,7 @@ function on_choice_select(n){
         }
     }
     buttons[n].classList.add("selected-choice")
+    selected_name = buttons[n].innerHTML
 }
 
 function random_generate_names(){
@@ -132,6 +153,7 @@ function random_generate_names(){
             }
         }
     }
+    selected_name = ""
 }
 
 /*
@@ -330,6 +352,10 @@ window.onload = () => {
             //event listeners
             document.getElementById("confirm-button-plane").addEventListener("click", () => {
                 process_plane_data()
+            })
+
+            document.getElementsByClassName("randomize-but")[0].addEventListener("click", () => {
+                random_generate_names()
             })
 
             let choice_buttons = document.getElementsByClassName("choice-but")

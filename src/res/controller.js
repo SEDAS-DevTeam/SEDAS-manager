@@ -63,9 +63,20 @@ function OnInput(elem){
     }
 }
 
-function create_plane_elem(){
+function plane_value_change(elem){
+    var other_elem = elem.parentNode.children
+    for (let i = 0; i < other_elem.length; i++){
+        if(other_elem[i].classList)
+    }
+}
+
+function create_plane_elem(plane_name, plane_departure, plane_arrival){
     let grid_container = document.createElement("div")
     grid_container.classList.add("grid-container")
+
+    let plane_cell = document.createElement("div")
+    plane_cell.classList.add("plane-cell")
+    plane_cell.innerHTML = `<h2>${plane_name} (from ${plane_departure.split("_")[0]} to ${plane_arrival.split("_")[0]})</h2>`
 
     for(let i_row = 0; i_row < 3; i_row++){
         for(let i_col = 0; i_col < 12; i_col++){
@@ -80,8 +91,16 @@ function create_plane_elem(){
             }
 
             grid_row.innerHTML = ALL[i_row][i_col - 1]
+            grid_row.classList.add("item" + i_row)
+
+            //add onclick event to them
+            grid_row.addEventListener("click", (event) => {
+                plane_value_change(event.target)
+            })
         }
     }
+    plane_cell.appendChild(grid_container)
+    document.getElementById("plane-list").appendChild(plane_cell)
 }
 
 function process_plane_data(){
@@ -104,18 +123,29 @@ function process_plane_data(){
 
     //on which monitor to spawn
     let spawn_elem = document.getElementById("monitor_spawn")
-    let spawn_on  = spawn_elem.options[spawn_elem.selectedIndex].text;
+    let spawn_on  = spawn_elem.options[spawn_elem.selectedIndex].value;
 
     //departure point
     let dep_elem = document.getElementById("departure_point")
-    let dep_point = dep_elem.options[dep_elem.selectedIndex].text;
+    let dep_point = dep_elem.options[dep_elem.selectedIndex].value;
 
     //monitor_spawn
     let arr_elem = document.getElementById("arrival_point")
-    let arr_point = dep_elem.options[dep_elem.selectedIndex].text;
+    let arr_point = arr_elem.options[arr_elem.selectedIndex].value;
 
 
-    console.log(name, heading, level, speed)
+    window.electronAPI.send_message("controller", ["spawn-plane", {
+        "name": name,
+        "heading": heading,
+        "level": level,
+        "speed": speed,
+        "monitor": spawn_on,
+        "departure": dep_point,
+        "arrival": arr_point
+    }])
+
+    //render on controller screen
+    create_plane_elem(name, dep_point, arr_point)
 }
 
 function on_choice_select(n){

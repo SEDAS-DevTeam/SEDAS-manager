@@ -232,6 +232,7 @@ ipcMain.handle("message", (event, data) => {
     let coords = [0, 0]
 
     switch(data[1][0]){
+        //generic message channels
         case "redirect-to-menu":
             //message call to redirect to main menu
             settings.close()
@@ -313,6 +314,7 @@ ipcMain.handle("message", (event, data) => {
         case "invoke":
             worker.postMessage(data[1][1])
             break
+        //info retrival to Controller
         case "send-info":
             //send initial info to controller
 
@@ -380,6 +382,10 @@ ipcMain.handle("message", (event, data) => {
                 controllerWindow.send_message("map-checked", JSON.stringify({"user-check": true}))
             }
             break
+        //plane control
+        case "spawn-plane":
+            console.log(data[1][1])
+            //TODO:
     }
 })
 

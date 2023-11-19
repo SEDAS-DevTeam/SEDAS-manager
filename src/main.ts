@@ -7,9 +7,6 @@ import * as path from "path"
 import * as read_map from "./read_map"
 import { BackupDB, PlaneDB } from "./database";
 
-//own imports
-//import * as comm from "./res/communication" //importing communication module 
-
 //window variable declarations
 var mainMenu: Window;
 var settings: Window;
@@ -20,7 +17,8 @@ var workerWindow: Window;
 var sender_win_name: string = "";
 var displays = [];
 var workers = [];
-var map_config = []
+var map_config = [];
+var map_data: any;
 
 
 const PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/fetch.py"
@@ -337,13 +335,39 @@ ipcMain.handle("message", (event, data) => {
         case "render-map":
             //retrieve all airport data
             let filename = data[1][1]
-            let map_data = read_map.read_map_from_file(filename)
+            map_data = read_map.read_map_from_file(filename)
 
             //render to workers
             console.log(map_data)
+
+            //save map data to variable
+
+
             //set map data to all workers
             for (let i = 0; i < workers.length; i++){
                 workers[i].send_message("map-data", [map_data])
+            }
+            break
+        case "get-points":
+            console.log(data[1][1])
+            let spec_data: any;
+            if (data[1][1].includes("ACC")){
+                //selected monitor is in ACC mode
+                spec_data = map_data["ACC"]
+            }
+            else if (data[1][1].includes("APP")){
+                //selected monitor is in APP mode
+                spec_data = map_data["APP"]
+            }
+            else if (data[1][1].includes("TWR")){
+                //selected monitor is in TWR mode
+                spec_data = map_data["TWR"]
+            }
+            let out_data = {}
+            for (const [key, value] of Object.entries(spec_data)) {
+                if (key == "POINTS" || key == "ARP" || key == "SID" || key == "STAR" || key == "RUNWAY"){
+                    console.log(key, value);
+                }
             }
             break
     }

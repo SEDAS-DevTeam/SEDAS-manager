@@ -71,12 +71,14 @@ function process_map_data(data, type){
     }
 
     //TEST
+    /*
     renderPlane(150, 350, 50, {
         "callsign": "LX123",
         "level": 120,
         "speed": 150,
         "code": undefined
     })
+    */
 }
 
 window.onload = () => {

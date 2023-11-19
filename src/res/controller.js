@@ -156,6 +156,12 @@ function random_generate_names(){
     selected_name = ""
 }
 
+function change_according_points(){
+    var monit_sel = document.getElementById("monitor_spawn");
+    var selectedValue = monit_sel.options[monit_sel.selectedIndex].value;
+    window.electronAPI.send_message("controller", ["get-points", selectedValue])
+}
+
 /*
 Controller_GEN features
 */
@@ -283,18 +289,22 @@ function process_init_data(data, reset = false){
         }
     }
     else if (page.includes("controller_sim")){
+        //clear parent element innerHTML
+        document.getElementById("monitor_spawn").innerHTML = ""
 
-        //event listeners
-        let ranges = document.getElementsByClassName("val-range")
-        for (let i = 0; i < ranges.length; i++){
-            ranges[i].addEventListener("input", () => {
-                MoveSlider(i)
-            })
+        var monitor_data = JSON.parse(data[1])
+
+        for (let i = 0; i < monitor_data.length; i++){
+            console.log(monitor_data[i])
+
+            let monitor_option = document.createElement("option")
+            monitor_option.value = `monitor${i}${monitor_data[i]["win_type"]}`
+            monitor_option.innerHTML = `monitor ${i} (${monitor_data[i]["win_type"]})`
+            document.getElementById("monitor_spawn").appendChild(monitor_option)
         }
 
-        document.getElementsByClassName("choice-text")[0].addEventListener("input", (event) => {
-            OnInput(event.target)
-        })
+        //change arrival and departure points onload
+        change_according_points()
     }
 }
 
@@ -364,6 +374,22 @@ window.onload = () => {
                     on_choice_select(i)
                 })
             }
+
+            let ranges = document.getElementsByClassName("val-range")
+            for (let i = 0; i < ranges.length; i++){
+                ranges[i].addEventListener("input", () => {
+                    MoveSlider(i)
+                })
+            }
+
+            document.getElementsByClassName("choice-text")[0].addEventListener("input", (event) => {
+                OnInput(event.target)
+            })
+
+            //check whenever monitor_spawn is selected and change departure and arrival points accordingly
+            document.getElementById("monitor_spawn").addEventListener("change", (event) => {
+                change_according_points()
+            })
     }
 
     //set for all pages

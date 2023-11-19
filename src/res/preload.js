@@ -34,7 +34,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
         });
     },
     on_map_data: (callback) => {
-        ipcRenderer.on("map-data", (event, data) => {
+        ipcRenderer.on('map-data', (event, data) => {
+            callback(data)
+        });
+    },
+    //on generic message send
+    on_message: (channel, callback) => {
+        ipcRenderer.on(channel, (event, data) => {
             callback(data)
         })
     }

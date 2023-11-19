@@ -335,13 +335,12 @@ ipcMain.handle("message", (event, data) => {
         case "render-map":
             //retrieve all airport data
             let filename = data[1][1]
+
+            //save map data to variable
             map_data = read_map.read_map_from_file(filename)
 
             //render to workers
             console.log(map_data)
-
-            //save map data to variable
-
 
             //set map data to all workers
             for (let i = 0; i < workers.length; i++){
@@ -366,8 +365,19 @@ ipcMain.handle("message", (event, data) => {
             let out_data = {}
             for (const [key, value] of Object.entries(spec_data)) {
                 if (key == "POINTS" || key == "ARP" || key == "SID" || key == "STAR" || key == "RUNWAY"){
-                    console.log(key, value);
+                    out_data[key] = value
                 }
+            }
+            controllerWindow.send_message("map-points", JSON.stringify(out_data))
+            break
+        case "map-check":
+            if (map_data == undefined){
+                console.log("user did not check")
+                controllerWindow.send_message("map-checked", JSON.stringify({"user-check": false}))
+            }
+            else {
+                console.log("user checked")
+                controllerWindow.send_message("map-checked", JSON.stringify({"user-check": true}))
             }
             break
     }

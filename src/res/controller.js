@@ -111,6 +111,10 @@ function on_choice_select(n){
     selected_name = buttons[n].innerHTML
 }
 
+function process_monitor_points(monitor_map_data){
+    console.log(monitor_map_data)
+}
+
 function random_generate_names(){
     /*
     CALLSIGN GENERATION RULES
@@ -357,6 +361,10 @@ window.onload = () => {
 
         case "controller_sim.html":
             //running init code
+
+            //check if user had already selected map
+            window.electronAPI.send_message("controller", ["map-check"])
+
             random_generate_names()
 
             //event listeners
@@ -397,6 +405,21 @@ window.onload = () => {
         window.electronAPI.send_message("controller", ["exit"])
     })
 
+    //general messages
+    window.electronAPI.on_message("map-points", (data) => {
+        process_monitor_points(data)
+    })
+    window.electronAPI.on_message("map-checked", (data) => {
+        let data_temp = JSON.parse(data)
+        if (data_temp["user-check"]){
+            document.getElementById("mask").style.visibility = "hidden"
+        }
+        else{
+            document.getElementById("mask").style.visibility = "visible"
+        }
+    })
+
+    //specific messages
     window.electronAPI.on_message_redir()
     window.electronAPI.on_init_info((data) => {
         process_init_data(data)

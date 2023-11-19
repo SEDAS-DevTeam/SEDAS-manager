@@ -1,3 +1,10 @@
+//variable definitions
+const PLANE_LABELS = ["Heading", "Level", "Speed"]
+const HEADING_VALS = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
+const LEVEL_VALS = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
+const SPEED_VALS = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
+const ALL = [HEADING_VALS, LEVEL_VALS, SPEED_VALS]
+
 var Windows = []
 var monitor_objects = []
 var INIT_DATA = [] //store it in this session
@@ -8,6 +15,7 @@ var selected_map = ""
 
 var already_generated_names = []
 var selected_name = ""
+var all_points = []
 
 /*
 CHOOSING WHICH MAP TO GENERATE ON WHICH MONITOR
@@ -55,6 +63,26 @@ function OnInput(elem){
     }
 }
 
+function create_plane_elem(){
+    let grid_container = document.createElement("div")
+    grid_container.classList.add("grid-container")
+
+    for(let i_row = 0; i_row < 3; i_row++){
+        for(let i_col = 0; i_col < 12; i_col++){
+            let grid_row = document.createElement("div")
+            grid_row.classList.add("grid-item")
+            grid_container.appendChild(grid_row)
+
+            if (i_col == 0){
+                grid_row.id = "label"
+                grid_row.innerHTML = PLANE_LABELS[i_row]
+                continue
+            }
+
+            grid_row.innerHTML = ALL[i_row][i_col - 1]
+        }
+    }
+}
 
 function process_plane_data(){
     //name
@@ -86,6 +114,7 @@ function process_plane_data(){
     let arr_elem = document.getElementById("arrival_point")
     let arr_point = dep_elem.options[dep_elem.selectedIndex].text;
 
+
     console.log(name, heading, level, speed)
 }
 
@@ -112,7 +141,41 @@ function on_choice_select(n){
 }
 
 function process_monitor_points(monitor_map_data){
+    //reset points
+    all_points = []
     console.log(monitor_map_data)
+
+    let data = JSON.parse(monitor_map_data)
+    for (const [key, value] of Object.entries(data)) {
+        if (value == "none"){
+            continue
+        }
+
+        for (let i = 0; i < value.length; i++){
+            all_points.push({
+                "type": key,
+                "name": value[i]["name"]
+            })
+        }
+    }
+
+    let dep_select = document.getElementById("departure_point")
+    for (let i = 0; i < all_points.length; i++){
+        let option_elem = document.createElement("option")
+        option_elem.innerHTML = `${all_points[i]["name"]} (${all_points[i]["type"]})`
+        option_elem.value = `${all_points[i]["name"]}_${all_points[i]["type"]}`
+
+        dep_select.appendChild(option_elem)
+    }
+
+    let arr_select = document.getElementById("arrival_point")
+    for (let i = 0; i < all_points.length; i++){
+        let option_elem = document.createElement("option")
+        option_elem.innerHTML = `${all_points[i]["name"]} (${all_points[i]["type"]})`
+        option_elem.value = `${all_points[i]["name"]}_${all_points[i]["type"]}`
+        
+        arr_select.appendChild(option_elem)
+    }
 }
 
 function random_generate_names(){
@@ -410,6 +473,40 @@ window.onload = () => {
             //check whenever monitor_spawn is selected and change departure and arrival points accordingly
             document.getElementById("monitor_spawn").addEventListener("change", (event) => {
                 change_according_points()
+            })
+
+            document.getElementById("departure_point").addEventListener("change", (event) => {
+                //disable that specific point on other point select
+                let selectedValue = event.target.options[event.target.selectedIndex].value;
+
+                let children = document.getElementById("arrival_point").children
+                for (let i = 0; i < children.length; i++){
+                    children[i].disabled = false
+                }
+
+                for (let i = 0; i < children.length; i++){
+                    if (selectedValue == children[i].value){
+                        children[i].disabled = true
+                        break
+                    }
+                }
+            })
+
+            document.getElementById("arrival_point").addEventListener("change", (event) => {
+                //disable that specific point on other point select
+                let selectedValue = event.target.options[event.target.selectedIndex].value;
+
+                let children = document.getElementById("departure_point").children
+                for (let i = 0; i < children.length; i++){
+                    children[i].disabled = false
+                }
+
+                for (let i = 0; i < children.length; i++){
+                    if (selectedValue == children[i].value){
+                        children[i].disabled = true
+                        break
+                    }
+                }
             })
     }
 

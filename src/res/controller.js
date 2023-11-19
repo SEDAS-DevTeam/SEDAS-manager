@@ -166,6 +166,15 @@ function change_according_points(){
     window.electronAPI.send_message("controller", ["get-points", selectedValue])
 }
 
+function ai_control_change(elem){
+    if (elem.checked){
+        window.electronAPI.send_message("controller", ["ai-control-start"])
+    }
+    else{
+        window.electronAPI.send_message("controller", ["ai-control-stop"])
+    }
+}
+
 /*
 Controller_GEN features
 */
@@ -374,6 +383,10 @@ window.onload = () => {
 
             document.getElementsByClassName("randomize-but")[0].addEventListener("click", () => {
                 random_generate_names()
+            })
+
+            document.getElementById("ai-control-switch").addEventListener("change", (event) => {
+                ai_control_change(event.target)
             })
 
             let choice_buttons = document.getElementsByClassName("choice-but")

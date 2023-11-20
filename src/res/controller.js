@@ -74,12 +74,14 @@ function plane_value_change(elem){
     }
 
     elem.classList.add("selected")
-    window.electronAPI.send_message("controller", ["plane-value-change", elem.innerHTML])
+    window.electronAPI.send_message("controller", ["plane-value-change", elem.classList[1], elem.innerHTML])
 }
 
-function create_plane_elem(plane_name, plane_departure, plane_arrival){
+function create_plane_elem(plane_name, plane_departure, plane_arrival, plane_heading, plane_level, plane_speed){
     let grid_container = document.createElement("div")
     grid_container.classList.add("grid-container")
+
+    let other_plane_components = [plane_heading, plane_level, plane_speed]
 
     let plane_cell = document.createElement("div")
     plane_cell.classList.add("plane-cell")
@@ -104,6 +106,11 @@ function create_plane_elem(plane_name, plane_departure, plane_arrival){
             grid_row.addEventListener("click", (event) => {
                 plane_value_change(event.target)
             })
+
+            //added selected to already selected elements
+            if (grid_row.innerHTML == other_plane_components[i_row]){
+                grid_row.classList.add("selected")
+            }
         }
     }
     plane_cell.appendChild(grid_container)
@@ -152,7 +159,7 @@ function process_plane_data(){
     }])
 
     //render on controller screen
-    create_plane_elem(name, dep_point, arr_point)
+    create_plane_elem(name, dep_point, arr_point, heading, level, speed)
 }
 
 function on_choice_select(n){
@@ -251,6 +258,7 @@ function random_generate_names(){
             
             if (!generated_callsigns.includes(out) && !already_generated_names.includes(out)){
                 generated_callsigns.push(out)
+                already_generated_names.push(out)
                 choice_buttons[i].innerHTML = out
                 selected_name = out
                 break

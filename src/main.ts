@@ -400,10 +400,25 @@ ipcMain.handle("message", (event, data) => {
                             plane_data["departure"], plane_data["arrival"], x, y)
 
             PlaneDatabase.add_record(plane)
+
+            console.log(PlaneDatabase.DB)
             
             break
         case "plane-value-change":
             console.log(data[1][1])
+            console.log(data[1][2])
+            switch(data[1][1]){
+                case "item0":
+                    //heading change
+                    break
+                case "item1":
+                    //level change
+                    break
+                case "item2":
+                    //speed change
+                    break
+
+            }
             //TODO:
             break
     }

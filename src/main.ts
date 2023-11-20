@@ -6,7 +6,7 @@ import {spawn} from "node:child_process"
 import * as path from "path"
 import * as read_map from "./read_map"
 import { BackupDB } from "./database";
-import { Plane, PlaneDB } from "./plane_functions";
+import { Plane, PlaneDB, update_planes } from "./plane_functions";
 
 //window variable declarations
 var mainMenu: Window;

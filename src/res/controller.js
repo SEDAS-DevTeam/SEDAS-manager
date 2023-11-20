@@ -66,8 +66,15 @@ function OnInput(elem){
 function plane_value_change(elem){
     var other_elem = elem.parentNode.children
     for (let i = 0; i < other_elem.length; i++){
-        if(other_elem[i].classList)
+        if (other_elem[i].classList[1] == elem.classList[1]){
+            if(other_elem[i].classList.contains("selected")){
+                other_elem[i].classList.remove("selected")
+            }
+        }
     }
+
+    elem.classList.add("selected")
+    window.electronAPI.send_message("controller", ["plane-value-change", elem.innerHTML])
 }
 
 function create_plane_elem(plane_name, plane_departure, plane_arrival){

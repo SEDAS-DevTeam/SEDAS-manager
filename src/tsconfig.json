@@ -15,6 +15,7 @@
     "voice_backend.ts",
     "main.ts",
     "read_map.ts",
-    "database.ts"
+    "database.ts",
+    "plane_functions.ts"
   ]
 }

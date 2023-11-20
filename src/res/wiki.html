@@ -3,33 +3,24 @@
     <head>
         <link rel="stylesheet" href="index.css">
         <meta charset="utf-8" />
-        <script src="monitor_control.js"></script>
         <script src="controller.js"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inria+Sans&family=Montserrat:wght@300&family=Saira&display=swap" rel="stylesheet"> 
     </head>
-    <body style="margin-left: 20px; margin-right: 20px;">
+    <body style="margin-left: 20px; margin-right: 20px;" id="scrollable">
         <div id="top-content">
             <div>
-                <h1 id="main-header">SEDAC manager Controller</h1>
+                <h1 id="main-header">SEDAC manager Wiki</h1>
                 <button id="main-header-button">Exit</button>
             </div>
             <hr>
             <div class="topnav" id="controller-topnav">
                 <a href="controller_gen.html">Generation</a>
-                <a href="controller_mon.html" class="active">Monitors</a>
+                <a href="controller_mon.html">Monitors</a>
                 <a href="controller_sim.html">Simulation</a>
-                <a href="wiki.html">wiki</a>
+                <a href="wiki.html" class="active">wiki</a>
             </div>
-        </div>
-        <div style="margin-left: 20px; margin-right: 20px;" id="page-content">
-            <h2>Monitors setup</h2>
-            <button id="res_to_def" style="margin-bottom: 15px;">reset to default</button>
-            <button style="margin-bottom: 15px;">Apply</button>
-
-            <svg id="field" height="70%" width="100%" style="background-color:rgb(218, 215, 215)">
-            </svg>
         </div>
     </body>
 </html>

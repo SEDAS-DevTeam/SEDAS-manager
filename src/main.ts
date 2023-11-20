@@ -5,7 +5,8 @@ import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
 import * as path from "path"
 import * as read_map from "./read_map"
-import { BackupDB, PlaneDB } from "./database";
+import { BackupDB } from "./database";
+import { Plane, PlaneDB } from "./plane_functions";
 
 //window variable declarations
 var mainMenu: Window;
@@ -19,6 +20,7 @@ var displays = [];
 var workers = [];
 var map_config = [];
 var map_data: any;
+var curr_plane_id: number = 0;
 
 
 const PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/fetch.py"
@@ -384,8 +386,19 @@ ipcMain.handle("message", (event, data) => {
             break
         //plane control
         case "spawn-plane":
+            let plane_data = data[1][1]
+
+            //get current x, y coordinates according to selected points
+            //TODO:
+            let x = 0
+            let y = 0
+
+            PlaneDatabase.add_record(curr_plane_id, plane_data["name"], plane_data["heading"], plane_data["level"], plane_data["speed"], plane_data["departure"], plane_data["arrival"], x, y)
+            break
+        case "plane-value-change":
             console.log(data[1][1])
             //TODO:
+            break
     }
 })
 
@@ -409,3 +422,5 @@ ipcMain.on("plane-info", (event, data) => {
     console.log("got data from process")
     console.log(data)
 })
+
+setInterval(update_planes, 1000)

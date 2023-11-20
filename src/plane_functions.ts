@@ -2,8 +2,7 @@ export class PlaneDB{
     /*Just an array with methods - for storing planes*/
     public DB: any = []
 
-    public add_record(id: number, callsign: string, heading: number, level: number,
-        speed: number, departure: string, arrival: string, x: number, y: number){
+    public add_record(plane_obj: any){
         /*
         id - record identifier
         callsign - aircraft callsing
@@ -12,38 +11,20 @@ export class PlaneDB{
         x - last x coordinate
         y - last y coordinate
         */
-        this.DB.push({
-            "id": id,
-            "callsign": callsign,
-            "heading": heading,
-            "level": level,
-            "speed": speed,
-            "departure": departure,
-            "arrival": arrival,
-            "x": x,
-            "y": y
-        })
+        this.DB.push(plane_obj)
     }
 
     public find_record(id: number){
         for (let i = 0; i < this.DB.length; i++){
-            if (this.DB[i]["id"] == id){
+            if (this.DB[i].id == id){
                 return this.DB[i]
-            }
-        }
-    }
-
-    public modify_record(id: number, mod_val :(string | number)[]){
-        for (let i = 0; i < this.DB.length; i++){
-            if (this.DB[i]["id"] == id){
-                this.DB[i][mod_val[0]] = mod_val[1]
             }
         }
     }
 
     public delete_record(id: number){
         for (let i = 0; i < this.DB.length; i++){
-            if (this.DB[i]["id"] == id){
+            if (this.DB[i].id == id){
                 this.DB.splice(i, 1)
             }
         }
@@ -55,11 +36,49 @@ export class PlaneDB{
 }
 
 export class Plane{
-    public constructor(){
+    public id: number;
+    public callsign: string;
 
+    public heading: number;
+    public updated_heading: number;
+
+    public level: number;
+    public updated_level: number;
+
+    public speed: number;
+    public updated_speed: number;
+
+    public departure: string;
+    public arrival: string;
+    public x: number;
+    public y: number;
+
+    public constructor(id: number, callsign: string, 
+        heading: number, heading_up: number, 
+        level: number, level_up: number,
+        speed: number, speed_up: number,
+        departure: string, arrival: string, x: number, y: number){
+            this.id = id;
+            this.callsign = callsign;
+
+            this.heading = heading;
+            this.updated_heading = heading_up
+
+            this.level = level;
+            this.updated_level = level_up;
+
+            this.speed = speed;
+            this.updated_speed = speed_up
+
+            this.departure = departure;
+            this.arrival = arrival;
+            this.x = x;
+            this.y = y;
     }
 }
 
-export function update_planes(){
-    
+export function update_planes(plane_database: any){
+    for(let i = 0; i < plane_database.length; i++){
+        //update each plane
+    } 
 }

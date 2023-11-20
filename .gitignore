@@ -8,14 +8,13 @@
 
 #typescript files (are automatically generated)
 /src/controller_backend.js
-/src/controller_backend.js.map
-
-/src/*.map
-
 /src/voice_backend.js
 /src/main.js
 /src/read_map.js
 /src/database.js
+/src/plane_functions.js
+
+/src/*.map
 
 #redis files
 /src/dump.rdb

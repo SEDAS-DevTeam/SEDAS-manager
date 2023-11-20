@@ -392,8 +392,15 @@ ipcMain.handle("message", (event, data) => {
             //TODO:
             let x = 0
             let y = 0
+            
+            let plane = new Plane(curr_plane_id, plane_data["name"], 
+                            plane_data["heading"], plane_data["heading"],
+                            plane_data["level"], plane_data["level"],
+                            plane_data["speed"], plane_data["speed"],
+                            plane_data["departure"], plane_data["arrival"], x, y)
 
-            PlaneDatabase.add_record(curr_plane_id, plane_data["name"], plane_data["heading"], plane_data["level"], plane_data["speed"], plane_data["departure"], plane_data["arrival"], x, y)
+            PlaneDatabase.add_record(plane)
+            
             break
         case "plane-value-change":
             console.log(data[1][1])
@@ -423,4 +430,6 @@ ipcMain.on("plane-info", (event, data) => {
     console.log(data)
 })
 
-setInterval(update_planes, 1000)
+setInterval(() => {
+    update_planes(PlaneDatabase)
+}, 1000)

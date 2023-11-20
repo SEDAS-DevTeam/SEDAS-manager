@@ -277,9 +277,15 @@ function change_according_points(){
 function ai_control_change(elem){
     if (elem.checked){
         window.electronAPI.send_message("controller", ["ai-control-start"])
+
+        //disable visibility on whole content
+        document.getElementById("main-content").style.visibility = "hidden"
     }
     else{
         window.electronAPI.send_message("controller", ["ai-control-stop"])
+
+        //enable visibility on whole content
+        document.getElementById("main-content").style.visibility = "visible"
     }
 }
 

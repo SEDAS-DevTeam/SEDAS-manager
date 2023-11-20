@@ -115,11 +115,12 @@ function draw_connection(){
     
     let y_top = monitor_objects[i].getBoundingClientRect().top - offset_y
     let y_bot =  monitor_objects[i].getBoundingClientRect().bottom - offset_y
+    let w_half = (y_bot - y_top) / 2
 
     object_offsets.push({
       "x1": Math.round(x1),
       "x2": Math.round(x2),
-      "y": Math.round(y_bot - y_top / 2)
+      "y": Math.round(y_top + w_half)
     })
   }
 
@@ -127,22 +128,10 @@ function draw_connection(){
   field.innerHTML = ""
 
   //write connections
-  let path_str_start = '<path d="'
   let path_str = ""
-  let path_str_end = '"/>'
-  let line_width = 2
-  for(let i = 0; i < object_offsets.length; i++){
-
-    if(i == 0){ //first
-      path_str += `M ${object_offsets[i].x2} ${object_offsets[i].y} `
-    }
-    else{
-      path_str += `L ${object_offsets[i].x1} ${object_offsets[i].y} `
-    }
+  for(let i = 0; i < object_offsets.length - 1; i++){
+    path_str += `<line x1="${object_offsets[i]["x2"]}" y1="${object_offsets[i]["y"]}" x2="${object_offsets[i + 1]["x1"]}" y2="${object_offsets[i + 1]["y"]}" stroke="black"/>`
   }
 
-  path_str += `V ${object_offsets[0].y + line_width} `
-  path_str += `L ${object_offsets[0].x2} ${object_offsets[0].y + line_width} `
-
-  field.innerHTML = (path_str_start + path_str + path_str_end)
+  field.innerHTML = path_str
 }

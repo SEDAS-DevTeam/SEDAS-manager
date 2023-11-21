@@ -345,6 +345,30 @@ function generate_airports_from_sources(){
     }
 }
 
+/*
+Controller_MON features
+*/
+
+function send_monitor_data(){
+    var monitor_headers = document.getElementsByClassName("monitor-header")
+    var monitor_options_elem = document.getElementsByClassName("monitor-functions")
+
+    var monitor_data = []
+
+    for (let i_mon = 0; i_mon < monitor_headers.length; i_mon++){
+        let monitor_header = monitor_headers[i_mon].innerHTML
+        var monitor_type = monitor_options_elem[i_mon].options[monitor_options_elem[i_mon].selectedIndex].value;
+
+        monitor_data.push({
+            "name": monitor_header,
+            "type": monitor_type
+        })
+    }
+
+    console.log(monitor_data)
+    window.electronAPI.send_message("controller", ["monitor-change-info", monitor_data])
+}
+
 function show_description(idx){
     let desc_data = document.querySelectorAll("div.popup-box")
     for (let i = 0; i < desc_data.length; i++){
@@ -478,6 +502,10 @@ window.onload = () => {
             //event listeners
             document.getElementById("res_to_def").addEventListener("click", () => {
                 process_init_data(INIT_DATA, true)
+            })
+            document.getElementById("apply-changes").addEventListener("click", () => {
+                //apply changes and send them to backend
+                send_monitor_data(monitor_objects)
             })
 
             break

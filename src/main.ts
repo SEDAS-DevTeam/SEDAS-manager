@@ -421,6 +421,9 @@ ipcMain.handle("message", (event, data) => {
             }
             //TODO:
             break
+        case "monitor-change-info":
+            //whenever controller decides to change monitor type
+            console.log(data[1][1])
     }
 })
 

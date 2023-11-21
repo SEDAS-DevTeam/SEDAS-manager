@@ -171,7 +171,11 @@ class Window{
         this.window.close()
     }
 
-    public show(){
+    public show(path: string = ""){
+        if (path.length != 0){
+            //rewrite path_load (used for controller window_manipulation
+            this.path_load = path
+        }
         this.window.loadFile(this.path_load);
     }
 
@@ -423,7 +427,43 @@ ipcMain.handle("message", (event, data) => {
             break
         case "monitor-change-info":
             //whenever controller decides to change monitor type
-            console.log(data[1][1])
+            let mon_data = data[1][1]
+            for (let i = 0; i < workers.length; i++){
+               if (workers[i].win_type != mon_data[i]["type"]){
+                    //rewrite current window type and render to another one
+                    let path_to_render = "";
+
+
+                    switch(mon_data[i]["type"]){
+                        case "ACC":
+                            //rewrite to Area control
+                            path_to_render = "./res/worker.html"
+                            //TODO: add rendering
+                            break
+                        case "APP":
+                            //rewrite to Approach control
+                            path_to_render = "./res/worker.html"
+                            //TODO: add rendering
+                            break
+                        case "TWR":
+                            //rewrite to tower
+                            path_to_render = "./res/worker.html"
+                            //TODO: add rendering
+                            break
+                        case "weather":
+                            //rewrite to weather forecast
+                            path_to_render = "./res/weather.html"
+                            break
+                        case "dep_arr":
+                            //rewrite to departure/arrival list
+                            path_to_render = "./res/dep_arr.html"
+                            break
+                    }
+
+                    workers[i].win_type = mon_data[i]["type"]
+                    workers[i].show(path_to_render)
+               }
+            }
     }
 })
 

@@ -464,6 +464,7 @@ ipcMain.handle("message", (event, data) => {
                     workers[i].show(path_to_render)
                }
             }
+            break
     }
 })
 

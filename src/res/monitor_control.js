@@ -5,9 +5,11 @@ var dragged_element = undefined
 //ELEMENT INIT DEFS
 const MONITOR_INIT_STRING = '<!-- Include a header DIV with the same name as the draggable DIV, followed by "header" --><div class="monitor-header">Monitor </div><select id="functions" class="monitor-functions" name="functions"><option value="TWR">TWR control</option><option value="APP">APP control</option><option value="ACC">ACC control</option><option value="weather">weather forecast</option><option value="dep_arr">departure list</option></select>'
 const MODES_TO_IDX = {
-  "worker.html": 2, //predefine this to ACC because we didnt set up any other rendering //TODO:
-  "weather.html": 3, //weather forecast
-  "dep_arr.html": 4 //departure/arrivals
+  "TWR": 0,
+  "APP": 1,
+  "ACC": 2,
+  "weather": 3, //weather forecast
+  "dep_arr": 4 //departure/arrivals
 }
 const MONITOR_X_SPACE = 250
 const MONITOR_Y = 200
@@ -58,6 +60,7 @@ function drag_elem_to_loc(event){
 //ELEMENT INIT
 
 function insert_selected(idx){
+  console.log(idx)
   var regex = /option/gi, result, indices = [], indices_mod = [];
   while ( (result = regex.exec(MONITOR_INIT_STRING)) ) {
       indices.push(result.index);
@@ -81,10 +84,9 @@ function rename(innerhtml_string, idx){
 function element_init(element_data, idx){
   //align to specified x and y
 
-  let worker_winname = element_data["path_load"].split("/")
-  worker_winname = worker_winname[worker_winname.length - 1]
+  let worker_type = element_data["win_type"]
 
-  let monitor_innerhtml = insert_selected(MODES_TO_IDX[worker_winname])
+  let monitor_innerhtml = insert_selected(MODES_TO_IDX[worker_type])
   monitor_innerhtml = rename(monitor_innerhtml, idx + 1)
 
   let monitor_elem = document.createElement("div")

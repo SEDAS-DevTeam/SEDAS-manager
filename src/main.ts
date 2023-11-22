@@ -192,7 +192,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -464,6 +464,10 @@ ipcMain.handle("message", (event, data) => {
                     workers[i].show(path_to_render)
                }
             }
+            break
+        case "send-location-data":
+            //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
+            console.log("any info sir?")
             break
     }
 })

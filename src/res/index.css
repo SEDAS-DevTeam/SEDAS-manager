@@ -405,3 +405,15 @@ body#weather-background{
 h2.weather-text a{
     color: #84948e;
 }
+
+.weather-but-run{
+    background-color: #04AA6D;
+    color: black;
+    border: 1px solid black;
+}
+
+.weather-but-stop{
+    background-color: rgb(255, 0, 0);
+    color: black;
+    border: 1px solid black;
+}

@@ -388,3 +388,20 @@ input:focus + .slider {
 input:checked + .slider:before {
     transform: translateX(26px);
 }
+
+/*
+WEATHER DEFS
+*/
+body#weather-background{
+    background-color: black;
+}
+
+.weather-text{
+    color: aliceblue;
+    margin: 0;
+    margin-top: 5px;
+}
+
+h2.weather-text a{
+    color: #84948e;
+}

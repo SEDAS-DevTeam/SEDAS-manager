@@ -283,6 +283,9 @@ function renderPoint(x, y, name, color, triag_len){
 }
 
 function renderAirport(x, y, name){
+  var canvas3 = document.querySelector("#canvas1");
+  var context3 = canvas3.getContext('2d');
+
   var canvas = document.querySelector("#canvas1");
   var context = canvas.getContext('2d');
 
@@ -294,6 +297,8 @@ function renderAirport(x, y, name){
   context3.lineTo(x - ARP_TRIAG_LENGTH, y)
   context.fillStyle = ARP_COLOR;
   context.fill();
+
+  renderText(x + 15, y - 15, name, ARP_COLOR, "12px")
 }
 
 function renderText(x, y, text, color, weight){

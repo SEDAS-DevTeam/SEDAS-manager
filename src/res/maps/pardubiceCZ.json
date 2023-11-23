@@ -10,7 +10,7 @@
         "TERRAIN": "none",
         "RESTRICTED_AREA": "none",
         "ARP": [
-            {"x": 55, "y": 65}
+            {"x": 55, "y": 65, "name": "Pardubice"}
         ],
         "POINTS": [
             {"x": 300, "y": 300, "name": "VEPOT"},

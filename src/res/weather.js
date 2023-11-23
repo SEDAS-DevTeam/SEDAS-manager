@@ -7,7 +7,7 @@ var optionKind = 'radar'; // can be 'radar' or 'satellite'
 
 var optionTileSize = 256; // can be 256 or 512.
 const OPTION_COLOR_SCHEME = 7; // from 0 to 8. Check the https://rainviewer.com/api/color-schemes.html for additional information
-var optionSmoothData = 0; // 0 - not smooth, 1 - smooth
+var optionSmoothData = 1; // 0 - not smooth, 1 - smooth
 var optionSnowColors = 1; // 0 - do not show snow colors, 1 - show snow colors
 
 var animationPosition = 0;

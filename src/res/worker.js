@@ -15,7 +15,7 @@ function process_map_data(data, type){
             switch(key){
                 case "ARP":
                     //rendering ARP for ACC/APP
-                    renderAirport(value[0]["x"], value[0]["y"])
+                    renderAirport(value[0]["x"], value[0]["y"], value[0]["name"])
                     break
                 case "RUNWAY":
                     //rendering runway for TWR

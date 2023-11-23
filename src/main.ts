@@ -214,7 +214,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        //this.window.webContents.openDevTools()
+        this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -410,28 +410,29 @@ ipcMain.handle("message", (event, data) => {
                             plane_data["level"], plane_data["level"],
                             plane_data["speed"], plane_data["speed"],
                             plane_data["departure"], plane_data["arrival"], x, y)
-
             PlaneDatabase.add_record(plane)
+            curr_plane_id += 1
 
-            console.log(PlaneDatabase.DB)
+            controllerWindow.send_message("update-plane-db", PlaneDatabase.DB)
             
             break
         case "plane-value-change":
-            console.log(data[1][1])
-            console.log(data[1][2])
             switch(data[1][1]){
                 case "item0":
                     //heading change
+                    PlaneDatabase.DB[data[1][3]].heading = parseInt(data[1][2])
                     break
                 case "item1":
                     //level change
+                    PlaneDatabase.DB[data[1][3]].level = parseInt(data[1][2])
                     break
                 case "item2":
                     //speed change
+                    PlaneDatabase.DB[data[1][3]].speed = parseInt(data[1][2])
                     break
 
             }
-            //TODO:
+            console.log(PlaneDatabase.DB[data[1][3]])
             break
         case "monitor-change-info":
             //whenever controller decides to change monitor type

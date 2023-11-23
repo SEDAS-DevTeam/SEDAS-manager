@@ -17,6 +17,7 @@ var already_generated_names = []
 var selected_name = ""
 var all_points = []
 var monitor_data = [] //data for storing monitors
+var plane_data = [] //data for storing all planes
 
 /*
 CHOOSING WHICH MAP TO GENERATE ON WHICH MONITOR
@@ -66,6 +67,13 @@ function OnInput(elem){
 
 function plane_value_change(elem){
     var other_elem = elem.parentNode.children
+    var header_full = elem.parentNode.parentNode.querySelector("h2").innerHTML
+    
+    header_full = header_full.split("(")[0]
+    var header = header_full.substring(0, header_full.length - 1)
+    var plane_id;
+    
+    //gui change
     for (let i = 0; i < other_elem.length; i++){
         if (other_elem[i].classList[1] == elem.classList[1]){
             if(other_elem[i].classList.contains("selected")){
@@ -73,9 +81,19 @@ function plane_value_change(elem){
             }
         }
     }
-
     elem.classList.add("selected")
-    window.electronAPI.send_message("controller", ["plane-value-change", elem.classList[1], elem.innerHTML])
+
+    //look at local db
+    console.log(plane_data)
+    for (let i = 0; i < plane_data.length; i++){
+        if (plane_data[i].callsign == header){
+            //found corresponding plane
+            plane_id = plane_data[i].id
+            console.log(plane_data[i].id)
+        }
+    }
+
+    window.electronAPI.send_message("controller", ["plane-value-change", elem.classList[1], elem.innerHTML, plane_id])
 }
 
 function create_plane_elem(plane_name, plane_departure, plane_arrival, plane_heading, plane_level, plane_speed){
@@ -611,6 +629,11 @@ window.onload = () => {
         else{
             document.getElementById("mask").style.visibility = "visible"
         }
+    })
+
+    //plane messages
+    window.electronAPI.on_message("update-plane-db", (data) => {
+        plane_data = data
     })
 
     //specific messages

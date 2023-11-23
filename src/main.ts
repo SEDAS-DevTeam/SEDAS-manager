@@ -162,6 +162,28 @@ function get_window_coords(idx: number){
     return [x, y]
 }
 
+function exit_app(){
+    //disable voice recognition and ACAI backend
+    voice_worker.postMessage("stop")
+    //kill voice recognition
+    voice_worker.postMessage("interrupt")
+    
+    //close windows
+    controllerWindow.close()
+    for(let i = 0; i < workers.length; i++){
+        workers[i].close()
+    }
+
+    //stop redis database
+    database.kill("SIGINT")
+
+    //stop SQLite database
+    BackupDatabase.close_database()
+
+    //complete process exit
+    process.exit()
+}
+
 class Window{
     public window: BrowserWindow;
     public win_type: string = "none";
@@ -192,7 +214,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -299,24 +321,8 @@ ipcMain.handle("message", (event, data) => {
             worker.postMessage("terrain") //generate terrain
             break
         case "exit":
-            //disable voice recognition and ACAI backend
-            voice_worker.postMessage("stop")
-            //kill voice recognition
-            voice_worker.postMessage("interrupt")
-            
-            //close windows
-            controllerWindow.close()
-            for(let i = 0; i < workers.length; i++){
-                workers[i].close()
-            }
+            exit_app()
 
-            //stop redis database
-            database.kill("SIGINT")
-
-            //stop SQLite database
-            BackupDatabase.close_database()
-
-            break
         case "invoke":
             worker.postMessage(data[1][1])
             break
@@ -507,3 +513,10 @@ ipcMain.on("plane-info", (event, data) => {
 setInterval(() => {
     update_planes(PlaneDatabase)
 }, 1000)
+
+//when app dies, it should die in peace
+process.on('SIGINT', function() {
+    console.log("Caught interrupt signal");
+
+    exit_app()
+});

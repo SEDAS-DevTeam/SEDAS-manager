@@ -15,7 +15,7 @@ var optionSmoothData = 1; // 0 - not smooth, 1 - smooth
 var optionSnowColors = 1; // 0 - do not show snow colors, 1 - show snow colors
 
 var animationPosition = 0;
-var animationTimer = false;
+var is_playing = true
 
 var loadingTilesCount = 0;
 var loadedTilesCount = 0;
@@ -46,6 +46,7 @@ window.onload = () => {
     apiRequest.send();
 
     //start playing
+    play()
 }
 
 function startLoadingTile() {
@@ -178,15 +179,17 @@ function showFrame(nextPosition, force) {
  * Check if the animation timeout is set and clear it.
  */
 function stop() {
-    clearTimeout(animationTimer);
-    animationTimer = false;
+    is_playing = false
 }
 
 function play() {
-    showFrame(animationPosition + 1);
+    is_playing = true
+}
 
-    // Main animation driver. Run this function every 500 ms
-    animationTimer = setTimeout(play, 500);
+function play_loop(){
+    if (is_playing){
+        showFrame(animationPosition + 1);
+    }
 }
 
 /*
@@ -195,3 +198,6 @@ Electron functions to communicate through IPC
 function ask_for_loc(){
     window.electronAPI.send_message("weather", ["send-location-data"])
 }
+
+//play loop to render frames
+setInterval(play_loop, 500)

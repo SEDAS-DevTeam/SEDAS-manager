@@ -156,7 +156,7 @@ function changeRadarPosition(position, preloadOnly, force) {
 
 
     var pastOrForecast = nextFrame.time > Date.now() / 1000 ? 'FORECAST' : 'PAST';
-
+    document.getElementById("timestamp").innerHTML = pastOrForecast + ': ' + (new Date(nextFrame.time * 1000)).toString();
 }
 
 /**
@@ -202,5 +202,7 @@ setInterval(play_loop, 500)
 
 window.electronAPI.on_message("geo-data", (data) => {
     console.log(data)
-    map.setView([50, 50], 6);
+    if (!(data[0] == "none" && data[1] == "none")){
+        map.setView([data[0], data[1]], data[2]);
+    }
 })

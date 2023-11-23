@@ -417,3 +417,12 @@ h2.weather-text a{
     color: black;
     border: 1px solid black;
 }
+
+#timestamp{
+    color: white;
+    text-align: center;
+}
+
+.weather-top button, .weather-top p{
+    display: inline-block;
+}

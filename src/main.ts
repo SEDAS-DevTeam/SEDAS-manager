@@ -474,7 +474,7 @@ ipcMain.handle("message", (event, data) => {
             console.log(workers)
             for (let i = 0; i < workers.length; i++){
                 if (workers[i]["win_type"] == "weather"){
-                    workers[i].send_message("geo-data", [longitude, latitude, zoom])
+                    workers[i].send_message("geo-data", [latitude, longitude, zoom])
                 }
             }
             break

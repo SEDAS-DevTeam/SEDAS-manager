@@ -37,7 +37,7 @@ function render_map(){
         return
     }
     
-    window.electronAPI.send_message("controller", ["render-map", selected_map])
+    window.electronAPI.send_message("controller", ["set-map", selected_map])
 
 }
 

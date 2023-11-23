@@ -1,14 +1,17 @@
 var map_data = undefined;
 
 function process_map_data(data, type){
-    map_data = data //set map data to global on session
-
-    let spec_data = map_data[0][type] //load map data type (ACC/APP/TWR)
-
-    //canvas rendering part
+    //rewrite all canvas data
     renderCanvas(1)
     renderCanvas(2)
     renderCanvas(3)
+
+    if (data[0] == undefined){
+        return;
+    }
+    map_data = data //set map data to global on session
+
+    let spec_data = map_data[0][type] //load map data type (ACC/APP/TWR)
 
     for (const [key, value] of Object.entries(spec_data)) {
         if (value != "none"){
@@ -82,6 +85,9 @@ function process_map_data(data, type){
 }
 
 window.onload = () => {
+    //ask for map data
+    window.electronAPI.send_message("worker", ["render-map"])
+
     //render all essential things
     renderCanvas(1)
     renderCanvas(2)

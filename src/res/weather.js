@@ -1,7 +1,3 @@
-/**
- * RainViewer radar animation part
- * @type {number[]}
- */
 var apiData = {};
 var mapFrames = [];
 var lastPastFramePosition = -1;
@@ -11,7 +7,7 @@ var optionKind = 'radar'; // can be 'radar' or 'satellite'
 
 var optionTileSize = 256; // can be 256 or 512.
 const OPTION_COLOR_SCHEME = 7; // from 0 to 8. Check the https://rainviewer.com/api/color-schemes.html for additional information
-var optionSmoothData = 1; // 0 - not smooth, 1 - smooth
+var optionSmoothData = 0; // 0 - not smooth, 1 - smooth
 var optionSnowColors = 1; // 0 - do not show snow colors, 1 - show snow colors
 
 var animationPosition = 0;
@@ -26,8 +22,7 @@ window.onload = () => {
     /*
      * Load whole map
     */
-    map = L.map('mapid')
-    map.setView([50, 50], 6); 
+    map = L.map('mapid') 
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
         attributions: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -47,6 +42,9 @@ window.onload = () => {
 
     //start playing
     play()
+
+    //ask for location where to focus
+    ask_for_loc()
 }
 
 function startLoadingTile() {
@@ -201,3 +199,8 @@ function ask_for_loc(){
 
 //play loop to render frames
 setInterval(play_loop, 500)
+
+window.electronAPI.on_message("geo-data", (data) => {
+    console.log(data)
+    map.setView([50, 50], 6);
+})

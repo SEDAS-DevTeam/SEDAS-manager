@@ -14,5 +14,8 @@
         ],
         "SID": "none",
         "STAR": "none"
-    }
+    },
+    "long": "none",
+    "lat": "none",
+    "zoom": 6
 }

@@ -77,7 +77,7 @@ const controller_dict = {
     resizable: true,
     icon: "./res/img/sedac-manager-logo.png",
     frame: true,
-    focusable: true,
+    //focusable: true,
     webPreferences: {
         preload: path.join(__dirname, "res/preload.js")
     }
@@ -89,8 +89,8 @@ const worker_dict = {
     title: "SEDAC",
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
-    frame: false,
-    focusable: false,
+    //frame: false,
+    //focusable: false,
     webPreferences: {
         preload: path.join(__dirname, "res/preload.js")
     }
@@ -192,7 +192,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        //this.window.webContents.openDevTools()
+        this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -467,7 +467,16 @@ ipcMain.handle("message", (event, data) => {
             break
         case "send-location-data":
             //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
-            console.log("any info sir?")
+            let longitude = map_data["long"]
+            let latitude = map_data["lat"]
+            let zoom = map_data["zoom"]
+
+            console.log(workers)
+            for (let i = 0; i < workers.length; i++){
+                if (workers[i]["win_type"] == "weather"){
+                    workers[i].send_message("geo-data", [longitude, latitude, zoom])
+                }
+            }
             break
     }
 })

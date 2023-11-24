@@ -50,6 +50,7 @@ export class Plane{
 
     public departure: string;
     public arrival: string;
+    public arrival_time: string;
     public x: number;
     public y: number;
 
@@ -57,7 +58,9 @@ export class Plane{
         heading: number, heading_up: number, 
         level: number, level_up: number,
         speed: number, speed_up: number,
-        departure: string, arrival: string, x: number, y: number){
+        departure: string, arrival: string, 
+        arrival_time: string,
+        x: number, y: number){
             this.id = id;
             this.callsign = callsign;
 
@@ -72,6 +75,7 @@ export class Plane{
 
             this.departure = departure;
             this.arrival = arrival;
+            this.arrival_time = arrival_time
             this.x = x;
             this.y = y;
     }

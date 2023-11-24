@@ -30,11 +30,11 @@ function render_planes(){
     for (let i = 0; i < plane_data.length; i++){
         if(plane_data[i].departure.includes("ARP") || plane_data[i].departure.includes("RUNWAY")){
             //comes to departures list
-            update_row(1, 1, "departures", ["", plane_data[i].callsign, plane_data[i].departure.split("_")[0], plane_data[i].arrival.split("_")[0]])
+            update_row(1, 1, "departures", [plane_data[i].arrival_time, plane_data[i].callsign, plane_data[i].departure.split("_")[0], plane_data[i].arrival.split("_")[0]])
         }
         else{
             //comes to arrivals list
-            update_row(1, 1, "arrivals", ["", plane_data[i].callsign, plane_data[i].departure.split("_")[0], plane_data[i].arrival.split("_")[0]])
+            update_row(1, 1, "arrivals", [plane_data[i].arrival_time, plane_data[i].callsign, plane_data[i].departure.split("_")[0], plane_data[i].arrival.split("_")[0]])
         }
     }
 }

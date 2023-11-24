@@ -470,7 +470,9 @@ ipcMain.handle("message", (event, data) => {
                             plane_data["heading"], plane_data["heading"],
                             plane_data["level"], plane_data["level"],
                             plane_data["speed"], plane_data["speed"],
-                            plane_data["departure"], plane_data["arrival"], x, y)
+                            plane_data["departure"], plane_data["arrival"], 
+                            plane_data["arrival_time"],
+                            x, y)
             PlaneDatabase.add_record(plane)
             curr_plane_id += 1
 

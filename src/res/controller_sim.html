@@ -78,7 +78,27 @@
                     <select id="arrival_point">
                     </select>
                 </div>
-
+                <div class="time-block-full">
+                    <p class="header" style="display: inline-block;">ARRIVAL TIME: (note: is in 24-hour format)</p>
+                    <div style="display: inline-block; margin-left: 25px;">
+                        <div id="time-block">
+                            <div class="time-row">
+                                <i class="fa-solid fa-arrow-up arr-up" style="margin-left: 5px;"></i>
+                                <i class="fa-solid fa-arrow-up arr-up"></i>
+                            </div>
+                            <div class="time-row">
+                                <p class="time-col" id="hours">00</p>
+                                <p class="time-col" id="minutes">00</p>
+                            </div>
+                            <div class="time-row">
+                                <i class="fa-solid fa-arrow-down arr-down" style="margin-left: 5px;"></i>
+                                <i class="fa-solid fa-arrow-down arr-down"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p>Prediction by selected points: 00:00</p>
+                    <button>Select predicted time</button>
+                </div>
                 <button id="confirm-button-plane">Confirm</button>
             </div>
             <h3>Plane control</h3>

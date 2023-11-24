@@ -444,3 +444,59 @@ h2.weather-text a{
 .plane-cell-header i:hover{
     color: #5271ff;
 }
+
+.grid-container2 {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    background-color: #5271ff;
+    padding: 10px;
+}
+
+.time-row i{
+    display: inline-block;
+    font-size: 16px;
+}
+
+.time-row p{
+    display: inline-block;
+    font-size: 18px;
+}
+
+#time-block{
+    border: 1px solid black;
+    width: fit-content;
+    padding: 4px 4px;
+    border-radius: 8px;
+}
+
+.time-col{
+    margin: 0;
+    color: black;
+}
+
+.arr-up{
+    font-size: 16px;
+    margin-right: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.arr-down{
+    font-size: 16px;
+    margin-right: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.time-block-full p, .time-block-full button{
+    display: inline-block;
+}
+
+.time-block-full p{
+    margin-left: 25px;
+}
+
+.time-block-full button{
+    font-size: 16px;
+    padding: 8px 20px;
+}

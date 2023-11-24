@@ -19,6 +19,10 @@ var all_points = []
 var monitor_data = [] //data for storing monitors
 var plane_data = [] //data for storing all planes
 
+//selected time
+var selected_hours = 0
+var selected_mins = 0
+
 /*
 CHOOSING WHICH MAP TO GENERATE ON WHICH MONITOR
 */
@@ -45,6 +49,54 @@ function render_map(){
 /*
 Controller_SIM features
 */
+
+function ChangeTime(inc_fact, i){
+    switch(i){
+        case 0:
+            //increment hours
+            selected_hours += inc_fact
+            break
+        case 1:
+            //increment minutes
+            selected_mins += inc_fact
+            break
+    }
+    //check
+    if (selected_hours > 24){
+        selected_hours = 0
+    }
+    if (selected_mins > 60){
+        selected_mins = 0
+    }
+
+    if (selected_hours < 0){
+        selected_hours = 24
+    }
+    if (selected_mins < 0){
+        selected_mins = 60
+    }
+
+    //better formatting
+    let res_h = ""
+    let res_m = ""
+
+    if (selected_hours < 10){
+        res_h = "0" + selected_hours.toString()
+    }
+    else{
+        res_h = selected_hours.toString()
+    }
+
+    if (selected_mins < 10){
+        res_m = "0" + selected_mins.toString()
+    }
+    else{
+        res_m = selected_mins.toString()
+    }
+
+    document.getElementById("hours").innerHTML = res_h
+    document.getElementById("minutes").innerHTML = res_m
+}
 
 function MoveSlider(idx){
     let range_value = document.getElementsByClassName("val-range")[idx].value
@@ -110,9 +162,13 @@ function delete_plane(elem){
         }
     }
     window.electronAPI.send_message("controller", ["plane-delete-record", plane_id])
+
+    //delete gui
+    document.getElementById("plane" + plane_id).remove()
 }
 
-function create_plane_elem(plane_name, plane_departure, plane_arrival, plane_heading, plane_level, plane_speed){
+function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival, plane_heading, plane_level, plane_speed){
+    
     let grid_container = document.createElement("div")
     grid_container.classList.add("grid-container")
 
@@ -121,7 +177,7 @@ function create_plane_elem(plane_name, plane_departure, plane_arrival, plane_hea
     let plane_cell = document.createElement("div")
     plane_cell.classList.add("plane-cell")
     //TODO: does not seem to work
-    plane_cell.innerHTML = `<div class="plane-cell-header"><h2>${plane_name} (from ${plane_departure.split("_")[0]} to ${plane_arrival.split("_")[0]})</h2><i class="fa-solid fa-trash" id="delete-icon" onclick="delete_plane(event.target)"></i><div>`
+    plane_cell.innerHTML = `<div class="plane-cell-header" id="plane${plane_id}"><h2>${plane_name} (from ${plane_departure.split("_")[0]} to ${plane_arrival.split("_")[0]})</h2><i class="fa-solid fa-trash" id="delete-icon" onclick="delete_plane(event.target)"></i><div>`
 
     for(let i_row = 0; i_row < 3; i_row++){
         for(let i_col = 0; i_col < 12; i_col++){
@@ -183,6 +239,10 @@ function process_plane_data(){
     let arr_elem = document.getElementById("arrival_point")
     let arr_point = arr_elem.options[arr_elem.selectedIndex].value;
 
+    //arrival time
+    let hours = document.getElementById("hours").innerHTML
+    let mins = document.getElementById("minutes").innerHTML
+
 
     window.electronAPI.send_message("controller", ["spawn-plane", {
         "name": name,
@@ -191,7 +251,8 @@ function process_plane_data(){
         "speed": speed,
         "monitor": spawn_on,
         "departure": dep_point,
-        "arrival": arr_point
+        "arrival": arr_point,
+        "arrival_time": `${hours}:${mins}`
     }])
 
     //render on controller screen
@@ -208,8 +269,8 @@ function refresh_plane_data(){
     }
 
     for (let i = 0; i < plane_data.length; i++){
-        create_plane_elem(plane_data[i].name, plane_data[i].dep_point, 
-            plane_data[i].arr_point, plane_data[i].heading, 
+        create_plane_elem(plane_data[i].id, plane_data[i].callsign, plane_data[i].departure, 
+            plane_data[i].arrival, plane_data[i].heading, 
             plane_data[i].level, plane_data[i].speed)
     }
 }
@@ -643,6 +704,21 @@ window.onload = () => {
                     }
                 }
             })
+
+            //time selection
+            var up_arrows = document.getElementsByClassName("arr-up")
+            for (let i = 0; i < up_arrows.length; i++){
+                up_arrows[i].addEventListener("click", () => {
+                    ChangeTime(1, i)
+                })
+            }
+
+            var down_arrows = document.getElementsByClassName("arr-down")
+            for (let i = 0; i < down_arrows.length; i++){
+                down_arrows[i].addEventListener("click", () => {
+                    ChangeTime(-1, i)
+                })
+            }
     }
 
     //set for all pages

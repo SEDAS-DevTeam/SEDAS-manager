@@ -3,7 +3,7 @@ var pos_init_X = 0, pos_init_Y = 0, pos_new_X = 0, pos_new_Y = 0
 var dragged_element = undefined
 
 //ELEMENT INIT DEFS
-const MONITOR_INIT_STRING = '<!-- Include a header DIV with the same name as the draggable DIV, followed by "header" --><div class="monitor-header">Monitor </div><select id="functions" class="monitor-functions" name="functions"><option value="TWR">TWR control</option><option value="APP">APP control</option><option value="ACC">ACC control</option><option value="weather">weather forecast</option><option value="dep_arr">departure list</option></select>'
+const MONITOR_INIT_STRING = '<div class="monitor-header">Monitor </div><select id="functions" class="monitor-functions" name="functions"><option value="TWR">TWR control</option><option value="APP">APP control</option><option value="ACC">ACC control</option><option value="weather">weather forecast</option><option value="dep_arr">departure/arrival list</option></select>'
 const MODES_TO_IDX = {
   "TWR": 0,
   "APP": 1,

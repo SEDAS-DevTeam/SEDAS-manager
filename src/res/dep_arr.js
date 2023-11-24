@@ -1,8 +1,4 @@
-window.onload = () => {
-    setInterval(update_time, 1000)
-    //clear_row(1, 1, "departures")
-    //update_row(1, 1, "arrivals", ["test1", "test1", "test1", "test1"])
-}
+var plane_data = [] //data for storing all planes
 
 function update_time(){
     let time_elem = document.getElementById("top-time-header")
@@ -30,3 +26,27 @@ function clear_row(idx, table_spec, type_spec){
     }
 }
 
+function render_planes(){
+    for (let i = 0; i < plane_data.length; i++){
+        if(plane_data[i].departure.includes("ARP") || plane_data[i].departure.includes("RUNWAY")){
+            //comes to departures list
+            update_row(1, 1, "departures", ["", plane_data[i].callsign, plane_data[i].departure.split("_")[0], plane_data[i].arrival.split("_")[0]])
+        }
+        else{
+            //comes to arrivals list
+            update_row(1, 1, "arrivals", ["", plane_data[i].callsign, plane_data[i].departure.split("_")[0], plane_data[i].arrival.split("_")[0]])
+        }
+    }
+}
+
+window.onload = () => {
+    setInterval(update_time, 1000)
+    //clear_row(1, 1, "departures")
+    //update_row(1, 1, "arrivals", ["test1", "test1", "test1", "test1"])
+}
+
+window.electronAPI.on_message("update-plane-db", (data) => {
+    console.log(data)
+    plane_data = data
+    render_planes()
+})

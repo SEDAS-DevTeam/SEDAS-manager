@@ -1,4 +1,5 @@
 var map_data = undefined;
+var plane_data = []
 
 function process_map_data(data, type){
     //rewrite all canvas data
@@ -131,4 +132,8 @@ window.onload = () => {
 window.electronAPI.on_message_redir() //for handling all message redirects
 window.electronAPI.on_map_data((data) => {
     process_map_data(data, data[1])
+})
+window.electronAPI.on_message("update-plane-db", (data) => { //for updating plane list
+    console.log(data)
+    plane_data = data
 })

@@ -120,6 +120,7 @@ function create_plane_elem(plane_name, plane_departure, plane_arrival, plane_hea
 
     let plane_cell = document.createElement("div")
     plane_cell.classList.add("plane-cell")
+    //TODO: does not seem to work
     plane_cell.innerHTML = `<div class="plane-cell-header"><h2>${plane_name} (from ${plane_departure.split("_")[0]} to ${plane_arrival.split("_")[0]})</h2><i class="fa-solid fa-trash" id="delete-icon" onclick="delete_plane(event.target)"></i><div>`
 
     for(let i_row = 0; i_row < 3; i_row++){

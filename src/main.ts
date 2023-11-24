@@ -184,6 +184,14 @@ function exit_app(){
     process.exit()
 }
 
+function send_to_all(planes: any){
+    controllerWindow.send_message("update-plane-db", planes)
+    for (let i = 0; i < workers.length; i++){
+        //send updated data to all workers
+        workers[i].send_message("update-plane-db", planes)
+    }
+}
+
 class Window{
     public window: BrowserWindow;
     public win_type: string = "none";
@@ -466,8 +474,9 @@ ipcMain.handle("message", (event, data) => {
             PlaneDatabase.add_record(plane)
             curr_plane_id += 1
 
-            controllerWindow.send_message("update-plane-db", PlaneDatabase.DB)
-            
+            console.log(PlaneDatabase.DB)
+
+            send_to_all(PlaneDatabase.DB)
             break
         case "plane-value-change":
             switch(data[1][1]){
@@ -485,12 +494,12 @@ ipcMain.handle("message", (event, data) => {
                     break
 
             }
-            controllerWindow.send_message("update-plane-db", PlaneDatabase.DB)
+            send_to_all(PlaneDatabase.DB)
             break
         case "plane-delete-record":
             PlaneDatabase.delete_record(data[1][1])
 
-            controllerWindow.send_message("update-plane-db", PlaneDatabase.DB)
+            send_to_all(PlaneDatabase.DB)
     }
 })
 

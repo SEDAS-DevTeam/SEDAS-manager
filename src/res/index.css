@@ -426,3 +426,21 @@ h2.weather-text a{
 .weather-top button, .weather-top p{
     display: inline-block;
 }
+
+#delete-icon{
+    cursor: pointer;
+    font-size: 24px;
+
+}
+
+.plane-cell-header h2, .plane-cell-header i{
+    display: inline-block;
+}
+
+.plane-cell-header i{
+    margin-left: 30px;
+}
+
+.plane-cell-header i:hover{
+    color: #5271ff;
+}

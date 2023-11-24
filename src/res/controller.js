@@ -84,7 +84,6 @@ function plane_value_change(elem){
     elem.classList.add("selected")
 
     //look at local db
-    console.log(plane_data)
     for (let i = 0; i < plane_data.length; i++){
         if (plane_data[i].callsign == header){
             //found corresponding plane
@@ -96,6 +95,23 @@ function plane_value_change(elem){
     window.electronAPI.send_message("controller", ["plane-value-change", elem.classList[1], elem.innerHTML, plane_id])
 }
 
+function delete_plane(elem){
+    var plane_id;
+    var header_full = elem.parentNode.querySelector("h2").innerHTML
+    
+    header_full = header_full.split("(")[0]
+    var header = header_full.substring(0, header_full.length - 1)
+
+    //look at local db
+    for (let i = 0; i < plane_data.length; i++){
+        if (plane_data[i].callsign == header){
+            //found corresponding plane
+            plane_id = plane_data[i].id
+        }
+    }
+    window.electronAPI.send_message("controller", ["plane-delete-record", plane_id])
+}
+
 function create_plane_elem(plane_name, plane_departure, plane_arrival, plane_heading, plane_level, plane_speed){
     let grid_container = document.createElement("div")
     grid_container.classList.add("grid-container")
@@ -104,7 +120,7 @@ function create_plane_elem(plane_name, plane_departure, plane_arrival, plane_hea
 
     let plane_cell = document.createElement("div")
     plane_cell.classList.add("plane-cell")
-    plane_cell.innerHTML = `<h2>${plane_name} (from ${plane_departure.split("_")[0]} to ${plane_arrival.split("_")[0]})</h2>`
+    plane_cell.innerHTML = `<div class="plane-cell-header"><h2>${plane_name} (from ${plane_departure.split("_")[0]} to ${plane_arrival.split("_")[0]})</h2><i class="fa-solid fa-trash" id="delete-icon" onclick="delete_plane(event.target)"></i><div>`
 
     for(let i_row = 0; i_row < 3; i_row++){
         for(let i_col = 0; i_col < 12; i_col++){
@@ -178,7 +194,23 @@ function process_plane_data(){
     }])
 
     //render on controller screen
-    create_plane_elem(name, dep_point, arr_point, heading, level, speed)
+    refresh_plane_data()
+}
+
+function refresh_plane_data(){
+    //delete currently generated GUI
+    let plane_list = document.getElementById("plane-list")
+    for (let i = 0; i < plane_list.children.length; i++){
+        if (plane_list.children[i].tagName == "DIV"){
+            plane_list.children[i].remove()
+        }
+    }
+
+    for (let i = 0; i < plane_data.length; i++){
+        create_plane_elem(plane_data[i].name, plane_data[i].dep_point, 
+            plane_data[i].arr_point, plane_data[i].heading, 
+            plane_data[i].level, plane_data[i].speed)
+    }
 }
 
 function on_choice_select(n){
@@ -634,6 +666,7 @@ window.onload = () => {
     //plane messages
     window.electronAPI.on_message("update-plane-db", (data) => {
         plane_data = data
+        refresh_plane_data()
     })
 
     //specific messages

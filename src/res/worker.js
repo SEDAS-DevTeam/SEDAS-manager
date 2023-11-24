@@ -12,6 +12,11 @@ function process_map_data(data, type){
     map_data = data //set map data to global on session
 
     let spec_data = map_data[0][type] //load map data type (ACC/APP/TWR)
+    if (spec_data == undefined){
+        //map resource for type does not exist
+        renderText(50, 100, `Map resource for type "${type}" does not exist`, "white", "48px")
+        return
+    }
 
     for (const [key, value] of Object.entries(spec_data)) {
         if (value != "none"){
@@ -125,5 +130,5 @@ window.onload = () => {
 
 window.electronAPI.on_message_redir() //for handling all message redirects
 window.electronAPI.on_map_data((data) => {
-    process_map_data(data, "ACC") //always load ACC
+    process_map_data(data, data[1])
 })

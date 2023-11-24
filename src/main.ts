@@ -354,13 +354,13 @@ ipcMain.handle("message", (event, data) => {
             map_data = read_map.read_map_from_file(filename)
             //set map data to all workers
             for (let i = 0; i < workers.length; i++){
-                workers[i].send_message("map-data", [map_data])
+                workers[i].send_message("map-data", [map_data, workers[i].win_type])
             }
             break
         case "render-map":
             //set map data to all workers
             for (let i = 0; i < workers.length; i++){
-                workers[i].send_message("map-data", [map_data])
+                workers[i].send_message("map-data", [map_data, workers[i].win_type])
             }
             break
         case "get-points":
@@ -395,44 +395,6 @@ ipcMain.handle("message", (event, data) => {
                 console.log("user checked")
                 controllerWindow.send_message("map-checked", JSON.stringify({"user-check": true}))
             }
-            break
-        //plane control
-        case "spawn-plane":
-            let plane_data = data[1][1]
-
-            //get current x, y coordinates according to selected points
-            //TODO:
-            let x = 0
-            let y = 0
-            
-            let plane = new Plane(curr_plane_id, plane_data["name"], 
-                            plane_data["heading"], plane_data["heading"],
-                            plane_data["level"], plane_data["level"],
-                            plane_data["speed"], plane_data["speed"],
-                            plane_data["departure"], plane_data["arrival"], x, y)
-            PlaneDatabase.add_record(plane)
-            curr_plane_id += 1
-
-            controllerWindow.send_message("update-plane-db", PlaneDatabase.DB)
-            
-            break
-        case "plane-value-change":
-            switch(data[1][1]){
-                case "item0":
-                    //heading change
-                    PlaneDatabase.DB[data[1][3]].heading = parseInt(data[1][2])
-                    break
-                case "item1":
-                    //level change
-                    PlaneDatabase.DB[data[1][3]].level = parseInt(data[1][2])
-                    break
-                case "item2":
-                    //speed change
-                    PlaneDatabase.DB[data[1][3]].speed = parseInt(data[1][2])
-                    break
-
-            }
-            console.log(PlaneDatabase.DB[data[1][3]])
             break
         case "monitor-change-info":
             //whenever controller decides to change monitor type
@@ -487,6 +449,48 @@ ipcMain.handle("message", (event, data) => {
                 }
             }
             break
+        //plane control
+        case "spawn-plane":
+            let plane_data = data[1][1]
+
+            //get current x, y coordinates according to selected points
+            //TODO:
+            let x = 0
+            let y = 0
+            
+            let plane = new Plane(curr_plane_id, plane_data["name"], 
+                            plane_data["heading"], plane_data["heading"],
+                            plane_data["level"], plane_data["level"],
+                            plane_data["speed"], plane_data["speed"],
+                            plane_data["departure"], plane_data["arrival"], x, y)
+            PlaneDatabase.add_record(plane)
+            curr_plane_id += 1
+
+            controllerWindow.send_message("update-plane-db", PlaneDatabase.DB)
+            
+            break
+        case "plane-value-change":
+            switch(data[1][1]){
+                case "item0":
+                    //heading change
+                    PlaneDatabase.DB[data[1][3]].heading = parseInt(data[1][2])
+                    break
+                case "item1":
+                    //level change
+                    PlaneDatabase.DB[data[1][3]].level = parseInt(data[1][2])
+                    break
+                case "item2":
+                    //speed change
+                    PlaneDatabase.DB[data[1][3]].speed = parseInt(data[1][2])
+                    break
+
+            }
+            controllerWindow.send_message("update-plane-db", PlaneDatabase.DB)
+            break
+        case "plane-delete-record":
+            PlaneDatabase.delete_record(data[1][1])
+
+            controllerWindow.send_message("update-plane-db", PlaneDatabase.DB)
     }
 })
 

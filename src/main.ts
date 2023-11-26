@@ -441,6 +441,8 @@ ipcMain.handle("message", (event, data) => {
 
                     workers[i].win_type = mon_data[i]["type"]
                     workers[i].show(path_to_render)
+
+
                }
             }
             break
@@ -502,6 +504,14 @@ ipcMain.handle("message", (event, data) => {
             PlaneDatabase.delete_record(data[1][1])
 
             send_to_all(PlaneDatabase.DB)
+            break
+        case "send-plane-data":
+            //send plane data (works for all windows)
+            for (let i = 0; i < workers.length; i++){
+                if (workers[i].win_type.includes(data[0])){
+                    workers[i].send_message("update-plane-db", PlaneDatabase.DB)
+                }
+            }
     }
 })
 

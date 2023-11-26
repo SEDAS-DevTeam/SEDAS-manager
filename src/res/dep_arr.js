@@ -43,6 +43,7 @@ window.onload = () => {
     setInterval(update_time, 1000)
     //clear_row(1, 1, "departures")
     //update_row(1, 1, "arrivals", ["test1", "test1", "test1", "test1"])
+    window.electronAPI.send_message("dep_arr", ["send-plane-data"])
 }
 
 window.electronAPI.on_message("update-plane-db", (data) => {

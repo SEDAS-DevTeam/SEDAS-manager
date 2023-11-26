@@ -94,6 +94,9 @@ window.onload = () => {
     //ask for map data
     window.electronAPI.send_message("worker", ["render-map"])
 
+    //ask for plane data
+    window.electronAPI.send_message("worker", ["send-plane-data"])
+
     //render all essential things
     renderCanvas(1)
     renderCanvas(2)
@@ -136,4 +139,6 @@ window.electronAPI.on_map_data((data) => {
 window.electronAPI.on_message("update-plane-db", (data) => { //for updating plane list
     console.log(data)
     plane_data = data
+
+    //rerender planes
 })

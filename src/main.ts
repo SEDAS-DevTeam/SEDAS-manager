@@ -6,7 +6,7 @@ import {spawn} from "node:child_process"
 import * as path from "path"
 import * as read_map from "./read_map"
 import { BackupDB } from "./database";
-import { Plane, PlaneDB, update_planes } from "./plane_functions";
+import { Plane, PlaneDB } from "./plane_functions";
 
 //window variable declarations
 var mainMenu: Window;
@@ -185,10 +185,13 @@ function exit_app(){
 }
 
 function send_to_all(planes: any){
-    controllerWindow.send_message("update-plane-db", planes)
-    for (let i = 0; i < workers.length; i++){
-        //send updated data to all workers
-        workers[i].send_message("update-plane-db", planes)
+    console.log(planes)
+    if (controllerWindow != undefined && workers.length != 0){
+        controllerWindow.send_message("update-plane-db", planes)
+        for (let i = 0; i < workers.length; i++){
+            //send updated data to all workers
+            workers[i].send_message("update-plane-db", planes)
+        }
     }
 }
 
@@ -537,10 +540,12 @@ ipcMain.on("plane-info", (event, data) => {
 })
 
 setInterval(() => {
-    update_planes(PlaneDatabase)
+    PlaneDatabase.update_planes()
+    //send updated plane database to all
+    send_to_all(PlaneDatabase.DB)
 }, 1000)
 
-//when app dies, it should die in peace
+//when app dies, it should die in peace (NOT WORKING)
 process.on('SIGINT', function() {
     console.log("Caught interrupt signal");
 

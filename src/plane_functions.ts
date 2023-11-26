@@ -33,6 +33,12 @@ export class PlaneDB{
     public delete_all(){
         this.DB = []
     }
+
+    public update_planes(){
+        for(let i = 0; i < this.DB.length; i++){
+            //update each plane
+        }
+    }
 }
 
 export class Plane{
@@ -79,10 +85,4 @@ export class Plane{
             this.x = x;
             this.y = y;
     }
-}
-
-export function update_planes(plane_database: any){
-    for(let i = 0; i < plane_database.length; i++){
-        //update each plane
-    } 
 }

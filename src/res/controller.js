@@ -262,6 +262,10 @@ function process_plane_data(){
 function refresh_plane_data(){
     //delete currently generated GUI
     let plane_list = document.getElementById("plane-list")
+    if (plane_list == undefined){
+        return
+    }
+
     for (let i = 0; i < plane_list.children.length; i++){
         if (plane_list.children[i].tagName == "DIV"){
             plane_list.children[i].remove()

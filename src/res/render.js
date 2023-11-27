@@ -163,6 +163,8 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
   let proc_x = x + 50;
   let proc_y = y - 50;
 
+  let init_y = proc_y
+
   let width = MAX_RECT_WIDTH;
   let height = 0;
 
@@ -176,7 +178,7 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
     height += (INFO_TEXT_SIZE + LINE_INDENT / 2) //This feels illegal
   }
 
-  let x1_text = proc_x
+  let x1_text = proc_x + width
   let y1_text = proc_y
 
 
@@ -212,6 +214,8 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
 
   context1.lineTo(x2, y2)
   context1.stroke()
+
+  return [x1_text, init_y + height, x2 - width, init_y]
 }
 
 function renderPlanePath(...coordinates){

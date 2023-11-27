@@ -321,7 +321,7 @@ div.selected{
     text-align: center;
     margin: auto;
     opacity: 0.5;
-    background-color: rgba(0, 0, 0, 0.50);
+    background-color: rgba(0, 0, 0, 0.5);
     color: white;
     margin-left: -20px;
     font-weight: bolder;

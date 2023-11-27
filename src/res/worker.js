@@ -1,8 +1,9 @@
-var map_data = undefined;
+var map_data = undefined
 var plane_data = []
+var plane_label_coords = [] //in format [x1, y1, x2, y2]
+var is_dragging = false
 
 function process_map_data(){
-    console.log(map_data)
 
     //rewrite all canvas data
     renderCanvas(1)
@@ -82,16 +83,32 @@ function process_map_data(){
 }
 
 function render_planes(){
-
+    plane_label_coords = []
     for (let i = 0; i < plane_data.length; i++){
         //plane rendering is in canvas 2
         //tag rendering is in canvas 1
-        renderPlane(plane_data[i]["x"], plane_data[i]["y"], plane_data[i]["heading"], {
+        label_coords = renderPlane(plane_data[i]["x"], plane_data[i]["y"], plane_data[i]["heading"], {
             "callsign": plane_data[i]["callsign"],
             "level": plane_data[i]["level"],
             "speed": plane_data[i]["speed"],
             "code": undefined
         })
+
+        plane_label_coords.push(label_coords)
+        console.log(plane_label_coords)
+    }
+}
+
+function update_labels(curr_x, curr_y){
+    for(i = 0; i < plane_label_coords.length; i++){
+        let curr_plane = plane_data[i]
+        let curr_coords = plane_label_coords[i]
+
+        if (curr_coords[2] < curr_x && curr_coords[0] > curr_x){
+            if (curr_coords[1] > curr_y){
+                console.log("On elem!")
+            }
+        }
     }
 }
 
@@ -135,6 +152,25 @@ window.onload = () => {
             elem.innerHTML = "STOP"
         }
     })
+}
+
+/*
+MOUSE EVENTS
+*/
+
+document.onmousedown = () => {
+    is_dragging = true
+}
+
+document.onmouseup = () => {
+    is_dragging = false
+}
+
+document.onmousemove = (event) => {
+    if (is_dragging){
+
+        update_labels(event.clientX, event.clientY)
+    }
 }
 
 window.electronAPI.on_message_redir() //for handling all message redirects

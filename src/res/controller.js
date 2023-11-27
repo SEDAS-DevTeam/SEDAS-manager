@@ -1,6 +1,6 @@
 //variable definitions
 const PLANE_LABELS = ["Heading", "Level", "Speed"]
-const HEADING_VALS = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
+const HEADING_VALS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350]
 const LEVEL_VALS = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
 const SPEED_VALS = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
 const ALL = [HEADING_VALS, LEVEL_VALS, SPEED_VALS]
@@ -633,6 +633,17 @@ window.onload = () => {
 
         case "controller_sim.html":
             //running init code
+
+            //setting attributes to ranges
+            var range_elements = document.getElementsByClassName("val-range")
+            range_elements[0].min = Math.min(...HEADING_VALS)
+            range_elements[0].max = Math.max(...HEADING_VALS)
+
+            range_elements[1].min = Math.min(...LEVEL_VALS)
+            range_elements[1].max = Math.max(...LEVEL_VALS)
+
+            range_elements[2].min = Math.min(...SPEED_VALS)
+            range_elements[2].max = Math.max(...SPEED_VALS)
 
             //check if user had already selected map
             window.electronAPI.send_message("controller", ["map-check"])

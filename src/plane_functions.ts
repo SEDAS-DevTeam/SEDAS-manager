@@ -34,8 +34,6 @@ export class PlaneDB{
                 this.monitor_DB[i]["planes_id"].push(plane_obj["id"])
             }
         }
-        console.log(this.DB)
-        console.log(this.monitor_DB)
     }
 
     public find_record(id: number){
@@ -47,15 +45,26 @@ export class PlaneDB{
     }
 
     public delete_record(id: number){
+        //delete from planes database
         for (let i = 0; i < this.DB.length; i++){
             if (this.DB[i].id == id){
                 this.DB.splice(i, 1)
+            }
+        }
+
+        //delete from monitors database
+        for (let i = 0; i < this.monitor_DB.length; i++){
+            for (let i_planes = 0; i_planes < this.monitor_DB[i]["planes_id"].length; i_planes++){
+                if(this.monitor_DB[i]["planes_id"][i_planes][i_planes] == id){
+                    this.monitor_DB.splice(i_planes, 1)
+                }
             }
         }
     }
 
     public delete_all(){
         this.DB = []
+        this.monitor_DB = []
     }
 
     public update_planes(){

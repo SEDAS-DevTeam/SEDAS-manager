@@ -485,9 +485,25 @@ ipcMain.handle("message", (event, data) => {
             let plane_data = data[1][1]
 
             //get current x, y coordinates according to selected points
-            //TODO:
             let x = 0
             let y = 0
+            //get according map data
+            let point_data = map_data[plane_data["monitor"].substring(plane_data["monitor"].length - 3, plane_data["monitor"].length)]
+            
+            //get departure point (ARP/POINTS/SID/STAR)
+            let corresponding_points = plane_data["departure"].split("_")
+            let point_name = corresponding_points[0]
+            let point_group = corresponding_points[1]
+
+
+
+            for (let i = 0; i < point_data[point_group].length; i++){
+                if (point_name == point_data[point_group][i].name){
+                    //found corresponding point - set initial point
+                    x = point_data[point_group][i].x
+                    y = point_data[point_group][i].y
+                }
+            }
             
             let plane = new Plane(curr_plane_id, plane_data["name"], 
                             plane_data["heading"], plane_data["heading"],

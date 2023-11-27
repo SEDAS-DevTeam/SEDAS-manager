@@ -1,21 +1,22 @@
 var map_data = undefined;
 var plane_data = []
 
-function process_map_data(data, type){
+function process_map_data(){
+    console.log(map_data)
+
     //rewrite all canvas data
     renderCanvas(1)
     renderCanvas(2)
     renderCanvas(3)
 
-    if (data[0] == undefined){
+    if (map_data[0] == undefined){
         return;
     }
-    map_data = data //set map data to global on session
 
-    let spec_data = map_data[0][type] //load map data type (ACC/APP/TWR)
+    let spec_data = map_data[0][map_data[1]] //load map data type (ACC/APP/TWR)
     if (spec_data == undefined){
         //map resource for type does not exist
-        renderText(50, 100, `Map resource for type "${type}" does not exist`, "white", "48px")
+        renderText(50, 100, `Map resource for type "${map_data[1]}" does not exist`, "white", "48px")
         return
     }
 
@@ -78,16 +79,20 @@ function process_map_data(data, type){
             }
         }
     }
+}
 
-    //TEST
-    /*
-    renderPlane(150, 350, 50, {
-        "callsign": "LX123",
-        "level": 120,
-        "speed": 150,
-        "code": undefined
-    })
-    */
+function render_planes(){
+
+    for (let i = 0; i < plane_data.length; i++){
+        //plane rendering is in canvas 2
+        //tag rendering is in canvas 1
+        renderPlane(plane_data[i]["x"], plane_data[i]["y"], plane_data[i]["heading"], {
+            "callsign": plane_data[i]["callsign"],
+            "level": plane_data[i]["level"],
+            "speed": plane_data[i]["speed"],
+            "code": undefined
+        })
+    }
 }
 
 window.onload = () => {
@@ -134,12 +139,18 @@ window.onload = () => {
 
 window.electronAPI.on_message_redir() //for handling all message redirects
 window.electronAPI.on_map_data((data) => {
-    process_map_data(data, data[1])
+    map_data = data //set map data to global on session
+    process_map_data()
 })
 window.electronAPI.on_message("update-plane-db", (data) => { //for updating plane list
-    console.log(data)
     plane_data = data
 
+    //redraw map
+    renderCanvas(2)
+    renderCanvas(3)
+
+    process_map_data()
+
     //rerender planes
-    console.log(plane_data)
+    render_planes()
 })

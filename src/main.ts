@@ -21,7 +21,7 @@ var workers = [];
 var map_config = [];
 var map_data: any;
 var curr_plane_id: number = 0;
-
+var PlaneDatabase;
 
 const PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/fetch.py"
 
@@ -41,9 +41,6 @@ const database = spawn("redis-server")
 //run SQLite DB
 var BackupDatabase = new BackupDB();
 BackupDatabase.create_database()
-
-//run local plane DB
-var PlaneDatabase = new PlaneDB();
 
 //fetch all python backend files
 const fetch_process = spawn("python3", [`${PATH_TO_PROCESS}`])
@@ -184,13 +181,29 @@ function exit_app(){
     process.exit()
 }
 
-function send_to_all(planes: any){
+function send_to_all(planes: any, plane_monitor_data: any){
     console.log(planes)
+    console.log(plane_monitor_data)
     if (controllerWindow != undefined && workers.length != 0){
+        //update planes on controller window
         controllerWindow.send_message("update-plane-db", planes)
-        for (let i = 0; i < workers.length; i++){
+
+        for (let i = 0; i < plane_monitor_data.length; i++){
+            let temp_planes = []
+
+            for (let i_plane = 0; i_plane < plane_monitor_data[i]["planes_id"].length; i_plane++){
+                //loop through all planes on specific monitor
+
+                //retrieve specific plane by id
+                for (let i2_plane = 0; i2_plane < planes.length; i2_plane++){
+                    if (planes[i2_plane]["id"] == plane_monitor_data[i]["planes_id"][i_plane]){
+                        temp_planes.push(planes[i2_plane])
+                    }
+                }
+            }
+
             //send updated data to all workers
-            workers[i].send_message("update-plane-db", planes)
+            workers[i].send_message("update-plane-db", temp_planes)
         }
     }
 }
@@ -330,6 +343,9 @@ ipcMain.handle("message", (event, data) => {
             //setup voice recognition and ACAI backend
             voice_worker.postMessage("start")
             worker.postMessage("terrain") //generate terrain
+
+            //run local plane DB
+            PlaneDatabase = new PlaneDB(workers);
             break
         case "exit":
             exit_app()
@@ -411,7 +427,7 @@ ipcMain.handle("message", (event, data) => {
             //whenever controller decides to change monitor type
             let mon_data = data[1][1]
             for (let i = 0; i < workers.length; i++){
-               if (workers[i].win_type != mon_data[i]["type"]){
+                if (workers[i].win_type != mon_data[i]["type"]){
                     //rewrite current window type and render to another one
                     let path_to_render = "";
 
@@ -446,7 +462,9 @@ ipcMain.handle("message", (event, data) => {
                     workers[i].show(path_to_render)
 
 
-               }
+                }
+                //change worker data in monitor_data DB
+                PlaneDatabase.update_worker_data(workers)
             }
             break
         case "send-location-data":
@@ -478,12 +496,10 @@ ipcMain.handle("message", (event, data) => {
                             plane_data["departure"], plane_data["arrival"], 
                             plane_data["arrival_time"],
                             x, y)
-            PlaneDatabase.add_record(plane)
+            PlaneDatabase.add_record(plane, plane_data["monitor"])
             curr_plane_id += 1
 
-            console.log(PlaneDatabase.DB)
-
-            send_to_all(PlaneDatabase.DB)
+            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
             break
         case "plane-value-change":
             switch(data[1][1]){
@@ -501,12 +517,12 @@ ipcMain.handle("message", (event, data) => {
                     break
 
             }
-            send_to_all(PlaneDatabase.DB)
+            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
             break
         case "plane-delete-record":
             PlaneDatabase.delete_record(data[1][1])
 
-            send_to_all(PlaneDatabase.DB)
+            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
             break
         case "send-plane-data":
             //send plane data (works for all windows)
@@ -515,6 +531,7 @@ ipcMain.handle("message", (event, data) => {
                     workers[i].send_message("update-plane-db", PlaneDatabase.DB)
                 }
             }
+            break
     }
 })
 
@@ -539,11 +556,15 @@ ipcMain.on("plane-info", (event, data) => {
     console.log(data)
 })
 
+
 setInterval(() => {
-    PlaneDatabase.update_planes()
-    //send updated plane database to all
-    send_to_all(PlaneDatabase.DB)
+    if (PlaneDatabase != undefined){
+        PlaneDatabase.update_planes()
+        //send updated plane database to all
+        send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
+    }
 }, 1000)
+
 
 //when app dies, it should die in peace (NOT WORKING)
 process.on('SIGINT', function() {

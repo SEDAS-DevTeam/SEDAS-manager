@@ -141,4 +141,5 @@ window.electronAPI.on_message("update-plane-db", (data) => { //for updating plan
     plane_data = data
 
     //rerender planes
+    console.log(plane_data)
 })

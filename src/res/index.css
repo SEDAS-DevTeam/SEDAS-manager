@@ -504,3 +504,13 @@ h2.weather-text a{
 #hours, #minutes{
     margin-left: 0;
 }
+
+.set-header h2{
+    margin-bottom: 0;
+}
+
+.set-header hr{
+    margin-bottom: 15px;
+    margin-right: 40px;
+    color: #5271ff;
+}

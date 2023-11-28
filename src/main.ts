@@ -208,6 +208,10 @@ function send_to_all(planes: any, plane_monitor_data: any){
     }
 }
 
+function save_to_local_db(){
+    console.log("saved to local db!")
+}
+
 class Window{
     public window: BrowserWindow;
     public win_type: string = "none";
@@ -572,7 +576,7 @@ ipcMain.on("plane-info", (event, data) => {
     console.log(data)
 })
 
-
+//update all planes on one second
 setInterval(() => {
     if (PlaneDatabase != undefined){
         PlaneDatabase.update_planes()
@@ -580,6 +584,11 @@ setInterval(() => {
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
     }
 }, 1000)
+
+//on every n minutes, save to local DB if app crashes
+setInterval(() => {
+    save_to_local_db()
+}, 60000)
 
 
 //when app dies, it should die in peace (NOT WORKING)

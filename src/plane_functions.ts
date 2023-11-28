@@ -2,6 +2,7 @@ export class PlaneDB{
     /*Just an array with methods - for storing planes*/
     public DB: any = [] //storing planes
     public monitor_DB: any = [] //storing where are planes rendered
+    public plane_paths_DB: any = []
 
     public constructor(monitor_data: any){
         for (let i = 0; i < monitor_data.length; i++){
@@ -29,9 +30,25 @@ export class PlaneDB{
         //append planes to main DB
         this.DB.push(plane_obj)
 
+        //add to monitor DB
         for (let i = 0; i < this.monitor_DB.length; i++){
             if (monitor_spawn.includes(this.monitor_DB[i]["type"])){
                 this.monitor_DB[i]["planes_id"].push(plane_obj["id"])
+            }
+        }
+
+        //add to path DB
+        this.plane_paths_DB.push({
+            "id": plane_obj["id"],
+            "coords":[]
+        })
+    }
+
+    public add_path_record(id: number, coords: any){
+        for (let i = 0; i < this.plane_paths_DB.length; i++){
+            if (this.plane_paths_DB[i]["id"] == id){
+                this.plane_paths_DB[i]["coords"].push(coords)
+                break
             }
         }
     }

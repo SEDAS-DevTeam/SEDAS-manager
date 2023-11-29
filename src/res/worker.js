@@ -1,7 +1,18 @@
 var map_data = undefined
 var plane_data = []
-var plane_label_coords = [] //in format [x1, y1, x2, y2]
+var plane_label_coords = []
+
+/*
+in format
+[{
+    "id": 
+    "coords": [x1, y1, x2, y2]
+}]
+*/
+
 var is_dragging = false
+
+var curr_plane = undefined
 
 function process_map_data(){
 
@@ -17,7 +28,7 @@ function process_map_data(){
     let spec_data = map_data[0][map_data[1]] //load map data type (ACC/APP/TWR)
     if (spec_data == undefined){
         //map resource for type does not exist
-        renderText(50, 100, `Map resource for type "${map_data[1]}" does not exist`, "white", "48px")
+        renderText(50, 100, `Map resource for type "${map_data[1]}" does not exist`, "white", "48px", "canvas3")
         return
     }
 
@@ -83,30 +94,74 @@ function process_map_data(){
 }
 
 function render_planes(){
-    plane_label_coords = []
+
+    //check saved coordinates if we deleted any plane
+    for (let i = 0; i < plane_label_coords.length; i++){
+        let found_record = false
+        for (let i_plane = 0; i_plane < plane_data.length; i_plane++){
+            if(plane_label_coords[i]["id"] == plane_data[i_plane]["id"]){
+                //plane coord record does exist
+                found_record = true
+            }
+        }
+        if(!found_record){
+            plane_label_coords.splice(i, 1)
+        }
+    }
+
+    //render plane
     for (let i = 0; i < plane_data.length; i++){
         //plane rendering is in canvas 2
-        //tag rendering is in canvas 1
-        label_coords = renderPlane(plane_data[i]["x"], plane_data[i]["y"], plane_data[i]["heading"], {
+        //tag rendering is in canvas 3
+        let label_x = 0
+        let label_y = 0
+
+        let found_plane = false
+        for (let i2 = 0; i2 < plane_label_coords.length; i2++){
+            if(plane_label_coords[i2]["id"] == plane_data[i]["id"]){
+                //found specific plane
+                found_plane = true
+                label_x = plane_label_coords[i2]["coords"][2]
+                label_y = plane_label_coords[i2]["coords"][3]
+                break
+            }
+        }
+        if (!found_plane){
+            label_x = plane_data[i]["x"] + 50
+            label_y = plane_data[i]["y"] - 50
+        }
+
+        renderPlane(plane_data[i]["x"], plane_data[i]["y"], plane_data[i]["heading"])
+        let label_coords = renderPlaneInfo(plane_data[i]["x"], plane_data[i]["y"], label_x, label_y, {
             "callsign": plane_data[i]["callsign"],
             "level": plane_data[i]["level"],
             "speed": plane_data[i]["speed"],
             "code": undefined
         })
 
-        plane_label_coords.push(label_coords)
-        console.log(plane_label_coords)
+        if (!found_plane){
+            plane_label_coords.push({
+                "id": plane_data[i]["id"],
+                "coords": label_coords
+            })
+        }
     }
 }
 
 function update_labels(curr_x, curr_y){
-    for(i = 0; i < plane_label_coords.length; i++){
-        let curr_plane = plane_data[i]
-        let curr_coords = plane_label_coords[i]
+    renderCanvas(3)
+    let label_coords = renderPlaneInfo(curr_plane["x"], curr_plane["y"], curr_x, curr_y, {
+        "callsign": curr_plane["callsign"],
+        "level": curr_plane["level"],
+        "speed": curr_plane["speed"],
+        "code": undefined
+    })
 
-        if (curr_coords[2] < curr_x && curr_coords[0] > curr_x){
-            if (curr_coords[1] > curr_y){
-                console.log("On elem!")
+    for (let i = 0; i < plane_label_coords.length; i++){
+       if (plane_label_coords[i]["id"] == curr_plane["id"]){
+            plane_label_coords[i] = {
+                "id": curr_plane["id"],
+                "coords": label_coords
             }
         }
     }
@@ -125,7 +180,7 @@ window.onload = () => {
     renderCanvas(3)
 
     //render empty map placeholder on init
-    renderText(50, 100, "Empty map placeholder", "white", "48px")
+    renderText(50, 100, "Empty map placeholder", "white", "48px", "canvas3")
 
     document.querySelector("a#plankmsg").addEventListener("click", () => {
         window.electronAPI.send_message_redir("controller", ["test msg2"])
@@ -133,6 +188,7 @@ window.onload = () => {
     
     document.querySelector("a#plankmsg2").addEventListener("click", () => {
         renderPlane(50, 50)
+        renderPlaneInfo(100, 100)
     })
     
     document.querySelector("a#exit").addEventListener("click", () => {
@@ -158,8 +214,22 @@ window.onload = () => {
 MOUSE EVENTS
 */
 
-document.onmousedown = () => {
-    is_dragging = true
+document.onmousedown = (event) => {
+    let curr_x = event.clientX
+    let curr_y = event.clientY
+
+    for(i = 0; i < plane_label_coords.length; i++){
+        let curr_coords = plane_label_coords[i]["coords"]
+
+        if (curr_coords[2] < curr_x && curr_coords[0] > curr_x){
+            if (curr_coords[1] > curr_y){
+                //is dragging on elem
+                is_dragging = true
+
+                curr_plane = plane_data[i]
+            }
+        }
+    }
 }
 
 document.onmouseup = () => {
@@ -168,7 +238,6 @@ document.onmouseup = () => {
 
 document.onmousemove = (event) => {
     if (is_dragging){
-
         update_labels(event.clientX, event.clientY)
     }
 }

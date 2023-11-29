@@ -93,7 +93,7 @@ function renderCanvas(canvas_id){
   }
 }
 
-function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
+function renderPlane(x, y, angle){ //0 - 360 degrees
   /*
   plane_info example:
   plane_info = {
@@ -106,9 +106,6 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
 
   var canvas = document.querySelector("#canvas2");
   var context = canvas.getContext('2d');
-
-  var canvas1 = document.querySelector("#canvas1")
-  var context1 = canvas1.getContext("2d")
 
   //plane rendering
   context.beginPath();
@@ -158,10 +155,15 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
   context.strokeStyle = MARKER_COLOR
   context.lineWidth = STD_LINE_WIDTH
   context.stroke()
+}
 
+function renderPlaneInfo(x_plane, y_plane, x, y, plane_info){
   //plane info rendering
-  let proc_x = x + 50;
-  let proc_y = y - 50;
+  var canvas1 = document.querySelector("#canvas3")
+  var context1 = canvas1.getContext("2d")
+
+  let proc_x = x;
+  let proc_y = y;
 
   let init_y = proc_y
 
@@ -173,7 +175,7 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
       continue
     }
 
-    renderText(proc_x, proc_y, `${key}: ${value}`, "white", INFO_TEXT_SIZE + "px")
+    renderText(proc_x, proc_y, `${key}: ${value}`, "white", INFO_TEXT_SIZE + "px", "canvas3")
     proc_y -= LINE_INDENT
     height += (INFO_TEXT_SIZE + LINE_INDENT / 2) //This feels illegal
   }
@@ -191,7 +193,7 @@ function renderPlane(x, y, angle, plane_info){ //0 - 360 degrees
   //info bounding box rendering
   //context1.rect(x1_text - BBOX_PAD, y1_text - BBOX_PAD, width + BBOX_PAD, height + BBOX_PAD)
 
-  context1.moveTo(x, y)
+  context1.moveTo(x_plane, y_plane)
 
   let x2 = 0;
   let y2 = 0;
@@ -283,7 +285,7 @@ function renderPoint(x, y, name, color, triag_len){
   context3.fillStyle = color;
   context3.fill();
 
-  renderText(x + 15, y - 15, name, color, "12px")
+  renderText(x + 15, y - 15, name, color, "12px", "canvas1")
 }
 
 function renderAirport(x, y, name){
@@ -302,11 +304,11 @@ function renderAirport(x, y, name){
   context.fillStyle = ARP_COLOR;
   context.fill();
 
-  renderText(x + 15, y - 15, name, ARP_COLOR, "12px")
+  renderText(x + 15, y - 15, name, ARP_COLOR, "12px", "#canvas1")
 }
 
-function renderText(x, y, text, color, weight){
-  var canvas = document.querySelector("#canvas3");
+function renderText(x, y, text, color, weight, canvas_layer){
+  var canvas = document.querySelector("#" + canvas_layer);
   var context = canvas.getContext('2d');
 
   context.font = weight + " Arial"

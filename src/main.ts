@@ -301,7 +301,8 @@ ipcMain.handle("message", (event, data) => {
 
             break
         case "save-settings":
-            fs.writeFileSync("./res/data/settings.json", JSON.parse(data[1][1]))
+            console.log(data[1][1])
+            fs.writeFileSync("./res/data/settings.json", data[1][1])
             break
         case "redirect-to-settings":
             //message call to redirect to settings
@@ -359,23 +360,31 @@ ipcMain.handle("message", (event, data) => {
             break
         //info retrival to Controller
         case "send-info":
-            //send initial info to controller
-
-            //sending monitor data
-            let worker_data_message = JSON.stringify(workers)
-
-            //sending airport map data
-            map_config = []
-            var map_files = read_map.list_map_files()
-            for (let i = 0; i < map_files.length; i++){
-                console.log(map_files[i])
-                let map = read_map.read_map_from_file(map_files[i])
-                if (map_files[i].includes("config")){
-                    map_config.push(map)
-                }
+            //this part of function is utilised both for controller window and settings window
+            //|settings window| uses this to acquire saved .json settings
+            //|controller window| uses this to acquire current worker/window data
+            
+            if (data[0] == "settings"){
+                //sending saved .json app data
+                settings.send_message("app-data", JSON.stringify(app_settings))
             }
+            else if (data[0] == "controller"){
+                //sending monitor data
+                let worker_data_message = JSON.stringify(workers)
 
-            controllerWindow.send_message("init-info", ["window-info", worker_data_message, map_config])
+                //sending airport map data
+                map_config = []
+                var map_files = read_map.list_map_files()
+                for (let i = 0; i < map_files.length; i++){
+                    console.log(map_files[i])
+                    let map = read_map.read_map_from_file(map_files[i])
+                    if (map_files[i].includes("config")){
+                        map_config.push(map)
+                    }
+                }
+
+                controllerWindow.send_message("init-info", ["window-info", worker_data_message, map_config])
+            }
             break
         case "set-map":
             //retrieve all airport data

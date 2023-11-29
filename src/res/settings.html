@@ -22,36 +22,59 @@
                 <hr>
             </div>
             <label for="location">Controller window location</label>
-            <select id="location" name="location">
+            <select id="location" name="location" class="settings-elem">
                 <option value="leftmost">leftmost</option>
                 <option value="rightmost">rigthmost</option>
             </select>
             <br>
             <label for="limit">Worker spawn limit</label>
-            <input type="text" name="limit" id="limit"> 
+            <input type="text" name="limit" id="limit" class="settings-elem"> 
             <br>
             <label for="alignment">window alignment</label>
-            <select id="alignment" name="alignment">
+            <select id="alignment" name="alignment" class="settings-elem">
                 <option value="set">set</option>
                 <option value="free">free</option>
             </select>
             <br>
             <label for="backup">Backup saving frequency</label>
-            <input type="text" name="backup" id="backup"> 
+            <select id="backup" name="backup" class="settings-elem">
+                <option value="1min">1 minute</option>
+                <option value="5min">5 minutes</option>
+                <option value="10min">10 minutes</option>
+                <option value="30min">30 minutes</option>
+                <option value="1hour">1 hour</option>
+                <option value="never">never</option>
+            </select>
             <br>
             <div class="set-header">
-                <h2>General Settings</h2>
+                <h2>Simulation Settings</h2>
                 <hr>
             </div>
             <label for="ai_aggression" name="ai_aggression">AI aggression policy</label>
-            <select>
+            <select id="ai_aggression" name="ai_aggression" class="settings-elem">
                 <option value="high">high</option>
                 <option value="medium">medium</option>
                 <option value="low">low</option>
             </select>
             <br>
             <label for="result" name="result">show results on end of simulation</label>
-            <input type="checkbox" name="result">
+            <input type="checkbox" name="result" id="result" class="settings-elem">
+            <br>
+            <div class="set-header">
+                <h2>Plane Settings</h2>
+                <hr>
+            </div>
+            <label for="bank_angle">standart bank angle</label>
+            <input type="text" name="bank_angle" id="bank_angle" class="settings-elem"> 
+            <label for="bank_angle">(in degrees)</label>
+            <br>
+            <label for="min_speed">aircraft minimum speed</label>
+            <input type="text" name="min_speed" id="min_speed" class="settings-elem"> 
+            <label for="min_speed">(in knots)</label>
+            <br>
+            <label for="max_speed">aircraft maximum speed</label>
+            <input type="text" name="max_speed" id="max_speed" class="settings-elem"> 
+            <label for="max_speed">(in knots)</label>
             <br>
         </div>
     </body>

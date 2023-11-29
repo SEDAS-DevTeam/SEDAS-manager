@@ -1,5 +1,11 @@
 {
-  "controller-loc": "leftmost",
-  "worker-spawn": "2",
-  "alignment": "set"
+    "controller-loc": "leftmost",
+    "worker-spawn": "2",
+    "alignment": "set",
+    "saving_frequency": "5min",
+    "ai_aggression": "medium",
+    "results": true,
+    "std_bank_angle": "30",
+    "min_speed": "50",
+    "max_speed": "500"
 }

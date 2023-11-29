@@ -61,8 +61,8 @@ function save_settings(){
     let bank_angle = document.getElementById("bank_angle").value
     let min_speed = document.getElementById("min_speed").value
     let max_speed = document.getElementById("max_speed").value
-    let min_level = document.getElementById("min_level").value
-    let max_level = document.getElementById("max_level").value 
+    let min_altitude = document.getElementById("min_level").value
+    let max_altitude = document.getElementById("max_level").value 
 
     let data = {
         //general data
@@ -77,8 +77,8 @@ function save_settings(){
         "std_bank_angle": bank_angle,
         "min_speed": min_speed,
         "max_speed": max_speed,
-        "min_level": min_level,
-        "max_level": max_level
+        "min_alt": min_altitude,
+        "max_alt": max_altitude
     }
     let data_str = JSON.stringify(data, null, 4)
     console.log(data_str)

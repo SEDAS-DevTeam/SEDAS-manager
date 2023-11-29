@@ -6,6 +6,8 @@
     "ai_aggression": "medium",
     "results": true,
     "std_bank_angle": "30",
-    "min_speed": "50",
-    "max_speed": "500"
+    "min_speed": "130",
+    "max_speed": "450",
+    "min_alt": "41000",
+    "max_alt": "500"
 }

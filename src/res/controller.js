@@ -173,7 +173,6 @@ function delete_plane(elem){
 }
 
 function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival, plane_heading, plane_level, plane_speed){
-    console.log(APP_DATA)
 
     let grid_container = document.createElement("div")
     grid_container.classList.add("grid-container")
@@ -182,9 +181,7 @@ function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival,
 
     let plane_cell = document.createElement("div")
     plane_cell.classList.add("plane-cell")
-    //TODO: does not seem to work
     plane_cell.innerHTML = `<div class="plane-cell-header" id="plane${plane_id}"><h2>${plane_name} (from ${plane_departure.split("_")[0]} to ${plane_arrival.split("_")[0]})</h2><i class="fa-solid fa-trash" id="delete-icon" onclick="delete_plane(event.target)"></i><div>`
-
     for(let i_row = 0; i_row < 3; i_row++){
         for(let i_col = 0; i_col < 12; i_col++){
             let grid_row = document.createElement("div")
@@ -587,13 +584,14 @@ function process_init_data(data, reset = false){
         let min_altitude = parseInt(APP_DATA["min_alt"])
         let max_altitude = parseInt(APP_DATA["max_alt"])
 
+        //modify ALL variable
+        ALL = [HEADING_VALS, LEVEL_VALS, SPEED_VALS]
+
 
         for (let i = min_speed; i < max_speed; i += SPEED_STEP){
             SPEED_VALS.push(i)
         }
-        delete i
         for (let i = min_altitude; i <= max_altitude; i += ALT_STEP){
-            console.log(i)
             LEVEL_VALS.push(i)
         }
 

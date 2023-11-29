@@ -1,13 +1,16 @@
 //variable definitions
 const PLANE_LABELS = ["Heading", "Level", "Speed"]
+const STEP = 10
 const HEADING_VALS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350]
 const LEVEL_VALS = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
-const SPEED_VALS = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
-const ALL = [HEADING_VALS, LEVEL_VALS, SPEED_VALS]
+var SPEED_VALS = []
+var ALL = []
+
 
 var Windows = []
 var monitor_objects = []
 var INIT_DATA = [] //store it in this session
+var APP_DATA = undefined
 
 var desc_rendered = false
 var curr_desc = -1
@@ -168,7 +171,8 @@ function delete_plane(elem){
 }
 
 function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival, plane_heading, plane_level, plane_speed){
-    
+    console.log(APP_DATA)
+
     let grid_container = document.createElement("div")
     grid_container.classList.add("grid-container")
 
@@ -498,6 +502,8 @@ function show_description(idx){
 }
 
 function process_init_data(data, reset = false){
+    //save app data
+    APP_DATA = JSON.parse(data[3])
 
     if (reset){
         //delete all monitors
@@ -572,6 +578,37 @@ function process_init_data(data, reset = false){
             document.getElementById("monitor_spawn").appendChild(monitor_option)
         }
 
+        //modify ranges according to APP DATA
+        let min_speed = parseInt(APP_DATA["min_speed"])
+        let max_speed = parseInt(APP_DATA["max_speed"])
+
+        for (let i = 10; i < max_speed - min_speed + 10; i += 10){
+            SPEED_VALS.push(i)
+        }
+
+        //setting attributes to ranges
+        var range_elements = document.getElementsByClassName("val-range")
+        var label_elements = document.getElementsByClassName("val-out")
+
+        range_elements[0].min = Math.min(...HEADING_VALS)
+        range_elements[0].max = Math.max(...HEADING_VALS)
+
+        range_elements[1].min = Math.min(...LEVEL_VALS)
+        range_elements[1].max = Math.max(...LEVEL_VALS)
+
+        range_elements[2].min = Math.min(...SPEED_VALS)
+        range_elements[2].max = Math.max(...SPEED_VALS)
+
+        //set values for labels and ranges
+        range_elements[0].value = Math.min(...HEADING_VALS)
+        label_elements[0].innerHTML = Math.min(...HEADING_VALS)
+
+        range_elements[1].value = Math.min(...LEVEL_VALS)
+        label_elements[1].innerHTML = Math.min(...LEVEL_VALS)
+
+        range_elements[2].value = Math.min(...SPEED_VALS)
+        label_elements[2].innerHTML = Math.min(...SPEED_VALS)
+
         //change arrival and departure points onload
         change_according_points()
     }
@@ -633,17 +670,6 @@ window.onload = () => {
 
         case "controller_sim.html":
             //running init code
-
-            //setting attributes to ranges
-            var range_elements = document.getElementsByClassName("val-range")
-            range_elements[0].min = Math.min(...HEADING_VALS)
-            range_elements[0].max = Math.max(...HEADING_VALS)
-
-            range_elements[1].min = Math.min(...LEVEL_VALS)
-            range_elements[1].max = Math.max(...LEVEL_VALS)
-
-            range_elements[2].min = Math.min(...SPEED_VALS)
-            range_elements[2].max = Math.max(...SPEED_VALS)
 
             //check if user had already selected map
             window.electronAPI.send_message("controller", ["map-check"])

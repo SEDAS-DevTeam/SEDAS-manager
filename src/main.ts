@@ -383,7 +383,7 @@ ipcMain.handle("message", (event, data) => {
                     }
                 }
 
-                controllerWindow.send_message("init-info", ["window-info", worker_data_message, map_config])
+                controllerWindow.send_message("init-info", ["window-info", worker_data_message, map_config, JSON.stringify(app_settings)])
             }
             break
         case "set-map":

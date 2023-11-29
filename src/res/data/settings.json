@@ -8,6 +8,6 @@
     "std_bank_angle": "30",
     "min_speed": "130",
     "max_speed": "450",
-    "min_alt": "41000",
-    "max_alt": "500"
+    "min_alt": "500",
+    "max_alt": "41000"
 }

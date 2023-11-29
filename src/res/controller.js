@@ -1,8 +1,10 @@
 //variable definitions
 const PLANE_LABELS = ["Heading", "Level", "Speed"]
-const STEP = 10
+const SPEED_STEP = 10
+const ALT_STEP = 500
+const HEAD_STEP = 10
 const HEADING_VALS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350]
-const LEVEL_VALS = [100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200]
+var LEVEL_VALS = []
 var SPEED_VALS = []
 var ALL = []
 
@@ -582,8 +584,17 @@ function process_init_data(data, reset = false){
         let min_speed = parseInt(APP_DATA["min_speed"])
         let max_speed = parseInt(APP_DATA["max_speed"])
 
-        for (let i = 10; i < max_speed - min_speed + 10; i += 10){
+        let min_altitude = parseInt(APP_DATA["min_alt"])
+        let max_altitude = parseInt(APP_DATA["max_alt"])
+
+
+        for (let i = min_speed; i < max_speed; i += SPEED_STEP){
             SPEED_VALS.push(i)
+        }
+        delete i
+        for (let i = min_altitude; i <= max_altitude; i += ALT_STEP){
+            console.log(i)
+            LEVEL_VALS.push(i)
         }
 
         //setting attributes to ranges
@@ -608,6 +619,11 @@ function process_init_data(data, reset = false){
 
         range_elements[2].value = Math.min(...SPEED_VALS)
         label_elements[2].innerHTML = Math.min(...SPEED_VALS)
+
+        //set values steps
+        range_elements[0].step = HEAD_STEP
+        range_elements[1].step = ALT_STEP
+        range_elements[2].step = SPEED_STEP
 
         //change arrival and departure points onload
         change_according_points()

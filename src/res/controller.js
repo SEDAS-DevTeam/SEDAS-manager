@@ -174,16 +174,24 @@ function delete_plane(elem){
 
 function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival, plane_heading, plane_level, plane_speed){
 
-    let grid_container = document.createElement("div")
-    grid_container.classList.add("grid-container")
-
     let other_plane_components = [plane_heading, plane_level, plane_speed]
+
 
     let plane_cell = document.createElement("div")
     plane_cell.classList.add("plane-cell")
     plane_cell.innerHTML = `<div class="plane-cell-header" id="plane${plane_id}"><h2>${plane_name} (from ${plane_departure.split("_")[0]} to ${plane_arrival.split("_")[0]})</h2><i class="fa-solid fa-trash" id="delete-icon" onclick="delete_plane(event.target)"></i><div>`
     for(let i_row = 0; i_row < 3; i_row++){
-        for(let i_col = 0; i_col < 12; i_col++){
+        let grid_container = document.createElement("div")
+        grid_container.classList.add("grid-container")
+    
+        //modify grid-template-columns
+        let auto_complete = ""
+        for (let i = 0; i < ALL[i_row]; i++){
+            auto_complete += "auto "
+        }
+        grid_container.style.gridTemplateColumns = auto_complete
+
+        for(let i_col = 0; i_col < ALL[i_row].length; i_col++){
             let grid_row = document.createElement("div")
             grid_row.classList.add("grid-item")
             grid_container.appendChild(grid_row)
@@ -194,7 +202,12 @@ function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival,
                 continue
             }
 
-            grid_row.innerHTML = ALL[i_row][i_col - 1]
+            let elem_value = ALL[i_row][i_col - 1]
+            if (elem_value == undefined){
+                continue
+            }
+
+            grid_row.innerHTML = elem_value
             grid_row.classList.add("item" + i_row)
 
             //add onclick event to them
@@ -207,8 +220,8 @@ function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival,
                 grid_row.classList.add("selected")
             }
         }
+        plane_cell.appendChild(grid_container)
     }
-    plane_cell.appendChild(grid_container)
     document.getElementById("plane-list").appendChild(plane_cell)
 }
 

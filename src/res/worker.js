@@ -94,7 +94,6 @@ function process_map_data(){
 }
 
 function render_planes(){
-
     //check saved coordinates if we deleted any plane
     for (let i = 0; i < plane_label_coords.length; i++){
         let found_record = false

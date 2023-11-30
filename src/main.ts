@@ -585,6 +585,7 @@ ipcMain.on("plane-info", (event, data) => {
     console.log(data)
 })
 
+/*
 //update all planes on one second
 setInterval(() => {
     if (PlaneDatabase != undefined){
@@ -593,6 +594,7 @@ setInterval(() => {
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
     }
 }, 1000)
+*/
 
 //on every n minutes, save to local DB if app crashes
 setInterval(() => {

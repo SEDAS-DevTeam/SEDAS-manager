@@ -338,3 +338,7 @@ function renderText(x, y, text, color, weight, canvas_layer){
   context.fillStyle = color
   context.fillText(text, x, y)
 }
+
+function renderScale(){
+  //TODO:
+}

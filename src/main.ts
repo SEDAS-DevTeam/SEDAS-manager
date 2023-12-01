@@ -24,6 +24,8 @@ var curr_plane_id: number = 0;
 var PlaneDatabase: any;
 var backupdb_saving_frequency: number = 0;
 var backup_db_on: boolean = true
+var scale: number = 0;
+var running: boolean = false
 
 /*
 APP INIT 1
@@ -231,6 +233,17 @@ function save_to_local_db(){
     console.log("saved to local db!")
 }
 
+function parse_scale(scale){
+    //parse scale (constant, that describes how many units is one pixel)
+
+    let val = 0
+    if(scale.includes("m")){
+        val = parseInt(scale.substring(0, scale.indexOf("m"))) //value is in nautical miles
+    }
+
+    return val
+}
+
 class Window{
     public window: BrowserWindow;
     public win_type: string = "none";
@@ -417,6 +430,9 @@ ipcMain.handle("message", (event, data) => {
 
             //save map data to variable
             map_data = read_map.read_map_from_file(filename)
+            //read scale, parse it and save it to another variable
+            scale = parse_scale(map_data["scale"])
+
             //set map data to all workers
             for (let i = 0; i < workers.length; i++){
                 workers[i].send_message("map-data", [map_data, workers[i].win_type])
@@ -586,6 +602,12 @@ ipcMain.handle("message", (event, data) => {
                 }
             }
             break
+        case "stop-sim":
+            running = false
+            break
+        case "start-sim":
+            running = true
+            break
     }
 })
 
@@ -613,8 +635,8 @@ ipcMain.on("plane-info", (event, data) => {
 
 //update all planes on one second
 setInterval(() => {
-    if (PlaneDatabase != undefined){
-        PlaneDatabase.update_planes(app_settings["transition_altitude"])
+    if (PlaneDatabase != undefined && map_data != undefined && running){
+        PlaneDatabase.update_planes(app_settings["transition_altitude"], scale)
         //send updated plane database to all
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
     }

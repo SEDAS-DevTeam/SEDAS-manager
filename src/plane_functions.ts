@@ -1,3 +1,12 @@
+//low level functions
+function deg_to_rad(deg){
+    return deg * (Math.PI / 180)
+}
+
+function rad_to_deg(rad){
+    return Math.round(rad * (180 / Math.PI))
+}
+
 export class PlaneDB{
     /*Just an array with methods - for storing planes*/
     public DB: any = [] //storing planes
@@ -84,7 +93,13 @@ export class PlaneDB{
         this.monitor_DB = []
     }
 
-    public update_planes(){
+    public update_planes(scale: number){
+        //scale that represents how many kms are on one pixel
+
+        //update all planes
+        for (let i = 0; i < this.DB.length; i++){
+            this.DB[i].forward(scale)
+        }
     }
 }
 
@@ -131,5 +146,68 @@ export class Plane{
             this.arrival_time = arrival_time
             this.x = x;
             this.y = y;
+    }
+
+    public forward(scale: number){
+        //make one forward pass
+
+        //get pixel distance from real one
+
+        //calculate pixel distance
+        let angle_head = Math.floor(this.heading / 90)
+        let rel_angle = this.heading % 90
+        if(this.heading % 90 == 0 && this.heading != 0){
+            rel_angle = this.heading - (angle_head - 1) * this.heading
+        }
+
+        let dy = Math.sin(deg_to_rad(rel_angle)) * scale
+        let dx = Math.cos(deg_to_rad(rel_angle)) * scale
+
+        let x1: number, y1: number = 0
+        console.log(angle_head)
+
+        switch(angle_head){
+            case 0:
+            x1 = this.x + dy
+            y1 = this.y - dx
+            break
+            case 1:
+            x1 = this.x + dx
+            y1 = this.y + dy
+            break
+            case 2:
+            x1 = this.x - dy
+            y1 = this.y + dx
+            break
+            case 3:
+            x1 = this.x - dx
+            y1 = this.y - dy
+            break
+            case 4:
+            //just for deg = 360
+            x1 = this.x
+            y1 = this.y - scale
+        }
+
+        if(this.heading == 90){
+            x1 = this.x + scale
+            y1 = this.y
+        }
+        else if(this.heading == 180){
+            x1 = this.x
+            y1 = this.y + scale
+        }
+        else if(this.heading == 270){
+            x1 = this.x - scale
+            y1 = this.y
+        }
+        else if(this.heading == 360){
+            x1 = this.x
+            y1 = this.y - scale
+        }
+
+        //rewrite variables
+        this.x = x1
+        this.y = y1
     }
 }

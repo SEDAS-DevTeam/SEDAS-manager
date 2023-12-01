@@ -228,16 +228,16 @@ window.onload = () => {
     })
 
     document.querySelector("a#stopbutton").addEventListener("click", () => {
-        window.electronAPI.send_message()
-
         let elem = document.querySelector("a#stopbutton")
         if (elem.className == "stopsim"){
             elem.className = "startsim"
             elem.innerHTML = "RUN"
+            window.electronAPI.send_message("worker", ["stop-sim"]) //stop simulation
         }
         else if (elem.className == "startsim"){
             elem.className = "stopsim"
             elem.innerHTML = "STOP"
+            window.electronAPI.send_message("worker", ["start-sim"]) //start simulation
         }
     })
 }

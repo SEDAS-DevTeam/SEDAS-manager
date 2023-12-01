@@ -123,22 +123,11 @@ function OnInput(elem){
 }
 
 function plane_value_change(elem){
-    var other_elem = elem.parentNode.children
     var header_full = elem.parentNode.parentNode.querySelector("h2").innerHTML
     
     header_full = header_full.split("(")[0]
     var header = header_full.substring(0, header_full.length - 1)
     var plane_id;
-    
-    //gui change
-    for (let i = 0; i < other_elem.length; i++){
-        if (other_elem[i].classList[1] == elem.classList[1]){
-            if(other_elem[i].classList.contains("selected")){
-                other_elem[i].classList.remove("selected")
-            }
-        }
-    }
-    elem.classList.add("selected")
 
     //look at local db
     for (let i = 0; i < plane_data.length; i++){
@@ -167,15 +156,12 @@ function delete_plane(elem){
         }
     }
     window.electronAPI.send_message("controller", ["plane-delete-record", plane_id])
-
-    //delete gui
-    document.getElementById("plane" + plane_id).remove()
 }
 
 function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival, plane_heading, plane_level, plane_speed){
-
     let other_plane_components = [plane_heading, plane_level, plane_speed]
 
+    console.log("created plane element")
 
     let plane_cell = document.createElement("div")
     plane_cell.classList.add("plane-cell")
@@ -183,13 +169,6 @@ function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival,
     for(let i_row = 0; i_row < 3; i_row++){
         let grid_container = document.createElement("div")
         grid_container.classList.add("grid-container")
-    
-        //modify grid-template-columns
-        let auto_complete = ""
-        for (let i = 0; i < ALL[i_row]; i++){
-            auto_complete += "auto "
-        }
-        grid_container.style.gridTemplateColumns = auto_complete
 
         for(let i_col = 0; i_col < ALL[i_row].length; i_col++){
             let grid_row = document.createElement("div")
@@ -270,12 +249,10 @@ function process_plane_data(){
         "arrival": arr_point,
         "arrival_time": `${hours}:${mins}`
     }])
-
-    //render on controller screen
-    refresh_plane_data()
 }
 
 function refresh_plane_data(){
+
     //delete currently generated GUI
     let plane_list = document.getElementById("plane-list")
     if (plane_list == undefined){
@@ -285,6 +262,7 @@ function refresh_plane_data(){
     for (let i = 0; i < plane_list.children.length; i++){
         if (plane_list.children[i].tagName == "DIV"){
             plane_list.children[i].remove()
+            i -= 1
         }
     }
 

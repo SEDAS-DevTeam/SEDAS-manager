@@ -614,7 +614,7 @@ ipcMain.on("plane-info", (event, data) => {
 //update all planes on one second
 setInterval(() => {
     if (PlaneDatabase != undefined){
-        PlaneDatabase.update_planes()
+        PlaneDatabase.update_planes(app_settings["transition_altitude"])
         //send updated plane database to all
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
     }

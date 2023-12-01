@@ -85,9 +85,6 @@ export class PlaneDB{
     }
 
     public update_planes(){
-        for(let i = 0; i < this.DB.length; i++){
-            //update each plane
-        }
     }
 }
 

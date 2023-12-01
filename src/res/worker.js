@@ -131,10 +131,28 @@ function render_planes(){
             label_y = plane_data[i]["y"] - 50
         }
 
+        //TODO: is set up only for 1000 transition altitude
+        let plane_level = ""
+        //check if altitude does exceed transition altitude
+        if (plane_data[i].level > parseInt(APP_DATA["transition_altitude"])){
+            let val = Math.floor(plane_data[i].level / 100).toString()
+            if (val.length < 3){
+                for (let i = 0; i < 3 - val.length; i++){
+                    val = "0" + val
+                }
+            }
+
+            //convert to FL
+            plane_level = "FL " + val
+        }
+        else{
+            plane_level = plane_data[i].level + " ft"
+        }
+
         renderPlane(plane_data[i]["x"], plane_data[i]["y"], plane_data[i]["heading"], plane_data[i]["speed"], APP_DATA["max_speed"], APP_DATA["min_speed"])
         let label_coords = renderPlaneInfo(plane_data[i]["x"], plane_data[i]["y"], label_x, label_y, {
             "callsign": plane_data[i]["callsign"],
-            "level": plane_data[i]["level"],
+            "level": plane_level,
             "speed": plane_data[i]["speed"],
             "code": undefined
         })

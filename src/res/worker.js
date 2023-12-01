@@ -158,12 +158,28 @@ function update_labels(curr_x, curr_y){
 
     for (let i = 0; i < plane_label_coords.length; i++){
        if (plane_label_coords[i]["id"] == curr_plane["id"]){
+            //do not rerender currently selected plane
             plane_label_coords[i] = {
                 "id": curr_plane["id"],
                 "coords": label_coords
             }
         }
+        else{
+            for(let i2 = 0; i2 < plane_data.length; i2++){
+                if (plane_label_coords[i]["id"] == plane_data[i2]["id"]){
+                    //rerender rest of unused labels onmousemove
+                    renderPlaneInfo(plane_data[i2]["x"], plane_data[i2]["y"], plane_label_coords[i]["coords"][2], plane_label_coords[i]["coords"][3], {
+                        "callsign": plane_data[i2]["callsign"],
+                        "level": plane_data[i2]["level"],
+                        "speed": plane_data[i2]["speed"],
+                        "code": undefined
+                    })
+                }
+            }
+        }
     }
+
+
 }
 
 window.onload = () => {

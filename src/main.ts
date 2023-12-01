@@ -21,7 +21,13 @@ var workers = [];
 var map_config = [];
 var map_data: any;
 var curr_plane_id: number = 0;
-var PlaneDatabase;
+var PlaneDatabase: any;
+var backupdb_saving_frequency: number = 0;
+var backup_db_on: boolean = true
+
+/*
+APP INIT 1
+*/
 
 const PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/fetch.py"
 
@@ -44,6 +50,19 @@ BackupDatabase.create_database()
 
 //fetch all python backend files
 const fetch_process = spawn("python3", [`${PATH_TO_PROCESS}`])
+
+if (app_settings["saving_frequency"].includes("min")){
+    backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 60 * 1000
+}
+else if (app_settings["saving_frequency"].includes("hour")){
+    backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 3600 * 1000
+}
+else if (app_settings["saving_frequency"].includes("never")){
+    backup_db_on = false
+    //defaultly set to 5 mins
+    backupdb_saving_frequency = 5 * 60 * 1000
+}
+console.log(backupdb_saving_frequency)
 
 const main_menu_dict = {
     width: 800,
@@ -598,8 +617,10 @@ setInterval(() => {
 
 //on every n minutes, save to local DB if app crashes
 setInterval(() => {
-    save_to_local_db()
-}, 60000)
+    if (backup_db_on){
+        save_to_local_db()
+    }
+}, backupdb_saving_frequency)
 
 
 //when app dies, it should die in peace (NOT WORKING)

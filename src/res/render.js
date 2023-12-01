@@ -14,6 +14,7 @@ const POINTER_INDENT = 15
 const MAX_RECT_WIDTH = 100
 const LINE_INDENT = 15
 const INFO_TEXT_SIZE = 12
+const MARKER_SCALE_CONST = 3
 
 //PLANE PATH DEFS
 const PLANE_PATH_RADIUS = 3
@@ -93,7 +94,7 @@ function renderCanvas(canvas_id){
   }
 }
 
-function renderPlane(x, y, angle){ //0 - 360 degrees
+function renderPlane(x, y, angle, plane_speed, max_speed, min_speed){ //0 - 360 degrees
   /*
   plane_info example:
   plane_info = {
@@ -103,6 +104,10 @@ function renderPlane(x, y, angle){ //0 - 360 degrees
     "code": undefined/7500/7600/7700 [squawks reserved by international law]
   }
   */
+
+  //get scale
+  var scale = (plane_speed - min_speed) / (max_speed - min_speed)
+  var scale_to_len = PLANE_HEADING_MARKER + PLANE_HEADING_MARKER * scale * MARKER_SCALE_CONST
 
   var canvas = document.querySelector("#canvas2");
   var context = canvas.getContext('2d');
@@ -123,32 +128,50 @@ function renderPlane(x, y, angle){ //0 - 360 degrees
     rel_angle = angle - (angle_head - 1) * angle
   }
 
-  let dy = Math.sin(deg_to_rad(rel_angle)) * PLANE_HEADING_MARKER
-  let dx = Math.cos(deg_to_rad(rel_angle)) * PLANE_HEADING_MARKER
+  let dy = Math.sin(deg_to_rad(rel_angle)) * scale_to_len
+  let dx = Math.cos(deg_to_rad(rel_angle)) * scale_to_len
 
   let x1, y1 = 0
+  console.log(angle_head)
 
   switch(angle_head){
     case 0:
-      x1 = x - dx
-      y1 = y - dy
+      x1 = x + dy
+      y1 = y - dx
       break
     case 1:
       x1 = x + dx
-      y1 = y - dy
+      y1 = y + dy
       break
     case 2:
-      x1 = x + dx
-      y1 = y + dy
+      x1 = x - dy
+      y1 = y + dx
       break
     case 3:
       x1 = x - dx
-      y1 = y + dy
+      y1 = y - dy
       break
     case 4:
       //just for deg = 360
-      x1 = x - PLANE_HEADING_MARKER
+      x1 = x
+      y1 = y - scale_to_len
+  }
+
+  if(angle == 90){
+    x1 = x + scale_to_len
+    y1 = y
+  }
+  else if(angle == 180){
+      x1 = x
+      y1 = y + scale_to_len
+  }
+  else if(angle == 270){
+      x1 = x - scale_to_len
       y1 = y
+  }
+  else if(angle == 360){
+      x1 = x
+      y1 = y - scale_to_len
   }
 
   context.lineTo(x1, y1);

@@ -170,7 +170,7 @@ function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival,
         let grid_container = document.createElement("div")
         grid_container.classList.add("grid-container")
 
-        for(let i_col = 0; i_col < ALL[i_row].length; i_col++){
+        for(let i_col = 0; i_col < ALL[i_row].length + 1; i_col++){
             let grid_row = document.createElement("div")
             grid_row.classList.add("grid-item")
             grid_container.appendChild(grid_row)

@@ -404,6 +404,12 @@ ipcMain.handle("message", (event, data) => {
 
                 controllerWindow.send_message("init-info", ["window-info", worker_data_message, map_config, JSON.stringify(app_settings)])
             }
+            else if (data[0] == "worker"){
+                //send to all workers
+                for (let i = 0; i < workers.length; i++){
+                    workers[i].send_message("init-info", ["window-info", JSON.stringify(app_settings)])
+                }
+            }
             break
         case "set-map":
             //retrieve all airport data

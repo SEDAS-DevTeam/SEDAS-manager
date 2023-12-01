@@ -1,6 +1,7 @@
 var map_data = undefined
 var plane_data = []
 var plane_label_coords = []
+var APP_DATA = undefined
 
 /*
 in format
@@ -130,7 +131,7 @@ function render_planes(){
             label_y = plane_data[i]["y"] - 50
         }
 
-        renderPlane(plane_data[i]["x"], plane_data[i]["y"], plane_data[i]["heading"])
+        renderPlane(plane_data[i]["x"], plane_data[i]["y"], plane_data[i]["heading"], plane_data[i]["speed"], APP_DATA["max_speed"], APP_DATA["min_speed"])
         let label_coords = renderPlaneInfo(plane_data[i]["x"], plane_data[i]["y"], label_x, label_y, {
             "callsign": plane_data[i]["callsign"],
             "level": plane_data[i]["level"],
@@ -186,6 +187,9 @@ window.onload = () => {
     //ask for map data
     window.electronAPI.send_message("worker", ["render-map"])
 
+    //ask for app data
+    window.electronAPI.send_message("worker", ["send-info"])
+
     //ask for plane data
     window.electronAPI.send_message("worker", ["send-plane-data"])
 
@@ -199,11 +203,6 @@ window.onload = () => {
 
     document.querySelector("a#plankmsg").addEventListener("click", () => {
         window.electronAPI.send_message_redir("controller", ["test msg2"])
-    })
-    
-    document.querySelector("a#plankmsg2").addEventListener("click", () => {
-        renderPlane(50, 50)
-        renderPlaneInfo(100, 100)
     })
     
     document.querySelector("a#exit").addEventListener("click", () => {
@@ -273,4 +272,9 @@ window.electronAPI.on_message("update-plane-db", (data) => { //for updating plan
 
     //rerender planes
     render_planes()
+})
+
+window.electronAPI.on_init_info((data) => {
+    APP_DATA = JSON.parse(data[1])
+    console.log(APP_DATA)
 })

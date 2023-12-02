@@ -160,10 +160,11 @@ export class Plane{
             rel_angle = this.heading - (angle_head - 1) * this.heading
         }
 
-        let dy = Math.sin(deg_to_rad(rel_angle)) * scale
-        let dx = Math.cos(deg_to_rad(rel_angle)) * scale
+        let dy = Math.sin(deg_to_rad(rel_angle)) * this.speed
+        let dx = Math.cos(deg_to_rad(rel_angle)) * this.speed
 
-        let x1: number, y1: number = 0
+        let x1: number = 0
+        let y1: number = 0
         console.log(angle_head)
 
         switch(angle_head){
@@ -183,27 +184,23 @@ export class Plane{
             x1 = this.x - dx
             y1 = this.y - dy
             break
-            case 4:
-            //just for deg = 360
-            x1 = this.x
-            y1 = this.y - scale
         }
 
         if(this.heading == 90){
-            x1 = this.x + scale
+            x1 = this.x + this.speed
             y1 = this.y
         }
         else if(this.heading == 180){
             x1 = this.x
-            y1 = this.y + scale
+            y1 = this.y + this.speed
         }
         else if(this.heading == 270){
-            x1 = this.x - scale
+            x1 = this.x - this.speed
             y1 = this.y
         }
         else if(this.heading == 360){
             x1 = this.x
-            y1 = this.y - scale
+            y1 = this.y - this.speed
         }
 
         //rewrite variables

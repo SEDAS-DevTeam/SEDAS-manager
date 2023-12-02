@@ -54,6 +54,9 @@ const SID_COLOR = "#7B85DA"
 const STAR_TRIAG_LENGTH = 12
 const STAR_COLOR = "#C38B8B"
 
+//SCALE DEFS
+const SCALE_DIST_FROM_SCREEN = 15
+
 //low level functions
 function deg_to_rad(deg){
   return deg * (Math.PI / 180)
@@ -340,5 +343,8 @@ function renderText(x, y, text, color, weight, canvas_layer){
 }
 
 function renderScale(){
-  //TODO:
+  var canvas3 = document.querySelector("#canvas3")
+  
+
+  renderText()
 }

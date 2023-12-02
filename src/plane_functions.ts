@@ -160,12 +160,19 @@ export class Plane{
             rel_angle = this.heading - (angle_head - 1) * this.heading
         }
 
-        let dy = Math.sin(deg_to_rad(rel_angle)) * this.speed
-        let dx = Math.cos(deg_to_rad(rel_angle)) * this.speed
+        let speed_per_sec = this.speed
+
+        let dy = (Math.sin(deg_to_rad(rel_angle)) * speed_per_sec) * scale
+        let dx = (Math.cos(deg_to_rad(rel_angle)) * speed_per_sec) * scale
+
+        console.log("tf is this " + Math.sin(deg_to_rad(rel_angle)) * speed_per_sec)
+
+        //if pixel-change is too small, set automatically to one
+        dy = Math.ceil(dy)
+        dx = Math.ceil(dx)
 
         let x1: number = 0
         let y1: number = 0
-        console.log(angle_head)
 
         switch(angle_head){
             case 0:
@@ -187,20 +194,20 @@ export class Plane{
         }
 
         if(this.heading == 90){
-            x1 = this.x + this.speed
+            x1 = this.x + speed_per_sec
             y1 = this.y
         }
         else if(this.heading == 180){
             x1 = this.x
-            y1 = this.y + this.speed
+            y1 = this.y + speed_per_sec
         }
         else if(this.heading == 270){
-            x1 = this.x - this.speed
+            x1 = this.x - speed_per_sec
             y1 = this.y
         }
         else if(this.heading == 360){
             x1 = this.x
-            y1 = this.y - this.speed
+            y1 = this.y - speed_per_sec
         }
 
         //rewrite variables

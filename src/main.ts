@@ -235,10 +235,9 @@ function save_to_local_db(){
 
 function parse_scale(scale){
     //parse scale (constant, that describes how many units is one pixel)
-
-    let val = 0
+    let val: number = 0
     if(scale.includes("m")){
-        val = parseInt(scale.substring(0, scale.indexOf("m"))) //value is in nautical miles
+        val = parseFloat(scale.substring(0, scale.indexOf("m"))) //value is in nautical miles
     }
 
     return val
@@ -445,7 +444,6 @@ ipcMain.handle("message", (event, data) => {
             }
             break
         case "get-points":
-            console.log(data[1][1])
             let spec_data: any;
             if (data[1][1].includes("ACC")){
                 //selected monitor is in ACC mode
@@ -636,7 +634,7 @@ ipcMain.on("plane-info", (event, data) => {
 //update all planes on one second
 setInterval(() => {
     if (PlaneDatabase != undefined && map_data != undefined && running){
-        PlaneDatabase.update_planes(app_settings["transition_altitude"], scale)
+        PlaneDatabase.update_planes(scale)
         //send updated plane database to all
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
     }

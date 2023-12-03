@@ -121,6 +121,11 @@ function render_planes(){
             if(plane_label_coords[i2]["id"] == plane_data[i]["id"]){
                 //found specific plane
                 found_plane = true
+
+                //rewrite label coords so it has same distance
+                plane_label_coords[i2]["coords"][2] = plane_data[i]["x"] + plane_label_coords[i2]["dist"][0]
+                plane_label_coords[i2]["coords"][3] = plane_data[i]["y"] + plane_label_coords[i2]["dist"][1]
+
                 label_x = plane_label_coords[i2]["coords"][2]
                 label_y = plane_label_coords[i2]["coords"][3]
                 break
@@ -160,7 +165,8 @@ function render_planes(){
         if (!found_plane){
             plane_label_coords.push({
                 "id": plane_data[i]["id"],
-                "coords": label_coords
+                "coords": label_coords,
+                "dist": [label_x - plane_data[i]["x"], label_y - plane_data[i]["y"]]
             })
         }
     }
@@ -180,7 +186,8 @@ function update_labels(curr_x, curr_y){
             //do not rerender currently selected plane
             plane_label_coords[i] = {
                 "id": curr_plane["id"],
-                "coords": label_coords
+                "coords": label_coords,
+                "dist": [plane_label_coords[i]["coords"][2] - plane_data[i]["x"], plane_label_coords[i]["coords"][3] - plane_data[i]["y"]]
             }
         }
         else{
@@ -230,13 +237,9 @@ window.onload = () => {
     document.querySelector("a#stopbutton").addEventListener("click", () => {
         let elem = document.querySelector("a#stopbutton")
         if (elem.className == "stopsim"){
-            elem.className = "startsim"
-            elem.innerHTML = "RUN"
             window.electronAPI.send_message("worker", ["stop-sim"]) //stop simulation
         }
         else if (elem.className == "startsim"){
-            elem.className = "stopsim"
-            elem.innerHTML = "STOP"
             window.electronAPI.send_message("worker", ["start-sim"]) //start simulation
         }
     })
@@ -291,8 +294,23 @@ window.electronAPI.on_message("update-plane-db", (data) => { //for updating plan
     //rerender planes
     render_planes()
 })
+window.electronAPI.on_message("sim-event", (data) => {
+    let elem = document.querySelector("a#stopbutton")
+    if (data == "stopsim"){
+        elem.className = "startsim"
+        elem.innerHTML = "RUN"
+    }
+    else if (data == "startsim"){
+        elem.className = "stopsim"
+        elem.innerHTML = "STOP"
+    }
+})
 
 window.electronAPI.on_init_info((data) => {
     APP_DATA = JSON.parse(data[1])
     console.log(APP_DATA)
 })
+
+setInterval(() => {
+    console.log(plane_label_coords)
+}, 1000)

@@ -17,6 +17,6 @@
     },
     "long": "none",
     "lat": "none",
-    "zoom": 6,
-    "scale": "1m"
+    "zoom": "none",
+    "scale": "0.005m"
 }

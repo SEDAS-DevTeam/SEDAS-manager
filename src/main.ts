@@ -602,9 +602,19 @@ ipcMain.handle("message", (event, data) => {
             break
         case "stop-sim":
             running = false
+
+            //send stop event to all workers
+            for (let i = 0; i < workers.length; i++){
+                workers[i].send_message("sim-event", "stopsim")
+            }
             break
         case "start-sim":
             running = true
+
+            //send stop event to all workers
+            for (let i = 0; i < workers.length; i++){
+                workers[i].send_message("sim-event", "startsim")
+            }
             break
     }
 })

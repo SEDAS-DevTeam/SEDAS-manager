@@ -268,8 +268,8 @@ function refresh_plane_data(){
 
     for (let i = 0; i < plane_data.length; i++){
         create_plane_elem(plane_data[i].id, plane_data[i].callsign, plane_data[i].departure, 
-            plane_data[i].arrival, plane_data[i].heading, 
-            plane_data[i].level, plane_data[i].speed)
+            plane_data[i].arrival, plane_data[i].updated_heading, 
+            plane_data[i].updated_level, plane_data[i].updated_speed)
     }
 }
 

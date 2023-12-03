@@ -572,15 +572,15 @@ ipcMain.handle("message", (event, data) => {
             switch(data[1][1]){
                 case "item0":
                     //heading change
-                    PlaneDatabase.DB[data[1][3]].updated_heading = parseInt(data[1][2])
+                    PlaneDatabase.DB[data[1][3]].updated_heading = data[1][2]
                     break
                 case "item1":
                     //level change
-                    PlaneDatabase.DB[data[1][3]].level = parseInt(data[1][2])
+                    PlaneDatabase.DB[data[1][3]].updated_level = data[1][2]
                     break
                 case "item2":
                     //speed change
-                    PlaneDatabase.DB[data[1][3]].speed = parseInt(data[1][2])
+                    PlaneDatabase.DB[data[1][3]].updated_speed = data[1][2]
                     break
 
             }

@@ -13,6 +13,9 @@ export class PlaneDB{
     public monitor_DB: any = [] //storing where are planes rendered
     public plane_paths_DB: any = []
 
+    //temporary databases for plane movement
+    public plane_turn_DB: any = []
+
     public constructor(monitor_data: any){
         for (let i = 0; i < monitor_data.length; i++){
             this.monitor_DB.push({
@@ -101,13 +104,62 @@ export class PlaneDB{
             this.DB[i].forward(scale)
         }
 
-        //check if any plane updated their heading
+        //heading change
         for (let i = 0; i < this.DB.length; i++){
             if (this.DB[i].updated_heading != this.DB[i].heading){
                 //make turn
-                let val = this.DB[i].calc_rate_of_turn(std_bank_angle)
-                //change heading
+                let r_of_t = this.DB[i].calc_rate_of_turn(std_bank_angle)
+                
+                let continue_change: boolean = true
+                //scan plane turn database
+                for (let i_db = 0; i_db < this.plane_turn_DB.length; i_db++){
+                    if (this.plane_turn_DB[i_db]["id"] == this.DB[i].id){
+                        //no need to update
+                        continue_change = false
+                        break
+                    }
+                }
 
+                if (!continue_change){
+                    continue
+                }
+
+                //add to turn DB for processing
+                this.plane_turn_DB.push({
+                    "id": this.DB[i].id,
+                    "rate_of_turn": r_of_t
+                })
+            }
+        }
+
+        //speed change
+
+        //level change
+
+        //update plane turns
+        for (let i = 0; i < this.plane_turn_DB.length; i++){
+            for (let i_plane = 0; i_plane < this.DB.length; i_plane++){
+                if (this.plane_turn_DB[i]["id"] == this.DB[i_plane].id){
+
+                    //check if completed
+                    if (parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"] > parseInt(this.DB[i_plane].updated_heading)){
+                        //automatically set to updated heading
+                        this.DB[i_plane].heading = this.DB[i_plane].updated_heading
+                    }
+
+                    if (parseInt(this.DB[i_plane].heading) < parseInt(this.DB[i_plane].updated_heading)){
+                        //increase turn
+                        this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"]
+                    }
+                    else if (this.DB[i_plane].heading > this.DB[i_plane].updated_heading){
+                        //decrease turn
+                        this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) - this.plane_turn_DB[i]["rate_of_turn"]
+                    }
+                    else{
+                        //heading == updated_heading => remove
+                        this.plane_turn_DB.splice(i, 1)
+                    }
+                }
             }
         }
     }
@@ -162,20 +214,26 @@ export class Plane{
         return ((1.091 * Math.tan(deg_to_rad(std_bank_angle))) / this.speed) * 1000 //TODO: inspect this rounding error
     }
 
-    public calc_pixel_change(scale: number, angle){
+    public calc_pixel_change(type: string, scale: number, angle: number, change: number){
         let angle_head = Math.floor(angle / 90)
         let rel_angle = angle % 90
         if(angle % 90 == 0 && angle != 0){
             rel_angle = angle - (angle_head - 1) * angle
         }
 
-        let speed_per_sec = this.speed / 3600
-
-        let dy_n_scale = Math.sin(deg_to_rad(rel_angle)) * speed_per_sec
-        let dx_n_scale = Math.cos(deg_to_rad(rel_angle)) * speed_per_sec
-
-        let dy = dy_n_scale / scale
-        let dx = dx_n_scale / scale
+        let dy_n_scale = Math.sin(deg_to_rad(rel_angle)) * change
+        let dx_n_scale = Math.cos(deg_to_rad(rel_angle)) * change
+        
+        let dy = 0
+        let dx = 0
+        if (type == "movement"){
+            dy = dy_n_scale / scale
+            dx = dx_n_scale / scale
+        }
+        else if (type == "rotation"){
+            dy = dy_n_scale
+            dx = dx_n_scale
+        }
 
         //if pixel-change is too small, set automatically to one
         dy = Math.ceil(dy)
@@ -204,20 +262,16 @@ export class Plane{
         }
 
         if(angle == 90){
-            x1 = this.x + Math.ceil(speed_per_sec / scale)
+            x1 = this.x + dy
             y1 = this.y
         }
         else if(angle == 180){
             x1 = this.x
-            y1 = this.y + Math.ceil(speed_per_sec / scale)
+            y1 = this.y + dx
         }
         else if(angle == 270){
-            x1 = this.x - Math.ceil(speed_per_sec / scale)
+            x1 = this.x - dy
             y1 = this.y
-        }
-        else if(angle == 360){
-            x1 = this.x
-            y1 = this.y - Math.ceil(speed_per_sec / scale)
         }
 
         return [x1, y1]
@@ -227,7 +281,7 @@ export class Plane{
         //make one forward pass
 
         //calculate pixel distance
-        let vals = this.calc_pixel_change(scale, this.heading)
+        let vals = this.calc_pixel_change("movement", scale, this.heading, this.speed / 3600)
 
         //rewrite variables
         this.x = vals[0]

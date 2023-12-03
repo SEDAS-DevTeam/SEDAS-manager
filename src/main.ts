@@ -525,7 +525,6 @@ ipcMain.handle("message", (event, data) => {
             let latitude = map_data["lat"]
             let zoom = map_data["zoom"]
 
-            console.log(workers)
             for (let i = 0; i < workers.length; i++){
                 if (workers[i]["win_type"] == "weather"){
                     workers[i].send_message("geo-data", [latitude, longitude, zoom])
@@ -573,7 +572,7 @@ ipcMain.handle("message", (event, data) => {
             switch(data[1][1]){
                 case "item0":
                     //heading change
-                    PlaneDatabase.DB[data[1][3]].heading = parseInt(data[1][2])
+                    PlaneDatabase.DB[data[1][3]].updated_heading = parseInt(data[1][2])
                     break
                 case "item1":
                     //level change
@@ -644,7 +643,7 @@ ipcMain.on("plane-info", (event, data) => {
 //update all planes on one second
 setInterval(() => {
     if (PlaneDatabase != undefined && map_data != undefined && running){
-        PlaneDatabase.update_planes(scale)
+        PlaneDatabase.update_planes(scale, app_settings["std_bank_angle"])
         //send updated plane database to all
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
     }

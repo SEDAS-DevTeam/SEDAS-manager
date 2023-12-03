@@ -93,12 +93,22 @@ export class PlaneDB{
         this.monitor_DB = []
     }
 
-    public update_planes(scale: number){
+    public update_planes(scale: number, std_bank_angle: number){
         //scale that represents how many kms are on one pixel
 
         //update all planes
         for (let i = 0; i < this.DB.length; i++){
             this.DB[i].forward(scale)
+        }
+
+        //check if any plane updated their heading
+        for (let i = 0; i < this.DB.length; i++){
+            if (this.DB[i].updated_heading != this.DB[i].heading){
+                //make turn
+                let val = this.DB[i].calc_rate_of_turn(std_bank_angle)
+                //change heading
+
+            }
         }
     }
 }
@@ -148,16 +158,15 @@ export class Plane{
             this.y = y;
     }
 
-    public forward(scale: number){
-        //make one forward pass
+    public calc_rate_of_turn(std_bank_angle: number){
+        return ((1.091 * Math.tan(deg_to_rad(std_bank_angle))) / this.speed) * 1000 //TODO: inspect this rounding error
+    }
 
-        //get pixel distance from real one
-
-        //calculate pixel distance
-        let angle_head = Math.floor(this.heading / 90)
-        let rel_angle = this.heading % 90
-        if(this.heading % 90 == 0 && this.heading != 0){
-            rel_angle = this.heading - (angle_head - 1) * this.heading
+    public calc_pixel_change(scale: number, angle){
+        let angle_head = Math.floor(angle / 90)
+        let rel_angle = angle % 90
+        if(angle % 90 == 0 && angle != 0){
+            rel_angle = angle - (angle_head - 1) * angle
         }
 
         let speed_per_sec = this.speed / 3600
@@ -194,25 +203,34 @@ export class Plane{
             break
         }
 
-        if(this.heading == 90){
+        if(angle == 90){
             x1 = this.x + Math.ceil(speed_per_sec / scale)
             y1 = this.y
         }
-        else if(this.heading == 180){
+        else if(angle == 180){
             x1 = this.x
             y1 = this.y + Math.ceil(speed_per_sec / scale)
         }
-        else if(this.heading == 270){
+        else if(angle == 270){
             x1 = this.x - Math.ceil(speed_per_sec / scale)
             y1 = this.y
         }
-        else if(this.heading == 360){
+        else if(angle == 360){
             x1 = this.x
             y1 = this.y - Math.ceil(speed_per_sec / scale)
         }
 
+        return [x1, y1]
+    }
+
+    public forward(scale: number){
+        //make one forward pass
+
+        //calculate pixel distance
+        let vals = this.calc_pixel_change(scale, this.heading)
+
         //rewrite variables
-        this.x = x1
-        this.y = y1
+        this.x = vals[0]
+        this.y = vals[1]
     }
 }

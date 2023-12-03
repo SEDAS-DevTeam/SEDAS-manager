@@ -5,7 +5,7 @@
     "saving_frequency": "5min",
     "ai_aggression": "medium",
     "results": true,
-    "std_bank_angle": "30",
+    "std_bank_angle": "25",
     "min_speed": "130",
     "max_speed": "450",
     "min_alt": "500",

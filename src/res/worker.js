@@ -154,6 +154,9 @@ function render_planes(){
             plane_level = plane_data[i].level + " ft"
         }
 
+        //add metrics and other functionalities to label values
+        plane_data[i].speed = plane_data[i].speed + " kts"
+
         renderPlane(plane_data[i]["x"], plane_data[i]["y"], plane_data[i]["heading"], plane_data[i]["speed"], APP_DATA["max_speed"], APP_DATA["min_speed"])
         let label_coords = renderPlaneInfo(plane_data[i]["x"], plane_data[i]["y"], label_x, label_y, {
             "callsign": plane_data[i]["callsign"],

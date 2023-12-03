@@ -130,11 +130,17 @@ export class PlaneDB{
                     "rate_of_turn": r_of_t
                 })
             }
+
+            //speed change
+            if (this.DB[i].updated_speed != this.DB[i].speed){
+                
+            }
+
+            //level change
+            if (this.DB[i].updated_level != this.DB[i].level){
+                
+            }
         }
-
-        //speed change
-
-        //level change
 
         //update plane turns
         for (let i = 0; i < this.plane_turn_DB.length; i++){
@@ -212,6 +218,13 @@ export class Plane{
 
     public calc_rate_of_turn(std_bank_angle: number){
         return ((1.091 * Math.tan(deg_to_rad(std_bank_angle))) / this.speed) * 1000 //TODO: inspect this rounding error
+    }
+
+    public calc_vertical_change(){
+        let vert_change: number = this.level - this.updated_level
+        let vert_dist: number = Math.abs(vert_change)
+
+        
     }
 
     public calc_pixel_change(type: string, scale: number, angle: number, change: number){

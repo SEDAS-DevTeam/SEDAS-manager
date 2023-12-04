@@ -89,6 +89,13 @@ export class PlaneDB{
                 }
             }
         }
+
+        //delete from path database
+        for (let i = 0; i < this.plane_paths_DB.length; i++){
+            if (this.plane_paths_DB[i]["id"] == id){
+                this.plane_paths_DB.splice(i, 1)
+            }
+        }
     }
 
     public delete_all(){

@@ -646,6 +646,7 @@ setInterval(() => {
         PlaneDatabase.update_planes(scale, app_settings["std_bank_angle"])
         //send updated plane database to all
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
+        console.log(PlaneDatabase.plane_paths_DB)
     }
 }, 1000)
 

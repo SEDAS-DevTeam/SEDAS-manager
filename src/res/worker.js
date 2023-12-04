@@ -323,4 +323,5 @@ window.electronAPI.on_init_info((data) => {
 
 setInterval(() => {
     console.log(plane_label_coords)
+    console.log(plane_paths)
 }, 1000)

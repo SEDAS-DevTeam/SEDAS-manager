@@ -329,7 +329,7 @@ function renderAirport(x, y, name){
   context.fillStyle = ARP_COLOR;
   context.fill();
 
-  renderText(x + 15, y - 15, name, ARP_COLOR, "12px", "#canvas1")
+  renderText(x + 15, y - 15, name, ARP_COLOR, "12px", "canvas1")
 }
 
 function renderText(x, y, text, color, weight, canvas_layer){

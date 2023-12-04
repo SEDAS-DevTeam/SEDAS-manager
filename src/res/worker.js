@@ -298,10 +298,12 @@ window.electronAPI.on_message("update-plane-db", (data) => { //for updating plan
     //rerender planes
     render_planes()
 
-    renderPlanePath(plane_paths)
+    for (let i = 0; i < plane_paths.length; i++){
+        renderPlanePath(plane_paths[i]["coords"])
+    }
 })
 window.electronAPI.on_message("update-paths", (data) => {
-    plane_paths = data[0]["coords"]
+    plane_paths = data
 })
 window.electronAPI.on_message("sim-event", (data) => {
     let elem = document.querySelector("a#stopbutton")

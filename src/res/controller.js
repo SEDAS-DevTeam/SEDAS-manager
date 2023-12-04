@@ -214,7 +214,7 @@ function process_plane_data(){
 
     let val_spans = document.getElementsByClassName("val-out")
     //heading
-    let heading = val_spans[0].innerHTML
+    let heading = parseInt(val_spans[0].innerHTML)
 
     //level
     let level = val_spans[1].innerHTML

@@ -202,7 +202,7 @@ function exit_app(){
     process.exit()
 }
 
-function send_to_all(planes: any, plane_monitor_data: any){
+function send_to_all(planes: any, plane_monitor_data: any, plane_paths_data: any){
     console.log(planes)
     console.log(plane_monitor_data)
     if (controllerWindow != undefined && workers.length != 0){
@@ -224,7 +224,7 @@ function send_to_all(planes: any, plane_monitor_data: any){
             }
 
             //send updated data to all workers
-            workers[i].send_message("update-plane-db", temp_planes)
+            workers[i].send_message("update-plane-db", temp_planes, plane_paths_data)
         }
     }
 }
@@ -566,7 +566,7 @@ ipcMain.handle("message", (event, data) => {
             PlaneDatabase.add_record(plane, plane_data["monitor"])
             curr_plane_id += 1
 
-            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
+            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
             break
         case "plane-value-change":
             switch(data[1][1]){
@@ -584,12 +584,12 @@ ipcMain.handle("message", (event, data) => {
                     break
 
             }
-            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
+            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
             break
         case "plane-delete-record":
             PlaneDatabase.delete_record(data[1][1])
 
-            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
+            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
             break
         case "send-plane-data":
             //send plane data (works for all windows)
@@ -645,7 +645,7 @@ setInterval(() => {
     if (PlaneDatabase != undefined && map_data != undefined && running){
         PlaneDatabase.update_planes(scale, app_settings["std_bank_angle"])
         //send updated plane database to all
-        send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB)
+        send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
     }
 }, 1000)
 

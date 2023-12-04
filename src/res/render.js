@@ -109,7 +109,7 @@ function renderPlane(x, y, angle, plane_speed, max_speed, min_speed){ //0 - 360 
   */
 
   //get scale
-  var scale = (plane_speed - min_speed) / (max_speed - min_speed)
+  var scale = (parseInt(plane_speed) - parseInt(min_speed)) / (parseInt(max_speed) - parseInt(min_speed))
   var scale_to_len = PLANE_HEADING_MARKER + PLANE_HEADING_MARKER * scale * MARKER_SCALE_CONST
 
   var canvas = document.querySelector("#canvas2");

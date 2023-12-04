@@ -97,10 +97,13 @@ export class PlaneDB{
     }
 
     public update_planes(scale: number, std_bank_angle: number){
-        //scale that represents how many kms are on one pixel
+        //scale that represents how many nautical miles are on one pixel
 
         //update all planes
         for (let i = 0; i < this.DB.length; i++){
+            //save current location to plane path history
+            this.add_path_record(this.DB[i].id, [this.DB[i].x, this.DB[i].y])
+
             this.DB[i].forward(scale)
         }
 

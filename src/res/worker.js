@@ -278,6 +278,11 @@ document.onmouseup = () => {
 document.onmousemove = (event) => {
     if (is_dragging){
         update_labels(event.clientX, event.clientY)
+
+        //also still render paths
+        for (let i = 0; i < plane_paths.length; i++){
+            renderPlanePath(plane_paths[i]["coords"])
+        }
     }
 }
 
@@ -297,6 +302,15 @@ window.electronAPI.on_message("update-plane-db", (data) => { //for updating plan
 
     //rerender planes
     render_planes()
+
+    //update current plane
+    if (curr_plane != undefined){
+        for (let i = 0; i < plane_data.length; i++){
+            if (curr_plane["id"] == plane_data[i]["id"]){
+                curr_plane = plane_data[i]
+            }
+        }
+    }
 
     for (let i = 0; i < plane_paths.length; i++){
         renderPlanePath(plane_paths[i]["coords"])
@@ -320,8 +334,3 @@ window.electronAPI.on_message("sim-event", (data) => {
 window.electronAPI.on_init_info((data) => {
     APP_DATA = JSON.parse(data[1])
 })
-
-setInterval(() => {
-    console.log(plane_label_coords)
-    console.log(plane_paths)
-}, 1000)

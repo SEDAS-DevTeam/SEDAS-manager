@@ -694,6 +694,15 @@ window.onload = () => {
                 ai_control_change(event.target)
             })
 
+            document.getElementById("sim_button").addEventListener("click", (event) => {
+                if (event.target.className == "stopsim"){
+                    window.electronAPI.send_message("controller", ["stop-sim"]) //stop simulation
+                }
+                else if (event.target.className == "startsim"){
+                    window.electronAPI.send_message("controller", ["start-sim"]) //start simulation
+                }
+            })
+
             let choice_buttons = document.getElementsByClassName("choice-but")
             for (let i = 0; i < choice_buttons.length; i++){
                 choice_buttons[i].addEventListener("click", () => {
@@ -796,5 +805,17 @@ window.onload = () => {
     window.electronAPI.on_message_redir()
     window.electronAPI.on_init_info((data) => {
         process_init_data(data)
+    })
+
+    window.electronAPI.on_message("sim-event", (data) => {
+        let elem = document.querySelector("button#sim_button")
+        if (data == "stopsim"){
+            elem.className = "startsim"
+            elem.innerHTML = "RUN"
+        }
+        else if (data == "startsim"){
+            elem.className = "stopsim"
+            elem.innerHTML = "STOP"
+        }
     })
 }

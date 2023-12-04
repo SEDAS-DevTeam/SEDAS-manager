@@ -17,7 +17,7 @@ const INFO_TEXT_SIZE = 12
 const MARKER_SCALE_CONST = 3
 
 //PLANE PATH DEFS
-const PLANE_PATH_RADIUS = 3
+const PLANE_PATH_RADIUS = 2
 
 //AIRSPACE DEFS
 const SECTOR_COLOR = "#171414"
@@ -246,12 +246,11 @@ function renderPlaneInfo(x_plane, y_plane, x, y, plane_info){
   return [x1_text, init_y + height, x2 - width, init_y]
 }
 
-function renderPlanePath(...coordinates){
-  var canvas = document.querySelector("#canvas2");
+function renderPlanePath(coordinates){
+  var canvas = document.querySelector("#canvas3");
   var context = canvas.getContext('2d');
 
   context.beginPath();
-
   for (let i = 0; i < coordinates.length; i++){
     context.moveTo(coordinates[i][0], coordinates[i][1])
     context.arc(coordinates[i][0], coordinates[i][1], PLANE_PATH_RADIUS, 0, 2 * Math.PI, false);

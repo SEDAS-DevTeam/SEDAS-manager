@@ -2,6 +2,7 @@ var map_data = undefined
 var plane_data = []
 var plane_label_coords = []
 var APP_DATA = undefined
+var plane_paths = []
 
 /*
 in format
@@ -296,6 +297,11 @@ window.electronAPI.on_message("update-plane-db", (data) => { //for updating plan
 
     //rerender planes
     render_planes()
+
+    renderPlanePath(plane_paths)
+})
+window.electronAPI.on_message("update-paths", (data) => {
+    plane_paths = data[0]["coords"]
 })
 window.electronAPI.on_message("sim-event", (data) => {
     let elem = document.querySelector("a#stopbutton")
@@ -311,7 +317,6 @@ window.electronAPI.on_message("sim-event", (data) => {
 
 window.electronAPI.on_init_info((data) => {
     APP_DATA = JSON.parse(data[1])
-    console.log(APP_DATA)
 })
 
 setInterval(() => {

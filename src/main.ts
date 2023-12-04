@@ -203,8 +203,6 @@ function exit_app(){
 }
 
 function send_to_all(planes: any, plane_monitor_data: any, plane_paths_data: any){
-    console.log(planes)
-    console.log(plane_monitor_data)
     if (controllerWindow != undefined && workers.length != 0){
         //update planes on controller window
         controllerWindow.send_message("update-plane-db", planes)
@@ -224,7 +222,9 @@ function send_to_all(planes: any, plane_monitor_data: any, plane_paths_data: any
             }
 
             //send updated data to all workers
-            workers[i].send_message("update-plane-db", temp_planes, plane_paths_data)
+            workers[i].send_message("update-plane-db", temp_planes)
+            //send path data to all workers
+            workers[i].send_message("update-paths", plane_paths_data)
         }
     }
 }

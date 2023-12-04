@@ -155,19 +155,23 @@ export class PlaneDB{
         //update plane turns
         for (let i = 0; i < this.plane_turn_DB.length; i++){
             for (let i_plane = 0; i_plane < this.DB.length; i_plane++){
+                console.log(parseInt(this.DB[i_plane].heading))
+                console.log(parseInt(this.DB[i_plane].updated_heading))
+
+
                 if (this.plane_turn_DB[i]["id"] == this.DB[i_plane].id){
-
+                    var fallback_diff = parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"] - parseInt(this.DB[i_plane].updated_heading)
+                    
                     //check if completed
-                    if (parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"] > parseInt(this.DB[i_plane].updated_heading)){
+                    if (fallback_diff > 0 && fallback_diff < 10){
                         //automatically set to updated heading
-                        this.DB[i_plane].heading = this.DB[i_plane].updated_heading
+                        this.DB[i_plane].heading = parseInt(this.DB[i_plane].updated_heading)
                     }
-
                     if (parseInt(this.DB[i_plane].heading) < parseInt(this.DB[i_plane].updated_heading)){
                         //increase turn
                         this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"]
                     }
-                    else if (this.DB[i_plane].heading > this.DB[i_plane].updated_heading){
+                    else if (parseInt(this.DB[i_plane].heading) > parseInt(this.DB[i_plane].updated_heading)){
                         //decrease turn
                         this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) - this.plane_turn_DB[i]["rate_of_turn"]
                     }

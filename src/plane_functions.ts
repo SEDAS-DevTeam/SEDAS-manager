@@ -103,7 +103,7 @@ export class PlaneDB{
         this.monitor_DB = []
     }
 
-    public update_planes(scale: number, std_bank_angle: number){
+    public update_planes(scale: number, std_bank_angle: number, std_climb_angle: number, std_descent_angle: number){
         //scale that represents how many nautical miles are on one pixel
 
         //update all planes
@@ -145,19 +145,45 @@ export class PlaneDB{
             if (this.DB[i].updated_speed != this.DB[i].speed){
                 
             }
+        }
 
-            //level change
-            if (this.DB[i].updated_level != this.DB[i].level){
-                
+        //level change
+        for (let i = 0; i < this.DB.length; i++){
+            if (parseInt(this.DB[i].updated_level) != parseInt(this.DB[i].level)){
+
+                console.log(this.DB[i].updated_level)
+                console.log(this.DB[i].level)
+                if (parseInt(this.DB[i].updated_level) > parseInt(this.DB[i].level)){
+                    //climb
+                    let change = (parseInt(this.DB[i].speed) / 3600) * Math.sin(deg_to_rad(std_climb_angle)) / scale
+                    console.log(change)
+                    let fallback_diff = parseInt(this.DB[i].level) + change - parseInt(this.DB[i].updated_level)
+
+                    //check if completed
+                    if (fallback_diff > 0 && fallback_diff < 500){
+                        this.DB[i].level = this.DB[i].updated_level
+                        continue
+                    }
+                    this.DB[i].level = (parseInt(this.DB[i].level) + change).toFixed(1) //round to 1 decimal point
+
+                }
+                else if (parseInt(this.DB[i].updated_level) < parseInt(this.DB[i].level)){
+                    //descent
+                    let change = parseInt(this.DB[i].speed) / 3600 * Math.sin(std_descent_angle)
+                    let fallback_diff = parseInt(this.DB[i].updated_level) - parseInt(this.DB[i].level) - change
+                    
+                    if (fallback_diff > 0 && fallback_diff < 500){
+                        this.DB[i].level = this.DB[i].updated_level
+                        continue
+                    }
+                    this.DB[i].level = (parseInt(this.DB[i].level) - change).toFixed(1)
+                }
             }
         }
 
         //update plane turns
         for (let i = 0; i < this.plane_turn_DB.length; i++){
             for (let i_plane = 0; i_plane < this.DB.length; i_plane++){
-                console.log(parseInt(this.DB[i_plane].heading))
-                console.log(parseInt(this.DB[i_plane].updated_heading))
-
 
                 if (this.plane_turn_DB[i]["id"] == this.DB[i_plane].id){
                     var fallback_diff = parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"] - parseInt(this.DB[i_plane].updated_heading)

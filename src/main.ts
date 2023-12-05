@@ -606,6 +606,7 @@ ipcMain.handle("message", (event, data) => {
             for (let i = 0; i < workers.length; i++){
                 workers[i].send_message("sim-event", "stopsim")
             }
+            controllerWindow.send_message("sim-event", "stopsim")
             break
         case "start-sim":
             running = true
@@ -614,6 +615,7 @@ ipcMain.handle("message", (event, data) => {
             for (let i = 0; i < workers.length; i++){
                 workers[i].send_message("sim-event", "startsim")
             }
+            controllerWindow.send_message("sim-event", "startsim")
             break
     }
 })

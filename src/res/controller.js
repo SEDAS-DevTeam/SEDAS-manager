@@ -349,6 +349,11 @@ function random_generate_names(){
     //random generate all buttons
     var choice_buttons = document.getElementsByClassName("choice-but")
     for (let i = 0; i < choice_buttons.length; i++){
+        //unselect all buttons
+        if (choice_buttons[i].classList.contains("selected-choice")){
+            choice_buttons[i].classList = ["choice-but"]
+        }
+
         while(true){
             let out = ""
 
@@ -695,6 +700,7 @@ window.onload = () => {
             })
 
             document.getElementById("sim_button").addEventListener("click", (event) => {
+                
                 if (event.target.className == "stopsim"){
                     window.electronAPI.send_message("controller", ["stop-sim"]) //stop simulation
                 }

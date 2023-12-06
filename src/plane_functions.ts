@@ -219,7 +219,9 @@ export class PlaneDB{
         //update plane turns
         for (let i = 0; i < this.plane_turn_DB.length; i++){
             for (let i_plane = 0; i_plane < this.DB.length; i_plane++){
-
+                if (this.DB[i_plane] == undefined || this.plane_turn_DB[i] == undefined){
+                    break
+                }
                 if (this.plane_turn_DB[i]["id"] == this.DB[i_plane].id){
                     var fallback_diff = parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"] - parseInt(this.DB[i_plane].updated_heading)
                     

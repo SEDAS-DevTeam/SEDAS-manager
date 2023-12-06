@@ -206,10 +206,12 @@ export class PlaneDB{
                 if (parseInt(this.DB[i].updated_speed) > parseInt(this.DB[i].speed)){
                     //increase velocity
                     this.DB[i].speed = parseInt(this.DB[i].speed) + std_accel
+                    this.DB[i].screen_speed = parseInt(this.DB[i].screen_speed) + std_accel
                 }
                 else if (parseInt(this.DB[i].updated_speed) < parseInt(this.DB[i].speed)){
                     //decrease velocity
                     this.DB[i].speed = parseInt(this.DB[i].speed) - std_accel
+                    this.DB[i].screen_speed = parseInt(this.DB[i].screen_speed) - std_accel
                 }
             }
         }
@@ -249,7 +251,7 @@ export class PlaneDB{
             if (!isNaN(path_limit)){
                 if (this.plane_paths_DB[i]["coords"].length > path_limit){
                     //free some path particles
-                    this.plane_paths_DB[i]["coords"].pop()
+                    this.plane_paths_DB[i]["coords"].shift()
                 }
             }
         }
@@ -305,11 +307,6 @@ export class Plane{
 
     public calc_rate_of_turn(std_bank_angle: number){
         return ((1.091 * Math.tan(deg_to_rad(std_bank_angle))) / this.speed) * 1000 //TODO: inspect this rounding error
-    }
-
-    public calc_vertical_change(){
-        let vert_change: number = this.level - this.updated_level
-        let vert_dist: number = Math.abs(vert_change)
     }
 
     public calc_pixel_change(type: string, scale: number, angle: number, change: number){
@@ -384,6 +381,7 @@ export class Plane{
             vals = this.calc_pixel_change("movement", scale, this.heading, this.screen_speed / 3600)
         }
         else{
+
             //calculate pixel distance
             vals = this.calc_pixel_change("movement", scale, this.heading, this.speed / 3600)
         }

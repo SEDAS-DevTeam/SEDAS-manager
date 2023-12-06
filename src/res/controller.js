@@ -267,6 +267,7 @@ function refresh_plane_data(){
     }
 
     for (let i = 0; i < plane_data.length; i++){
+        console.log(plane_data)
         create_plane_elem(plane_data[i].id, plane_data[i].callsign, plane_data[i].departure, 
             plane_data[i].arrival, plane_data[i].updated_heading, 
             plane_data[i].updated_level, plane_data[i].updated_speed)
@@ -804,6 +805,7 @@ window.onload = () => {
     //plane messages
     window.electronAPI.on_message("update-plane-db", (data) => {
         plane_data = data
+        console.log(plane_data)
         refresh_plane_data()
     })
 

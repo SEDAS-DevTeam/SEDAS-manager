@@ -273,7 +273,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        //this.window.webContents.openDevTools()
+        this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -569,21 +569,25 @@ ipcMain.handle("message", (event, data) => {
             send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
             break
         case "plane-value-change":
-            switch(data[1][1]){
-                case "item0":
-                    //heading change
-                    PlaneDatabase.DB[data[1][3]].updated_heading = data[1][2]
-                    break
-                case "item1":
-                    //level change
-                    PlaneDatabase.DB[data[1][3]].updated_level = data[1][2]
-                    break
-                case "item2":
-                    //speed change
-                    PlaneDatabase.DB[data[1][3]].updated_speed = data[1][2]
-                    break
-
+            for (let i = 0; i < PlaneDatabase.DB.length; i++){
+                if(PlaneDatabase.DB[i].id == data[1][3]){
+                    switch(data[1][1]){
+                        case "item0":
+                            //heading change
+                            PlaneDatabase.DB[i].updated_heading = data[1][2]
+                            break
+                        case "item1":
+                            //level change
+                            PlaneDatabase.DB[i].updated_level = data[1][2]
+                            break
+                        case "item2":
+                            //speed change
+                            PlaneDatabase.DB[i].updated_speed = data[1][2]
+                            break
+                    }
+                }
             }
+            
             send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
             break
         case "plane-delete-record":
@@ -649,6 +653,7 @@ setInterval(() => {
                                     parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
         //send updated plane database to all
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
+        console.log(PlaneDatabase.DB)
     }
 }, 1000)
 

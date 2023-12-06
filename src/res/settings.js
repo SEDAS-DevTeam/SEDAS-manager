@@ -52,6 +52,7 @@ function save_settings(){
     let limit_data = document.getElementById("limit").value
     let align_data = document.getElementById("alignment").value
     let saving_freq = document.getElementById("backup").value
+    let path_limit = document.getElementById("path_limit").value
 
     //simulation data
     let ai_aggression = document.getElementById("ai_aggression").value
@@ -74,6 +75,7 @@ function save_settings(){
         "worker-spawn": limit_data,
         "alignment": align_data,
         "saving_frequency": saving_freq,
+        "plane_path_limit": path_limit,
         //simulation data
         "ai_aggression": ai_aggression,
         "results": results,

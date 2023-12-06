@@ -55,7 +55,11 @@ const STAR_TRIAG_LENGTH = 12
 const STAR_COLOR = "#C38B8B"
 
 //SCALE DEFS
-const SCALE_DIST_FROM_SCREEN = 15
+const SCALE_DIST_FROM_SCREEN_X = 150
+const SCALE_DIST_FROM_SCREEN_Y = 200
+const SCALE_LEN = 100
+const SCALE_WIDTH = 3
+const SCALE_CORNER = 5
 
 //low level functions
 function deg_to_rad(deg){
@@ -341,9 +345,28 @@ function renderText(x, y, text, color, weight, canvas_layer){
   context.fillText(text, x, y)
 }
 
-function renderScale(){
-  var canvas3 = document.querySelector("#canvas3")
-  
+function renderScale(scale){
+  var canvas = document.querySelector("#canvas3")
+  var context = canvas.getContext('2d');
 
-  renderText()
+  //always set to 100 pixels
+  let x1 = window.screen.width - SCALE_DIST_FROM_SCREEN_X - SCALE_LEN
+  let x2 = window.screen.width - SCALE_DIST_FROM_SCREEN_X
+  let y = window.screen.height - SCALE_DIST_FROM_SCREEN_Y
+
+  renderText(window.screen.width - SCALE_DIST_FROM_SCREEN_X - SCALE_LEN, window.screen.height - SCALE_DIST_FROM_SCREEN_Y - 15, `scale: ${parseFloat(scale) * SCALE_LEN} nm`, "white", "24px", "canvas3")
+  
+  context.beginPath()
+  context.moveTo(x1, y)
+  context.lineTo(x1, y - SCALE_CORNER)
+  context.lineTo(x1, y + SCALE_CORNER)
+  context.moveTo(x1, y)
+
+  context.lineTo(x2, y)
+  context.lineTo(x2, y - SCALE_CORNER)
+  context.lineTo(x2, y + SCALE_CORNER)
+  
+  context.strokeStyle = "white"
+  context.lineWidth = SCALE_WIDTH
+  context.stroke()
 }

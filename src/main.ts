@@ -273,7 +273,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -646,7 +646,7 @@ ipcMain.on("plane-info", (event, data) => {
 setInterval(() => {
     if (PlaneDatabase != undefined && map_data != undefined && running){
         PlaneDatabase.update_planes(scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]),
-                                    parseInt(app_settings["standard_accel"]))
+                                    parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
         //send updated plane database to all
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
     }

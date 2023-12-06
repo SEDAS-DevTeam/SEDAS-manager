@@ -3,6 +3,7 @@ var plane_data = []
 var plane_label_coords = []
 var APP_DATA = undefined
 var plane_paths = []
+var scale = 0
 
 /*
 in format
@@ -28,6 +29,7 @@ function process_map_data(){
     }
 
     let spec_data = map_data[0][map_data[1]] //load map data type (ACC/APP/TWR)
+    scale = map_data[0]["scale"]
     if (spec_data == undefined){
         //map resource for type does not exist
         renderText(50, 100, `Map resource for type "${map_data[1]}" does not exist`, "white", "48px", "canvas3")
@@ -93,6 +95,9 @@ function process_map_data(){
             }
         }
     }
+
+    //render scale
+    renderScale(scale)
 }
 
 function render_planes(){
@@ -283,6 +288,9 @@ document.onmousemove = (event) => {
         for (let i = 0; i < plane_paths.length; i++){
             renderPlanePath(plane_paths[i]["coords"])
         }
+
+        //render scale
+        renderScale(scale)
     }
 }
 
@@ -315,6 +323,9 @@ window.electronAPI.on_message("update-plane-db", (data) => { //for updating plan
     for (let i = 0; i < plane_paths.length; i++){
         renderPlanePath(plane_paths[i]["coords"])
     }
+
+    //render scale
+    renderScale(scale)
 })
 window.electronAPI.on_message("update-paths", (data) => {
     plane_paths = data

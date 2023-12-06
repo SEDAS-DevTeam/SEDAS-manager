@@ -104,8 +104,12 @@ export class PlaneDB{
     }
 
     public update_planes(scale: number, std_bank_angle: number, std_climb_angle: number, std_descent_angle: number,
-                         std_accel: number){
+                         std_accel: number, path_limit: number){
         //scale that represents how many nautical miles are on one pixel
+
+        /*
+        MOVEMENT CHANGES
+        */
 
         //update all planes
         for (let i = 0; i < this.DB.length; i++){
@@ -143,6 +147,53 @@ export class PlaneDB{
             }
         }
 
+        //level change
+        for (let i = 0; i < this.DB.length; i++){
+            if (parseInt(this.DB[i].updated_level) != parseInt(this.DB[i].level)){
+
+                if (parseInt(this.DB[i].updated_level) > parseInt(this.DB[i].level)){
+                    //compute screen 2d speed, because of trigonometry
+                    let screen_speed = Math.cos(deg_to_rad(std_climb_angle)) * parseInt(this.DB[i].speed)
+                    this.DB[i].screen_speed = screen_speed
+
+                    //climb
+                    let change = (parseInt(this.DB[i].speed) / 3600) * Math.sin(deg_to_rad(std_climb_angle)) / scale
+                    let fallback_diff = parseInt(this.DB[i].level) + change - parseInt(this.DB[i].updated_level)
+
+                    //check if completed
+                    if (fallback_diff > 0 && fallback_diff < 500){
+                        this.DB[i].level = this.DB[i].updated_level
+
+                        //set screen speed back to normal
+                        this.DB[i].screen_speed = this.DB[i].speed
+                        
+                        continue
+                    }
+                    this.DB[i].level = Math.round(parseInt(this.DB[i].level) + change) //round
+
+                }
+                else if (parseInt(this.DB[i].updated_level) < parseInt(this.DB[i].level)){
+                    //compute screen 2d speed, because of trigonometry
+                    let screen_speed = Math.cos(deg_to_rad(std_descent_angle)) * parseInt(this.DB[i].speed)
+                    this.DB[i].screen_speed = screen_speed
+
+                    //descent
+                    let change = parseInt(this.DB[i].speed) / 3600 * Math.sin(std_descent_angle)
+                    let fallback_diff = parseInt(this.DB[i].updated_level) - parseInt(this.DB[i].level) - change
+                    
+                    if (fallback_diff > 0 && fallback_diff < 500){
+                        this.DB[i].level = this.DB[i].updated_level
+
+                        //set screen speed back to normal
+                        this.DB[i].screen_speed = this.DB[i].speed
+
+                        continue
+                    }
+                    this.DB[i].level = (parseInt(this.DB[i].level) - change).toFixed(1)
+                }
+            }
+        }
+
         //speed change
         for (let i = 0; i < this.DB.length; i++){
             if (this.DB[i].updated_speed != this.DB[i].speed){
@@ -159,40 +210,6 @@ export class PlaneDB{
                 else if (parseInt(this.DB[i].updated_speed) < parseInt(this.DB[i].speed)){
                     //decrease velocity
                     this.DB[i].speed = parseInt(this.DB[i].speed) - std_accel
-                }
-            }
-        }
-
-        //level change
-        for (let i = 0; i < this.DB.length; i++){
-            if (parseInt(this.DB[i].updated_level) != parseInt(this.DB[i].level)){
-
-                console.log(this.DB[i].updated_level)
-                console.log(this.DB[i].level)
-                if (parseInt(this.DB[i].updated_level) > parseInt(this.DB[i].level)){
-                    //climb
-                    let change = (parseInt(this.DB[i].speed) / 3600) * Math.sin(deg_to_rad(std_climb_angle)) / scale
-                    console.log(change)
-                    let fallback_diff = parseInt(this.DB[i].level) + change - parseInt(this.DB[i].updated_level)
-
-                    //check if completed
-                    if (fallback_diff > 0 && fallback_diff < 500){
-                        this.DB[i].level = this.DB[i].updated_level
-                        continue
-                    }
-                    this.DB[i].level = (parseInt(this.DB[i].level) + change).toFixed(1) //round to 1 decimal point
-
-                }
-                else if (parseInt(this.DB[i].updated_level) < parseInt(this.DB[i].level)){
-                    //descent
-                    let change = parseInt(this.DB[i].speed) / 3600 * Math.sin(std_descent_angle)
-                    let fallback_diff = parseInt(this.DB[i].updated_level) - parseInt(this.DB[i].level) - change
-                    
-                    if (fallback_diff > 0 && fallback_diff < 500){
-                        this.DB[i].level = this.DB[i].updated_level
-                        continue
-                    }
-                    this.DB[i].level = (parseInt(this.DB[i].level) - change).toFixed(1)
                 }
             }
         }
@@ -224,6 +241,18 @@ export class PlaneDB{
                 }
             }
         }
+
+        /*
+        PLANE PATH CHANGES
+        */
+        for (let i = 0; i < this.plane_paths_DB.length; i++){
+            if (!isNaN(path_limit)){
+                if (this.plane_paths_DB[i]["coords"].length > path_limit){
+                    //free some path particles
+                    this.plane_paths_DB[i]["coords"].pop()
+                }
+            }
+        }
     }
 }
 
@@ -238,6 +267,7 @@ export class Plane{
     public updated_level: number;
 
     public speed: number;
+    public screen_speed: number //2d speed for climb and descent
     public updated_speed: number;
 
     public departure: string;
@@ -263,6 +293,7 @@ export class Plane{
             this.updated_level = level_up;
 
             this.speed = speed;
+            this.screen_speed = speed
             this.updated_speed = speed_up
 
             this.departure = departure;
@@ -279,8 +310,6 @@ export class Plane{
     public calc_vertical_change(){
         let vert_change: number = this.level - this.updated_level
         let vert_dist: number = Math.abs(vert_change)
-
-        
     }
 
     public calc_pixel_change(type: string, scale: number, angle: number, change: number){
@@ -349,8 +378,15 @@ export class Plane{
     public forward(scale: number){
         //make one forward pass
 
-        //calculate pixel distance
-        let vals = this.calc_pixel_change("movement", scale, this.heading, this.speed / 3600)
+        let vals = undefined
+        if (this.speed != this.screen_speed){
+            //calculate pixel distance
+            vals = this.calc_pixel_change("movement", scale, this.heading, this.screen_speed / 3600)
+        }
+        else{
+            //calculate pixel distance
+            vals = this.calc_pixel_change("movement", scale, this.heading, this.speed / 3600)
+        }
 
         //rewrite variables
         this.x = vals[0]

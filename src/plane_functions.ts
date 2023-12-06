@@ -103,7 +103,8 @@ export class PlaneDB{
         this.monitor_DB = []
     }
 
-    public update_planes(scale: number, std_bank_angle: number, std_climb_angle: number, std_descent_angle: number){
+    public update_planes(scale: number, std_bank_angle: number, std_climb_angle: number, std_descent_angle: number,
+                         std_accel: number){
         //scale that represents how many nautical miles are on one pixel
 
         //update all planes
@@ -114,8 +115,8 @@ export class PlaneDB{
             this.DB[i].forward(scale)
         }
 
-        //heading change
         for (let i = 0; i < this.DB.length; i++){
+            //heading change
             if (this.DB[i].updated_heading != this.DB[i].heading){
                 //make turn
                 let r_of_t = this.DB[i].calc_rate_of_turn(std_bank_angle)
@@ -140,10 +141,25 @@ export class PlaneDB{
                     "rate_of_turn": r_of_t
                 })
             }
+        }
 
-            //speed change
+        //speed change
+        for (let i = 0; i < this.DB.length; i++){
             if (this.DB[i].updated_speed != this.DB[i].speed){
-                
+                var fallback_diff = parseInt(this.DB[i].speed) + std_accel - parseInt(this.DB[i].updated_speed)
+                if (fallback_diff > 0 && fallback_diff < std_accel){
+                    //check if finished
+                    this.DB[i].speed = parseInt(this.DB[i].updated_speed)
+                }
+
+                if (parseInt(this.DB[i].updated_speed) > parseInt(this.DB[i].speed)){
+                    //increase velocity
+                    this.DB[i].speed = parseInt(this.DB[i].speed) + std_accel
+                }
+                else if (parseInt(this.DB[i].updated_speed) < parseInt(this.DB[i].speed)){
+                    //decrease velocity
+                    this.DB[i].speed = parseInt(this.DB[i].speed) - std_accel
+                }
             }
         }
 

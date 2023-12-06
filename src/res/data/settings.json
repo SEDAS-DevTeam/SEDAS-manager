@@ -12,5 +12,6 @@
     "max_alt": "41000",
     "standard_pitch_up": "15",
     "standard_pitch_down": "10",
+    "standard_accel": "7.2",
     "transition_altitude": "1000"
 }

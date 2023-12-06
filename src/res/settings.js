@@ -66,6 +66,7 @@ function save_settings(){
     let trans_altitude = document.getElementById("trans_alt").value
     let standard_pitch_up = document.getElementById("std_pitch_up").value
     let standard_pitch_down = document.getElementById("std_pitch_down").value
+    let standard_acceleration = document.getElementById("std_accel").value
 
     let data = {
         //general data
@@ -84,6 +85,7 @@ function save_settings(){
         "max_alt": max_altitude,
         "standard_pitch_up": standard_pitch_up,
         "standard_pitch_down": standard_pitch_down,
+        "standard_accel": standard_acceleration,
         "transition_altitude": trans_altitude
     }
     let data_str = JSON.stringify(data, null, 4)

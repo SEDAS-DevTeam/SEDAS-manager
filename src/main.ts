@@ -645,7 +645,8 @@ ipcMain.on("plane-info", (event, data) => {
 //update all planes on one second
 setInterval(() => {
     if (PlaneDatabase != undefined && map_data != undefined && running){
-        PlaneDatabase.update_planes(scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]))
+        PlaneDatabase.update_planes(scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]),
+                                    parseInt(app_settings["standard_accel"]))
         //send updated plane database to all
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
     }

@@ -3,6 +3,19 @@ import os
 
 URL = "https://raw.githubusercontent.com/HelloWorld7894/SEDAC-networks/main/src/"
 
+def download_newest(type):
+    #model download
+    main_url = URL + type
+
+    if type == "PlaneResponse":
+        urllib.request.urlretrieve(os.path.join(main_url, "voice_models.py"), PATH + "/voice_models.py")
+        urllib.request.urlretrieve(os.path.join(main_url, "speech_models.py"), PATH + "/speech_models.py")
+        urllib.request.urlretrieve(os.path.join(main_url, "main_plane.py"), PATH + "/main_plane.py")
+    elif type == "ACAI":
+        urllib.request.urlretrieve(os.path.join(main_url, "main_control.py"), PATH + "/main_control.py")
+    elif type == "gen_map":
+        urllib.request.urlretrieve(os.path.join(main_url, "main_terrain.py"), PATH + "/main_terrain.py")
+
 
 #PATH formatting
 PATH = os.getcwd()
@@ -25,25 +38,12 @@ except OSError as e:
     print(e)
     print("Error while updating cache")
 
-print("All files deleted")
-print("Updating cache")
+if __name__ == "__main__":
+    print("All files deleted")
+    print("Updating cache")
 
-def download_newest(type):
-    #model download
-    main_url = URL + type
+    download_newest("PlaneResponse")
+    download_newest("ACAI")
+    download_newest("gen_map")
 
-    if type == "VoiceRecognition":
-        urllib.request.urlretrieve(os.path.join(main_url, "voice_models.py"), PATH + "/voice_models.py")
-    elif type == "SpeechSynthesis":
-        urllib.request.urlretrieve(os.path.join(main_url, "speech_models.py"), PATH + "/speech_models.py")
-    elif type == "ACAI":
-        urllib.request.urlretrieve(os.path.join(main_url, "main_control.py"), PATH + "/main_control.py")
-    elif type == "gen_map":
-        urllib.request.urlretrieve(os.path.join(main_url, "main_terrain.py"), PATH + "/main_terrain.py")
-
-download_newest("VoiceRecognition")
-download_newest("SpeechSynthesis")
-download_newest("ACAI")
-download_newest("gen_map")
-
-print("Done")
+    print("Done")

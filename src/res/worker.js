@@ -25,6 +25,8 @@ function process_map_data(){
     renderCanvas(3)
 
     if (map_data[0] == undefined){
+        //render empty map placeholder on init
+        renderText(50, 100, "Empty map placeholder", "white", "48px", "canvas3")
         return;
     }
 
@@ -301,10 +303,6 @@ window.electronAPI.on_map_data((data) => {
 })
 window.electronAPI.on_message("update-plane-db", (data) => { //for updating plane list
     plane_data = data
-
-    //redraw map
-    renderCanvas(2)
-    renderCanvas(3)
 
     process_map_data()
 

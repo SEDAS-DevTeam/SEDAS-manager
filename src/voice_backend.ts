@@ -17,7 +17,13 @@ const voice_process = spawn("python3", [`${PATH_TO_PROCESS}`])
 async function db_check(){
     let value: string = await client.get("out-voice")
 
-    //send to main loop
+    //
+    //main code for plane responses
+    //
+    let message: string = "fly heading 090"
+    client.set("gen-speech", message)
+    //TODO:
+
     parentPort.postMessage(value)
 }
 

@@ -3,9 +3,6 @@ from queue import Queue
 
 from cache.voice_models import CMUSphinx, DeepSpeech, Whisper, GoogleSpeechToText
 
-#for index, name in enumerate(sr.Microphone.list_microphone_names()):
-#    print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
-
 data_queue = Queue()
 
 #Speech Recognition models

@@ -220,27 +220,48 @@ export class PlaneDB{
         for (let i = 0; i < this.plane_turn_DB.length; i++){
             for (let i_plane = 0; i_plane < this.DB.length; i_plane++){
                 if (this.DB[i_plane] == undefined || this.plane_turn_DB[i] == undefined){
-                    break
+                    continue
                 }
                 if (this.plane_turn_DB[i]["id"] == this.DB[i_plane].id){
-                    var fallback_diff = parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"] - parseInt(this.DB[i_plane].updated_heading)
-                    
+
+                    var fallback_diff = Math.abs(parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"] - parseInt(this.DB[i_plane].updated_heading))
+
+
                     //check if completed
                     if (fallback_diff > 0 && fallback_diff < 10){
                         //automatically set to updated heading
                         this.DB[i_plane].heading = parseInt(this.DB[i_plane].updated_heading)
+
+                        //heading == updated_heading => remove
+                        this.plane_turn_DB.splice(i, 1)
+                        continue
                     }
-                    if (parseInt(this.DB[i_plane].heading) < parseInt(this.DB[i_plane].updated_heading)){
-                        //increase turn
-                        this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"]
+                    
+                    var diff = 0
+                    if (this.DB[i_plane].heading > 180){
+                        diff = Math.abs(180 - parseInt(this.DB[i_plane].heading))
                     }
-                    else if (parseInt(this.DB[i_plane].heading) > parseInt(this.DB[i_plane].updated_heading)){
+                    else{
+                        diff = Math.abs(180 + parseInt(this.DB[i_plane].heading))
+                    }
+
+                    if (this.DB[i_plane].updated_heading > diff){
                         //decrease turn
                         this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) - this.plane_turn_DB[i]["rate_of_turn"]
                     }
                     else{
-                        //heading == updated_heading => remove
-                        this.plane_turn_DB.splice(i, 1)
+                        //increase turn
+                        this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"]
+                    }
+
+                    //check if over 360
+                    if (this.DB[i_plane].heading > 360){
+                        this.DB[i_plane].heading = 0
+                    }
+
+                    //check if under 360
+                    if (this.DB[i_plane].heading < 0){
+                        this.DB[i_plane].heading = 355
                     }
                 }
             }

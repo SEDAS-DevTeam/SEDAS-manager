@@ -273,7 +273,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -653,7 +653,6 @@ setInterval(() => {
                                     parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
         //send updated plane database to all
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
-        console.log(PlaneDatabase.DB)
     }
 }, 1000)
 

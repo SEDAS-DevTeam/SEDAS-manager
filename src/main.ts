@@ -182,9 +182,9 @@ function get_window_coords(idx: number){
 
 function exit_app(){
     //disable voice recognition and ACAI backend
-    voice_worker.postMessage("stop")
+    worker.postMessage("stop")
     //kill voice recognition
-    voice_worker.postMessage("interrupt")
+    worker.postMessage("interrupt")
     
     //close windows
     controllerWindow.close()
@@ -302,16 +302,11 @@ app.on("ready", () => {
 })
 
 //communication workers
-const worker = new Worker("./controller_backend.js")
-const voice_worker = new Worker("./voice_backend.js")
+const worker = new Worker("./backend.js")
 
 //worker listeners
 worker.on("message", (message) => {
-    console.log("backend output: " + message)
-})
-
-voice_worker.on("message", (message) => { //messages from microphone
-    console.log("voice output: " + message)
+    console.log("output: " + message)
 })
 
 //IPC listeners
@@ -377,7 +372,7 @@ ipcMain.handle("message", (event, data) => {
             controllerWindow.show()
 
             //setup voice recognition and ACAI backend
-            voice_worker.postMessage("start")
+            worker.postMessage("start")
             worker.postMessage("terrain") //generate terrain
 
             //run local plane DB

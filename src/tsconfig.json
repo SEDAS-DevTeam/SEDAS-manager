@@ -11,8 +11,7 @@
   },
   "exclude": [ "node_modules" ],
   "files": [
-    "controller_backend.ts",
-    "voice_backend.ts",
+    "backend.ts",
     "main.ts",
     "read_map.ts",
     "database.ts",

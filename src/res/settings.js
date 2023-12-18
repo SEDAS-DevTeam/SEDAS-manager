@@ -53,6 +53,7 @@ function save_settings(){
     let align_data = document.getElementById("alignment").value
     let saving_freq = document.getElementById("backup").value
     let path_limit = document.getElementById("path_limit").value
+    let logging = document.getElementById("logging").value
 
     //simulation data
     let ai_aggression = document.getElementById("ai_aggression").value
@@ -76,6 +77,7 @@ function save_settings(){
         "alignment": align_data,
         "saving_frequency": saving_freq,
         "plane_path_limit": path_limit,
+        "logging": logging,
         //simulation data
         "ai_aggression": ai_aggression,
         "results": results,

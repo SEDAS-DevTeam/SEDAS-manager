@@ -2,7 +2,18 @@
     "airlines": [
         {
             "name": "Aer Lingus",
-            "fleet": ["B737", "B757"]
+            "fleet": ["B737", "B757"],
+            "type": "airline"
+        },
+        {
+            "name": "private",
+            "fleet": [],
+            "type": "special"
+        },
+        {
+            "name": "military",
+            "fleet": [],
+            "type": "special"
         }
     ]
 }

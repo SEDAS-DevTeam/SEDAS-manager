@@ -78,6 +78,7 @@ async function db_check(){
 
         last_value = value_voice
     }
+    parentPort.postMessage(value_voice)
 }
 
 parentPort.on("message", async (message) => {

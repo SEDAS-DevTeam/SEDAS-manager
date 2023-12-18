@@ -7,9 +7,8 @@
 !/src/build/.gitkeep
 
 #typescript files (are automatically generated)
-/src/controller_backend.js
-/src/voice_backend.js
 /src/main.js
+/src/backend.js
 /src/read_map.js
 /src/database.js
 /src/plane_functions.js

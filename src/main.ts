@@ -4,6 +4,7 @@ import * as fs from "fs";
 import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
 import * as path from "path"
+import {resolve} from "dns"
 import * as read_map from "./read_map"
 import { BackupDB } from "./database";
 import { Plane, PlaneDB } from "./plane_functions";
@@ -50,8 +51,18 @@ const database = spawn("redis-server")
 var BackupDatabase = new BackupDB();
 BackupDatabase.create_database()
 
-//fetch all python backend files
-const fetch_process = spawn("python3", [`${PATH_TO_PROCESS}`])
+//check internet connectivity
+resolve("8.8.8.8", (err) => {
+    if(err){
+        console.log("error fetching files")
+    }
+    else {
+        console.log("fetching files...")
+
+        //fetch all python backend files
+        const fetch_process = spawn("python3", [`${PATH_TO_PROCESS}`])
+    }
+})
 
 if (app_settings["saving_frequency"].includes("min")){
     backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 60 * 1000

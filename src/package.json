@@ -13,6 +13,7 @@
   "license": "GPL-3.0",
   "scripts": {
     "dev": "npx tsc --project ./tsconfig.json && export ELECTRON_ENABLE_LOGGING=1 && electron main.js",
+    "compile": "npx tsc --project ./tsconfig.json",
     "build": "electron-builder build -wl",
     "clear": "rm -rf ./build/* && touch ./build/.gitkeep"
   },

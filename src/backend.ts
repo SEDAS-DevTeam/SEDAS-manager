@@ -68,9 +68,7 @@ async function db_check(){
     }
 
     //check if change
-    if (value_voice != last_value){4
-        parentPort.postMessage("value_voice: " + value_voice)
-        parentPort.postMessage("last_value: " + last_value)
+    if (value_voice != last_value){
         //
         //main code for plane responses
         //

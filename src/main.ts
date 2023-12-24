@@ -200,7 +200,9 @@ function exit_app(){
     worker.postMessage("interrupt")
     
     //close windows
-    controllerWindow.close()
+    if (controllerWindow != undefined){
+        controllerWindow.close()
+    }
     for(let i = 0; i < workers.length; i++){
         workers[i].close()
     }
@@ -209,10 +211,9 @@ function exit_app(){
     database.kill("SIGINT")
 
     //stop SQLite database
-    BackupDatabase.close_database()
+    //BackupDatabase.close_database() //TODO
 
-    //complete process exit
-    process.exit()
+    app.exit(0)
 }
 
 function send_to_all(planes: any, plane_monitor_data: any, plane_paths_data: any){
@@ -673,9 +674,10 @@ setInterval(() => {
 }, backupdb_saving_frequency)
 
 
-//when app dies, it should die in peace (NOT WORKING)
-process.on('SIGINT', function() {
-    console.log("Caught interrupt signal");
-
+//when app dies, it should die in peace
+app.on("window-all-closed", () => {
+    console.log("win-close")
     exit_app()
-});
+})
+
+//TODO: add SIGINT functionality

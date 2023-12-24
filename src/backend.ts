@@ -17,6 +17,8 @@ client.set("out-terrain", "")
 
 const PATH_TO_RECOG = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/voice_recognition.py"
 const PATH_TO_TERRAIN = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/generate_terrain.py"
+const PATH_TO_SYNTH = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/speech_synth.py"
+
 
 /*CLASSES*/
 class Acai {
@@ -38,7 +40,8 @@ class TerrainGeneration {
 const event_gen = new Acai("balls")
 const terrain_gen = new TerrainGeneration()
 
-const voice_process = spawn("python3", [`${PATH_TO_RECOG}`])
+const voice_process = spawn("python3", [PATH_TO_RECOG])
+const speech_process = spawn("python3", [PATH_TO_SYNTH])
 
 function gen_random_nums(n: number): string{
     let nums: string[] = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
@@ -68,17 +71,18 @@ async function db_check(){
         //
         //main code for plane responses
         //
-        client.set("proc-voice", value_voice)
 
+        //process voice data
+        client.set("proc-voice", value_voice)
+        
+        //generate speech
         let message: string = "fly heading 090"
         client.set("gen-speech", message)
-        //TODO:
 
         parentPort.postMessage(value_voice)
 
         last_value = value_voice
     }
-    parentPort.postMessage(value_voice)
 }
 
 parentPort.on("message", async (message) => {

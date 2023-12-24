@@ -12,6 +12,7 @@
 /src/read_map.js
 /src/database.js
 /src/plane_functions.js
+/src/fetch.js
 
 /src/*.map
 

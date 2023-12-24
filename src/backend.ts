@@ -11,6 +11,7 @@ client.connect()
 
 //set default on start
 client.set("start-voice", "false")
+client.set("gen-speech", "")
 client.set("proc-voice", "")
 client.set("out-voice", "")
 client.set("in-terrain", "")

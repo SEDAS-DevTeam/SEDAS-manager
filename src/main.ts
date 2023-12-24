@@ -4,7 +4,7 @@ import * as fs from "fs";
 import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
 import * as path from "path"
-import {resolve} from "dns"
+import {lookup} from "dns"
 import * as read_map from "./read_map"
 import { BackupDB } from "./database";
 import { Plane, PlaneDB } from "./plane_functions";
@@ -52,9 +52,10 @@ var BackupDatabase = new BackupDB();
 BackupDatabase.create_database()
 
 //check internet connectivity
-resolve("8.8.8.8", (err) => {
+lookup("8.8.8.8", (err) => {
     if(err){
         console.log("error fetching files")
+        console.log(err)
     }
     else {
         console.log("fetching files...")

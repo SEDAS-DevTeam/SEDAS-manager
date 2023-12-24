@@ -11,7 +11,7 @@ client.connect()
 
 //set default on start
 client.set("start-voice", "false")
-client.set("out-voice", "test")
+client.set("out-voice", "")
 client.set("in-terrain", "")
 client.set("out-terrain", "")
 
@@ -76,7 +76,7 @@ async function db_check(){
         client.set("proc-voice", value_voice)
         
         //generate speech
-        let message: string = "fly heading 090"
+        let message: string = "fly heading zero niner zero"
         client.set("gen-speech", message)
 
         parentPort.postMessage(value_voice)

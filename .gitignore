@@ -28,5 +28,6 @@
 #cache files
 /src/res/neural/cache/voice_models.py
 /src/res/neural/cache/speech_models.py
+/src/res/neural/cache/text_models.py
 /src/res/neural/cache/main_control.py
 /src/res/neural/cache/main_terrain.py

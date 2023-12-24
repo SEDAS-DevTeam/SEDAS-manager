@@ -35,7 +35,7 @@ export function update_all(){
     //PlaneResponse
     fetch_file("PlaneResponse", "voice_models.py")
     fetch_file("PlaneResponse", "speech_models.py")
-    fetch_file("PlaneResponse", "main_plane.py")
+    fetch_file("PlaneResponse", "text_models.py")
 
     //ACAI
     fetch_file("ACAI", "main_control.py")

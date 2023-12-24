@@ -78,7 +78,7 @@ async function db_check(){
         client.set("proc-voice", value_voice)
         
         //generate speech
-        let message: string = "fly heading zero niner zero"
+        let message: string = value_voice
         client.set("gen-speech", message)
 
         parentPort.postMessage(value_voice)

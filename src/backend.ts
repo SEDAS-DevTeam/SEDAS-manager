@@ -11,6 +11,7 @@ client.connect()
 
 //set default on start
 client.set("start-voice", "false")
+client.set("proc-voice", "")
 client.set("out-voice", "")
 client.set("in-terrain", "")
 client.set("out-terrain", "")
@@ -67,7 +68,9 @@ async function db_check(){
     }
 
     //check if change
-    if (value_voice != last_value){
+    if (value_voice != last_value){4
+        parentPort.postMessage("value_voice: " + value_voice)
+        parentPort.postMessage("last_value: " + last_value)
         //
         //main code for plane responses
         //

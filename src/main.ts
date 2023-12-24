@@ -8,6 +8,7 @@ import {lookup} from "dns"
 import * as read_map from "./read_map"
 import { BackupDB } from "./database";
 import { Plane, PlaneDB } from "./plane_functions";
+import { update_all } from "./fetch";
 
 //window variable declarations
 var mainMenu: Window;
@@ -61,7 +62,7 @@ lookup("8.8.8.8", (err) => {
         console.log("fetching files...")
 
         //fetch all python backend files
-        const fetch_process = spawn("python3", [`${PATH_TO_PROCESS}`])
+        update_all()
     }
 })
 

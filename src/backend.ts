@@ -18,8 +18,9 @@ client.set("in-terrain", "")
 client.set("out-terrain", "")
 
 const PATH_TO_RECOG = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/voice_recognition.py"
-const PATH_TO_TERRAIN = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/generate_terrain.py"
+const PATH_TO_PROC = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/text_process.py"
 const PATH_TO_SYNTH = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/speech_synth.py"
+const PATH_TO_TERRAIN = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/generate_terrain.py"
 
 
 /*CLASSES*/
@@ -43,6 +44,7 @@ const event_gen = new Acai("balls")
 const terrain_gen = new TerrainGeneration()
 
 const voice_process = spawn("python3", [PATH_TO_RECOG])
+const text_process = spawn("python3", [PATH_TO_PROC])
 const speech_process = spawn("python3", [PATH_TO_SYNTH])
 
 function gen_random_nums(n: number): string{
@@ -76,6 +78,8 @@ async function db_check(){
 
         //process voice data
         client.set("proc-voice", value_voice)
+
+        //TODO: add proc-voice output processing!
         
         //generate speech
         let message: string = value_voice
@@ -102,6 +106,8 @@ parentPort.on("message", async (message) => {
             break
         case "interrupt":
             voice_process.kill("SIGINT")
+            text_process.kill("SIGINT")
+            speech_process.kill("SIGINT")
             break
         case "terrain":
             //for test

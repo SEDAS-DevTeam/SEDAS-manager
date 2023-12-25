@@ -11,17 +11,15 @@ client.connect()
 
 //set default on start
 client.set("start-voice", "false")
+client.set("terminate", "false") //used by core.py when terminating all threads
 client.set("gen-speech", "")
 client.set("proc-voice", "")
 client.set("out-voice", "")
 client.set("in-terrain", "")
 client.set("out-terrain", "")
 
-const PATH_TO_RECOG = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/voice_recognition.py"
-const PATH_TO_PROC = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/text_process.py"
-const PATH_TO_SYNTH = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/speech_synth.py"
 const PATH_TO_TERRAIN = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/generate_terrain.py"
-
+const PATH_TO_CORE = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/core.py"
 
 /*CLASSES*/
 class Acai {
@@ -43,9 +41,7 @@ class TerrainGeneration {
 const event_gen = new Acai("balls")
 const terrain_gen = new TerrainGeneration()
 
-const voice_process = spawn("python3", [PATH_TO_RECOG])
-const text_process = spawn("python3", [PATH_TO_PROC])
-const speech_process = spawn("python3", [PATH_TO_SYNTH])
+const core_process = spawn("python3", [PATH_TO_CORE])
 
 function gen_random_nums(n: number): string{
     let nums: string[] = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
@@ -105,9 +101,7 @@ parentPort.on("message", async (message) => {
             client.set("out-voice", "test")
             break
         case "interrupt":
-            voice_process.kill("SIGINT")
-            text_process.kill("SIGINT")
-            speech_process.kill("SIGINT")
+            core_process.kill("SIGINT")
             break
         case "terrain":
             //for test

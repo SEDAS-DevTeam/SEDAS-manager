@@ -3,7 +3,8 @@ import {spawn} from "node:child_process"
 import { createClient } from 'redis';
 
 //variables
-let last_value: string = "";
+let last_value_voice: string = "";
+let last_value_command: string = "";
 
 //redis for communication
 const client = createClient()
@@ -17,6 +18,7 @@ client.set("proc-voice", "")
 client.set("out-voice", "")
 client.set("in-terrain", "")
 client.set("out-terrain", "")
+client.set("proc-voice-out", "")
 
 const PATH_TO_TERRAIN = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/generate_terrain.py"
 const PATH_TO_CORE = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/core.py"
@@ -57,7 +59,7 @@ function gen_random_nums(n: number): string{
 async function db_check(){
     let value_voice: string = await client.get("out-voice")
     let value_terrain: string = await client.get("out-terrain")
-
+    let value_command: string = await client.get("proc-voice-out")
 
     if (value_terrain.length != 0){
         //send to main loop
@@ -66,24 +68,25 @@ async function db_check(){
         client.set("out-terrain", "") //reset to default value
     }
 
-    //check if change
-    if (value_voice != last_value){
-        //
-        //main code for plane responses
-        //
-
+    //check if voice change
+    if (value_voice != last_value_voice){
         //process voice data
         client.set("proc-voice", value_voice)
 
-        //TODO: add proc-voice output processing!
+        last_value_voice = value_voice
+        parentPort.postMessage(value_voice)
+    }
+
+    //check if command change
+    if (value_command != last_value_command){
+        //process command data
         
         //generate speech
-        let message: string = value_voice
-        client.set("gen-speech", message)
+        //let message: string = value_voice
+        //client.set("gen-speech", message)
 
-        parentPort.postMessage(value_voice)
-
-        last_value = value_voice
+        parentPort.postMessage(value_command)
+        last_value_command = value_command
     }
 }
 

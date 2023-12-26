@@ -37,8 +37,10 @@ function fetch_file_src(header: string, filename: string){
 
 function delete_conf(){
     let files: any = readdirSync(PATH_TO_CONFIG)
+    console.log()
+
     files.forEach(file => {
-        let abs_path: string = join(PATH_TO_CACHE, file)
+        let abs_path: string = join(PATH_TO_CONFIG, file)
 
         if (lstatSync(abs_path).isFile() && file != ".gitkeep"){
             //remove cached file

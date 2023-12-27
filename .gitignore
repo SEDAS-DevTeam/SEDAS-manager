@@ -32,3 +32,11 @@
 #fetched conf files
 /src/res/alg_data/*
 !/src/res/alg_data/.gitkeep
+
+#fetched tmp files
+/src/res/tmp_data/*
+!/src/res/tmp_data/.gitkeep
+
+#app logs
+/src/logs/*
+!/src/logs/.gitkeep

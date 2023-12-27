@@ -4,7 +4,7 @@
     "alignment": "set",
     "saving_frequency": "5min",
     "plane_path_limit": "15",
-    "logging": "false",
+    "logging": false,
     "port": "6379",
     "ai_aggression": "medium",
     "results": true,

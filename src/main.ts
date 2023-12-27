@@ -9,6 +9,7 @@ import * as read_map from "./read_map"
 import { BackupDB } from "./database";
 import { Plane, PlaneDB } from "./plane_functions";
 import { update_all } from "./fetch";
+import {EventLogger} from "./logger"
 
 //window variable declarations
 var mainMenu: Window;
@@ -33,8 +34,6 @@ var running: boolean = false
 APP INIT 1
 */
 
-const PATH_TO_PROCESS = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/fetch.py"
-
 //read JSON
 const app_settings_raw = fs.readFileSync("./res/data/settings.json", "utf-8")
 const app_settings = JSON.parse(app_settings_raw);
@@ -44,6 +43,9 @@ const acai_settings = JSON.parse(acai_settings_raw);
 
 const voice_settings_raw = fs.readFileSync("./res/data/voice_settings.json", "utf-8")
 const voice_settings = JSON.parse(voice_settings_raw);
+
+//initialize EventLogger (first initialization to log other ones)
+const EvLogger = new EventLogger(app_settings["logging"]);
 
 //run RedisDB
 const database = spawn("redis-server", ["--port",  app_settings["port"]])

@@ -16,6 +16,7 @@
     "read_map.ts",
     "database.ts",
     "plane_functions.ts",
-    "fetch.ts"
+    "fetch.ts",
+    "logger.ts"
   ]
 }

@@ -2,6 +2,7 @@ import redis
 import threading
 import signal
 import time
+import json
 
 from cache.voice_models import CMUSphinx, DeepSpeech, Whisper, GoogleSpeechToText
 from cache.text_models import simplePOS
@@ -19,8 +20,12 @@ def signal_handler(sig, frame):
     exit(0)
 
 if __name__ == "__main__":
+    #get redis port
+    app_settings_raw = open("../data/settings.json")
+    app_settings = json.load(app_settings_raw)
+
     #redis
-    r_instance = redis.Redis(host='localhost', port=6379, decode_responses=True)
+    r_instance = redis.Redis(host='localhost', port=app_settings["port"], decode_responses=True)
     
     #models
     m_voice_instance = GoogleSpeechToText(r_instance)

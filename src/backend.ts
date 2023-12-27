@@ -1,6 +1,11 @@
 import {parentPort} from "worker_threads"
 import {spawn} from "node:child_process"
 import { createClient } from 'redis';
+import * as fs from "fs";
+
+//read JSON
+const app_settings_raw = fs.readFileSync("./res/data/settings.json", "utf-8")
+const app_settings = JSON.parse(app_settings_raw);
 
 //variables
 var last_value_voice: string = "";
@@ -47,7 +52,9 @@ const NUMS = {
 }
 
 //redis for communication
-const client = createClient()
+const client = createClient({
+    url: `redis://127.0.0.1:${app_settings["port"]}`
+})
 client.connect()
 
 //set default on start

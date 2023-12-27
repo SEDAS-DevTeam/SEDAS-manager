@@ -20,7 +20,6 @@ function load_settings(data){
 
     let i = 0;
     for (const [key, value] of Object.entries(json_data)) {
-        console.log(key, value);
         if (all_settings_elem[i].tagName == "SELECT"){
             //select element
             for(let i_child = 0; i_child < all_settings_elem[i].children.length; i_child++){
@@ -54,6 +53,7 @@ function save_settings(){
     let saving_freq = document.getElementById("backup").value
     let path_limit = document.getElementById("path_limit").value
     let logging = document.getElementById("logging").value
+    let database_port = document.getElementById("port").value
 
     //simulation data
     let ai_aggression = document.getElementById("ai_aggression").value
@@ -78,6 +78,7 @@ function save_settings(){
         "saving_frequency": saving_freq,
         "plane_path_limit": path_limit,
         "logging": logging,
+        "db_port": database_port,
         //simulation data
         "ai_aggression": ai_aggression,
         "results": results,

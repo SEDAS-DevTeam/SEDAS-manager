@@ -53,7 +53,10 @@ const NUMS = {
 
 //redis for communication
 const client = createClient({
-    url: `redis://127.0.0.1:${app_settings["port"]}`
+    socket: {
+        host: "127.0.0.1",
+        port: app_settings["port"]
+    }
 })
 client.connect()
 

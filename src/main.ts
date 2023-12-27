@@ -46,7 +46,7 @@ const voice_settings_raw = fs.readFileSync("./res/data/voice_settings.json", "ut
 const voice_settings = JSON.parse(voice_settings_raw);
 
 //run RedisDB
-const database = spawn(`redis-server --port ${app_settings["port"]}`)
+const database = spawn("redis-server", ["--port",  app_settings["port"]])
 
 //run SQLite DB
 var BackupDatabase = new BackupDB();

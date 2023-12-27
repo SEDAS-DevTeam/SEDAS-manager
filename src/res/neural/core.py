@@ -3,6 +3,7 @@ import threading
 import signal
 import time
 import json
+import os
 
 from cache.voice_models import CMUSphinx, DeepSpeech, Whisper, GoogleSpeechToText
 from cache.text_models import simplePOS
@@ -21,7 +22,8 @@ def signal_handler(sig, frame):
 
 if __name__ == "__main__":
     #get redis port
-    app_settings_raw = open("../data/settings.json")
+    app_settings_path = os.getcwd()[:os.getcwd().index("SEDAC") + len("SEDAC")] + "/src/res/data/settings.json"
+    app_settings_raw = open(app_settings_path)
     app_settings = json.load(app_settings_raw)
 
     #redis

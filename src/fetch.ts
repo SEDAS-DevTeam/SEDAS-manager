@@ -23,7 +23,6 @@ function fetch_file_src(header: string, filename: string){
     var des_url: string = URL + header
 
     var file = createWriteStream(join(PATH_TO_CACHE, filename))
-    console.log(join(des_url, filename))
     var request = get(join(des_url, filename), (response) => {
         response.pipe(file)
 
@@ -37,7 +36,6 @@ function fetch_file_src(header: string, filename: string){
 
 function delete_conf(){
     let files: any = readdirSync(PATH_TO_CONFIG)
-    console.log()
 
     files.forEach(file => {
         let abs_path: string = join(PATH_TO_CONFIG, file)
@@ -53,7 +51,6 @@ function fetch_file_conf(header: string, filename: string){
     var des_url: string = URL + header
 
     var file = createWriteStream(join(PATH_TO_CONFIG, filename))
-    console.log(join(des_url, filename))
     var request = get(join(des_url, filename), (response) => {
         response.pipe(file)
 

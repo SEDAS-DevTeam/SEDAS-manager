@@ -44,25 +44,30 @@ const acai_settings = JSON.parse(acai_settings_raw);
 const voice_settings_raw = fs.readFileSync("./res/data/voice_settings.json", "utf-8")
 const voice_settings = JSON.parse(voice_settings_raw);
 
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+
 //initialize EventLogger (first initialization to log other ones)
 const EvLogger = new EventLogger(app_settings["logging"]);
+EvLogger.add_record("DEBUG", "APP-INIT 1")
 
 //run RedisDB
 const database = spawn("redis-server", ["--port",  app_settings["port"]])
+EvLogger.log("DEBUG", ["Initialized communication DB", `Initialized redis database on port ${app_settings["port"]}`])
 
 //run SQLite DB
 var BackupDatabase = new BackupDB();
 BackupDatabase.create_database()
+EvLogger.log("DEBUG", ["Initialized BackupDB", "Initialized Sqlite3 database for backup"])
 
 //check internet connectivity
+EvLogger.log("DEBUG", ["Internet connectivity check...", "Performing DNSLookup on google servers (8.8.8.8) for internet check"])
 lookup("8.8.8.8", (err) => {
     if(err){
-        console.log("error fetching files")
-        console.log(err)
+        EvLogger.add_record("DEBUG", "Lookup unsuccessful")
+        EvLogger.add_record("ERROR", err.message)
     }
     else {
-        console.log("fetching files...")
-
+        EvLogger.add_record("DEBUG", "Lookup successful, fetching algorithm files...")
         //fetch all python backend files
         update_all()
     }
@@ -79,7 +84,12 @@ else if (app_settings["saving_frequency"].includes("never")){
     //defaultly set to 5 mins
     backupdb_saving_frequency = 5 * 60 * 1000
 }
-console.log(backupdb_saving_frequency)
+EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_saving_frequency / 1000} seconds`)
+
+//communication workers
+EvLogger.log("DEBUG", ["Deploying app backend", "Deploying backend.js as a worker, starting core.py"])
+const worker = new Worker("./backend.js")
+
 
 const main_menu_dict = {
     width: 800,
@@ -197,11 +207,14 @@ function get_window_coords(idx: number){
 
 function exit_app(){
     //disable voice recognition and ACAI backend
+    EvLogger.add_record("DEBUG", "stopping voice-recognition")
     worker.postMessage("stop")
     //kill voice recognition
+    EvLogger.add_record("DEBUG", "killing core.py")
     worker.postMessage("interrupt")
     
     //close windows
+    EvLogger.add_record("DEBUG", "closing all windows")
     if (controllerWindow != undefined){
         controllerWindow.close()
     }
@@ -210,11 +223,13 @@ function exit_app(){
     }
 
     //stop redis database
+    EvLogger.add_record("DEBUG", "stopping redis database")
     database.kill("SIGINT")
 
     //stop SQLite database
     //BackupDatabase.close_database() //TODO
 
+    EvLogger.add_record("DEBUG", "exit")
     app.exit(0)
 }
 
@@ -289,15 +304,19 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        //this.window.webContents.openDevTools()
+        this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
+
+        EvLogger.add_record("DEBUG", `Created window object(win_type=${this.win_type},path_load=${this.path_load}, coords=${coords})`)
     }
 }
 
 app.on("ready", () => {
+    EvLogger.log("DEBUG", ["App ready to show", "App ready to show"])
 
+    EvLogger.add_record("DEBUG", "Get display coords info for better window positioning")
     //get screen info
     var displays_info: any = screen.getAllDisplays()
     var displays_mod = []
@@ -306,19 +325,18 @@ app.on("ready", () => {
     }
     displays_mod.sort((a, b) => a.x - b.x);
     displays = displays_mod
-
+    
     //calculate x, y
     let [x, y] = get_window_coords(-1)
 
+    EvLogger.add_record("DEBUG", "main-menu show")
     mainMenu = new Window(main_menu_dict, "./res/main.html", [x, y])
     mainMenu.show()
 
-    worker.postMessage("terrain")
+    //TODO
+    //worker.postMessage("terrain")
 
 })
-
-//communication workers
-const worker = new Worker("./backend.js")
 
 //worker listeners
 worker.on("message", (message) => {
@@ -333,27 +351,34 @@ ipcMain.handle("message", (event, data) => {
         //generic message channels
         case "redirect-to-menu":
             //message call to redirect to main menu
+            EvLogger.add_record("DEBUG", "redirect-to-menu event")
+
             settings.close()
 
             //calculate x, y
             coords = get_window_coords(-1)
 
+            EvLogger.add_record("DEBUG", "main-menu show")
             mainMenu = new Window(main_menu_dict, "./res/main.html", coords)
             mainMenu.show()
 
             break
         case "save-settings":
-            console.log(data[1][1])
+            //save settings
+            EvLogger.add_record("DEBUG", "saving settings")
+
             fs.writeFileSync("./res/data/settings.json", data[1][1])
             break
         case "redirect-to-settings":
             //message call to redirect to settings
+            EvLogger.add_record("DEBUG", "redirect-to-settings event")
 
             mainMenu.close()
 
             //calculate x, y
             coords = get_window_coords(-1)
 
+            EvLogger.add_record("DEBUG", "settings show")
             settings = new Window(settings_dict, "./res/settings.html", coords)
             settings.show()
             break
@@ -374,12 +399,14 @@ ipcMain.handle("message", (event, data) => {
                     continue
                 }
                 
+                EvLogger.add_record("DEBUG", "worker show")
                 workerWindow = new Window(worker_dict, "./res/worker.html", coords, "ACC")
                 workers.push(workerWindow)
             }
 
             coords = get_window_coords(-1)
 
+            EvLogger.add_record("DEBUG", "controller show")
             controllerWindow = new Window(controller_dict, "./res/controller_gen.html", coords, "controller")
             
             for (let i = 0; i < workers.length; i++){
@@ -389,12 +416,13 @@ ipcMain.handle("message", (event, data) => {
 
             //setup voice recognition and ACAI backend
             worker.postMessage("start")
-            worker.postMessage("terrain") //generate terrain
+            //worker.postMessage("terrain") //generate terrain
 
             //run local plane DB
             PlaneDatabase = new PlaneDB(workers);
             break
         case "exit":
+            EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got window-all-closed request, saving logs and quitting app..."])
             exit_app()
 
         case "invoke":
@@ -678,7 +706,7 @@ setInterval(() => {
 
 //when app dies, it should die in peace
 app.on("window-all-closed", () => {
-    console.log("win-close")
+    EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got window-all-closed request, saving logs and quitting app..."])
     exit_app()
 })
 

@@ -38,12 +38,6 @@ APP INIT 1
 const app_settings_raw = fs.readFileSync("./res/data/settings.json", "utf-8")
 const app_settings = JSON.parse(app_settings_raw);
 
-const acai_settings_raw = fs.readFileSync("./res/data/acai_settings.json", "utf-8")
-const acai_settings = JSON.parse(acai_settings_raw);
-
-const voice_settings_raw = fs.readFileSync("./res/data/voice_settings.json", "utf-8")
-const voice_settings = JSON.parse(voice_settings_raw);
-
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
 //initialize EventLogger (first initialization to log other ones)
@@ -332,10 +326,6 @@ app.on("ready", () => {
     EvLogger.add_record("DEBUG", "main-menu show")
     mainMenu = new Window(main_menu_dict, "./res/main.html", [x, y])
     mainMenu.show()
-
-    //TODO
-    //worker.postMessage("terrain")
-
 })
 
 //worker listeners
@@ -435,8 +425,17 @@ ipcMain.handle("message", (event, data) => {
             //|controller window| uses this to acquire current worker/window data
             
             if (data[0] == "settings"){
-                //sending saved .json app data
-                settings.send_message("app-data", JSON.stringify(app_settings))
+                const speech_config_raw = fs.readFileSync("./res/alg_data/speech_config.json", "utf-8")
+                const speech_config = JSON.parse(speech_config_raw);
+
+                const text_config_raw = fs.readFileSync("./res/alg_data/text_config.json", "utf-8")
+                const text_config = JSON.parse(text_config_raw);
+
+                const voice_config_raw = fs.readFileSync("./res/alg_data/voice_config.json", "utf-8")
+                const voice_config = JSON.parse(voice_config_raw);
+
+                //sending app data and alg configs
+                settings.send_message("app-data", [app_settings, voice_config, text_config, speech_config])
             }
             else if (data[0] == "controller"){
                 //sending monitor data
@@ -659,6 +658,9 @@ ipcMain.handle("message", (event, data) => {
                 workers[i].send_message("sim-event", "startsim")
             }
             controllerWindow.send_message("sim-event", "startsim")
+            break
+        case "regenerate-map":
+            worker.postMessage("terrain")
             break
     }
 })

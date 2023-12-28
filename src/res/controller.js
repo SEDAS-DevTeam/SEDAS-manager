@@ -410,6 +410,10 @@ function ai_control_change(elem){
 Controller_GEN features
 */
 
+function regen_map(){
+    window.electronAPI.send_message("controller", ["regenerate-map"])
+}
+
 function generate_airports_from_sources(){
     let airport_data = INIT_DATA[2]
     for (let i = 0; i < airport_data.length; i++){
@@ -652,6 +656,9 @@ window.onload = () => {
 
             document.getElementById("confirm").addEventListener("click", () => {
                 render_map()
+            })
+            document.getElementById("regen-map").addEventListener("click", () => {
+                regen_map()
             })
             break
 

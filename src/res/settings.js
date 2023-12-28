@@ -13,13 +13,21 @@ window.onload = () => {
 
 //load settings
 function load_settings(data){
-    let json_data = JSON.parse(data)
-    console.log(json_data)
+    let app_data = data[0]
+    data.shift()
+    let config_data = data
 
+    //load all app data
     var all_settings_elem = document.getElementsByClassName("settings-elem")
 
     let i = 0;
-    for (const [key, value] of Object.entries(json_data)) {
+    for (const [key, value] of Object.entries(app_data)) {
+        //skip
+        if (key.includes("-skip")){
+            i += 1
+            continue
+        }
+
         if (all_settings_elem[i].tagName == "SELECT"){
             //select element
             for(let i_child = 0; i_child < all_settings_elem[i].children.length; i_child++){
@@ -40,6 +48,32 @@ function load_settings(data){
         }
         i += 1
     }
+
+    //load all configs
+    let all_config_elem = document.getElementsByClassName("skip")
+
+    for (let i_config = 0; i_config < config_data.length; i_config++){
+        //append all select values
+        let all_algs = ""
+        config_data[i_config]["algorithms"].forEach(alg => {
+            all_algs += `<option value="${alg["name"]}">${alg["name"]} (${alg["acc"]})</option>`
+        })
+        all_config_elem[i_config].innerHTML = all_algs
+    }
+
+    //load saved data to configs
+    i = 0;
+    for (const [key, value] of Object.entries(app_data)) {
+        if (key.includes("-skip")){
+            for(let i_child = 0; i_child < all_config_elem[i].children.length; i_child++){
+                if (all_config_elem[i].children[i_child].value == value){
+                    all_config_elem[i].children[i_child].setAttribute('selected', true);
+                }
+            }
+
+            i += 1
+        }
+    }
 }
 
 //save settings
@@ -58,6 +92,9 @@ function save_settings(){
     //simulation data
     let ai_aggression = document.getElementById("ai_aggression").value
     let results = document.getElementById("result").checked
+    let voice_alg = document.getElementById("voice_recog").value
+    let text_alg = document.getElementById("text_process").value
+    let speech_alg = document.getElementById("speech_synth").value
 
     //plane data
     let bank_angle = document.getElementById("bank_angle").value
@@ -82,6 +119,9 @@ function save_settings(){
         //simulation data
         "ai_aggression": ai_aggression,
         "results": results,
+        "voice_alg-skip": voice_alg, //-skip is for values that are skipped on initial loading
+        "text_alg-skip": text_alg,
+        "speech_alg-skip": speech_alg,
         //plane data
         "std_bank_angle": bank_angle,
         "min_speed": min_speed,

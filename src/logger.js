@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventLogger = void 0;
+const fs_1 = require("fs");
 class EventLogger {
     /*
     data will be processed in format:
@@ -12,12 +13,23 @@ class EventLogger {
     */
     data = [];
     debug_mode = undefined;
+    LOG_PATH = "";
     constructor(debug) {
         this.debug_mode = debug;
+        this.LOG_PATH = "./logs/app_log.txt";
         if (this.debug_mode) {
             let time = this.get_time();
             console.log(`[${time}]`, "(DEBUG)", "Initialized event logger with DEBUGGING=TRUE");
         }
+        //create log file
+        let files = (0, fs_1.readdirSync)("./logs");
+        if (files.includes("app_log.txt")) {
+            (0, fs_1.unlinkSync)(this.LOG_PATH);
+        }
+        (0, fs_1.openSync)(this.LOG_PATH, "w");
+        (0, fs_1.appendFileSync)(this.LOG_PATH, "#########################################\n");
+        (0, fs_1.appendFileSync)(this.LOG_PATH, "SEDAC manager v1.0.0 Linux 64-bit version\n"); //TODO: different outputs for different OSes!
+        (0, fs_1.appendFileSync)(this.LOG_PATH, "#########################################\n");
     }
     get_time() {
         let date_obj = new Date();
@@ -50,10 +62,13 @@ class EventLogger {
             cat: cat_name,
             content: content
         });
+        let output = `[${time}] (${cat_name}) ${content}`;
         //log to terminal if debug mode
         if (this.debug_mode) {
-            console.log(`[${time}]`, `(${cat_name})`, `${content}`);
+            console.log(output);
         }
+        //log to main log file
+        (0, fs_1.appendFileSync)(this.LOG_PATH, output + "\n");
     }
     filter(cat_name) {
         let out_data = [];

@@ -8,135 +8,146 @@
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inria+Sans&family=Montserrat:wght@300&family=Saira&display=swap" rel="stylesheet"> 
+
+         <!-- Lightweight client-side loader that feature-detects and load polyfills only when necessary -->
+         <script src="https://cdn.jsdelivr.net/npm/@webcomponents/webcomponentsjs@2/webcomponents-loader.min.js"></script>
+
+         <!-- Load the element definition -->
+         <script type="module" src="https://cdn.jsdelivr.net/gh/zerodevx/zero-md@1/src/zero-md.min.js"></script>
     </head>
     <body style="margin-left: 20px; margin-top: 20px;">
-        <div>
-            <button id="redir_to_menu" style="margin-top: 20px;"><i class="fa-solid fa-arrow-left"></i> Back to menu</button>
-            <button id="save_settings" style="margin-top: 20px;">Save</button>
+        <div style="display: inline-block;">
+            <div>
+                <button id="redir_to_menu" style="margin-top: 20px;"><i class="fa-solid fa-arrow-left"></i> Back to menu</button>
+                <button id="save_settings" style="margin-top: 20px;">Save</button>
+            </div>
+            <h1>SEDAC manager settings</h1>
+            <p>NOTE: Changes will be activated after restart</p>
+    
+            <div style="margin-left: 20px;">
+                <div class="set-header">
+                    <h2>General Settings</h2>
+                    <hr>
+                </div>
+                <label for="location">controller window location</label>
+                <select id="location" name="location" class="settings-elem">
+                    <option value="leftmost">leftmost</option>
+                    <option value="rightmost">rigthmost</option>
+                </select>
+                <br>
+                <label for="limit">worker spawn limit</label>
+                <input type="text" name="limit" id="limit" class="settings-elem"> 
+                <br>
+                <label for="alignment">window alignment</label>
+                <select id="alignment" name="alignment" class="settings-elem">
+                    <option value="set">set</option>
+                    <option value="free">free</option>
+                </select>
+                <br>
+                <label for="backup">backup saving frequency</label>
+                <select id="backup" name="backup" class="settings-elem">
+                    <option value="1min">1 minute</option>
+                    <option value="5min">5 minutes</option>
+                    <option value="10min">10 minutes</option>
+                    <option value="30min">30 minutes</option>
+                    <option value="1hour">1 hour</option>
+                    <option value="never">never</option>
+                </select>
+                <br>
+                <label for="path_limit">maximum plane path particles limit</label>
+                <input type="text" name="path_limit" id="path_limit" class="settings-elem"> 
+                <br>
+                <label for="backup">debug logging</label>
+                <select id="logging" name="logging" class="settings-elem">
+                    <option value="false">false</option>
+                    <option value="true">true</option>
+                </select>
+                <br>
+                <label for="port">database port:</label>
+                <input type="text" name="port" id="port" class="settings-elem">
+                <span>(port 6379 is the default one)</span>
+                <br>
+    
+                <div class="set-header">
+                    <h2>Simulation Settings</h2>
+                    <hr>
+                </div>
+                <label for="ai_aggression" name="ai_aggression">AI aggression policy</label>
+                <select id="ai_aggression" name="ai_aggression" class="settings-elem">
+                    <option value="high">high</option>
+                    <option value="medium">medium</option>
+                    <option value="low">low</option>
+                </select>
+                <br>
+                <label for="result" name="result">show results on end of simulation</label>
+                <input type="checkbox" name="result" id="result" class="settings-elem">
+                <br>
+    
+                <label for="voice_recog" name="voice_recog">voice recognition algorithm</label>
+                <select id="voice_recog" name="voice_recog" class="settings-elem skip">
+                </select>
+                <br>
+                <label for="text_process" name="text_process">language processing algorithm</label>
+                <select id="text_process" name="text_process" class="settings-elem skip">
+                </select>
+                <br>
+                <label for="speech_synth" name="speech_synth">speech synthesis algorithm</label>
+                <select id="speech_synth" name="speech_synth" class="settings-elem skip">
+                </select>
+                <br>
+    
+                <div class="set-header">
+                    <h2>Plane Settings</h2>
+                    <hr>
+                </div>
+                <label for="bank_angle">standard bank angle</label>
+                <input type="text" name="bank_angle" id="bank_angle" class="settings-elem"> 
+                <label for="bank_angle">(in degrees)</label>
+                <br>
+                <label for="min_speed">aircraft minimum speed</label>
+                <input type="text" name="min_speed" id="min_speed" class="settings-elem"> 
+                <label for="min_speed">(in knots)</label>
+                <br>
+                <label for="max_speed">aircraft maximum speed</label>
+                <input type="text" name="max_speed" id="max_speed" class="settings-elem"> 
+                <label for="max_speed">(in knots)</label>
+                <br>
+                <label for="min_level">aircraft minimum altitude</label>
+                <input type="text" name="min_level" id="min_level" class="settings-elem"> 
+                <label for="min_level">(in feets)</label>
+                <br>
+                <label for="max_level">aircraft maximum altitude</label>
+                <input type="text" name="max_level" id="max_level" class="settings-elem"> 
+                <label for="max_level">(in feets)</label>
+                <br>
+                <label for="std_pitch_up">aircraft standard climb angle</label>
+                <input type="text" name="std_pitch_up" id="std_pitch_up" class="settings-elem"> 
+                <label for="std_pitch_up">(in degrees)</label>
+                <br>
+                <label for="std_pitch_down">aircraft standard descent angle</label>
+                <input type="text" name="std_pitch_down" id="std_pitch_down" class="settings-elem"> 
+                <label for="std_pitch_down">(in degrees)</label>
+                <br>
+                <label for="std_accel">aircraft standard descent angle</label>
+                <input type="text" name="std_accel" id="std_accel" class="settings-elem"> 
+                <label for="std_accel">(in knots/seconds-squared)</label>
+                <br>
+    
+                <p>NOTE: Plane settings data were set up for Boeing 737-800 aircraft as an example</p>
+                <div class="set-header">
+                    <h2>Enviroment Settings</h2>
+                    <hr>
+                </div>
+                <label for="trans_alt">standart transition altitude</label>
+                <input type="text" name="trans_alt" id="trans_alt" class="settings-elem"> 
+                <label for="trans_alt">(in feets)</label>
+                <br>
+    
+                <p>NOTE: transition altitude is set to 1000 feet on default</p>
+            </div>
         </div>
-        <h1>SEDAC manager settings</h1>
-        <p>NOTE: Changes will be activated after restart</p>
-
-        <div style="margin-left: 20px;">
-            <div class="set-header">
-                <h2>General Settings</h2>
-                <hr>
-            </div>
-            <label for="location">controller window location</label>
-            <select id="location" name="location" class="settings-elem">
-                <option value="leftmost">leftmost</option>
-                <option value="rightmost">rigthmost</option>
-            </select>
-            <br>
-            <label for="limit">worker spawn limit</label>
-            <input type="text" name="limit" id="limit" class="settings-elem"> 
-            <br>
-            <label for="alignment">window alignment</label>
-            <select id="alignment" name="alignment" class="settings-elem">
-                <option value="set">set</option>
-                <option value="free">free</option>
-            </select>
-            <br>
-            <label for="backup">backup saving frequency</label>
-            <select id="backup" name="backup" class="settings-elem">
-                <option value="1min">1 minute</option>
-                <option value="5min">5 minutes</option>
-                <option value="10min">10 minutes</option>
-                <option value="30min">30 minutes</option>
-                <option value="1hour">1 hour</option>
-                <option value="never">never</option>
-            </select>
-            <br>
-            <label for="path_limit">maximum plane path particles limit</label>
-            <input type="text" name="path_limit" id="path_limit" class="settings-elem"> 
-            <br>
-            <label for="backup">debug logging</label>
-            <select id="logging" name="logging" class="settings-elem">
-                <option value="false">false</option>
-                <option value="true">true</option>
-            </select>
-            <br>
-            <label for="port">database port:</label>
-            <input type="text" name="port" id="port" class="settings-elem">
-            <span>(port 6379 is the default one)</span>
-            <br>
-
-            <div class="set-header">
-                <h2>Simulation Settings</h2>
-                <hr>
-            </div>
-            <label for="ai_aggression" name="ai_aggression">AI aggression policy</label>
-            <select id="ai_aggression" name="ai_aggression" class="settings-elem">
-                <option value="high">high</option>
-                <option value="medium">medium</option>
-                <option value="low">low</option>
-            </select>
-            <br>
-            <label for="result" name="result">show results on end of simulation</label>
-            <input type="checkbox" name="result" id="result" class="settings-elem">
-            <br>
-
-            <label for="voice_recog" name="voice_recog">voice recognition algorithm</label>
-            <select id="voice_recog" name="voice_recog" class="settings-elem skip">
-            </select>
-            <br>
-            <label for="text_process" name="text_process">language processing algorithm</label>
-            <select id="text_process" name="text_process" class="settings-elem skip">
-            </select>
-            <br>
-            <label for="speech_synth" name="speech_synth">speech synthesis algorithm</label>
-            <select id="speech_synth" name="speech_synth" class="settings-elem skip">
-            </select>
-            <br>
-
-            <div class="set-header">
-                <h2>Plane Settings</h2>
-                <hr>
-            </div>
-            <label for="bank_angle">standard bank angle</label>
-            <input type="text" name="bank_angle" id="bank_angle" class="settings-elem"> 
-            <label for="bank_angle">(in degrees)</label>
-            <br>
-            <label for="min_speed">aircraft minimum speed</label>
-            <input type="text" name="min_speed" id="min_speed" class="settings-elem"> 
-            <label for="min_speed">(in knots)</label>
-            <br>
-            <label for="max_speed">aircraft maximum speed</label>
-            <input type="text" name="max_speed" id="max_speed" class="settings-elem"> 
-            <label for="max_speed">(in knots)</label>
-            <br>
-            <label for="min_level">aircraft minimum altitude</label>
-            <input type="text" name="min_level" id="min_level" class="settings-elem"> 
-            <label for="min_level">(in feets)</label>
-            <br>
-            <label for="max_level">aircraft maximum altitude</label>
-            <input type="text" name="max_level" id="max_level" class="settings-elem"> 
-            <label for="max_level">(in feets)</label>
-            <br>
-            <label for="std_pitch_up">aircraft standard climb angle</label>
-            <input type="text" name="std_pitch_up" id="std_pitch_up" class="settings-elem"> 
-            <label for="std_pitch_up">(in degrees)</label>
-            <br>
-            <label for="std_pitch_down">aircraft standard descent angle</label>
-            <input type="text" name="std_pitch_down" id="std_pitch_down" class="settings-elem"> 
-            <label for="std_pitch_down">(in degrees)</label>
-            <br>
-            <label for="std_accel">aircraft standard descent angle</label>
-            <input type="text" name="std_accel" id="std_accel" class="settings-elem"> 
-            <label for="std_accel">(in knots/seconds-squared)</label>
-            <br>
-
-            <p>NOTE: Plane settings data were set up for Boeing 737-800 aircraft as an example</p>
-            <div class="set-header">
-                <h2>Enviroment Settings</h2>
-                <hr>
-            </div>
-            <label for="trans_alt">standart transition altitude</label>
-            <input type="text" name="trans_alt" id="trans_alt" class="settings-elem"> 
-            <label for="trans_alt">(in feets)</label>
-            <br>
-
-            <p>NOTE: transition altitude is set to 1000 feet on default</p>
+        <div id="wiki-block">
+            <zero-md src="https://raw.githubusercontent.com/HelloWorld7894/SEDAC-wiki/main/doc/settings.md" style="margin-top: 15px;"></zero-md>
         </div>
     </body>
 </html>

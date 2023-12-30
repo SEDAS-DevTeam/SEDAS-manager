@@ -5,9 +5,9 @@ import time
 import json
 import os
 
-from cache.voice_models import CMUSphinx, DeepSpeech, Whisper, GoogleSpeechToText
-from cache.text_models import simplePOS
-from cache.speech_models import Google
+from cache.voice_models import VOICE_MODEL_DICT
+from cache.text_models import TEXT_MODEL_DICT
+from cache.speech_models import SPEECH_MODEL_DICT
 
 #variables
 thread_voice = None
@@ -29,10 +29,10 @@ if __name__ == "__main__":
     #redis
     r_instance = redis.Redis(host='localhost', port=app_settings["port"], decode_responses=True)
     
-    #models
-    m_voice_instance = GoogleSpeechToText(r_instance)
-    m_text_instance = simplePOS(r_instance)
-    m_speech_instance = Google(r_instance)
+    #model selection
+    m_voice_instance = VOICE_MODEL_DICT[app_settings["voice_alg-skip"]]
+    m_text_instance = TEXT_MODEL_DICT[app_settings["text_alg-skip"]]
+    m_speech_instance = SPEECH_MODEL_DICT[app_settings["speech_alg-skip"]]
     
 
     thread_voice = threading.Thread(target=m_voice_instance.run_recognition)

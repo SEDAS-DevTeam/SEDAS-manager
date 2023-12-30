@@ -81,7 +81,7 @@ else if (app_settings["saving_frequency"].includes("never")){
 EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_saving_frequency / 1000} seconds`)
 
 //communication workers
-EvLogger.log("DEBUG", ["Deploying app backend", "Deploying backend.js as a worker, starting core.py"])
+EvLogger.log("DEBUG", ["Deploying app backend", "Deploying backend.js as a worker, startting core.py"])
 const worker = new Worker("./backend.js")
 
 

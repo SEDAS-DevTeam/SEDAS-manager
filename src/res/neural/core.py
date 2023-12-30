@@ -5,7 +5,7 @@ import time
 import json
 import os
 
-from cache.voice_models import VOICE_MODEL_DICT
+from cache.voice_models import VOICE_MODEL_DICT, whisper
 from cache.text_models import TEXT_MODEL_DICT
 from cache.speech_models import SPEECH_MODEL_DICT
 
@@ -28,14 +28,14 @@ if __name__ == "__main__":
 
     #redis
     r_instance = redis.Redis(host='localhost', port=app_settings["port"], decode_responses=True)
-    
+
     #model selection
-    m_voice_instance = VOICE_MODEL_DICT[app_settings["voice_alg-skip"]]
-    m_text_instance = TEXT_MODEL_DICT[app_settings["text_alg-skip"]]
-    m_speech_instance = SPEECH_MODEL_DICT[app_settings["speech_alg-skip"]]
+    m_voice_instance = VOICE_MODEL_DICT[app_settings["voice_alg-skip"]](r_instance)
+    m_text_instance = TEXT_MODEL_DICT[app_settings["text_alg-skip"]](r_instance)
+    m_speech_instance = SPEECH_MODEL_DICT[app_settings["speech_alg-skip"]](r_instance)
     
 
-    thread_voice = threading.Thread(target=m_voice_instance.run_recognition)
+    thread_voice = threading.Thread(target=m_voice_instance.process)
     thread_text = threading.Thread(target=m_text_instance.process)
     thread_speech = threading.Thread(target=m_speech_instance.process)
 

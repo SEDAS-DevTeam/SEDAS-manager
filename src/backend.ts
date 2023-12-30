@@ -124,6 +124,10 @@ function command_processor(command_text: string){
     //check commands
     switch (command_args[1]){
         case "change-heading":
+            if (command_args[2].length == 2){
+                command_args[2] = "0" + command_args[2]
+            }
+
             //translate updated heading
             let trans_heading: string = ""
             for (let i = 0; i < command_args[2].length; i++){
@@ -163,7 +167,7 @@ async function db_check(){
         var message: string = command_processor(value_command)
         client.set("gen-speech", message)
 
-        parentPort.postMessage(value_command) //post to main process for updates
+        parentPort.postMessage("command: " + value_command) //post to main process for updates
         last_value_command = value_command
     }
 }

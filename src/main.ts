@@ -328,9 +328,32 @@ app.on("ready", () => {
     mainMenu.show()
 })
 
-//worker listeners
-worker.on("message", (message) => {
-    console.log("output: " + message)
+//worker listener
+worker.on("message", (message: string) => {
+    //processing from backend.js
+    let arg = message.split(":")[0]
+    let content = message.split(":")[1].slice(1)
+
+    switch(arg){
+        case "command":
+            let command_args = content.split(" ")
+
+            //search plane by callsign
+            for(let i = 0; i < PlaneDatabase.DB.length; i++){
+                if (command_args[0] == PlaneDatabase.DB[i].callsign){
+                    if (command_args[1] == "change-heading"){
+                        PlaneDatabase.DB[i].updated_heading = parseInt(command_args[2])
+                    }
+                    else if (command_args[1] == "change-speed"){
+                        PlaneDatabase.DB[i].updated_speed = parseInt(command_args[2])
+                    }
+                    else if (command_args[1] == "change-level"){
+                        PlaneDatabase.DB[i].updated_level = parseInt(command_args[2])
+                    }
+                }
+            }
+            break
+    }
 })
 
 //IPC listeners

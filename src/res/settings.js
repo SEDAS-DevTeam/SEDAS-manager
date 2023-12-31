@@ -88,6 +88,8 @@ function save_settings(){
     let path_limit = document.getElementById("path_limit").value
     let logging = (document.getElementById("logging").value == "true")
     let database_port = document.getElementById("port").value
+    let audio_out_device = document.getElementById("out_devices").value
+    let audio_in_device = document.getElementById("in_devices").value
 
     //simulation data
     let ai_aggression = document.getElementById("ai_aggression").value
@@ -116,6 +118,8 @@ function save_settings(){
         "plane_path_limit": path_limit,
         "logging": logging,
         "port": database_port,
+        "out_device": audio_out_device,
+        "in_device": audio_in_device,
         //simulation data
         "ai_aggression": ai_aggression,
         "results": results,

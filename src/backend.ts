@@ -84,7 +84,7 @@ class Acai {
 
 class TerrainGeneration {
     public gen_terrain(seed: string): void{
-        const generation_process = spawn("python3", [`${PATH_TO_TERRAIN}`])
+        const generation_process = spawn("python3", [PATH_TO_TERRAIN])
         client.set("in-terrain", seed)
     }
 }

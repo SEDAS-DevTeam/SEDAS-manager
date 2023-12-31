@@ -40,3 +40,7 @@
 #app logs
 /src/logs/*
 !/src/logs/.gitkeep
+
+#locally generated settings files
+/src/res/data/in_device_list.json
+/src/res/data/out_device_list.json

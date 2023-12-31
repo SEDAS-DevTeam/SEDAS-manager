@@ -29,6 +29,8 @@ var backupdb_saving_frequency: number = 0;
 var backup_db_on: boolean = true
 var scale: number = 0;
 var running: boolean = false
+const PATH_TO_AUDIO_UPDATE: string = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/get_info.py"
+
 
 /*
 APP INIT 1
@@ -66,6 +68,10 @@ lookup("8.8.8.8", (err) => {
         update_all()
     }
 })
+
+//update audio devices
+EvLogger.log("DEBUG", ["Updating audio devices...", "Updating audio device list using get_info.py"])
+const update_devices = spawn("python3", [PATH_TO_AUDIO_UPDATE])
 
 if (app_settings["saving_frequency"].includes("min")){
     backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 60 * 1000

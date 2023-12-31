@@ -1,14 +1,19 @@
 import pyaudio
 import speech_recognition as sr
+import os
+import json
 
-def getaudiodevices():
-    p = pyaudio.PyAudio()
-    for i in range(p.get_device_count()):
-        print (p.get_device_info_by_index(i).get('name'))
-
-def getaudiodevices_sr():
+def get_audio_input_devices():
+    in_dict = {
+        "devices": []
+    }
     for index, name in enumerate(sr.Microphone.list_microphone_names()):
-        print("Microphone with name \"{1}\" found for `Microphone(device_index={0})`".format(index, name))
+        device = {
+            "name": name,
+            "index": index
+        }
+        in_dict["devices"].append(device)
+    return in_dict
 
 def get_audio_output_devices():
     p = pyaudio.PyAudio()
@@ -25,4 +30,19 @@ def get_audio_output_devices():
             print(device_info.get("name"))
 
 if __name__ == "__main__":
-    get_audio_output_devices()
+    #write new devices into file
+    in_devices_path = os.getcwd()[:os.getcwd().index("SEDAC") + len("SEDAC")] + "/src/res/data/out_device_list.json"
+    out_devices_path = os.getcwd()[:os.getcwd().index("SEDAC") + len("SEDAC")] + "/src/res/data/in_device_list.json"
+
+    if os.path.exists(in_devices_path):
+        os.remove(in_devices_path)
+    if os.path.exists(out_devices_path):
+        os.remove(out_devices_path)
+
+    in_devices = get_audio_input_devices()
+    out_devices = get_audio_output_devices()
+
+    with open(in_devices_path, "w") as in_file:
+        json.dump(in_devices, in_file, indent=4)
+    with open(out_devices_path, "w") as out_file:
+        json.dump(out_devices, out_file, indent=4)

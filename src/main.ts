@@ -454,6 +454,9 @@ ipcMain.handle("message", (event, data) => {
             //|controller window| uses this to acquire current worker/window data
             
             if (data[0] == "settings"){
+
+                //ACAI backend
+
                 const speech_config_raw = fs.readFileSync("./res/alg_data/speech_config.json", "utf-8")
                 const speech_config = JSON.parse(speech_config_raw);
 
@@ -463,8 +466,16 @@ ipcMain.handle("message", (event, data) => {
                 const voice_config_raw = fs.readFileSync("./res/alg_data/voice_config.json", "utf-8")
                 const voice_config = JSON.parse(voice_config_raw);
 
+                //audio devices
+
+                const in_devices_raw = fs.readFileSync("./res/data/in_device_list.json", "utf-8")
+                const in_devices = JSON.parse(in_devices_raw)
+
+                const out_devices_raw = fs.readFileSync("./res/data/out_device_list.json", "utf-8")
+                const out_devices = JSON.parse(out_devices_raw)
+
                 //sending app data and alg configs
-                settings.send_message("app-data", [app_settings, voice_config, text_config, speech_config])
+                settings.send_message("app-data", [app_settings, voice_config, text_config, speech_config, in_devices, out_devices])
             }
             else if (data[0] == "controller"){
                 //sending monitor data
@@ -740,5 +751,3 @@ app.on("window-all-closed", () => {
     EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got window-all-closed request, saving logs and quitting app..."])
     exit_app()
 })
-
-//TODO: add SIGINT functionality

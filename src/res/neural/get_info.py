@@ -16,12 +16,14 @@ def get_audio_input_devices():
     return in_dict
 
 def get_audio_output_devices():
+    out_dict = {
+        "devices": []
+    }
+
     p = pyaudio.PyAudio()
 
     # Get the number of available devices
     num_devices = p.get_device_count()
-
-    output_devices = []
 
     # Iterate through devices and check if they are output devices
     for i in range(num_devices):
@@ -29,10 +31,12 @@ def get_audio_output_devices():
         if device_info['maxOutputChannels'] > 0:
             print(device_info.get("name"))
 
+    return out_dict
+
 if __name__ == "__main__":
     #write new devices into file
-    in_devices_path = os.getcwd()[:os.getcwd().index("SEDAC") + len("SEDAC")] + "/src/res/data/out_device_list.json"
-    out_devices_path = os.getcwd()[:os.getcwd().index("SEDAC") + len("SEDAC")] + "/src/res/data/in_device_list.json"
+    in_devices_path = os.getcwd()[:os.getcwd().index("SEDAC") + len("SEDAC")] + "/src/res/data/in_device_list.json"
+    out_devices_path = os.getcwd()[:os.getcwd().index("SEDAC") + len("SEDAC")] + "/src/res/data/out_device_list.json"
 
     if os.path.exists(in_devices_path):
         os.remove(in_devices_path)

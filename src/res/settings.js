@@ -14,8 +14,8 @@ window.onload = () => {
 //load settings
 function load_settings(data){
     let app_data = data[0]
-    data.shift()
-    let config_data = data
+    let config_data = data.slice(1, 4)
+    let device_data = data.slice(4, 6)
 
     //load all app data
     var all_settings_elem = document.getElementsByClassName("settings-elem")
@@ -31,7 +31,7 @@ function load_settings(data){
         if (all_settings_elem[i].tagName == "SELECT"){
             //select element
             for(let i_child = 0; i_child < all_settings_elem[i].children.length; i_child++){
-                if (all_settings_elem[i].children[i_child].value == value){
+                if (all_settings_elem[i].children[i_child].value == value.toString()){
                     all_settings_elem[i].children[i_child].setAttribute('selected', true);
                     break
                 }
@@ -49,8 +49,18 @@ function load_settings(data){
         i += 1
     }
 
-    //load all configs
+    //load all algorithms
     let all_config_elem = document.getElementsByClassName("skip")
+
+    //load all devices
+    for (let i_device = 0; i_device < device_data.length; i_device++){
+        //append all select values
+        let all_devices = ""
+        device_data[i_device]["devices"].forEach(device => {
+            all_devices += `<option value="${device["index"]}">${device["name"]} (device index: ${device["index"]})</option>`
+        })
+        all_config_elem[i_device].innerHTML = all_devices
+    }
 
     for (let i_config = 0; i_config < config_data.length; i_config++){
         //append all select values
@@ -58,10 +68,10 @@ function load_settings(data){
         config_data[i_config]["algorithms"].forEach(alg => {
             all_algs += `<option value="${alg["name"]}">${alg["name"]} (${alg["acc"]})</option>`
         })
-        all_config_elem[i_config].innerHTML = all_algs
+        all_config_elem[i_config + device_data.length].innerHTML = all_algs
     }
 
-    //load saved data to configs
+    //select already "selected" data for "-skip" elements
     i = 0;
     for (const [key, value] of Object.entries(app_data)) {
         if (key.includes("-skip")){
@@ -92,7 +102,7 @@ function save_settings(){
     let audio_in_device = document.getElementById("in_devices").value
 
     //simulation data
-    let ai_aggression = document.getElementById("ai_aggression").value
+    let ai_aggression = document.getfElementById("ai_aggression").value
     let results = document.getElementById("result").checked
     let voice_alg = document.getElementById("voice_recog").value
     let text_alg = document.getElementById("text_process").value
@@ -118,8 +128,8 @@ function save_settings(){
         "plane_path_limit": path_limit,
         "logging": logging,
         "port": database_port,
-        "out_device": audio_out_device,
-        "in_device": audio_in_device,
+        "out_device-skip": audio_out_device,
+        "in_device-skip": audio_in_device,
         //simulation data
         "ai_aggression": ai_aggression,
         "results": results,

@@ -10,6 +10,7 @@ const app_settings = JSON.parse(app_settings_raw);
 //variables
 var last_value_voice: string = "";
 var last_value_command: string = "";
+var plane_data = []
 const NATO_ALPHA = {
     "A": "alpha",
     "B": "beta",
@@ -164,15 +165,34 @@ async function db_check(){
     //check if command change
     if (value_command != last_value_command){
         //process command data & generate speech
-        var message: string = command_processor(value_command)
-        client.set("gen-speech", message)
 
-        parentPort.postMessage("command: " + value_command) //post to main process for updates
-        last_value_command = value_command
+        //check if plane exists
+        let exists: boolean = false
+        var callsign = value_command.split(" ")[0]
+        for (let i = 0; i < plane_data.length; i++){
+            if (plane_data[i].callsign == callsign){
+                exists = true
+                break
+            }
+        }
+        
+        if (exists){
+            var message: string = command_processor(value_command)
+            client.set("gen-speech", message)
+
+            parentPort.postMessage("command: " + value_command) //post to main process for updates
+            last_value_command = value_command
+        }
     }
 }
 
+
 parentPort.on("message", async (message) => {
+    //separate data messages from command messages
+    if (Array.isArray(message)){
+        plane_data = message[1]
+    }
+
     switch(message){
         case "start":
             //going to start recognition
@@ -193,7 +213,6 @@ parentPort.on("message", async (message) => {
 
             let seed = gen_random_nums(16)
             terrain_gen.gen_terrain(seed) //generate terrain 
-            //parentPort.postMessage(out)
             break
         case "acai":
             break

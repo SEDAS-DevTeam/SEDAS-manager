@@ -737,6 +737,17 @@ setInterval(() => {
     }
 }, 1000)
 
+setInterval(() => {
+    //sending plane status every 500ms for backend
+    if (PlaneDatabase == undefined){
+        worker.postMessage(["data", []]) //send empty array so the backend can still function without any problems
+    }
+    else{
+        worker.postMessage(["data", PlaneDatabase.DB])
+        console.log(PlaneDatabase.DB)
+    }
+}, 500)
+
 
 //on every n minutes, save to local DB if app crashes
 setInterval(() => {

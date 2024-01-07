@@ -1,9 +1,9 @@
 //system imports
 import {app, BrowserWindow, ipcMain, screen} from "electron";
-import * as fs from "fs";
+import fs from "fs";
 import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
-import * as path from "path"
+import path from "path"
 import {lookup} from "dns"
 import * as read_map from "./read_map"
 import { BackupDB } from "./database";

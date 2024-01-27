@@ -11,6 +11,7 @@ const app_settings = JSON.parse(app_settings_raw);
 var last_value_voice: string = "";
 var last_value_command: string = "";
 var plane_data = []
+var logging: boolean = undefined
 const NATO_ALPHA = {
     "A": "alpha",
     "B": "beta",
@@ -150,14 +151,18 @@ async function db_check(){
     if (value_terrain.length != 0){
         //send to main loop
         parentPort.postMessage(value_terrain)
+        parentPort.postMessage("debug: Generated terrain seed")
 
         client.set("out-terrain", "") //reset to default value
     }
 
     //check if voice change
     if (value_voice != last_value_voice){
+        parentPort.postMessage(`debug: voice change, got: ${value_voice}`)
+
         //process voice data
         client.set("proc-voice", value_voice)
+        parentPort.postMessage("debug: set voice for processing")
 
         last_value_voice = value_voice
     }
@@ -165,6 +170,7 @@ async function db_check(){
     //check if command change
     if (value_command != last_value_command){
         //process command data & generate speech
+        parentPort.postMessage("debug: command change, processing command")
 
         //check if plane exists
         let exists: boolean = false
@@ -188,11 +194,20 @@ async function db_check(){
 
 
 parentPort.on("message", async (message) => {
-    //separate data messages from command messages
     if (Array.isArray(message)){
-        plane_data = message[1]
+        switch(message[0]){
+            //command messages with args
+            case "debug":
+                logging = message[1]
+                break
+            //data messages
+            default:
+                plane_data = message[1]
+                break
+        }
     }
 
+    //command messages without args
     switch(message){
         case "start":
             //going to start recognition

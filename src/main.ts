@@ -359,6 +359,10 @@ worker.on("message", (message: string) => {
                 }
             }
             break
+        case "debug":
+            //used for debug logging
+            EvLogger.log("DEBUG", [content, content])
+            break
     }
 })
 
@@ -435,7 +439,7 @@ ipcMain.handle("message", (event, data) => {
 
             //setup voice recognition and ACAI backend
             worker.postMessage("start")
-            //worker.postMessage("terrain") //generate terrain
+            worker.postMessage(["debug", app_settings["logging"]]) 
 
             //run local plane DB
             PlaneDatabase = new PlaneDB(workers);

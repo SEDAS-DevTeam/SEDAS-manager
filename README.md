@@ -17,3 +17,9 @@ If you want to contribute to the project, you can simply follow these commands.
 5. (optional) `npm run build` to build and package electron project for win and linux (MacOS not supported yet)
 
 NOTE: `npm run clear` to clear all build files
+
+## TODO
+
+- [ ] move from plain HTML/CSS to jQuery/React/etc.
+- [ ] get better accuracy from backend files
+- [ ] start working on SEDAC glossary

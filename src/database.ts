@@ -1,12 +1,15 @@
 import * as sqlite from "sqlite3"
-import * as fs from "fs"
+import fs from "fs"
+import path from "path"
+
+const ABS_PATH = path.resolve("")
 
 export class BackupDB{
     /*Simple SQLite database*/
     private DB: any;
 
     public create_database(){
-        this.DB = new sqlite.Database("plane_info.db")
+        this.DB = new sqlite.Database(path.join(ABS_PATH, "/src/plane_info.db"))
     
         let promise_pending = new Promise<void>((resolve, reject) => {
             this.DB.run("CREATE TABLE IF NOT EXISTS PLANES (id INTEGER, callsign TEXT, heading INTEGER, level INTEGER, speed INTEGER, departure TEXT, arrival TEXT, x INTEGER, y INTEGER)", (err: any) => {

@@ -12,7 +12,7 @@
   "homepage": "https://github.com/HelloWorld7894/SEDAC",
   "license": "GPL-3.0",
   "scripts": {
-    "dev": "npx tsc --project ./tsconfig.json && electron main.js",
+    "dev": "npx tsc --project ./tsconfig.json && electron ./src/main.js",
     "compile": "npx tsc --project ./tsconfig.json",
     "build": "electron-builder build -wl",
     "clear": "rm -rf ./build/* && touch ./build/.gitkeep"

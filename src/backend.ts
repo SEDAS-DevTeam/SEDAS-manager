@@ -2,9 +2,12 @@ import {parentPort} from "worker_threads"
 import {spawn} from "node:child_process"
 import { createClient } from 'redis';
 import fs from "fs";
+import path from "path";
+
+const ABS_PATH = path.resolve("")
 
 //read JSON
-const app_settings_raw = fs.readFileSync("./res/data/settings.json", "utf-8")
+const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/settings.json"), "utf-8")
 const app_settings = JSON.parse(app_settings_raw);
 
 //variables

@@ -1,6 +1,6 @@
 #generic node.js config
-/src/node_modules
-/src/package-lock.json
+node_modules
+package-lock.json
 
 #clear useless build files
 /src/build/*
@@ -17,7 +17,7 @@
 /src/*.map
 
 #redis files
-/src/dump.rdb
+dump.rdb
 
 #sqlite db file
 /src/plane_info.db

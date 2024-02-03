@@ -1,7 +1,12 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EventLogger = void 0;
 const fs_1 = require("fs");
+const path_1 = __importDefault(require("path"));
+const ABS_PATH = path_1.default.resolve("");
 class EventLogger {
     /*
     data will be processed in format:
@@ -16,13 +21,13 @@ class EventLogger {
     LOG_PATH = "";
     constructor(debug) {
         this.debug_mode = debug;
-        this.LOG_PATH = "./logs/app_log.txt";
+        this.LOG_PATH = path_1.default.join(ABS_PATH, "/src/logs/app_log.txt");
         if (this.debug_mode) {
             let time = this.get_time();
             console.log(`[${time}]`, "(DEBUG)", "Initialized event logger with DEBUGGING=TRUE");
         }
         //create log file
-        let files = (0, fs_1.readdirSync)("./logs");
+        let files = (0, fs_1.readdirSync)(path_1.default.join(ABS_PATH, "/src/logs"));
         if (files.includes("app_log.txt")) {
             (0, fs_1.unlinkSync)(this.LOG_PATH);
         }

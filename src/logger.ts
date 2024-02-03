@@ -1,4 +1,7 @@
 import { readdirSync, unlinkSync, openSync, appendFileSync} from "fs"
+import path from "path"
+
+const ABS_PATH = path.resolve("")
 
 export class EventLogger{
     /*
@@ -15,7 +18,7 @@ export class EventLogger{
     private LOG_PATH: string = ""
     public constructor(debug: boolean){
         this.debug_mode = debug
-        this.LOG_PATH = "./logs/app_log.txt"
+        this.LOG_PATH = path.join(ABS_PATH, "/src/logs/app_log.txt")
 
         if(this.debug_mode){
             let time: string = this.get_time()
@@ -23,7 +26,7 @@ export class EventLogger{
         }
 
         //create log file
-        let files: string[] = readdirSync("./logs")
+        let files: string[] = readdirSync(path.join(ABS_PATH, "/src/logs"))
         if (files.includes("app_log.txt")){
             unlinkSync(this.LOG_PATH)
         }

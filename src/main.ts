@@ -29,15 +29,16 @@ var backupdb_saving_frequency: number = 0;
 var backup_db_on: boolean = true
 var scale: number = 0;
 var running: boolean = false
-const PATH_TO_AUDIO_UPDATE: string = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/get_info.py"
 
+const PATH_TO_AUDIO_UPDATE: string = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/get_info.py"
+const ABS_PATH = path.resolve("")
 
 /*
 APP INIT 1
 */
 
 //read JSON
-const app_settings_raw = fs.readFileSync("./res/data/settings.json", "utf-8")
+const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/settings.json"), "utf-8")
 const app_settings = JSON.parse(app_settings_raw);
 
 process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
@@ -88,7 +89,7 @@ EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_sav
 
 //communication workers
 EvLogger.log("DEBUG", ["Deploying app backend", "Deploying backend.js as a worker, startting core.py"])
-const worker = new Worker("./backend.js")
+const worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
 
 
 const main_menu_dict = {
@@ -390,7 +391,7 @@ ipcMain.handle("message", (event, data) => {
             //save settings
             EvLogger.add_record("DEBUG", "saving settings")
 
-            fs.writeFileSync("./res/data/settings.json", data[1][1])
+            fs.writeFileSync(path.join(ABS_PATH, "/src/res/data/settings.json"), data[1][1])
             break
         case "redirect-to-settings":
             //message call to redirect to settings

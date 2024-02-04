@@ -17,6 +17,7 @@ thread_speech = None
 def signal_handler(sig, frame):
     print("siginterrupt detected, stopping threads")
 
+    r_instance.set("debug-core", "SIGINT for database")
     r_instance.set("terminate", "true")
     exit(0)
 
@@ -28,6 +29,7 @@ if __name__ == "__main__":
 
     #redis
     r_instance = redis.Redis(host='localhost', port=app_settings["port"], decode_responses=True)
+    r_instance.set("debug-core", "Redis instance setting completed")
 
     #model selection
     m_voice_instance = VOICE_MODEL_DICT[app_settings["voice_alg-skip"]](r_instance)
@@ -39,9 +41,13 @@ if __name__ == "__main__":
     thread_text = threading.Thread(target=m_text_instance.process)
     thread_speech = threading.Thread(target=m_speech_instance.process)
 
+    r_instance.set("debug-core", "All threads initialized successfully")
+
     thread_voice.start()
     thread_text.start()
     thread_speech.start()
+
+    r_instance.set("debug-core", "All threads deployed successfully")
 
     #register signal for SIGINT
     signal.signal(signal.SIGINT, signal_handler)

@@ -13,8 +13,10 @@ const app_settings = JSON.parse(app_settings_raw);
 //variables
 var last_value_voice: string = "";
 var last_value_command: string = "";
+var last_core_debug_message: string = "";
 var plane_data = []
 var logging: boolean = undefined
+
 const NATO_ALPHA = {
     "A": "alpha",
     "B": "beta",
@@ -78,25 +80,10 @@ client.set("proc-voice-out", "")
 const PATH_TO_TERRAIN = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/generate_terrain.py"
 const PATH_TO_CORE = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/core.py"
 
-/*CLASSES*/
-class Acai {
-    private name: string;
+client.on('error', err => console.log('Redis Client Error', err));
 
-    public constructor(name: string){
-        this.name = name;
-    }
-}
-
-class TerrainGeneration {
-    public gen_terrain(seed: string): void{
-        const generation_process = spawn("python3", [PATH_TO_TERRAIN])
-        client.set("in-terrain", seed)
-    }
-}
-
-/*OBJECTS*/
-const event_gen = new Acai("balls")
-const terrain_gen = new TerrainGeneration()
+setInterval(db_check, 1000)
+setInterval(debug_check, 100)
 
 const core_process = spawn("python3", [PATH_TO_CORE])
 
@@ -195,6 +182,15 @@ async function db_check(){
     }
 }
 
+async function debug_check(){
+    let debug_core: string = await client.get("debug-core")
+
+    if (debug_core != null && debug_core != last_core_debug_message){
+        parentPort.postMessage("debug: " + debug_core)
+        last_core_debug_message = debug_core
+    }
+}
+
 
 parentPort.on("message", async (message) => {
     if (Array.isArray(message)){
@@ -230,13 +226,8 @@ parentPort.on("message", async (message) => {
             //for test
 
             let seed = gen_random_nums(16)
-            terrain_gen.gen_terrain(seed) //generate terrain 
             break
         case "acai":
             break
     }
 })
-
-client.on('error', err => console.log('Redis Client Error', err));
-
-setInterval(db_check, 1000)

@@ -490,7 +490,6 @@ ipcMain.handle("message", (event, data) => {
                 map_config = []
                 var map_files = read_map.list_map_files()
                 for (let i = 0; i < map_files.length; i++){
-                    console.log(map_files[i])
                     let map = read_map.read_map_from_file(map_files[i])
                     if (map_files[i].includes("config")){
                         map_config.push(map)
@@ -550,11 +549,11 @@ ipcMain.handle("message", (event, data) => {
             break
         case "map-check":
             if (map_data == undefined){
-                console.log("user did not check")
+                EvLogger.add_record("WARN", "user did not check any map")
                 controllerWindow.send_message("map-checked", JSON.stringify({"user-check": false}))
             }
             else {
-                console.log("user checked")
+                EvLogger.add_record("DEBUG", "user checked a map")
                 controllerWindow.send_message("map-checked", JSON.stringify({"user-check": true}))
             }
             break
@@ -727,8 +726,6 @@ ipcMain.on("message-redirect", (event, data) => {
 
 //channel for sending created plane data
 ipcMain.on("plane-info", (event, data) => {
-    console.log("got data from process")
-    console.log(data)
 })
 
 
@@ -749,7 +746,6 @@ setInterval(() => {
     }
     else{
         worker.postMessage(["data", PlaneDatabase.DB])
-        console.log(PlaneDatabase.DB)
     }
 }, 500)
 

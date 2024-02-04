@@ -23,6 +23,7 @@ var selected_name = ""
 var all_points = []
 var monitor_data = [] //data for storing monitors
 var plane_data = [] //data for storing all planes
+var map_checked = false
 
 //selected time
 var selected_hours = 0
@@ -564,6 +565,11 @@ function process_init_data(data, reset = false){
         }
     }
     else if (page.includes("controller_sim")){
+        if (!map_checked){
+            //user did not check, do nothing
+            return 
+        }
+
         //clear parent element innerHTML
         document.getElementById("monitor_spawn").innerHTML = ""
 
@@ -807,6 +813,8 @@ window.onload = () => {
         else{
             document.getElementById("mask").style.visibility = "visible"
         }
+
+        map_checked = data_temp["user-check"]
     })
 
     //plane messages

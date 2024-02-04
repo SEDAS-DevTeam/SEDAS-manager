@@ -13,7 +13,10 @@ const app_settings = JSON.parse(app_settings_raw);
 //variables
 var last_value_voice: string = "";
 var last_value_command: string = "";
-var last_core_debug_message: string = "";
+
+//debug messages: core, text, voice, speech
+var last_debug_messages: string[] = ["", "", "", ""]
+
 var plane_data = []
 var logging: boolean = undefined
 
@@ -184,10 +187,16 @@ async function db_check(){
 
 async function debug_check(){
     let debug_core: string = await client.get("debug-core")
+    let debug_text: string = await client.get("debug-text-model")
+    let debug_speech: string = await client.get("debug-speech-model")
+    let debug_voice: string = await client.get("debug-voice-model")
 
-    if (debug_core != null && debug_core != last_core_debug_message){
-        parentPort.postMessage("debug: " + debug_core)
-        last_core_debug_message = debug_core
+    let all_debug_messages: string[] = [debug_core, debug_text, debug_speech, debug_voice]
+    for (let i = 0; i < all_debug_messages.length; i++){
+        if (all_debug_messages[i] != null && all_debug_messages[i] != last_debug_messages[i]){
+            parentPort.postMessage("debug: " + all_debug_messages[i])
+            last_debug_messages[i] = all_debug_messages[i]
+        }
     }
 }
 

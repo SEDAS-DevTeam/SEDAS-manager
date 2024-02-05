@@ -1,7 +1,5 @@
 import redis
 import threading
-import signal
-import time
 import json
 import os
 
@@ -13,13 +11,6 @@ from cache.speech_models import SPEECH_MODEL_DICT
 thread_voice = None
 thread_text = None
 thread_speech = None
-
-def signal_handler(sig, frame):
-    print("siginterrupt detected, stopping threads")
-
-    r_instance.set("debug-core", "SIGINT for database")
-    r_instance.set("terminate", "true")
-    exit(0)
 
 if __name__ == "__main__":
     #get redis port
@@ -48,8 +39,3 @@ if __name__ == "__main__":
     thread_speech.start()
 
     r_instance.set("debug-core", "All threads deployed successfully")
-
-    #register signal for SIGINT
-    signal.signal(signal.SIGINT, signal_handler)
-
-    time.sleep(10)

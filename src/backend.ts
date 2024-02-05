@@ -104,6 +104,10 @@ function gen_random_nums(n: number): string{
     return out
 }
 
+function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+}
+
 function command_processor(command_text: string){
     let command_args = command_text.split(" ")
     let response: string = ""
@@ -169,6 +173,7 @@ async function db_check(){
 
         if (current_query_timeout == QUERY_TIMEOUT){
             value_command = last_value_command
+            parentPort.postMessage("debug: QUERY TIMEOUT")
         }
 
         if (current_query_timeout == 0){ //only once
@@ -242,7 +247,14 @@ parentPort.on("message", async (message) => {
             client.set("out-voice", "test")
             break
         case "interrupt":
-            core_process.kill("SIGINT")
+            client.set("terminate", "true")
+
+            parentPort.postMessage("debug: SIGINT for core.py")
+
+            delay(5000)
+
+            core_process.kill("SIGINT") //killing core.py
+
             break
         case "terrain":
             //for test

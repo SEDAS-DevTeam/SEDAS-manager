@@ -6,6 +6,8 @@ import path from "path";
 
 const ABS_PATH = path.resolve("")
 
+const QUERY_TIMEOUT: number = 10
+
 //read JSON
 const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/settings.json"), "utf-8")
 const app_settings = JSON.parse(app_settings_raw);
@@ -19,6 +21,7 @@ var last_debug_messages: string[] = ["", "", "", ""]
 
 var plane_data = []
 var logging: boolean = undefined
+var current_query_timeout: number = 0
 
 const NATO_ALPHA = {
     "A": "alpha",
@@ -163,7 +166,14 @@ async function db_check(){
     //check if command change
     if (value_command != last_value_command){
         //process command data & generate speech
-        parentPort.postMessage("debug: command change, processing command")
+
+        if (current_query_timeout == QUERY_TIMEOUT){
+            value_command = last_value_command
+        }
+
+        if (current_query_timeout == 0){ //only once
+            parentPort.postMessage("debug: command change, processing command")
+        }
 
         //check if plane exists
         let exists: boolean = false
@@ -181,6 +191,9 @@ async function db_check(){
 
             parentPort.postMessage("command: " + value_command) //post to main process for updates
             last_value_command = value_command
+        }
+        else{
+            current_query_timeout += 1
         }
     }
 }

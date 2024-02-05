@@ -815,6 +815,9 @@ window.onload = () => {
         }
 
         map_checked = data_temp["user-check"]
+
+        //send message to get new data
+        window.electronAPI.send_message("controller", ["send-info"])
     })
 
     //plane messages

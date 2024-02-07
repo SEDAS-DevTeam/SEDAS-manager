@@ -1,13 +1,34 @@
-# SEDAC
-Scalable and Easily Deployable Aircraft Control
+# SEDAS
 
-# Installation
+**S**calable and **E**asily **D**eployable **ATC** **S**imulator
 
-## Windows
+<hr>
 
-## Linux
+**About**
+This project is new concept of ATC simulator both for beginners and advanced users. It utilises of neural networks to imitate real pilots on the other communication end and also function as a personal trainer. Goal of this desktop application is to make ATC learning easier for hobbyists and begineer ATC students. Project is still in early developement.
 
-## Build from source
+<hr>
+
+**Technical**
+Application is made in `electron`, with the help of `sqlite3`, app also uses `python` to implement the **AI** part. It is also packaged using `electron-packager`. Frontend is fully made in `VanillaJS`.
+
+<hr>
+
+**ATC**
+See `/doc/sources/readme.md` for more information about **ATC sources i used**.
+
+## Installation
+
+### Windows
+TODO
+
+### Linux
+TODO
+
+### MacOS
+TODO
+
+### Build from source
 If you want to contribute to the project, you can simply follow these commands.
 
 1. `git clone https://github.com/HelloWorld7894/SEDAC.git`
@@ -17,9 +38,3 @@ If you want to contribute to the project, you can simply follow these commands.
 5. (optional) `npm run build` to build and package electron project for win and linux (MacOS not supported yet)
 
 NOTE: `npm run clear` to clear all build files
-
-## TODO
-
-- [ ] move from plain HTML/CSS to jQuery/React/etc.
-- [ ] get better accuracy from backend files
-- [ ] start working on SEDAC glossary

@@ -30,8 +30,15 @@ var backup_db_on: boolean = true
 var scale: number = 0;
 var running: boolean = false
 
-const PATH_TO_AUDIO_UPDATE: string = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/get_info.py"
+//simulation-based declarations
+var simulation_dict = {
+    "planes": undefined,
+    "map": undefined,
+    "monitor-data": undefined
+} //this dictionary is used for saving all necessary simulation data to database (used for recovery)
+
 const ABS_PATH = path.resolve("")
+const PATH_TO_AUDIO_UPDATE: string = path.join(ABS_PATH, "/src/res/neural/get_info.py")
 
 /*
 APP INIT 1
@@ -89,8 +96,10 @@ EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_sav
 
 //communication workers
 EvLogger.log("DEBUG", ["Deploying app backend", "Deploying backend.js as a worker, startting core.py"])
-const worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
 
+//workers 
+const worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
+const database_worker = new Worker(path.join(ABS_PATH, "/src/database.js"))
 
 const main_menu_dict = {
     width: 800,
@@ -261,10 +270,6 @@ function send_to_all(planes: any, plane_monitor_data: any, plane_paths_data: any
     }
 }
 
-function save_to_local_db(){
-    console.log("saved to local db!")
-}
-
 function parse_scale(scale){
     //parse scale (constant, that describes how many units is one pixel)
     let val: number = 0
@@ -335,7 +340,7 @@ app.on("ready", () => {
     mainMenu.show()
 })
 
-//worker listener
+//worker listeners
 worker.on("message", (message: string) => {
     //processing from backend.js
     let arg = message.split(":")[0]
@@ -363,6 +368,16 @@ worker.on("message", (message: string) => {
         case "debug":
             //used for debug logging
             EvLogger.log("DEBUG", [content, content])
+            break
+    }
+})
+
+database_worker.on("message", (message: string) => {
+    let arg = message.split(":")[0]
+    let content = message.split(":")[1].slice(1)
+
+    switch(arg){
+        case "debug":
             break
     }
 })
@@ -753,7 +768,8 @@ setInterval(() => {
 //on every n minutes, save to local DB if app crashes
 setInterval(() => {
     if (backup_db_on){
-        save_to_local_db()
+        //save to local db using database.ts 
+        database_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict)])
     }
 }, backupdb_saving_frequency)
 

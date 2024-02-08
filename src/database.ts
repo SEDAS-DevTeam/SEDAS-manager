@@ -1,5 +1,5 @@
 import * as sqlite from "sqlite3"
-import fs from "fs"
+import {parentPort} from "worker_threads"
 import path from "path"
 
 const ABS_PATH = path.resolve("")
@@ -11,7 +11,7 @@ export class BackupDB{
     public create_database(){
         this.DB = new sqlite.Database(path.join(ABS_PATH, "/src/plane_info.db"))
     
-        let promise_pending = new Promise<void>((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             this.DB.run("CREATE TABLE IF NOT EXISTS PLANES (id INTEGER, callsign TEXT, heading INTEGER, level INTEGER, speed INTEGER, departure TEXT, arrival TEXT, x INTEGER, y INTEGER)", (err: any) => {
                 if (err){
                     console.log(err)
@@ -95,3 +95,27 @@ export class BackupDB{
         })
     }
 }
+
+//
+// worker part
+//
+
+parentPort.on("message", async (message) => {
+    if (Array.isArray(message)){
+        switch(message[0]){
+            case "save-to-db":
+                let sim_dict = JSON.parse(message[1])
+
+                //creating and saving "planes"
+                let planes = sim_dict["planes"]
+
+                //creating and saving "map"
+                let map_data = sim_dict["map"]
+
+                //creating and saving "monitor-data"
+                let monitors = sim_dict["monitor-data"]
+
+                break
+        }
+    }
+})

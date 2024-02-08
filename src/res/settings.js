@@ -102,7 +102,7 @@ function save_settings(){
     let audio_in_device = document.getElementById("in_devices").value
 
     //simulation data
-    let ai_aggression = document.getfElementById("ai_aggression").value
+    let ai_aggression = document.getElementById("ai_aggression").value
     let results = document.getElementById("result").checked
     let voice_alg = document.getElementById("voice_recog").value
     let text_alg = document.getElementById("text_process").value

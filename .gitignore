@@ -19,9 +19,6 @@ package-lock.json
 #redis files
 dump.rdb
 
-#sqlite db file
-/src/plane_info.db
-
 #pycache files
 /src/res/neural/cache/__pycache__/
 

@@ -1,15 +1,18 @@
 import * as sqlite from "sqlite3"
 import {parentPort} from "worker_threads"
 import path from "path"
+import fs from "fs"
 
 const ABS_PATH = path.resolve("")
+const SQLITE_DATABASE_PATH = path.join(ABS_PATH, "/src/res/tmp_data/backup.db")
+const DATABASE_PATH = path.join(ABS_PATH, "/src/res/tmp_data/backup.json")
 
 export class BackupDB{
     /*Simple SQLite database*/
     private DB: any;
 
     public create_database(){
-        this.DB = new sqlite.Database(path.join(ABS_PATH, "/src/plane_info.db"))
+        this.DB = new sqlite.Database(SQLITE_DATABASE_PATH)
     
         return new Promise<void>((resolve, reject) => {
             this.DB.run("CREATE TABLE IF NOT EXISTS PLANES (id INTEGER, callsign TEXT, heading INTEGER, level INTEGER, speed INTEGER, departure TEXT, arrival TEXT, x INTEGER, y INTEGER)", (err: any) => {
@@ -104,17 +107,11 @@ parentPort.on("message", async (message) => {
     if (Array.isArray(message)){
         switch(message[0]){
             case "save-to-db":
-                let sim_dict = JSON.parse(message[1])
-
-                //creating and saving "planes"
-                let planes = sim_dict["planes"]
-
-                //creating and saving "map"
-                let map_data = sim_dict["map"]
-
-                //creating and saving "monitor-data"
-                let monitors = sim_dict["monitor-data"]
-
+                fs.writeFileSync(DATABASE_PATH, message[1])
+                break
+            case "read-db":
+                let data = fs.readFileSync(DATABASE_PATH, "utf-8")
+                parentPort.postMessage(["db-data", data])
                 break
         }
     }

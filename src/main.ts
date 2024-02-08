@@ -6,7 +6,6 @@ import {spawn} from "node:child_process"
 import path from "path"
 import {lookup} from "dns"
 import * as read_map from "./read_map"
-import { BackupDB } from "./database";
 import { Plane, PlaneDB } from "./plane_functions";
 import { update_all } from "./fetch";
 import {EventLogger} from "./logger"
@@ -32,9 +31,9 @@ var running: boolean = false
 
 //simulation-based declarations
 var simulation_dict = {
-    "planes": undefined,
-    "map": undefined,
-    "monitor-data": undefined
+    "planes": null,
+    "map": null,
+    "monitor-data": null
 } //this dictionary is used for saving all necessary simulation data to database (used for recovery)
 
 const ABS_PATH = path.resolve("")
@@ -57,11 +56,6 @@ EvLogger.add_record("DEBUG", "APP-INIT 1")
 //run RedisDB
 const database = spawn("redis-server", ["--port",  app_settings["port"]])
 EvLogger.log("DEBUG", ["Initialized communication DB", `Initialized redis database on port ${app_settings["port"]}`])
-
-//run SQLite DB
-var BackupDatabase = new BackupDB();
-BackupDatabase.create_database()
-EvLogger.log("DEBUG", ["Initialized BackupDB", "Initialized Sqlite3 database for backup"])
 
 //check internet connectivity
 EvLogger.log("DEBUG", ["Internet connectivity check...", "Performing DNSLookup on google servers (8.8.8.8) for internet check"])
@@ -100,6 +94,7 @@ EvLogger.log("DEBUG", ["Deploying app backend", "Deploying backend.js as a worke
 //workers 
 const worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
 const database_worker = new Worker(path.join(ABS_PATH, "/src/database.js"))
+EvLogger.log("DEBUG", ["Initialized BackupDB", "Initialized Sqlite3 database for backup"])
 
 const main_menu_dict = {
     width: 800,
@@ -373,12 +368,13 @@ worker.on("message", (message: string) => {
 })
 
 database_worker.on("message", (message: string) => {
-    let arg = message.split(":")[0]
-    let content = message.split(":")[1].slice(1)
-
-    switch(arg){
-        case "debug":
-            break
+    if (Array.isArray(message)){
+        switch(message[0]){
+            case "db-data":
+                var database_data = JSON.parse(message[1])
+                console.log(database_data)
+                break
+        }
     }
 })
 
@@ -477,21 +473,21 @@ ipcMain.handle("message", (event, data) => {
 
                 //ACAI backend
 
-                const speech_config_raw = fs.readFileSync("./res/alg_data/speech_config.json", "utf-8")
+                const speech_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/alg_data/speech_config.json"), "utf-8")
                 const speech_config = JSON.parse(speech_config_raw);
 
-                const text_config_raw = fs.readFileSync("./res/alg_data/text_config.json", "utf-8")
+                const text_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/alg_data/text_config.json"), "utf-8")
                 const text_config = JSON.parse(text_config_raw);
 
-                const voice_config_raw = fs.readFileSync("./res/alg_data/voice_config.json", "utf-8")
+                const voice_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/alg_data/voice_config.json"), "utf-8")
                 const voice_config = JSON.parse(voice_config_raw);
 
                 //audio devices
 
-                const in_devices_raw = fs.readFileSync("./res/data/in_device_list.json", "utf-8")
+                const in_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/in_device_list.json"), "utf-8")
                 const in_devices = JSON.parse(in_devices_raw)
 
-                const out_devices_raw = fs.readFileSync("./res/data/out_device_list.json", "utf-8")
+                const out_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/out_device_list.json"), "utf-8")
                 const out_devices = JSON.parse(out_devices_raw)
 
                 //sending app data and alg configs
@@ -769,7 +765,8 @@ setInterval(() => {
 setInterval(() => {
     if (backup_db_on){
         //save to local db using database.ts 
-        database_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict)])
+        database_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict, null, 2)])
+        EvLogger.log("DEBUG", ["Saving temporary backup...", "Saving temporary backup using database.ts"])
     }
 }, backupdb_saving_frequency)
 

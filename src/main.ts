@@ -480,7 +480,7 @@ ipcMain.handle("message", (event, data) => {
             break
         case "exit":
             EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got window-all-closed request, saving logs and quitting app..."])
-            exit_app()
+            controllerWindow.close()
 
         case "invoke":
             worker.postMessage(data[1][1])

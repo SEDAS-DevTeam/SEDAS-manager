@@ -74,7 +74,7 @@ const client = createClient({
 client.connect()
 
 //set default on start
-client.set("start-voice", "false")
+client.set("start", "false")
 client.set("terminate", "false") //used by core.py when terminating all threads
 client.set("gen-speech", "")
 client.set("proc-voice", "")
@@ -237,11 +237,11 @@ parentPort.on("message", async (message) => {
     switch(message){
         case "start":
             //going to start recognition
-            client.set("start-voice", "true")
+            client.set("start", "true")
             break
         case "stop":
             //going to stop recognition
-            client.set("start-voice", "false")
+            client.set("start", "false")
 
             //reset all values
             client.set("out-voice", "test")

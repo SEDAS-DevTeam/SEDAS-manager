@@ -21,13 +21,14 @@ var sender_win_name: string = "";
 var displays = [];
 var workers = [];
 var map_config = [];
-var map_data: any;
+var map_data: any = undefined;
 var curr_plane_id: number = 0;
 var PlaneDatabase: any;
 var backupdb_saving_frequency: number = 0;
 var backup_db_on: boolean = true
 var scale: number = 0;
 var running: boolean = false
+var coords = [0, 0]
 
 //simulation-based declarations
 var simulation_dict = {
@@ -214,9 +215,15 @@ function exit_app(){
     //disable voice recognition and ACAI backend
     EvLogger.add_record("DEBUG", "stopping voice-recognition")
     worker.postMessage("stop")
+
     //kill voice recognition
     EvLogger.add_record("DEBUG", "killing core.py")
     worker.postMessage("interrupt")
+
+    //stop backend worker
+    EvLogger.add_record("DEBUG", "terminating backend & database worker")
+    worker.terminate()
+    database_worker.terminate()
     
     //close windows
     EvLogger.add_record("DEBUG", "closing all windows")
@@ -238,6 +245,64 @@ function exit_app(){
 
     EvLogger.add_record("DEBUG", "exit")
     app.exit(0)
+}
+
+function main_app(backup_plane_db: any = undefined, backup_workers: any = undefined){
+    mainMenu.close()
+
+    //calculate x, y
+    //leftmost tactic
+    for(let i = 0; i < displays.length; i++){
+        coords = get_window_coords(i)
+        //stop sequence (display limit reached)
+        if (coords[0] == -2){
+            break
+        }
+        if (coords[0] == -3){
+            continue
+        }
+        
+        EvLogger.add_record("DEBUG", "worker show")
+        if (backup_workers){
+            //backup was created, reload workers
+            workerWindow = new Window(worker_dict, backup_workers[i]["path_load"], backup_workers[i]["win_coordinates"], backup_workers[i]["win_type"])
+            workerWindow.isClosed = backup_workers[i]["isClosed"]
+        }
+        else{
+            //backup was not created, create new workers
+            workerWindow = new Window(worker_dict, "./res/worker.html", coords, "ACC")
+        }
+        
+        workers.push(workerWindow)
+    }
+
+    coords = get_window_coords(-1)
+
+    EvLogger.add_record("DEBUG", "controller show")
+    controllerWindow = new Window(controller_dict, "./res/controller_gen.html", coords, "controller")
+    
+    for (let i = 0; i < workers.length; i++){
+        workers[i].show()
+        workers[i].checkClose()
+    }
+    controllerWindow.show()
+    controllerWindow.checkClose(() => {
+        //additional callback for controller window (invoke closing to every other window)
+        exit_app()
+    })
+
+    //setup voice recognition and ACAI backend
+    worker.postMessage("start")
+    worker.postMessage(["debug", app_settings["logging"]]) 
+
+    //run local plane DB
+    PlaneDatabase = new PlaneDB(workers);
+    if (backup_plane_db){
+        PlaneDatabase.DB = backup_plane_db
+
+        //send reloaded plane database to all windows
+        send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB) //TODO: not working
+    }
 }
 
 function send_to_all(planes: any, plane_monitor_data: any, plane_paths_data: any){
@@ -281,6 +346,7 @@ class Window{
     public window: BrowserWindow;
     public win_type: string = "none";
     public isClosed: boolean = false;
+    public win_coordinates: number[];
     private path_load: string;
 
     public close(){
@@ -314,6 +380,8 @@ class Window{
     }
 
     public constructor(config: any, path: string, coords: number[], window_type: string = "none"){
+        this.win_coordinates = coords //store to use later
+        
         config.x = coords[0]
         config.y = coords[1]
 
@@ -389,7 +457,10 @@ database_worker.on("message", (message: string) => {
         switch(message[0]){
             case "db-data":
                 var database_data = JSON.parse(message[1])
-                console.log(database_data)
+                
+                map_data = database_data["map"]
+
+                main_app(database_data["planes"], database_data["monitor-data"]) //start main app on backup restore
                 break
         }
     }
@@ -397,8 +468,6 @@ database_worker.on("message", (message: string) => {
 
 //IPC listeners
 ipcMain.handle("message", (event, data) => {
-    let coords = [0, 0]
-
     switch(data[1][0]){
         //generic message channels
         case "redirect-to-menu":
@@ -436,47 +505,7 @@ ipcMain.handle("message", (event, data) => {
             break
         case "redirect-to-main":
             //message call to redirect to main program (start)
-
-            mainMenu.close()
-
-            //calculate x, y
-            //leftmost tactic
-            for(let i = 0; i < displays.length; i++){
-                coords = get_window_coords(i)
-                //stop sequence (display limit reached)
-                if (coords[0] == -2){
-                    break
-                }
-                if (coords[0] == -3){
-                    continue
-                }
-                
-                EvLogger.add_record("DEBUG", "worker show")
-                workerWindow = new Window(worker_dict, "./res/worker.html", coords, "ACC")
-                workers.push(workerWindow)
-            }
-
-            coords = get_window_coords(-1)
-
-            EvLogger.add_record("DEBUG", "controller show")
-            controllerWindow = new Window(controller_dict, "./res/controller_gen.html", coords, "controller")
-            
-            for (let i = 0; i < workers.length; i++){
-                workers[i].show()
-                workers[i].checkClose()
-            }
-            controllerWindow.show()
-            controllerWindow.checkClose(() => {
-                //additional callback for controller window (invoke closing to every other window)
-                exit_app()
-            })
-
-            //setup voice recognition and ACAI backend
-            worker.postMessage("start")
-            worker.postMessage(["debug", app_settings["logging"]]) 
-
-            //run local plane DB
-            PlaneDatabase = new PlaneDB(workers);
+            main_app()
             break
         case "exit":
             EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got window-all-closed request, saving logs and quitting app..."])
@@ -739,6 +768,9 @@ ipcMain.handle("message", (event, data) => {
         case "regenerate-map":
             worker.postMessage("terrain")
             break
+        case "restore-sim":
+            database_worker.postMessage(["read-db"])
+            break
     }
 })
 
@@ -770,7 +802,7 @@ setInterval(() => {
         //send updated plane database to all
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
     }
-}, 1000)
+}, backupdb_saving_frequency)
 
 setInterval(() => {
     //sending plane status every 500ms for backend
@@ -785,12 +817,18 @@ setInterval(() => {
 
 //on every n minutes, save to local DB if app crashes
 setInterval(() => {
-    if (backup_db_on){
+    if (backup_db_on && PlaneDatabase != undefined && map_data != undefined && workers.length != 0){
+        simulation_dict = {
+            "planes": PlaneDatabase.DB,
+            "map": map_data,
+            "monitor-data": workers
+        }
+
         //save to local db using database.ts 
         database_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict, null, 2)])
         EvLogger.log("DEBUG", ["Saving temporary backup...", "Saving temporary backup using database.ts"])
     }
-}, backupdb_saving_frequency)
+}, 1000)
 
 
 //when app dies, it should die in peace

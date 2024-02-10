@@ -1,4 +1,4 @@
-import * as sqlite from "sqlite3"
+import sqlite from "sqlite3"
 import {parentPort} from "worker_threads"
 import path from "path"
 import fs from "fs"

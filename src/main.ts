@@ -220,11 +220,13 @@ function exit_app(){
     
     //close windows
     EvLogger.add_record("DEBUG", "closing all windows")
-    if (controllerWindow != undefined){
+    if (controllerWindow){
         controllerWindow.close()
     }
     for(let i = 0; i < workers.length; i++){
-        workers[i].close()
+        if (workers[i]){
+            workers[i].close()
+        }
     }
 
     //stop redis database
@@ -278,10 +280,14 @@ function parse_scale(scale){
 class Window{
     public window: BrowserWindow;
     public win_type: string = "none";
+    public isClosed: boolean = false;
     private path_load: string;
 
     public close(){
-        this.window.close()
+        if (!this.isClosed){
+            this.window.close()
+        }
+        this.isClosed = true
     }
 
     public show(path: string = ""){
@@ -289,11 +295,22 @@ class Window{
             //rewrite path_load (used for controller window_manipulation
             this.path_load = path
         }
+
+        this.isClosed = false
         this.window.loadFile(this.path_load);
     }
 
     public send_message(channel: string, message: any){
         this.window.webContents.postMessage(channel, message)
+    }
+
+    public checkClose(callback: any = undefined){
+        this.window.on("closed", () => {
+            this.isClosed = true
+            if (callback != undefined){
+                callback()
+            }
+        })
     }
 
     public constructor(config: any, path: string, coords: number[], window_type: string = "none"){
@@ -446,8 +463,13 @@ ipcMain.handle("message", (event, data) => {
             
             for (let i = 0; i < workers.length; i++){
                 workers[i].show()
+                workers[i].checkClose()
             }
             controllerWindow.show()
+            controllerWindow.checkClose(() => {
+                //additional callback for controller window (invoke closing to every other window)
+                exit_app()
+            })
 
             //setup voice recognition and ACAI backend
             worker.postMessage("start")

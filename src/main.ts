@@ -145,21 +145,9 @@ const worker_dict = {
     }
 }
 
-/*
-DATABASE FUNCTIONS (READY TO IMPLEMENT)
-async function run(){
-    CreateDatabase()
-    InsertRecord(5, "amogus", 180, 180, 180, "vepot", "afis")
-    InsertRecord(3, "fix", 180, 180, 180, "vepot", "afis")
-    let out = await SelectRecord(5)
-    DeleteRecord(5)
-    console.log(out)
-
-    setTimeout(() => console.log("timeout"), 5000)
-    CloseDatabase()
-}
-*/
-
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}  
 
 function get_window_coords(idx: number){
     let x: number
@@ -796,13 +784,16 @@ ipcMain.on("plane-info", (event, data) => {
 
 //update all planes on one second
 setInterval(() => {
-    if (PlaneDatabase != undefined && map_data != undefined && running){
-        PlaneDatabase.update_planes(scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]),
+    if (PlaneDatabase != undefined && map_data != undefined){
+        if (running){
+            PlaneDatabase.update_planes(scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]),
                                     parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
+        }
         //send updated plane database to all
+        console.log(PlaneDatabase)
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
     }
-}, backupdb_saving_frequency)
+}, 1000)
 
 setInterval(() => {
     //sending plane status every 500ms for backend
@@ -828,7 +819,7 @@ setInterval(() => {
         database_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict, null, 2)])
         EvLogger.log("DEBUG", ["Saving temporary backup...", "Saving temporary backup using database.ts"])
     }
-}, 1000)
+}, backupdb_saving_frequency)
 
 
 //when app dies, it should die in peace

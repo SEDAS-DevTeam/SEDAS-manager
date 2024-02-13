@@ -33,6 +33,7 @@ var coords = [0, 0]
 //simulation-based declarations
 var simulation_dict = {
     "planes": null,
+    "monitor-planes": null,
     "map": null,
     "monitor-data": null
 } //this dictionary is used for saving all necessary simulation data to database (used for recovery)
@@ -235,7 +236,8 @@ function exit_app(){
     app.exit(0)
 }
 
-function main_app(backup_plane_db: any = undefined, backup_workers: any = undefined){
+function main_app(backup_plane_db: any = undefined, backup_workers: any = undefined, 
+                    backup_plane_monitors: any = undefined, backup_map_data: any = undefined){
     mainMenu.close()
 
     //calculate x, y
@@ -283,13 +285,38 @@ function main_app(backup_plane_db: any = undefined, backup_workers: any = undefi
     worker.postMessage("start")
     worker.postMessage(["debug", app_settings["logging"]]) 
 
+    //set scale of map
+    scale = parse_scale(backup_map_data["scale"])
+
     //run local plane DB
     PlaneDatabase = new PlaneDB(workers);
     if (backup_plane_db){
-        PlaneDatabase.DB = backup_plane_db
+        curr_plane_id = 0 //reset planeID
+
+        for (let i = 0; i < backup_plane_db.length; i++){
+            //get monitor-type spawn
+            let monit_type: string;
+            for (let i2 = 0; i2 < backup_plane_monitors.length; i2++){
+                if (backup_plane_monitors[i2]["planes_id"].includes(curr_plane_id)){
+                    monit_type = backup_plane_monitors[i2]["type"]
+                    break
+                }
+            }
+
+            let plane = new Plane(curr_plane_id, backup_plane_db[i]["callsign"], 
+                    backup_plane_db[i]["heading"], backup_plane_db[i]["updated_heading"],
+                    backup_plane_db[i]["level"], backup_plane_db[i]["updated_level"],
+                    backup_plane_db[i]["speed"], backup_plane_db[i]["updated_speed"],
+                    backup_plane_db[i]["departure"], backup_plane_db[i]["arrival"], 
+                    backup_plane_db[i]["arrival_time"],
+                    backup_plane_db[i]["x"], backup_plane_db[i]["y"])
+
+            PlaneDatabase.add_record(plane, monit_type)
+            curr_plane_id += 1
+        }
 
         //send reloaded plane database to all windows
-        send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB) //TODO: not working
+        send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
     }
 }
 
@@ -445,10 +472,9 @@ database_worker.on("message", (message: string) => {
         switch(message[0]){
             case "db-data":
                 var database_data = JSON.parse(message[1])
-                
                 map_data = database_data["map"]
 
-                main_app(database_data["planes"], database_data["monitor-data"]) //start main app on backup restore
+                main_app(database_data["planes"], database_data["monitor-data"], database_data["monitor-planes"], map_data) //start main app on backup restore
                 break
         }
     }
@@ -688,6 +714,7 @@ ipcMain.handle("message", (event, data) => {
                 }
             }
             
+
             let plane = new Plane(curr_plane_id, plane_data["name"], 
                             plane_data["heading"], plane_data["heading"],
                             plane_data["level"], plane_data["level"],
@@ -811,6 +838,7 @@ setInterval(() => {
     if (backup_db_on && PlaneDatabase != undefined && map_data != undefined && workers.length != 0){
         simulation_dict = {
             "planes": PlaneDatabase.DB,
+            "monitor-planes": PlaneDatabase.monitor_DB,
             "map": map_data,
             "monitor-data": workers
         }

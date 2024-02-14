@@ -29,6 +29,7 @@ var backup_db_on: boolean = true
 var scale: number = 0;
 var running: boolean = false
 var coords = [0, 0]
+var map_name: string = ""
 
 //simulation-based declarations
 var simulation_dict = {
@@ -40,6 +41,7 @@ var simulation_dict = {
 
 const ABS_PATH = path.resolve("")
 const PATH_TO_AUDIO_UPDATE: string = path.join(ABS_PATH, "/src/res/neural/get_info.py")
+const PATH_TO_MAPS: string = path.join(ABS_PATH, "/src/res/maps/")
 
 /*
 APP INIT 1
@@ -285,8 +287,10 @@ function main_app(backup_plane_db: any = undefined, backup_workers: any = undefi
     worker.postMessage("start")
     worker.postMessage(["debug", app_settings["logging"]]) 
 
-    //set scale of map
-    scale = parse_scale(backup_map_data["scale"])
+    if (backup_map_data){
+        //set scale of map
+        scale = parse_scale(backup_map_data["scale"])
+    }
 
     //run local plane DB
     PlaneDatabase = new PlaneDB(workers);
@@ -317,6 +321,8 @@ function main_app(backup_plane_db: any = undefined, backup_workers: any = undefi
 
         //send reloaded plane database to all windows
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
+
+        controllerWindow.send_message("init-info", ["window-info", JSON.stringify(workers), map_config, JSON.stringify(app_settings), map_name])
     }
 }
 
@@ -560,7 +566,6 @@ ipcMain.handle("message", (event, data) => {
             }
             else if (data[0] == "controller"){
                 //sending monitor data
-                let worker_data_message = JSON.stringify(workers)
 
                 //sending airport map data
                 map_config = []
@@ -572,7 +577,7 @@ ipcMain.handle("message", (event, data) => {
                     }
                 }
 
-                controllerWindow.send_message("init-info", ["window-info", worker_data_message, map_config, JSON.stringify(app_settings)])
+                controllerWindow.send_message("init-info", ["window-info", JSON.stringify(workers), map_config, JSON.stringify(app_settings)])
             }
             else if (data[0] == "worker"){
                 //send to all workers
@@ -589,6 +594,9 @@ ipcMain.handle("message", (event, data) => {
             map_data = read_map.read_map_from_file(filename)
             //read scale, parse it and save it to another variable
             scale = parse_scale(map_data["scale"])
+            //save map name for other usage
+            let map_config_raw = fs.readFileSync(PATH_TO_MAPS + map_data["CONFIG"], "utf-8")
+            map_name = JSON.parse(map_config_raw)["AIRPORT_NAME"];
 
             //set map data to all workers
             for (let i = 0; i < workers.length; i++){
@@ -817,7 +825,6 @@ setInterval(() => {
                                     parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
         }
         //send updated plane database to all
-        console.log(PlaneDatabase)
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
     }
 }, 1000)

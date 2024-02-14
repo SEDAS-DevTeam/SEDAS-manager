@@ -506,6 +506,8 @@ function process_init_data(data, reset = false){
     //save app data
     APP_DATA = JSON.parse(data[3])
 
+    console.log(data)
+
     if (reset){
         //delete all monitors
         monitor_objects.forEach(elem => {

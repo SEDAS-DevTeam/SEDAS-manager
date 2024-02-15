@@ -37,6 +37,7 @@ var simulation_dict = {
     "planes": null,
     "monitor-planes": null,
     "map": null,
+    "map-name": "",
     "monitor-data": null
 } //this dictionary is used for saving all necessary simulation data to database (used for recovery)
 
@@ -241,8 +242,7 @@ function exit_app(){
     app.exit(0)
 }
 
-function main_app(backup_plane_db: any = undefined, backup_workers: any = undefined, 
-                    backup_plane_monitors: any = undefined, backup_map_data: any = undefined){
+function main_app(backup_db: any = undefined){
     mainMenu.close()
 
     //calculate x, y
@@ -258,10 +258,10 @@ function main_app(backup_plane_db: any = undefined, backup_workers: any = undefi
         }
         
         EvLogger.add_record("DEBUG", "worker show")
-        if (backup_workers){
+        if (backup_db){
             //backup was created, reload workers
-            workerWindow = new Window(worker_dict, backup_workers[i]["path_load"], backup_workers[i]["win_coordinates"], backup_workers[i]["win_type"])
-            workerWindow.isClosed = backup_workers[i]["isClosed"]
+            workerWindow = new Window(worker_dict, backup_db["monitor-data"][i]["path_load"], backup_db["monitor-data"][i]["win_coordinates"], backup_db["monitor-data"][i]["win_type"])
+            workerWindow.isClosed = backup_db["monitor-planes"][i]["isClosed"]
         }
         else{
             //backup was not created, create new workers
@@ -290,33 +290,35 @@ function main_app(backup_plane_db: any = undefined, backup_workers: any = undefi
     worker.postMessage("start")
     worker.postMessage(["debug", app_settings["logging"]]) 
 
-    if (backup_map_data){
+    if (backup_db){
         //set scale of map
-        scale = parse_scale(backup_map_data["scale"])
+        scale = parse_scale(backup_db["map"]["scale"])
+
+        map_name = backup_db["map-name"]
     }
 
     //run local plane DB
     PlaneDatabase = new PlaneDB(workers);
-    if (backup_plane_db){
+    if (backup_db){
         curr_plane_id = 0 //reset planeID
 
-        for (let i = 0; i < backup_plane_db.length; i++){
+        for (let i = 0; i < backup_db["planes"].length; i++){
             //get monitor-type spawn
             let monit_type: string;
-            for (let i2 = 0; i2 < backup_plane_monitors.length; i2++){
-                if (backup_plane_monitors[i2]["planes_id"].includes(curr_plane_id)){
-                    monit_type = backup_plane_monitors[i2]["type"]
+            for (let i2 = 0; i2 < backup_db["monitor-planes"].length; i2++){
+                if (backup_db["monitor-planes"][i2]["planes_id"].includes(curr_plane_id)){
+                    monit_type = backup_db["monitor-planes"][i2]["type"]
                     break
                 }
             }
 
-            let plane = new Plane(curr_plane_id, backup_plane_db[i]["callsign"], 
-                    backup_plane_db[i]["heading"], backup_plane_db[i]["updated_heading"],
-                    backup_plane_db[i]["level"], backup_plane_db[i]["updated_level"],
-                    backup_plane_db[i]["speed"], backup_plane_db[i]["updated_speed"],
-                    backup_plane_db[i]["departure"], backup_plane_db[i]["arrival"], 
-                    backup_plane_db[i]["arrival_time"],
-                    backup_plane_db[i]["x"], backup_plane_db[i]["y"])
+            let plane = new Plane(curr_plane_id, backup_db["planes"][i]["callsign"], 
+                    backup_db["planes"][i]["heading"], backup_db["planes"][i]["updated_heading"],
+                    backup_db["planes"][i]["level"], backup_db["planes"][i]["updated_level"],
+                    backup_db["planes"][i]["speed"], backup_db["planes"][i]["updated_speed"],
+                    backup_db["planes"][i]["departure"], backup_db["planes"][i]["arrival"], 
+                    backup_db["planes"][i]["arrival_time"],
+                    backup_db["planes"][i]["x"], backup_db["planes"][i]["y"])
 
             PlaneDatabase.add_record(plane, monit_type)
             curr_plane_id += 1
@@ -324,8 +326,7 @@ function main_app(backup_plane_db: any = undefined, backup_workers: any = undefi
 
         //send reloaded plane database to all windows
         send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
-
-        controllerWindow.send_message("init-info", ["window-info", JSON.stringify(workers), map_config, JSON.stringify(app_settings), map_name])
+        //controllerWindow.send_message("init-info", ["window-info", map_name, JSON.stringify(workers), map_config, JSON.stringify(app_settings)])
     }
 }
 
@@ -414,7 +415,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        //this.window.webContents.openDevTools()
+        this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -483,7 +484,7 @@ database_worker.on("message", (message: string) => {
                 var database_data = JSON.parse(message[1])
                 map_data = database_data["map"]
 
-                main_app(database_data["planes"], database_data["monitor-data"], database_data["monitor-planes"], map_data) //start main app on backup restore
+                main_app(database_data) //start main app on backup restore
                 break
         }
     }
@@ -580,7 +581,7 @@ ipcMain.handle("message", (event, data) => {
                     }
                 }
 
-                controllerWindow.send_message("init-info", ["window-info", JSON.stringify(workers), map_config, JSON.stringify(app_settings)])
+                controllerWindow.send_message("init-info", ["window-info", JSON.stringify(workers), map_config, JSON.stringify(app_settings), map_name])
             }
             else if (data[0] == "worker"){
                 //send to all workers
@@ -855,6 +856,7 @@ setInterval(() => {
                 "planes": PlaneDatabase.DB,
                 "monitor-planes": PlaneDatabase.monitor_DB,
                 "map": map_data,
+                "map-name": map_name,
                 "monitor-data": workers
             }
     

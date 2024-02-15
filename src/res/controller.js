@@ -505,8 +505,11 @@ function show_description(idx){
 function process_init_data(data, reset = false){
     //save app data
     APP_DATA = JSON.parse(data[3])
-
-    console.log(data)
+    let map_name = data[4]
+    if (map_name != undefined){
+        //loaded from backup, change map name
+        document.getElementById("confirmresult").innerHTML = map_name
+    }
 
     if (reset){
         //delete all monitors

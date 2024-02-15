@@ -30,6 +30,7 @@ var scale: number = 0;
 var running: boolean = false
 var coords = [0, 0]
 var map_name: string = ""
+var app_running: boolean = true
 
 //simulation-based declarations
 var simulation_dict = {
@@ -203,6 +204,8 @@ function get_window_coords(idx: number){
 }
 
 function exit_app(){
+    app_running = false; //stopping all Interval events from firing
+
     //disable voice recognition and ACAI backend
     EvLogger.add_record("DEBUG", "stopping voice-recognition")
     worker.postMessage("stop")
@@ -411,7 +414,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -824,35 +827,41 @@ setInterval(() => {
             PlaneDatabase.update_planes(scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]),
                                     parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
         }
-        //send updated plane database to all
-        send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
+        if (app_running){
+            //send updated plane database to all
+            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
+        }
     }
 }, 1000)
 
 setInterval(() => {
-    //sending plane status every 500ms for backend
-    if (PlaneDatabase == undefined){
-        worker.postMessage(["data", []]) //send empty array so the backend can still function without any problems
-    }
-    else{
-        worker.postMessage(["data", PlaneDatabase.DB])
+    if (app_running){
+        //sending plane status every 500ms for backend
+        if (PlaneDatabase == undefined){
+            worker.postMessage(["data", []]) //send empty array so the backend can still function without any problems
+        }
+        else{
+            worker.postMessage(["data", PlaneDatabase.DB])
+        }
     }
 }, 500)
 
 
 //on every n minutes, save to local DB if app crashes
 setInterval(() => {
-    if (backup_db_on && PlaneDatabase != undefined && map_data != undefined && workers.length != 0){
-        simulation_dict = {
-            "planes": PlaneDatabase.DB,
-            "monitor-planes": PlaneDatabase.monitor_DB,
-            "map": map_data,
-            "monitor-data": workers
+    if (app_running){
+        if (backup_db_on && PlaneDatabase != undefined && map_data != undefined && workers.length != 0){
+            simulation_dict = {
+                "planes": PlaneDatabase.DB,
+                "monitor-planes": PlaneDatabase.monitor_DB,
+                "map": map_data,
+                "monitor-data": workers
+            }
+    
+            //save to local db using database.ts 
+            database_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict, null, 2)])
+            EvLogger.log("DEBUG", ["Saving temporary backup...", "Saving temporary backup using database.ts"])
         }
-
-        //save to local db using database.ts 
-        database_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict, null, 2)])
-        EvLogger.log("DEBUG", ["Saving temporary backup...", "Saving temporary backup using database.ts"])
     }
 }, backupdb_saving_frequency)
 

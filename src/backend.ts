@@ -258,8 +258,6 @@ parentPort.on("message", async (message) => {
 
             parentPort.postMessage("debug: SIGINT for core.py")
 
-            delay(5000)
-
             core_process.kill("SIGINT") //killing core.py
 
             break

@@ -204,7 +204,7 @@ function get_window_coords(idx: number){
     return [x, y]
 }
 
-function exit_app(){
+async function exit_app(){
     app_running = false; //stopping all Interval events from firing
 
     //disable voice recognition and ACAI backend
@@ -214,6 +214,8 @@ function exit_app(){
     //kill voice recognition
     EvLogger.add_record("DEBUG", "killing core.py")
     worker.postMessage("interrupt")
+
+    await sleep(2000)
 
     //stop backend worker
     EvLogger.add_record("DEBUG", "terminating backend & database worker")
@@ -234,9 +236,6 @@ function exit_app(){
     //stop redis database
     EvLogger.add_record("DEBUG", "stopping redis database")
     database.kill("SIGINT")
-
-    //stop SQLite database
-    //BackupDatabase.close_database() //TODO
 
     EvLogger.add_record("DEBUG", "exit")
     app.exit(0)

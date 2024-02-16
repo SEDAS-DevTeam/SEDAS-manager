@@ -5,7 +5,7 @@ import os
 import sys
 
 #append all cache files to PATH
-sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), "cache"))
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from cache.voice_models import VOICE_MODEL_DICT
 from cache.text_models import TEXT_MODEL_DICT

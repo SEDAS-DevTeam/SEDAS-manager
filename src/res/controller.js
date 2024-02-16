@@ -506,10 +506,6 @@ function process_init_data(data, reset = false){
     //save app data
     APP_DATA = JSON.parse(data[3])
     let map_name = data[4]
-    if (map_name != undefined){
-        //loaded from backup, change map name
-        document.getElementById("confirmresult").innerHTML = map_name
-    }
 
     if (reset){
         //delete all monitors
@@ -551,6 +547,11 @@ function process_init_data(data, reset = false){
         }
     }
     else if (page.includes("controller_gen")){
+        if (map_name != undefined){
+            //loaded from backup, change map name
+            document.getElementById("confirmresult").innerHTML = map_name
+        }
+
         generate_airports_from_sources() //initial airport data generation from configs sent through IPC
 
         //add listeners to select buttons

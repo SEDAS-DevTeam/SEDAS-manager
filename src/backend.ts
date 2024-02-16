@@ -73,16 +73,6 @@ const client = createClient({
 })
 client.connect()
 
-//set default on start
-client.set("start", "false")
-client.set("terminate", "false") //used by core.py when terminating all threads
-client.set("gen-speech", "")
-client.set("proc-voice", "")
-client.set("out-voice", "")
-client.set("in-terrain", "")
-client.set("out-terrain", "")
-client.set("proc-voice-out", "")
-
 const PATH_TO_TERRAIN = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/generate_terrain.py"
 const PATH_TO_CORE = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/core.py"
 
@@ -92,6 +82,23 @@ setInterval(db_check, 1000)
 setInterval(debug_check, 100)
 
 const core_process = spawn("python3", [PATH_TO_CORE])
+
+// Event handlers for child process
+core_process.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+});
+
+core_process.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+});
+
+core_process.on('error', (err) => {
+    console.error('Error occurred:', err);
+});
+
+core_process.on('close', (code) => {
+    console.log(`Child process exited with code ${code}`);
+});
 
 function gen_random_nums(n: number): string{
     let nums: string[] = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]

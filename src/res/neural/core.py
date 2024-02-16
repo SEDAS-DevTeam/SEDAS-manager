@@ -27,6 +27,15 @@ if __name__ == "__main__":
     m_text_instance = TEXT_MODEL_DICT[app_settings["text_alg-skip"]](r_instance)
     m_speech_instance = SPEECH_MODEL_DICT[app_settings["speech_alg-skip"]](r_instance)
     
+    #set all channels to default
+    r_instance.set("start", "false")
+    r_instance.set("terminate", "false") #used by core.py when terminating all threads
+    r_instance.set("gen-speech", "")
+    r_instance.set("proc-voice", "")
+    r_instance.set("out-voice", "")
+    r_instance.set("in-terrain", "")
+    r_instance.set("out-terrain", "")
+    r_instance.set("proc-voice-out", "")
 
     thread_voice = threading.Thread(target=m_voice_instance.process)
     thread_text = threading.Thread(target=m_text_instance.process)

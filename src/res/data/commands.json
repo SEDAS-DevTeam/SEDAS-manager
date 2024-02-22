@@ -1,0 +1,19 @@
+{
+    "commands": [
+        {
+            "input": "<callsign>, fly heading <value>",
+            "output": "<callsign>, flying heading <value>",
+            "comm": "change-heading"
+        },
+        {
+            "input": "<callsign>, turn right heading <value>",
+            "output": "<callsign>, flying heading <value>",
+            "comm": "change-heading --right --<value>"
+        },
+        {
+            "input": "<callsign>, turn left heading <value>",
+            "output": "<callsign>, flying heading <value>",
+            "comm": "change-heading --left --<value>"
+        }
+    ]
+}

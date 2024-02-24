@@ -77,6 +77,12 @@
                 <select id="in_devices" name="in_devices" class="settings-elem skip">
                 </select>
                 <br>
+                <label for="backend">Skip backend initialization (for testing purposes)</label>
+                <select id="backend" name="backend" class="settings-elem">
+                    <option value="false">false</option>
+                    <option value="true">true</option>
+                </select>
+                <br>
                 <div class="set-header">
                     <h2>Simulation Settings</h2>
                     <hr>
@@ -103,6 +109,9 @@
                 <label for="speech_synth" name="speech_synth">speech synthesis algorithm</label>
                 <select id="speech_synth" name="speech_synth" class="settings-elem skip">
                 </select>
+                <br>
+                <label for="noise" name="noise">Add artificial noise to generated audio output</label>
+                <input type="checkbox" name="noise" id="noise" class="settings-elem">
                 <br>
     
                 <div class="set-header">

@@ -100,6 +100,7 @@ function save_settings(){
     let database_port = document.getElementById("port").value
     let audio_out_device = document.getElementById("out_devices").value
     let audio_in_device = document.getElementById("in_devices").value
+    let skip_backend_init = (document.getElementById("backend").value == "true")
 
     //simulation data
     let ai_aggression = document.getElementById("ai_aggression").value
@@ -107,6 +108,7 @@ function save_settings(){
     let voice_alg = document.getElementById("voice_recog").value
     let text_alg = document.getElementById("text_process").value
     let speech_alg = document.getElementById("speech_synth").value
+    let noise_addition = document.getElementById("noise").checked
 
     //plane data
     let bank_angle = document.getElementById("bank_angle").value
@@ -130,12 +132,14 @@ function save_settings(){
         "port": database_port,
         "out_device-skip": audio_out_device,
         "in_device-skip": audio_in_device,
+        "backend_init": skip_backend_init,
         //simulation data
         "ai_aggression": ai_aggression,
         "results": results,
         "voice_alg-skip": voice_alg, //-skip is for values that are skipped on initial loading
         "text_alg-skip": text_alg,
         "speech_alg-skip": speech_alg,
+        "noise": noise_addition,
         //plane data
         "std_bank_angle": bank_angle,
         "min_speed": min_speed,

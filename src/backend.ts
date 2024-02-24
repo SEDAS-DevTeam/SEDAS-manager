@@ -78,7 +78,7 @@ const PATH_TO_CORE = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC"
 
 client.on('error', err => console.log('Redis Client Error', err));
 
-setInterval(db_check, 1000)
+setInterval(db_check, 500)
 setInterval(debug_check, 100)
 
 const core_process = spawn("python3", [PATH_TO_CORE])

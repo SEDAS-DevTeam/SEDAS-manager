@@ -88,9 +88,11 @@ core_process.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
 });
 
-//core_process.stderr.on('data', (data) => {
-//    console.error(`stderr: ${data}`);
-//});
+/*
+core_process.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+});
+*/
 
 core_process.on('error', (err) => {
     console.error('Error occurred:', err);

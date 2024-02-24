@@ -1,0 +1,173 @@
+/*GENERIC*/
+
+html{
+    height: 100%;
+}
+
+body{
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+h1, h2, h3, p, a{
+    color: #5271ff;
+    font-family: 'Montserrat', sans-serif;
+}
+
+button{
+    display: inline-block;
+    background-color: white;
+    color: #5271ff;
+    border: solid 2px #5271ff;
+    text-align: center;
+    text-decoration: none;
+    font-size: 24px;
+    padding: 8px 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+}
+
+img{
+    pointer-events: none;
+}
+
+
+/* Add a black background color to the top navigation */
+.topnav {
+    background-color: #c9c9c9;
+    overflow: hidden;
+}
+  
+/* Style the links inside the navigation bar */
+.topnav a {
+    float: left;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    border: solid 2px #5271ff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+    background-color: #04AA6D;
+    color: white;
+}
+
+.leftalign{
+    float: left;
+}
+
+.rightalign{
+    float: right;
+}
+
+.inline-but{
+    margin-right: 15px;
+}
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+
+.tablebutton{
+    font-size: medium;
+    color: black;
+    border: solid 2px black;
+}
+
+/*
+Generic declarations
+*/
+#center{
+    text-align: center;
+}
+
+#center-overflow{
+    text-align: center;
+    overflow: hidden;
+}
+
+#main-header{
+    display: inline-block;
+}
+
+#main-header-button{
+    display: inline-block;
+}
+
+/*
+Canvases
+*/
+#canvas1{
+    position: absolute;
+    z-index: 0;
+}
+
+#canvas2{
+    position: absolute;
+    z-index: 1;
+}
+
+#canvas3{
+    position: absolute;
+    z-index: 2;
+}
+
+/*topnav for controller*/
+#controller-topnav {
+    background-color: white;
+    overflow: hidden;
+    border: solid 3px #5271ff;
+}
+
+#controller-topnav a.active {
+    background-color:rgb(218, 215, 215);
+    color: black;
+}
+
+.monitor-content {
+    position: absolute;
+    z-index: 10;
+    background-color: #f1f1f1;
+    border: 1px solid #d3d3d3;
+    text-align: center;
+}
+
+.monitor-header {
+    padding: 10px;
+    cursor: move;
+    z-index: 10;
+    background-color: #2196F3;
+    color: #fff;
+}
+
+div.selected{
+    background-color: #5271ff;
+}
+
+.div-indent{
+    margin-left: 20px; 
+    margin-right: 20px;
+}

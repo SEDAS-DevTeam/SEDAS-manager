@@ -109,7 +109,7 @@ const main_menu_dict = {
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
     webPreferences: {
-        preload: path.join(__dirname, "res/preload.js")
+        preload: path.join(__dirname, "res/scripts/preload.js")
     }
 }
 
@@ -120,7 +120,7 @@ const settings_dict = {
     resizable: true,
     icon: "./res/img/sedac-manager-logo.png",
     webPreferences: {
-        preload: path.join(__dirname, "res/preload.js")
+        preload: path.join(__dirname, "res/scripts/preload.js")
     }
 }
 
@@ -133,7 +133,7 @@ const controller_dict = {
     frame: true,
     //focusable: true,
     webPreferences: {
-        preload: path.join(__dirname, "res/preload.js")
+        preload: path.join(__dirname, "res/scripts/preload.js")
     }
 }
 
@@ -146,7 +146,7 @@ const worker_dict = {
     //frame: false,
     //focusable: false,
     webPreferences: {
-        preload: path.join(__dirname, "res/preload.js")
+        preload: path.join(__dirname, "res/scripts/preload.js")
     }
 }
 

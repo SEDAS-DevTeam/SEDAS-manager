@@ -1,0 +1,17 @@
+#wiki-block{
+    float: right;
+    width: 40%;
+    border-left: 2px solid black;
+    padding-left: 10px;
+    height: 95%;
+}
+
+.set-header h2{
+    margin-bottom: 0;
+}
+
+.set-header hr{
+    margin-bottom: 15px;
+    margin-right: 40px;
+    color: #5271ff;
+}

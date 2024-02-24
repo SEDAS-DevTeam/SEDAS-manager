@@ -1,5 +1,10 @@
 body{
     background-color: black;
+    margin: 0;
+
+    font-family: "Montserrat", sans-serif;
+    font-weight: 600;
+    font-style: normal;
 }
 
 h1, h2, h3, p, a{
@@ -13,7 +18,7 @@ table{
 
 td, th, tr{
     color: white;
-    border: 1px solid white;
+    border: 1px solid rgb(153, 153, 153);
     text-align: center;
     height: 50px;
     width: 25%;
@@ -25,10 +30,39 @@ td, th, tr{
 }
 
 .block{
-    width: 49%;
+    width: 50%;
     display: inline-block;
 }
 
+#b1{
+    float: left;
+}
+
+#b2{
+    float: right;
+}
+
+.t1{
+    border-right: 3px solid rgb(153, 153, 153);
+}
+
+.t2{
+    border-left: 3px solid rgb(153, 153, 153);
+}
+
+
 .aligner{
-    margin-left: 1%;
+    overflow: auto;
+}
+
+.header-indent{
+    margin-left: 10px;
+}
+
+td{
+    border-right: 1px solid black;
+}
+
+td:last-child{
+    border-right: 1px solid rgb(153, 153, 153);
 }

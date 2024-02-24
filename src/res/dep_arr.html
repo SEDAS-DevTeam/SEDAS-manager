@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+
+
         <link rel="stylesheet" href="styles/dep_arr.css">
         <meta charset="utf-8" />
         <script src="scripts/dep_arr.js"></script>
     </head>
     <body>
         <h1 id="top-time-header">Time: 00:00:00</h1>
-        <h1>Arrivals</h1>
         <div class="aligner">
-            <div class="block">
-                <table id="arrivals1">
+            <h1 class="header-indent">Arrivals</h1>
+            <div class="block" id="b1">
+                <table id="arrivals1" class="t1">
                     <tr>
                         <th>ETA</th>
                         <th>CALLSIGN</th>
@@ -55,8 +60,8 @@
                     </tr>
                 </table>
             </div>
-            <div class="block">
-                <table id="arrivals2">
+            <div class="block" id="b2">
+                <table id="arrivals2" class="t2">
                     <tr>
                         <th>ETA</th>
                         <th>CALLSIGN</th>
@@ -102,10 +107,10 @@
                 </table>
             </div>
         </div>
-        <h1>Departures</h1>
         <div class="aligner">
-            <div class="block">
-                <table id="departures1">
+            <h1 class="header-indent">Departures</h1>
+            <div class="block" id="b1">
+                <table id="departures1" class="t1">
                     <tr>
                         <th>ETA</th>
                         <th>CALLSIGN</th>
@@ -150,8 +155,8 @@
                     </tr>
                 </table>
             </div>
-            <div class="block">
-                <table id="departures2">
+            <div class="block" id="b2">
+                <table id="departures2" class="t2">
                     <tr>
                         <th>ETA</th>
                         <th>CALLSIGN</th>

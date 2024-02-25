@@ -23,8 +23,8 @@ dump.rdb
 /src/res/neural/cache/__pycache__/
 
 #cache files
-/src/res/neural/cache/*
-!/src/res/neural/cache/.gitkeep
+/src/res/neural/alg_cache/*
+!/src/res/neural/alg_cache/.gitkeep
 
 #fetched conf files
 /src/res/alg_data/*

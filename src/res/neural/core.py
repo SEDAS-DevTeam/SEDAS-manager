@@ -7,9 +7,9 @@ import sys
 #append all cache files to PATH
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from cache.voice_models import VOICE_MODEL_DICT
-from cache.text_models import TEXT_MODEL_DICT
-from cache.speech_models import SPEECH_MODEL_DICT
+from alg_cache.voice_models import VOICE_MODEL_DICT
+from alg_cache.text_models import TEXT_MODEL_DICT
+from alg_cache.speech_models import SPEECH_MODEL_DICT
 
 #variables
 thread_voice = None

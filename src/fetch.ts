@@ -2,7 +2,7 @@ import {get} from 'https'
 import { createWriteStream, unlinkSync, readdirSync, lstatSync } from 'fs'
 import {join} from "path"
 
-const PATH_TO_CACHE: string = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/cache"
+const PATH_TO_CACHE: string = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/alg_cache"
 const PATH_TO_CONFIG: string = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/alg_data"
 
 const URL: string = "https://raw.githubusercontent.com/HelloWorld7894/SEDAC-networks/main/src/"

@@ -88,11 +88,11 @@ core_process.stdout.on('data', (data) => {
     console.log(`stdout: ${data}`);
 });
 
-/*
+
 core_process.stderr.on('data', (data) => {
     console.error(`stderr: ${data}`);
 });
-*/
+
 
 core_process.on('error', (err) => {
     console.error('Error occurred:', err);
@@ -167,7 +167,7 @@ async function db_check(){
 
     //check if voice change
     if (value_voice != last_value_voice){
-        parentPort.postMessage(`debug: voice change, got: ${value_voice}`)
+        parentPort.postMessage(`debug: voice change, got ${value_voice}`)
 
         //process voice data
         client.set("proc-voice", value_voice)

@@ -4,7 +4,7 @@ import fs from "fs";
 import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
 import path from "path"
-import {lookup} from "dns"
+import http from "http"
 import * as read_map from "./read_map"
 import { Plane, PlaneDB } from "./plane_functions";
 import { update_all } from "./fetch";
@@ -64,17 +64,14 @@ const database = spawn("redis-server", ["--port",  app_settings["port"]])
 EvLogger.log("DEBUG", ["Initialized communication DB", `Initialized redis database on port ${app_settings["port"]}`])
 
 //check internet connectivity
-EvLogger.log("DEBUG", ["Internet connectivity check...", "Performing DNSLookup on google servers (8.8.8.8) for internet check"])
-lookup("8.8.8.8", (err) => {
-    if(err){
-        EvLogger.add_record("DEBUG", "Lookup unsuccessful")
-        EvLogger.add_record("ERROR", err.message)
-    }
-    else {
-        EvLogger.add_record("DEBUG", "Lookup successful, fetching algorithm files...")
-        //fetch all python backend files
-        update_all()
-    }
+EvLogger.log("DEBUG", ["Internet connectivity check...", "Performing HTTP GET on google servers for internet check"])
+http.get("http://www.google.com", (res) => {
+    EvLogger.add_record("DEBUG", "Lookup successful, fetching algorithm files...")
+    //fetch all python backend files
+    update_all()
+}).on("error", (err) => {
+    EvLogger.add_record("ERROR", "Lookup unsuccessful")
+    EvLogger.add_record("ERROR", err.message)
 })
 
 //update audio devices

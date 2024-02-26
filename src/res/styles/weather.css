@@ -35,3 +35,10 @@ h2.weather-text a{
 .weather-top button, .weather-top p{
     display: inline-block;
 }
+
+#info-label{
+    color: black;
+    font-weight: bolder;
+    font-size: 50px;
+    margin-left: 50px;
+}

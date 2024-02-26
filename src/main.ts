@@ -15,6 +15,7 @@ var mainMenu: Window;
 var settings: Window;
 var controllerWindow: Window;
 var workerWindow: Window;
+var exitWindow: Window;
 
 //other declarations
 var sender_win_name: string = "";
@@ -115,6 +116,17 @@ const settings_dict = {
     height: 1080,
     title: "SEDAC manager - settings",
     resizable: true,
+    icon: "./res/img/sedac-manager-logo.png",
+    webPreferences: {
+        preload: path.join(__dirname, "res/scripts/preload.js")
+    }
+}
+
+const exit_dict = {
+    width: 500,
+    height: 300,
+    title: "SEDAC manager - exit tray",
+    resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
     webPreferences: {
         preload: path.join(__dirname, "res/scripts/preload.js")
@@ -228,6 +240,10 @@ async function exit_app(){
         if (workers[i]){
             workers[i].close()
         }
+    }
+
+    if (exitWindow){
+        exitWindow.close()
     }
 
     //stop redis database
@@ -528,8 +544,12 @@ ipcMain.handle("message", (event, data) => {
             main_app()
             break
         case "exit":
+            //spawning info window
+            exitWindow = new Window(exit_dict, "./res/exit.html", coords)
+            exitWindow.show()
+
             EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got window-all-closed request, saving logs and quitting app..."])
-            controllerWindow.close()
+            exit_app()
 
         case "invoke":
             worker.postMessage(data[1][1])

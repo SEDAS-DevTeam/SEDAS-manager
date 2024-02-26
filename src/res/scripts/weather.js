@@ -205,4 +205,13 @@ window.electronAPI.on_message("geo-data", (data) => {
     if (!(data[0] == "none" && data[1] == "none")){
         map.setView([data[0], data[1]], data[2]);
     }
+    else{
+        //map has not location data
+
+        let info_text = document.createElement("h1")
+        info_text.id = "info-label"
+        info_text.innerHTML = "Current map does not support location data for weather services"
+
+        document.getElementById("mapid").appendChild(info_text)
+    }
 })

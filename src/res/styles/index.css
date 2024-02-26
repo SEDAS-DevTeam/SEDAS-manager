@@ -3,6 +3,11 @@
 /*imports*/
 @import url('../../../node_modules/@fortawesome/fontawesome-free/css/all.min.css'); 
 
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../fonts/Montserrat-VariableFont_wght.ttf')
+}
+
 html{
     height: 100%;
 }
@@ -16,6 +21,7 @@ body{
 h1, h2, h3, p, a{
     color: #5271ff;
     font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
 }
 
 button{

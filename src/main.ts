@@ -163,9 +163,11 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }  
 
-function get_window_coords(idx: number){
+function get_window_coords(idx: number, window_dict: any = undefined){
     let x: number
     let y: number
+
+    let last_display: any;
 
     if (app_settings["alignment"] == "free"){
         x = undefined
@@ -176,6 +178,13 @@ function get_window_coords(idx: number){
     if (displays.length == 1){
         x = displays[0].x
         y = displays[0].y
+
+        last_display = displays[0]
+
+        if (window_dict){
+            x = x + (last_display.width / 2) - (window_dict.width / 2)
+            y = y + (last_display.height / 2) - (window_dict.height / 2)
+        }
         return [x, y]
     }
 
@@ -183,10 +192,14 @@ function get_window_coords(idx: number){
         if (app_settings["controller-loc"] == "leftmost"){
             x = displays[0].x
             y = displays[0].y
+
+            last_display = displays[0]
         }
         else if (app_settings["controller-loc"] == "rightmost"){
             x = displays[displays.length - 1].x
             y = displays[displays.length - 1].y
+
+            last_display = displays[displays.length - 1]
         }
     }
     else{ //idx != -1: other worker windows
@@ -197,6 +210,8 @@ function get_window_coords(idx: number){
 
             x = displays[idx + 1].x
             y = displays[idx + 1].y
+
+            last_display = displays[idx + 1]
         }
         else if (app_settings["controller-loc"] == "rightmost"){
             if (displays.length == idx){
@@ -208,6 +223,14 @@ function get_window_coords(idx: number){
 
             x = displays[idx - 1].x
             y = displays[idx - 1].y
+
+            last_display = displays[idx - 1]
+        }
+
+        //align to center on some windows
+        if (window_dict){
+            x = x + (last_display.width / 2) - (window_dict.width / 2)
+            y = y + (last_display.height / 2) - (window_dict.height / 2)
         }
     }
     return [x, y]
@@ -450,7 +473,7 @@ app.on("ready", () => {
     displays = displays_mod
     
     //calculate x, y
-    let [x, y] = get_window_coords(-1)
+    let [x, y] = get_window_coords(-1, main_menu_dict)
 
     EvLogger.add_record("DEBUG", "main-menu show")
     mainMenu = new Window(main_menu_dict, "./res/main.html", [x, y])
@@ -545,6 +568,7 @@ ipcMain.handle("message", (event, data) => {
             break
         case "exit":
             //spawning info window
+            coords = get_window_coords(-1, exit_dict)
             exitWindow = new Window(exit_dict, "./res/exit.html", coords)
             exitWindow.show()
 

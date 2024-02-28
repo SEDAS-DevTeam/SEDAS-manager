@@ -1,5 +1,5 @@
 //system imports
-import {app, BrowserWindow, ipcMain, screen} from "electron";
+import {app, BrowserWindow, ipcMain, screen, Tray, nativeImage, Menu} from "electron";
 import fs from "fs";
 import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
@@ -32,6 +32,7 @@ var running: boolean = false
 var coords = [0, 0]
 var map_name: string = ""
 var app_running: boolean = true
+var tray: any;
 
 //simulation-based declarations
 var simulation_dict = {
@@ -128,6 +129,7 @@ const exit_dict = {
     title: "SEDAC manager - exit tray",
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
+    frame: false,
     webPreferences: {
         preload: path.join(__dirname, "res/scripts/preload.js")
     }
@@ -226,13 +228,13 @@ function get_window_coords(idx: number, window_dict: any = undefined){
 
             last_display = displays[idx - 1]
         }
-
-        //align to center on some windows
-        if (window_dict){
-            x = x + (last_display.width / 2) - (window_dict.width / 2)
-            y = y + (last_display.height / 2) - (window_dict.height / 2)
-        }
     }
+    //align to center on some windows
+    if (window_dict){
+        x = x + (last_display.width / 2) - (window_dict.width / 2)
+        y = y + (last_display.height / 2) - (window_dict.height / 2)
+    }
+
     return [x, y]
 }
 

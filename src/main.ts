@@ -480,6 +480,16 @@ app.on("ready", () => {
     EvLogger.add_record("DEBUG", "main-menu show")
     mainMenu = new Window(main_menu_dict, "./res/main.html", [x, y])
     mainMenu.show()
+
+    mainMenu.window.on("close", () => {
+        //spawning info window
+        coords = get_window_coords(-1, exit_dict)
+        exitWindow = new Window(exit_dict, "./res/exit.html", coords)
+        exitWindow.show()
+
+        EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got close-app request, saving logs and quitting app..."])
+        exit_app()
+    })
 })
 
 //worker listeners
@@ -908,10 +918,3 @@ setInterval(() => {
         }
     }
 }, backupdb_saving_frequency)
-
-
-//when app dies, it should die in peace
-app.on("window-all-closed", () => {
-    EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got window-all-closed request, saving logs and quitting app..."])
-    exit_app()
-})

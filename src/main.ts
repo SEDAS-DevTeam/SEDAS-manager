@@ -32,7 +32,7 @@ var running: boolean = false
 var coords = [0, 0]
 var map_name: string = ""
 var app_running: boolean = true
-var tray: any;
+var redir_to_main: boolean = false
 
 //simulation-based declarations
 var simulation_dict = {
@@ -452,7 +452,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -482,13 +482,15 @@ app.on("ready", () => {
     mainMenu.show()
 
     mainMenu.window.on("close", () => {
-        //spawning info window
-        coords = get_window_coords(-1, exit_dict)
-        exitWindow = new Window(exit_dict, "./res/exit.html", coords)
-        exitWindow.show()
+        if (!redir_to_main){
+            //spawning info window
+            coords = get_window_coords(-1, exit_dict)
+            exitWindow = new Window(exit_dict, "./res/exit.html", coords)
+            exitWindow.show()
 
-        EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got close-app request, saving logs and quitting app..."])
-        exit_app()
+            EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got close-app request, saving logs and quitting app..."])
+            exit_app();
+        }
     })
 })
 
@@ -542,6 +544,8 @@ ipcMain.handle("message", (event, data) => {
     switch(data[1][0]){
         //generic message channels
         case "redirect-to-menu":
+            redir_to_main = false
+
             //message call to redirect to main menu
             EvLogger.add_record("DEBUG", "redirect-to-menu event")
 
@@ -563,6 +567,8 @@ ipcMain.handle("message", (event, data) => {
             break
         case "redirect-to-settings":
             //message call to redirect to settings
+            redir_to_main = true
+
             EvLogger.add_record("DEBUG", "redirect-to-settings event")
 
             mainMenu.close()
@@ -576,6 +582,7 @@ ipcMain.handle("message", (event, data) => {
             break
         case "redirect-to-main":
             //message call to redirect to main program (start)
+            redir_to_main = true
             main_app()
             break
         case "exit":

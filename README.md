@@ -17,7 +17,7 @@ Application is made in `electron`, with the help of `sqlite3`, app also uses `py
 **ATC**
 See `/doc/sources/readme.md` for more information about **ATC sources i used**.
 
-## Installation
+## Installation:
 
 ### Windows
 TODO
@@ -38,3 +38,18 @@ If you want to contribute to the project, you can simply follow these commands.
 5. (optional) `npm run build` to build and package electron project for win and linux (MacOS not supported yet)
 
 NOTE: `npm run clear` to clear all build files
+
+# Wiki:
+SEDAS has its own wiki, all written in `markdown`
+
+[1. About SEDAS]()
+[2. functionalities]()
+[3. SEDAS window documentation]()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.1. Main menu]()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.1. Settings]()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2. Controller window]()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.1. Generation]()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.2. Monitors]()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.3. Simulation]()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.4. Worker window]()
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.5. Misc (Departure/Arrivals, Weather forecast, etc.)]()

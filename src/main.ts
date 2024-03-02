@@ -239,6 +239,11 @@ function get_window_coords(idx: number, window_dict: any = undefined){
 }
 
 async function exit_app(){
+    //spawning info window
+    coords = get_window_coords(-1, exit_dict)
+    exitWindow = new Window(exit_dict, "./res/exit.html", coords)
+    exitWindow.show()
+
     app_running = false; //stopping all Interval events from firing
 
     //disable voice recognition and ACAI backend
@@ -456,6 +461,15 @@ class Window{
 
         this.path_load = path
         this.window.maximize()
+        
+        if (path.includes("main")){
+            this.checkClose(() => {
+                if (!redir_to_main){
+                    EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got close-app request, saving logs and quitting app..."])
+                    exit_app();
+                }
+            })
+        }
 
         EvLogger.add_record("DEBUG", `Created window object(win_type=${this.win_type},path_load=${this.path_load}, coords=${coords})`)
     }
@@ -480,18 +494,6 @@ app.on("ready", () => {
     EvLogger.add_record("DEBUG", "main-menu show")
     mainMenu = new Window(main_menu_dict, "./res/main.html", [x, y])
     mainMenu.show()
-
-    mainMenu.window.on("close", () => {
-        if (!redir_to_main){
-            //spawning info window
-            coords = get_window_coords(-1, exit_dict)
-            exitWindow = new Window(exit_dict, "./res/exit.html", coords)
-            exitWindow.show()
-
-            EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got close-app request, saving logs and quitting app..."])
-            exit_app();
-        }
-    })
 })
 
 //worker listeners
@@ -545,6 +547,7 @@ ipcMain.handle("message", (event, data) => {
         //generic message channels
         case "redirect-to-menu":
             redir_to_main = false
+            console.log(redir_to_main)
 
             //message call to redirect to main menu
             EvLogger.add_record("DEBUG", "redirect-to-menu event")
@@ -552,7 +555,7 @@ ipcMain.handle("message", (event, data) => {
             settings.close()
 
             //calculate x, y
-            coords = get_window_coords(-1)
+            coords = get_window_coords(-1, main_menu_dict)
 
             EvLogger.add_record("DEBUG", "main-menu show")
             mainMenu = new Window(main_menu_dict, "./res/main.html", coords)
@@ -587,10 +590,6 @@ ipcMain.handle("message", (event, data) => {
             break
         case "exit":
             //spawning info window
-            coords = get_window_coords(-1, exit_dict)
-            exitWindow = new Window(exit_dict, "./res/exit.html", coords)
-            exitWindow.show()
-
             EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got window-all-closed request, saving logs and quitting app..."])
             exit_app()
 

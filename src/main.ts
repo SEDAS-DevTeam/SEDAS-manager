@@ -33,6 +33,11 @@ var coords = [0, 0]
 var map_name: string = ""
 var app_running: boolean = true
 var redir_to_main: boolean = false
+var EvLogger: EventLogger;
+var app_settings: any;
+var worker: Worker;
+var database_worker: Worker;
+var database: any;
 
 //simulation-based declarations
 var simulation_dict = {
@@ -43,62 +48,42 @@ var simulation_dict = {
     "monitor-data": null
 } //this dictionary is used for saving all necessary simulation data to database (used for recovery)
 
+/*
+APP INIT 1
+*/
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+
 const ABS_PATH = path.resolve("")
 const PATH_TO_AUDIO_UPDATE: string = path.join(ABS_PATH, "/src/res/neural/get_info.py")
 const PATH_TO_MAPS: string = path.join(ABS_PATH, "/src/res/maps/")
 
-/*
-APP INIT 1
-*/
-
 //read JSON
 const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/settings.json"), "utf-8")
-const app_settings = JSON.parse(app_settings_raw);
-
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
+app_settings = JSON.parse(app_settings_raw);
 
 //initialize EventLogger (first initialization to log other ones)
-const EvLogger = new EventLogger(app_settings["logging"]);
+EvLogger = new EventLogger(app_settings["logging"]);
 EvLogger.add_record("DEBUG", "APP-INIT 1")
 
 //run RedisDB
-const database = spawn("redis-server", ["--port",  app_settings["port"]])
+database = spawn("redis-server", ["--port",  app_settings["port"]])
 EvLogger.log("DEBUG", ["Initialized communication DB", `Initialized redis database on port ${app_settings["port"]}`])
 
 //check internet connectivity
 EvLogger.log("DEBUG", ["Internet connectivity check...", "Performing HTTP GET on google servers for internet check"])
-http.get("http://www.google.com", (res) => {
+http.get("http://www.google.com", async (res) => {
     EvLogger.add_record("DEBUG", "Lookup successful, fetching algorithm files...")
     //fetch all python backend files
-    update_all()
+    await update_all(EvLogger)
+    //sleep(2000)
 }).on("error", (err) => {
     EvLogger.add_record("ERROR", "Lookup unsuccessful")
     EvLogger.add_record("ERROR", err.message)
 })
 
-//update audio devices
-EvLogger.log("DEBUG", ["Updating audio devices...", "Updating audio device list using get_info.py"])
-const update_devices = spawn("python3", [PATH_TO_AUDIO_UPDATE])
-
-if (app_settings["saving_frequency"].includes("min")){
-    backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 60 * 1000
-}
-else if (app_settings["saving_frequency"].includes("hour")){
-    backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 3600 * 1000
-}
-else if (app_settings["saving_frequency"].includes("never")){
-    backup_db_on = false
-    //defaultly set to 5 mins
-    backupdb_saving_frequency = 5 * 60 * 1000
-}
-EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_saving_frequency / 1000} seconds`)
-
-//communication workers
-EvLogger.log("DEBUG", ["Deploying app backend", "Deploying backend.js as a worker, startting core.py"])
-
 //workers 
-const worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
-const database_worker = new Worker(path.join(ABS_PATH, "/src/database.js"))
+worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
+database_worker = new Worker(path.join(ABS_PATH, "/src/database.js"))
 EvLogger.log("DEBUG", ["Initialized BackupDB", "Initialized Sqlite3 database for backup"])
 
 const main_menu_dict = {
@@ -475,8 +460,30 @@ class Window{
     }
 }
 
-app.on("ready", () => {
-    EvLogger.log("DEBUG", ["App ready to show", "App ready to show"])
+app.on("ready", async () => {
+    /*
+    APP INIT 2
+    */
+
+    //update audio devices
+    EvLogger.log("DEBUG", ["Updating audio devices...", "Updating audio device list using get_info.py"])
+    const update_devices = spawn("python3", [PATH_TO_AUDIO_UPDATE])
+
+    if (app_settings["saving_frequency"].includes("min")){
+        backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 60 * 1000
+    }
+    else if (app_settings["saving_frequency"].includes("hour")){
+        backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 3600 * 1000
+    }
+    else if (app_settings["saving_frequency"].includes("never")){
+        backup_db_on = false
+        //defaultly set to 5 mins
+        backupdb_saving_frequency = 5 * 60 * 1000
+    }
+    EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_saving_frequency / 1000} seconds`)
+
+    //communication workers
+    EvLogger.log("DEBUG", ["Deploying app backend", "Deploying backend.js as a worker, startting core.py"])
 
     EvLogger.add_record("DEBUG", "Get display coords info for better window positioning")
     //get screen info

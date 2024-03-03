@@ -99,7 +99,7 @@ core_process.on('error', (err) => {
 });
 
 core_process.on('close', (code) => {
-    console.log(`Child process exited with code ${code}`);
+    parentPort.postMessage("debug: core.py process exited")
 });
 
 function gen_random_nums(n: number): string{

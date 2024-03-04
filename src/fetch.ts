@@ -44,7 +44,6 @@ export async function update_all(event_logger: any){
     /*
     fetching for source files
     */
-    event_logger.add_record("DEBUG", "Deleted cached files")
 
     //PlaneResponse
     await fetch_file_src("PlaneResponse", "voice_models.py")

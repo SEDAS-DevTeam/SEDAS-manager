@@ -65,17 +65,13 @@ app_settings = JSON.parse(app_settings_raw);
 EvLogger = new EventLogger(app_settings["logging"]);
 EvLogger.add_record("DEBUG", "APP-INIT 1")
 
-//run RedisDB
-database = spawn("redis-server", ["--port",  app_settings["port"]])
-EvLogger.log("DEBUG", ["Initialized communication DB", `Initialized redis database on port ${app_settings["port"]}`])
-
 //check internet connectivity
 EvLogger.log("DEBUG", ["Internet connectivity check...", "Performing HTTP GET on google servers for internet check"])
 http.get("http://www.google.com", async (res) => {
     EvLogger.add_record("DEBUG", "Lookup successful, fetching algorithm files...")
     //fetch all python backend files
-    await update_all(EvLogger)
-    //sleep(2000)
+    await update_all(EvLogger) //TODO is delayed on deploy (maybe solve by adding artificial time to it)
+    sleep(1000) //TODO
 }).on("error", (err) => {
     EvLogger.add_record("ERROR", "Lookup unsuccessful")
     EvLogger.add_record("ERROR", err.message)
@@ -233,11 +229,11 @@ async function exit_app(){
 
     //disable voice recognition and ACAI backend
     EvLogger.add_record("DEBUG", "stopping voice-recognition")
-    worker.postMessage("stop")
+    worker.postMessage(["action", "stop-neural"])
 
     //kill voice recognition
     EvLogger.add_record("DEBUG", "killing core.py")
-    worker.postMessage("interrupt")
+    worker.postMessage(["action", "interrupt"])
 
     await sleep(2000)
 
@@ -260,10 +256,6 @@ async function exit_app(){
     if (exitWindow){
         exitWindow.close()
     }
-
-    //stop redis database
-    EvLogger.add_record("DEBUG", "stopping redis database")
-    database.kill("SIGINT")
 
     EvLogger.add_record("DEBUG", "exit")
     app.exit(0)
@@ -314,7 +306,6 @@ function main_app(backup_db: any = undefined){
     })
 
     //setup voice recognition and ACAI backend
-    worker.postMessage("start")
     worker.postMessage(["debug", app_settings["logging"]]) 
 
     if (backup_db){
@@ -593,6 +584,7 @@ ipcMain.handle("message", (event, data) => {
         case "redirect-to-main":
             //message call to redirect to main program (start)
             redir_to_main = true
+            worker.postMessage(["action", "start-neural"])
             main_app()
             break
         case "exit":
@@ -601,6 +593,7 @@ ipcMain.handle("message", (event, data) => {
             exit_app()
 
         case "invoke":
+            //TODO: find out why I have this written here
             worker.postMessage(data[1][1])
             break
         //info retrival to Controller
@@ -858,7 +851,7 @@ ipcMain.handle("message", (event, data) => {
             controllerWindow.send_message("sim-event", "startsim")
             break
         case "regenerate-map":
-            worker.postMessage("terrain")
+            worker.postMessage(["action", "terrain"])
             break
         case "restore-sim":
             database_worker.postMessage(["read-db"])

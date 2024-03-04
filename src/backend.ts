@@ -1,6 +1,5 @@
 import {parentPort} from "worker_threads"
 import {spawn} from "node:child_process"
-import { createClient } from 'redis';
 import fs from "fs";
 import path from "path";
 
@@ -64,59 +63,6 @@ const NUMS = {
     "9": "niner"
 }
 
-//redis for communication
-const client = createClient({
-    socket: {
-        host: "127.0.0.1",
-        port: app_settings["port"]
-    }
-})
-client.connect()
-
-const PATH_TO_TERRAIN = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/generate_terrain.py"
-const PATH_TO_CORE = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/core.py"
-
-client.on('error', err => console.log('Redis Client Error', err));
-
-setInterval(db_check, 500)
-setInterval(debug_check, 100)
-
-const core_process = spawn("python3", [PATH_TO_CORE])
-
-// Event handlers for child process
-core_process.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-});
-
-
-core_process.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-});
-
-
-core_process.on('error', (err) => {
-    console.error('Error occurred:', err);
-});
-
-core_process.on('close', (code) => {
-    parentPort.postMessage("debug: core.py process exited")
-});
-
-function gen_random_nums(n: number): string{
-    let nums: string[] = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
-    let out = ""
-
-    for (let i = 0; i < n; i++){
-        let choice: number = Math.floor(Math.random() * nums.length)
-        out += nums[choice]
-    }
-    return out
-}
-
-function delay(ms: number) {
-    return new Promise( resolve => setTimeout(resolve, ms) );
-}
-
 function command_processor(command_text: string){
     let command_args = command_text.split(" ")
     let response: string = ""
@@ -152,81 +98,50 @@ function command_processor(command_text: string){
     return response
 }
 
-async function db_check(){
-    let value_voice: string = await client.get("out-voice")
-    let value_terrain: string = await client.get("out-terrain")
-    let value_command: string = await client.get("proc-voice-out")
+const PATH_TO_TERRAIN: string = path.join(ABS_PATH, "/src/res/neural/generate_terrain.py")
+const PATH_TO_CORE: string = path.join(ABS_PATH, "/src/res/neural/core.py")
 
-    if (value_terrain.length != 0){
-        //send to main loop
-        parentPort.postMessage(value_terrain)
-        parentPort.postMessage("debug: Generated terrain seed")
+const core_process = spawn("python3", [PATH_TO_CORE])
 
-        client.set("out-terrain", "") //reset to default value
-    }
 
-    //check if voice change
-    if (value_voice != last_value_voice){
-        parentPort.postMessage(`debug: voice change, got ${value_voice}`)
+// Event handlers for child process
+core_process.stdout.on('data', (data: string) => {
+    let value_command = data.split(":")[1];
 
-        //process voice data
-        client.set("proc-voice", value_voice)
-        parentPort.postMessage("debug: set voice for processing")
-
-        last_value_voice = value_voice
-    }
-
-    //check if command change
-    if (value_command != last_value_command){
-        //process command data & generate speech
-
-        if (current_query_timeout == QUERY_TIMEOUT){
-            value_command = last_value_command
-            parentPort.postMessage("debug: QUERY TIMEOUT")
-        }
-
-        if (current_query_timeout == 0){ //only once
-            parentPort.postMessage("debug: command change, processing command")
-        }
-
-        //check if plane exists
-        let exists: boolean = false
-        var callsign = value_command.split(" ")[0]
-        for (let i = 0; i < plane_data.length; i++){
-            if (plane_data[i].callsign == callsign){
-                exists = true
-                break
-            }
-        }
-        
-        if (exists){
-            var message: string = command_processor(value_command)
-            client.set("gen-speech", message)
-
-            parentPort.postMessage("command: " + value_command) //post to main process for updates
-            last_value_command = value_command
-        }
-        else{
-            current_query_timeout += 1
+    //check if plane exists
+    let exists: boolean = false
+    var callsign = value_command.split(" ")[0]
+    for (let i = 0; i < plane_data.length; i++){
+        if (plane_data[i].callsign == callsign){
+            exists = true
+            break
         }
     }
-}
+    
+    if (exists){
+        var message: string = command_processor(value_command)
+        //send message to generate speech
+        core_process.stdin.write(`data-for-speech: ${message}\n`)
 
-async function debug_check(){
-    let debug_core: string = await client.get("debug-core")
-    let debug_text: string = await client.get("debug-text-model")
-    let debug_speech: string = await client.get("debug-speech-model")
-    let debug_voice: string = await client.get("debug-voice-model")
-
-    let all_debug_messages: string[] = [debug_core, debug_text, debug_speech, debug_voice]
-    for (let i = 0; i < all_debug_messages.length; i++){
-        if (all_debug_messages[i] != null && all_debug_messages[i] != last_debug_messages[i]){
-            parentPort.postMessage("debug: " + all_debug_messages[i])
-            last_debug_messages[i] = all_debug_messages[i]
-        }
+        parentPort.postMessage("command: " + value_command) //post to main process for updates
     }
-}
 
+    console.log(`stdout: ${data}`);
+});
+
+
+core_process.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+});
+
+
+core_process.on('error', (err) => {
+    console.error('Error occurred:', err);
+});
+
+core_process.on('close', (code) => {
+    parentPort.postMessage("debug: core.py process exited")
+});
 
 parentPort.on("message", async (message) => {
     if (Array.isArray(message)){
@@ -235,40 +150,26 @@ parentPort.on("message", async (message) => {
             case "debug":
                 logging = message[1]
                 break
+            case "action":
+                switch(message[1]){
+                    case "start-neural":
+                        core_process.stdin.write('action: start-neural\n')
+                        break
+                    case "stop-neural":
+                        core_process.stdin.write('action: stop-neural\n')
+                        break
+                    case "terrain":
+                        console.log("terrain not working :(")
+                        break
+                    case "stop":
+                        break
+                    case "interrupt":
+                        parentPort.postMessage("debug: SIGINT for core.py")
+                }
             //data messages
-            default:
+            case "data":
                 plane_data = message[1]
                 break
         }
-    }
-
-    //command messages without args
-    switch(message){
-        case "start":
-            //going to start recognition
-            client.set("start", "true")
-            break
-        case "stop":
-            //going to stop recognition
-            client.set("start", "false")
-
-            //reset all values
-            client.set("out-voice", "test")
-            break
-        case "interrupt":
-            client.set("terminate", "true")
-
-            parentPort.postMessage("debug: SIGINT for core.py")
-
-            core_process.kill("SIGINT") //killing core.py
-
-            break
-        case "terrain":
-            //for test
-
-            let seed = gen_random_nums(16)
-            break
-        case "acai":
-            break
     }
 })

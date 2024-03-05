@@ -47,7 +47,7 @@ if __name__ == "__main__":
         # Backend to core.py communication
         #
         data_from_parent = sys.stdin.readline().rstrip().split()
-
+        
         if data_from_parent[0] == "action":
             if data_from_parent[1] == "start-neural":
                 thread_voice.start()
@@ -76,4 +76,4 @@ if __name__ == "__main__":
 
         if not queue_out_text.empty():
             data_from_text = queue_out_text.get()
-            sys.stdout.write(f"data: data_from_text")
+            sys.stdout.write(f"data: {data_from_text}")

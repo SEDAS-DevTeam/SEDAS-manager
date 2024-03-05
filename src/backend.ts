@@ -106,24 +106,31 @@ const core_process = spawn("python3", [PATH_TO_CORE])
 
 // Event handlers for child process
 core_process.stdout.on('data', (data: string) => {
-    let value_command = data.split(":")[1];
+    let value_command = data.split(":");
+    console.log(value_command)
+    switch(value_command[0]){
+        case "data":
+            //check if plane exists
+            let exists: boolean = false
+            var callsign = value_command[1].split(" ")[0]
+            for (let i = 0; i < plane_data.length; i++){
+                if (plane_data[i].callsign == callsign){
+                    exists = true
+                    break
+                }
+            }
+            
+            if (exists){
+                var message: string = command_processor(value_command[1])
+                //send message to generate speech
+                core_process.stdin.write(`data-for-speech: ${message}\n`)
 
-    //check if plane exists
-    let exists: boolean = false
-    var callsign = value_command.split(" ")[0]
-    for (let i = 0; i < plane_data.length; i++){
-        if (plane_data[i].callsign == callsign){
-            exists = true
+                parentPort.postMessage("command: " + value_command) //post to main process for updates
+            }
             break
-        }
-    }
-    
-    if (exists){
-        var message: string = command_processor(value_command)
-        //send message to generate speech
-        core_process.stdin.write(`data-for-speech: ${message}\n`)
-
-        parentPort.postMessage("command: " + value_command) //post to main process for updates
+        case "debug":
+            console.log(value_command[1])
+            break
     }
 
     console.log(`stdout: ${data}`);
@@ -153,6 +160,7 @@ parentPort.on("message", async (message) => {
             case "action":
                 switch(message[1]){
                     case "start-neural":
+                        console.log("start neural")
                         core_process.stdin.write('action: start-neural\n')
                         break
                     case "stop-neural":

@@ -41,19 +41,32 @@ if __name__ == "__main__":
     thread_speech = threading.Thread(target=m_speech_instance.process)
 
     sys.stdout.write("debug: Initialized all model threads")
+    sys.stdout.flush()
+
+    time.sleep(1) #wait until everything is flushed
 
     while True:
         #
         # Backend to core.py communication
         #
-        data_from_parent = sys.stdin.readline().rstrip().split()
-        
+        data_from_parent_str = sys.stdin.readline().rstrip()
+        data_from_parent = data_from_parent_str.split(":")
+
         if data_from_parent[0] == "action":
-            if data_from_parent[1] == "start-neural":
+
+            sys.stdout.write(data_from_parent[1].rstrip())
+            sys.stdout.flush()
+
+            time.sleep(1)
+
+            if "start-neural" in data_from_parent[1]:
                 thread_voice.start()
                 thread_text.start()
                 thread_speech.start()
-            elif data_from_parent[1] == "stop-neural":
+
+                sys.stdout.write("debug: started neural")
+                sys.stdout.flush()
+            elif "stop-neural" in data_from_parent[1]:
                 queue_in_voice.put("interrupt")
                 queue_in_text.put("interrupt")
                 queue_in_speech.put("interrupt")
@@ -64,6 +77,9 @@ if __name__ == "__main__":
                 thread_voice.join()
                 thread_voice.join()
                 thread_voice.join()
+
+                sys.stdout.write("debug: stopped neural")
+                sys.stdout.flush()
         elif data_from_parent[0] == "data-for-speech":
             queue_in_speech.put(data_from_parent[1])
 

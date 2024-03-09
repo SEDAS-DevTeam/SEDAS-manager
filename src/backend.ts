@@ -105,9 +105,10 @@ const core_process = spawn("python3", [PATH_TO_CORE])
 
 
 // Event handlers for child process
-core_process.stdout.on('data', (data: string) => {
-    let value_command = data.split(":");
-    console.log(value_command)
+core_process.stdout.on('data', (data: Buffer) => {
+    let data_str: string = data.toString()
+    let value_command = data_str.split(":");
+    console.log(data_str)
     switch(value_command[0]){
         case "data":
             //check if plane exists
@@ -132,8 +133,6 @@ core_process.stdout.on('data', (data: string) => {
             console.log(value_command[1])
             break
     }
-
-    console.log(`stdout: ${data}`);
 });
 
 
@@ -160,7 +159,6 @@ parentPort.on("message", async (message) => {
             case "action":
                 switch(message[1]){
                     case "start-neural":
-                        console.log("start neural")
                         core_process.stdin.write('action: start-neural\n')
                         break
                     case "stop-neural":

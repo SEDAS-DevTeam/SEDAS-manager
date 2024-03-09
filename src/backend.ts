@@ -108,9 +108,10 @@ const core_process = spawn("python3", [PATH_TO_CORE])
 core_process.stdout.on('data', (data: Buffer) => {
     let data_str: string = data.toString()
     let value_command = data_str.split(":");
-    console.log(data_str)
     switch(value_command[0]){
         case "data":
+            console.log(value_command[1])
+
             //check if plane exists
             let exists: boolean = false
             var callsign = value_command[1].split(" ")[0]

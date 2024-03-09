@@ -70,8 +70,8 @@ EvLogger.log("DEBUG", ["Internet connectivity check...", "Performing HTTP GET on
 http.get("http://www.google.com", async (res) => {
     EvLogger.add_record("DEBUG", "Lookup successful, fetching algorithm files...")
     //fetch all python backend files
-    //await update_all(EvLogger) //TODO is delayed on deploy (maybe solve by adding artificial time to it)
-    sleep(1000) //TODO
+    await update_all(EvLogger)
+    sleep(1000)
 }).on("error", (err) => {
     EvLogger.add_record("ERROR", "Lookup unsuccessful")
     EvLogger.add_record("ERROR", err.message)

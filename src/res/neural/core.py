@@ -31,10 +31,12 @@ if __name__ == "__main__":
     queue_out_text = queue.Queue()
     queue_out_speech = queue.Queue()
 
+    debug_queue = queue.Queue()
+
     #model selection
-    m_voice_instance = VOICE_MODEL_DICT[app_settings["voice_alg-skip"]](queue_in_voice, queue_out_voice)
-    m_text_instance = TEXT_MODEL_DICT[app_settings["text_alg-skip"]](queue_in_text, queue_out_text)
-    m_speech_instance = SPEECH_MODEL_DICT[app_settings["speech_alg-skip"]](queue_in_speech, queue_out_speech)
+    m_voice_instance = VOICE_MODEL_DICT[app_settings["voice_alg-skip"]](queue_in_voice, queue_out_voice, debug_queue)
+    m_text_instance = TEXT_MODEL_DICT[app_settings["text_alg-skip"]](queue_in_text, queue_out_text, debug_queue)
+    m_speech_instance = SPEECH_MODEL_DICT[app_settings["speech_alg-skip"]](queue_in_speech, queue_out_speech, debug_queue)
 
     thread_voice = threading.Thread(target=m_voice_instance.process)
     thread_text = threading.Thread(target=m_text_instance.process)
@@ -52,13 +54,13 @@ if __name__ == "__main__":
         data_from_parent_str = sys.stdin.readline().rstrip()
         data_from_parent = data_from_parent_str.split(":")
 
-        if data_from_parent[0] == "action":
-
-            sys.stdout.write(data_from_parent[1].rstrip())
+        #check debug messages
+        if not debug_queue.empty():
+            debug_message = debug_queue.get()
+            sys.stdout.write(f"debug: {debug_message}")
             sys.stdout.flush()
 
-            time.sleep(1)
-
+        if data_from_parent[0] == "action":
             if "start-neural" in data_from_parent[1]:
                 thread_voice.start()
                 thread_text.start()
@@ -70,9 +72,6 @@ if __name__ == "__main__":
                 queue_in_voice.put("interrupt")
                 queue_in_text.put("interrupt")
                 queue_in_speech.put("interrupt")
-
-                #timeout for threads to process
-                time.sleep(2)
 
                 thread_voice.join()
                 thread_voice.join()
@@ -86,7 +85,7 @@ if __name__ == "__main__":
         #
         # core.py to Voice/Speech/Text algorithms
         #
-        if not queue_in_voice.empty():
+        if not queue_out_voice.empty():
             data_from_voice = queue_out_voice.get()
             queue_in_text.put(data_from_voice)
 

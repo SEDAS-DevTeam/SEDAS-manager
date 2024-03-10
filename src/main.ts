@@ -70,7 +70,7 @@ EvLogger.log("DEBUG", ["Internet connectivity check...", "Performing HTTP GET on
 http.get("http://www.google.com", async (res) => {
     EvLogger.add_record("DEBUG", "Lookup successful, fetching algorithm files...")
     //fetch all python backend files
-    await update_all(EvLogger)
+    //await update_all(EvLogger)
     sleep(1000)
 }).on("error", (err) => {
     EvLogger.add_record("ERROR", "Lookup unsuccessful")

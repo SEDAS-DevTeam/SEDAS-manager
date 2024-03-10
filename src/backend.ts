@@ -1,9 +1,11 @@
 import {parentPort} from "worker_threads"
 import {spawn} from "node:child_process"
+import net from "net"
 import fs from "fs";
 import path from "path";
 
 const ABS_PATH = path.resolve("")
+const PORT = 36000
 
 const QUERY_TIMEOUT: number = 10
 
@@ -101,54 +103,50 @@ function command_processor(command_text: string){
 const PATH_TO_TERRAIN: string = path.join(ABS_PATH, "/src/res/neural/generate_terrain.py")
 const PATH_TO_CORE: string = path.join(ABS_PATH, "/src/res/neural/core.py")
 
-const core_process = spawn("python3", [PATH_TO_CORE])
+const core_server = net.createServer((socket) => {
+    console.log('Client connected');
 
-
-// Event handlers for child process
-core_process.stdout.on('data', (data: Buffer) => {
-    let data_str: string = data.toString()
-    let value_command = data_str.split(":");
-    switch(value_command[0]){
-        case "data":
-            console.log(value_command[1])
-
-            //check if plane exists
-            let exists: boolean = false
-            var callsign = value_command[1].split(" ")[0]
-            for (let i = 0; i < plane_data.length; i++){
-                if (plane_data[i].callsign == callsign){
-                    exists = true
-                    break
+    // Handle data received from the client
+    socket.on('data', (data: Buffer) => {
+        let data_str: string = data.toString()
+        console.log(data_str)
+    
+        let value_command = data_str.split(":");
+        switch(value_command[0]){
+            case "data":
+                console.log(value_command[1])
+    
+                //check if plane exists
+                let exists: boolean = false
+                var callsign = value_command[1].split(" ")[0]
+                for (let i = 0; i < plane_data.length; i++){
+                    if (plane_data[i].callsign == callsign){
+                        exists = true
+                        break
+                    }
                 }
-            }
-            
-            if (exists){
-                var message: string = command_processor(value_command[1])
-                //send message to generate speech
-                core_process.stdin.write(`data-for-speech: ${message}\n`)
+                
+                if (exists){
+                    var message: string = command_processor(value_command[1])
+                    //send message to generate speech
+                    socket.write(`data-for-speech: ${message}\n`)
+    
+                    parentPort.postMessage("command: " + value_command) //post to main process for updates
+                }
+                break
+            case "debug":
+                console.log(value_command[1])
+                break
+        }
+    });
 
-                parentPort.postMessage("command: " + value_command) //post to main process for updates
-            }
-            break
-        case "debug":
-            console.log(value_command[1])
-            break
-    }
+    // Handle client disconnect
+    socket.on('end', () => {
+        console.log('Client disconnected');
+    });
 });
 
-
-core_process.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
-});
-
-
-core_process.on('error', (err) => {
-    console.error('Error occurred:', err);
-});
-
-core_process.on('close', (code) => {
-    parentPort.postMessage("debug: core.py process exited")
-});
+const core_process = spawn("python3", [PATH_TO_CORE])
 
 parentPort.on("message", async (message) => {
     if (Array.isArray(message)){
@@ -160,10 +158,10 @@ parentPort.on("message", async (message) => {
             case "action":
                 switch(message[1]){
                     case "start-neural":
-                        core_process.stdin.write('action: start-neural\n')
+                        core_server.emit('action: start-neural\n')
                         break
                     case "stop-neural":
-                        core_process.stdin.write('action: stop-neural\n')
+                        core_process.emit('action: stop-neural\n')
                         break
                     case "terrain":
                         console.log("terrain not working :(")
@@ -180,3 +178,7 @@ parentPort.on("message", async (message) => {
         }
     }
 })
+
+core_server.listen(PORT, '127.0.0.1', () => {
+    console.log('Server listening on 127.0.0.1');
+});

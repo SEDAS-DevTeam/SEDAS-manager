@@ -4,6 +4,7 @@ import os
 import sys
 import queue
 import time
+import socket
 
 #append all cache files to PATH
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -16,11 +17,16 @@ from alg_cache.speech_models import SPEECH_MODEL_DICT
 thread_voice = None
 thread_text = None
 thread_speech = None
+PORT = 36000
 
 if __name__ == "__main__":
     app_settings_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/data/settings.json")
     app_settings_raw = open(app_settings_path)
     app_settings = json.load(app_settings_raw)
+
+    #initialize socket server
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    host = "127.0.0.1"
 
     #initialize queues
     queue_in_voice = queue.Queue()
@@ -33,6 +39,9 @@ if __name__ == "__main__":
 
     debug_queue = queue.Queue()
 
+    #connect
+    client_socket.connect((host, PORT))
+
     #model selection
     m_voice_instance = VOICE_MODEL_DICT[app_settings["voice_alg-skip"]](queue_in_voice, queue_out_voice, debug_queue)
     m_text_instance = TEXT_MODEL_DICT[app_settings["text_alg-skip"]](queue_in_text, queue_out_text, debug_queue)
@@ -42,23 +51,36 @@ if __name__ == "__main__":
     thread_text = threading.Thread(target=m_text_instance.process)
     thread_speech = threading.Thread(target=m_speech_instance.process)
 
-    sys.stdout.write("debug: Initialized all model threads")
-    sys.stdout.flush()
+    client_socket.sendall(b"debug: Initialized all model threads")
 
-    time.sleep(1) #wait until everything is flushed
+    # Clean up
+    client_socket.close()
 
     while True:
         #
         # Backend to core.py communication
         #
-        data_from_parent_str = sys.stdin.readline().rstrip()
+        data_from_parent_str = client_socket.recv(1024)
         data_from_parent = data_from_parent_str.split(":")
 
         #check debug messages
         if not debug_queue.empty():
             debug_message = debug_queue.get()
-            sys.stdout.write(f"debug: {debug_message}")
-            sys.stdout.flush()
+            client_socket.sendall(f"debug: {debug_message}".encode())
+
+        #
+        # core.py to Voice/Speech/Text algorithms
+        #
+        if not queue_out_voice.empty():
+            data_from_voice = queue_out_voice.get()
+            client_socket.sendall(f"debug: {data_from_voice}".encode())
+            
+            #queue_in_text.put(data_from_voice)
+            queue_in_speech.put(f"input: {data_from_voice}")
+
+        if not queue_out_text.empty():
+            data_from_text = queue_out_text.get()
+            client_socket.sendall(f"data: {data_from_text}".encode())
 
         if data_from_parent[0] == "action":
             if "start-neural" in data_from_parent[1]:
@@ -66,8 +88,7 @@ if __name__ == "__main__":
                 thread_text.start()
                 thread_speech.start()
 
-                sys.stdout.write("debug: started neural")
-                sys.stdout.flush()
+                client_socket.sendall(b"debug: started neural")
             elif "stop-neural" in data_from_parent[1]:
                 queue_in_voice.put("interrupt")
                 queue_in_text.put("interrupt")
@@ -77,18 +98,6 @@ if __name__ == "__main__":
                 thread_voice.join()
                 thread_voice.join()
 
-                sys.stdout.write("debug: stopped neural")
-                sys.stdout.flush()
+                client_socket.close()
         elif data_from_parent[0] == "data-for-speech":
             queue_in_speech.put(data_from_parent[1])
-
-        #
-        # core.py to Voice/Speech/Text algorithms
-        #
-        if not queue_out_voice.empty():
-            data_from_voice = queue_out_voice.get()
-            queue_in_text.put(data_from_voice)
-
-        if not queue_out_text.empty():
-            data_from_text = queue_out_text.get()
-            sys.stdout.write(f"data: {data_from_text}")

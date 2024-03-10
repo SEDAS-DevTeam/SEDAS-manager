@@ -140,44 +140,44 @@ const core_server = net.createServer((socket) => {
         }
     });
 
+    parentPort.on("message", async (message) => {
+        if (Array.isArray(message)){
+            switch(message[0]){
+                //command messages with args
+                case "debug":
+                    logging = message[1]
+                    break
+                case "action":
+                    switch(message[1]){
+                        case "start-neural":
+                            socket.write('action: start-neural\n')
+                            break
+                        case "stop-neural":
+                            socket.write('action: stop-neural\n')
+                            break
+                        case "terrain":
+                            console.log("terrain not working :(")
+                            break
+                        case "stop":
+                            break
+                        case "interrupt":
+                            parentPort.postMessage("debug: SIGINT for core.py")
+                    }
+                //data messages
+                case "data":
+                    plane_data = message[1]
+                    break
+            }
+        }
+    })
+
     // Handle client disconnect
     socket.on('end', () => {
         console.log('Client disconnected');
     });
 });
 
-const core_process = spawn("python3", [PATH_TO_CORE])
-
-parentPort.on("message", async (message) => {
-    if (Array.isArray(message)){
-        switch(message[0]){
-            //command messages with args
-            case "debug":
-                logging = message[1]
-                break
-            case "action":
-                switch(message[1]){
-                    case "start-neural":
-                        core_server.emit('action: start-neural\n')
-                        break
-                    case "stop-neural":
-                        core_process.emit('action: stop-neural\n')
-                        break
-                    case "terrain":
-                        console.log("terrain not working :(")
-                        break
-                    case "stop":
-                        break
-                    case "interrupt":
-                        parentPort.postMessage("debug: SIGINT for core.py")
-                }
-            //data messages
-            case "data":
-                plane_data = message[1]
-                break
-        }
-    }
-})
+//const core_process = spawn("python3", [PATH_TO_CORE])
 
 core_server.listen(PORT, '127.0.0.1', () => {
     console.log('Server listening on 127.0.0.1');

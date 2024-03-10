@@ -53,14 +53,11 @@ if __name__ == "__main__":
 
     client_socket.sendall(b"debug: Initialized all model threads")
 
-    # Clean up
-    client_socket.close()
-
     while True:
         #
         # Backend to core.py communication
         #
-        data_from_parent_str = client_socket.recv(1024)
+        data_from_parent_str = client_socket.recv(1024).decode()
         data_from_parent = data_from_parent_str.split(":")
 
         #check debug messages

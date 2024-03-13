@@ -23,6 +23,7 @@ threads_active = True
 
 def check_server(client_socket):
     while True:
+        global threads_active
         #
         # Backend to core.py communication
         #
@@ -100,8 +101,7 @@ if __name__ == "__main__":
             data_from_voice = queue_out_voice.pop(0)
             client_socket.sendall(f"debug: {data_from_voice}".encode())
             
-            #queue_in_text.put(data_from_voice)
-            queue_in_speech.append(f"input: {data_from_voice}")
+            queue_in_text.put(f"input: {data_from_voice}")
 
         if len(queue_out_text) != 0:
             data_from_text = queue_out_text.pop(0)

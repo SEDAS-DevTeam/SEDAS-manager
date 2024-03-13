@@ -468,9 +468,10 @@ app.on("ready", async () => {
     }
     else if (app_settings["saving_frequency"].includes("never")){
         backup_db_on = false
-        //defaultly set to 5 mins
+        //by default set to 5 mins
         backupdb_saving_frequency = 5 * 60 * 1000
     }
+
     EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_saving_frequency / 1000} seconds`)
 
     //communication workers
@@ -874,11 +875,6 @@ ipcMain.on("message-redirect", (event, data) => {
     }
 })
 
-//channel for sending created plane data
-ipcMain.on("plane-info", (event, data) => {
-})
-
-
 //update all planes on one second
 setInterval(() => {
     if (PlaneDatabase != undefined && map_data != undefined){
@@ -903,13 +899,12 @@ setInterval(() => {
             worker.postMessage(["data", PlaneDatabase.DB])
         }
     }
-}, 500)
-
+}, 1000)
 
 //on every n minutes, save to local DB if app crashes
 setInterval(() => {
     if (app_running){
-        if (backup_db_on && PlaneDatabase != undefined && map_data != undefined && workers.length != 0){
+        if (backup_db_on && (PlaneDatabase != undefined) && (map_data != undefined) && (workers.length != 0)){
             simulation_dict = {
                 "planes": PlaneDatabase.DB,
                 "monitor-planes": PlaneDatabase.monitor_DB,

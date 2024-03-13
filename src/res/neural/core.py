@@ -19,6 +19,39 @@ thread_text = None
 thread_speech = None
 PORT = 36000
 
+threads_active = True
+
+def check_server(client_socket):
+    while True:
+        #
+        # Backend to core.py communication
+        #
+        data_from_parent_str = client_socket.recv(1024).decode()
+        data_from_parent = data_from_parent_str.split(":")
+
+        #check debug messages
+        if len(debug_queue) != 0:
+            debug_message = debug_queue.pop(0)
+            client_socket.sendall(f"debug: {debug_message}".encode())
+
+        if data_from_parent[0] == "action":
+            if "start-neural" in data_from_parent[1]:
+                thread_voice.start()
+                thread_text.start()
+                thread_speech.start()
+
+                client_socket.sendall(b"debug: started neural")
+            elif "stop-neural" in data_from_parent[1]:
+                queue_in_voice.append("interrupt")
+                queue_in_text.append("interrupt")
+                queue_in_speech.append("interrupt")
+
+                threads_active = False
+
+                client_socket.close()
+        elif data_from_parent[0] == "data-for-speech":
+            queue_in_speech.append(data_from_parent[1])
+
 if __name__ == "__main__":
     app_settings_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/data/settings.json")
     app_settings_raw = open(app_settings_path)
@@ -29,18 +62,22 @@ if __name__ == "__main__":
     host = "127.0.0.1"
 
     #initialize queues
-    queue_in_voice = queue.Queue()
-    queue_in_text = queue.Queue()
-    queue_in_speech = queue.Queue()
+    queue_in_voice = []
+    queue_in_text = []
+    queue_in_speech = []
 
-    queue_out_voice = queue.Queue()
-    queue_out_text = queue.Queue()
-    queue_out_speech = queue.Queue()
+    queue_out_voice = []
+    queue_out_text = []
+    queue_out_speech = []
 
-    debug_queue = queue.Queue()
+    debug_queue = []
 
     #connect
     client_socket.connect((host, PORT))
+
+    #start a thread that checks for input/output from parent
+    server_checker = threading.Thread(target=check_server, args=(client_socket, ))
+    server_checker.start()
 
     #model selection
     m_voice_instance = VOICE_MODEL_DICT[app_settings["voice_alg-skip"]](queue_in_voice, queue_out_voice, debug_queue)
@@ -53,48 +90,26 @@ if __name__ == "__main__":
 
     client_socket.sendall(b"debug: Initialized all model threads")
 
-    while True:
-        #
-        # Backend to core.py communication
-        #
-        data_from_parent_str = client_socket.recv(1024).decode()
-        data_from_parent = data_from_parent_str.split(":")
-
-        #check debug messages
-        if not debug_queue.empty():
-            debug_message = debug_queue.get()
-            client_socket.sendall(f"debug: {debug_message}".encode())
+    while threads_active:
 
         #
         # core.py to Voice/Speech/Text algorithms
         #
-        if not queue_out_voice.empty():
-            data_from_voice = queue_out_voice.get()
+        if len(queue_out_voice) != 0:
+            print("test")
+            data_from_voice = queue_out_voice.pop(0)
             client_socket.sendall(f"debug: {data_from_voice}".encode())
             
             #queue_in_text.put(data_from_voice)
-            queue_in_speech.put(f"input: {data_from_voice}")
+            queue_in_speech.append(f"input: {data_from_voice}")
 
-        if not queue_out_text.empty():
-            data_from_text = queue_out_text.get()
+        if len(queue_out_text) != 0:
+            data_from_text = queue_out_text.pop(0)
             client_socket.sendall(f"data: {data_from_text}".encode())
 
-        if data_from_parent[0] == "action":
-            if "start-neural" in data_from_parent[1]:
-                thread_voice.start()
-                thread_text.start()
-                thread_speech.start()
+thread_voice.join()
+thread_voice.join()
+thread_voice.join()
+server_checker.join()
 
-                client_socket.sendall(b"debug: started neural")
-            elif "stop-neural" in data_from_parent[1]:
-                queue_in_voice.put("interrupt")
-                queue_in_text.put("interrupt")
-                queue_in_speech.put("interrupt")
-
-                thread_voice.join()
-                thread_voice.join()
-                thread_voice.join()
-
-                client_socket.close()
-        elif data_from_parent[0] == "data-for-speech":
-            queue_in_speech.put(data_from_parent[1])
+client_socket.close()

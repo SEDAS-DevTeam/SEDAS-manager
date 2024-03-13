@@ -162,6 +162,7 @@ const core_server = net.createServer((socket) => {
                             break
                         case "interrupt":
                             parentPort.postMessage("debug: SIGINT for core.py")
+                            core_process.kill()
                     }
                 //data messages
                 case "data":
@@ -177,7 +178,7 @@ const core_server = net.createServer((socket) => {
     });
 });
 
-//const core_process = spawn("python3", [PATH_TO_CORE])
+const core_process = spawn("python3", [PATH_TO_CORE])
 
 core_server.listen(PORT, '127.0.0.1', () => {
     console.log('Server listening on 127.0.0.1');

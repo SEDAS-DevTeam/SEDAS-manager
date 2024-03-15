@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="styles/index.css">
+        <link rel="stylesheet" href="styles/plugins.css">
+        
+        <meta charset="utf-8" />
+        <script src="scripts/controller.js"></script>
+    </head>
+    <body style="margin-left: 20px; margin-right: 20px;" id="scrollable">
+        <div id="top-content">
+            <div>
+                <h1 id="main-header">SEDAC manager Controller</h1>
+                <button id="main-header-button">Exit</button>
+            </div>
+            <hr>
+            <div class="topnav" id="controller-topnav">
+                <a href="controller_gen.html">Generation</a>
+                <a href="controller_mon.html">Monitors</a>
+                <a href="controller_sim.html">Simulation</a>
+                <a href="plugins.html" class="active">Plugins</a>
+                <a href="wiki.html">wiki</a>
+            </div>
+        </div>
+        <div class="div-indent">
+            <h2>Plugins repository</h2>
+            <hr>
+            
+            <div>
+                <p class="">Refresh plugins tab</p><i class="fa fa-refresh" aria-hidden="true"></i>
+            </div>
+            <table id="plugins-tab">
+                <tr>
+                    <th>Plugin</th>
+                    <th>Version</th>
+                    <th>Last updated</th>
+                    <th>
+                        <form><input type="text" placeholder="Search.." name="search"></form>
+                    </th>
+                </tr>
+                <tr>
+                    <td>SEDAC MapBuilder</td>
+                    <td>ver 1.0.0</td>
+                    <td>Last week</td>
+                    <td><button class="indicator-but" id="installed">Installed</button></td>
+                </tr>
+                <tr>
+                    <td>Lorem Ipsum</td>
+                    <td>ver 1.0.0</td>
+                    <td>Last year</td>
+                    <td><button class="indicator-but" id="not-installed">Install</button></td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>

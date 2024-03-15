@@ -1,0 +1,23 @@
+#plugins-tab{
+    border-collapse:separate;
+    border:solid gray 1px;
+    border-radius:6px;
+}
+
+.indicator-but{
+    border-radius: 5px;
+    font-size: smaller;
+    padding: 5px 15px;
+}
+
+.indicator-but#not-installed{
+    background-color: white;
+    color: black;
+    border-color: black;
+}
+
+.indicator-but#installed{
+    background-color: rgb(216, 216, 216);
+    color: rgb(133, 133, 133);
+    border-color: rgb(133, 133, 133);
+}

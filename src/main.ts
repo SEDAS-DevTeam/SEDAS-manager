@@ -37,7 +37,7 @@ var EvLogger: EventLogger;
 var app_settings: any;
 var worker: Worker;
 var database_worker: Worker;
-var database: any;
+var turn_on_backend: boolean = true;
 
 //simulation-based declarations
 var simulation_dict = {
@@ -77,8 +77,15 @@ http.get("http://www.google.com", async (res) => {
     EvLogger.add_record("ERROR", err.message)
 })
 
-//workers 
-worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
+//workers
+if (app_settings["backend_init"]){
+    worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
+    EvLogger.log("DEBUG", ["Starting BackendWorker because flag backend_init=true", "Starting Backend because flag backend_init is=true"])
+}
+else{
+    turn_on_backend = false
+    EvLogger.log("DEBUG", ["Not starting BackendWorker because flag backend_init=false", "Starting Backend because flag backend_init=false"])
+}
 database_worker = new Worker(path.join(ABS_PATH, "/src/database.js"))
 EvLogger.log("DEBUG", ["Initialized BackupDB", "Initialized Sqlite3 database for backup"])
 
@@ -227,19 +234,22 @@ async function exit_app(){
 
     app_running = false; //stopping all Interval events from firing
 
-    //disable voice recognition and ACAI backend
-    EvLogger.add_record("DEBUG", "stopping voice-recognition")
-    worker.postMessage(["action", "stop-neural"])
+    if (turn_on_backend){
+        //disable voice recognition and ACAI backend
+        EvLogger.add_record("DEBUG", "stopping voice-recognition")
+        worker.postMessage(["action", "stop-neural"])
 
-    //kill voice recognition
-    EvLogger.add_record("DEBUG", "killing core.py")
-    worker.postMessage(["action", "interrupt"])
+        //kill voice recognition
+        EvLogger.add_record("DEBUG", "killing core.py")
+        worker.postMessage(["action", "interrupt"])
 
-    await sleep(2000)
+        await sleep(2000)
 
-    //stop backend worker
-    EvLogger.add_record("DEBUG", "terminating backend & database worker")
-    worker.terminate()
+        //stop backend worker
+        EvLogger.add_record("DEBUG", "terminating backend worker")
+        worker.terminate()
+    }
+    EvLogger.add_record("DEBUG", "terminating database worker")
     database_worker.terminate()
     
     //close windows
@@ -305,8 +315,10 @@ function main_app(backup_db: any = undefined){
         exit_app()
     })
 
-    //setup voice recognition and ACAI backend
-    worker.postMessage(["debug", app_settings["logging"]]) 
+    if (turn_on_backend){
+        //setup voice recognition and ACAI backend
+        worker.postMessage(["debug", app_settings["logging"]]) 
+    }
 
     if (backup_db){
         //set scale of map
@@ -433,7 +445,7 @@ class Window{
 
         this.window = new BrowserWindow(config);
         this.window.setMenu(null);
-        //this.window.webContents.openDevTools()
+        this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -474,9 +486,6 @@ app.on("ready", async () => {
 
     EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_saving_frequency / 1000} seconds`)
 
-    //communication workers
-    EvLogger.log("DEBUG", ["Deploying app backend", "Deploying backend.js as a worker, startting core.py"])
-
     EvLogger.add_record("DEBUG", "Get display coords info for better window positioning")
     //get screen info
     var displays_info: any = screen.getAllDisplays()
@@ -495,38 +504,41 @@ app.on("ready", async () => {
     mainMenu.show()
 })
 
-//worker listeners
-worker.on("message", (message: string) => {
-    //processing from backend.js
-    let arg = message.split(":")[0]
-    let content = message.split(":")[1].slice(1)
+//backend-worker events
+if (turn_on_backend){
+    worker.on("message", (message: string) => {
+        //processing from backend.js
+        let arg = message.split(":")[0]
+        let content = message.split(":")[1].slice(1)
 
-    switch(arg){
-        case "command":
-            let command_args = content.split(" ")
+        switch(arg){
+            case "command":
+                let command_args = content.split(" ")
 
-            //search plane by callsign
-            for(let i = 0; i < PlaneDatabase.DB.length; i++){
-                if (command_args[0] == PlaneDatabase.DB[i].callsign){
-                    if (command_args[1] == "change-heading"){
-                        PlaneDatabase.DB[i].updated_heading = parseInt(command_args[2])
-                    }
-                    else if (command_args[1] == "change-speed"){
-                        PlaneDatabase.DB[i].updated_speed = parseInt(command_args[2])
-                    }
-                    else if (command_args[1] == "change-level"){
-                        PlaneDatabase.DB[i].updated_level = parseInt(command_args[2])
+                //search plane by callsign
+                for(let i = 0; i < PlaneDatabase.DB.length; i++){
+                    if (command_args[0] == PlaneDatabase.DB[i].callsign){
+                        if (command_args[1] == "change-heading"){
+                            PlaneDatabase.DB[i].updated_heading = parseInt(command_args[2])
+                        }
+                        else if (command_args[1] == "change-speed"){
+                            PlaneDatabase.DB[i].updated_speed = parseInt(command_args[2])
+                        }
+                        else if (command_args[1] == "change-level"){
+                            PlaneDatabase.DB[i].updated_level = parseInt(command_args[2])
+                        }
                     }
                 }
-            }
-            break
-        case "debug":
-            //used for debug logging
-            EvLogger.log("DEBUG", [content, content])
-            break
-    }
-})
+                break
+            case "debug":
+                //used for debug logging
+                EvLogger.log("DEBUG", [content, content])
+                break
+        }
+    })
+}
 
+//database.wirjer events
 database_worker.on("message", (message: string) => {
     if (Array.isArray(message)){
         switch(message[0]){
@@ -546,7 +558,6 @@ ipcMain.handle("message", (event, data) => {
         //generic message channels
         case "redirect-to-menu":
             redir_to_main = false
-            console.log(redir_to_main)
 
             //message call to redirect to main menu
             EvLogger.add_record("DEBUG", "redirect-to-menu event")
@@ -585,7 +596,9 @@ ipcMain.handle("message", (event, data) => {
         case "redirect-to-main":
             //message call to redirect to main program (start)
             redir_to_main = true
-            worker.postMessage(["action", "start-neural"])
+            if (turn_on_backend){
+                worker.postMessage(["action", "start-neural"])
+            }
             main_app()
             break
         case "exit":
@@ -595,7 +608,9 @@ ipcMain.handle("message", (event, data) => {
 
         case "invoke":
             //TODO: find out why I have this written here
-            worker.postMessage(data[1][1])
+            if (turn_on_backend){
+                worker.postMessage(data[1][1])
+            }
             break
         //info retrival to Controller
         case "send-info":
@@ -852,7 +867,9 @@ ipcMain.handle("message", (event, data) => {
             controllerWindow.send_message("sim-event", "startsim")
             break
         case "regenerate-map":
-            worker.postMessage(["action", "terrain"])
+            if (turn_on_backend){
+                worker.postMessage(["action", "terrain"])
+            }
             break
         case "restore-sim":
             database_worker.postMessage(["read-db"])
@@ -890,7 +907,7 @@ setInterval(() => {
 }, 1000)
 
 setInterval(() => {
-    if (app_running){
+    if (app_running && turn_on_backend){
         //sending plane status every 500ms for backend
         if (PlaneDatabase == undefined){
             worker.postMessage(["data", []]) //send empty array so the backend can still function without any problems

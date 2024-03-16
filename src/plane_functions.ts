@@ -225,8 +225,6 @@ export class PlaneDB{
                 if (this.plane_turn_DB[i]["id"] == this.DB[i_plane].id){
 
                     var fallback_diff = Math.abs(parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"] - parseInt(this.DB[i_plane].updated_heading))
-
-
                     //check if completed
                     if (fallback_diff > 0 && fallback_diff < 10){
                         //automatically set to updated heading
@@ -236,21 +234,15 @@ export class PlaneDB{
                         this.plane_turn_DB.splice(i, 1)
                         continue
                     }
-                    
-                    var diff = 0
-                    if (this.DB[i_plane].heading > 180){
-                        diff = Math.abs(180 - parseInt(this.DB[i_plane].heading))
-                    }
-                    else{
-                        diff = Math.abs(180 + parseInt(this.DB[i_plane].heading))
-                    }
 
-                    if (this.DB[i_plane].updated_heading > diff){
-                        //decrease turn
+                    var divider = ((this.DB[i_plane].heading < 180) ? this.DB[i_plane].heading + 180 : this.DB[i_plane].heading - 180)
+                    console.log(divider)
+                    if (parseInt(this.DB[i_plane].updated_heading) > divider || parseInt(this.DB[i_plane].updated_heading) < this.DB[i_plane].heading){
+                        //turn left
                         this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) - this.plane_turn_DB[i]["rate_of_turn"]
                     }
                     else{
-                        //increase turn
+                        //turn right
                         this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"]
                     }
 

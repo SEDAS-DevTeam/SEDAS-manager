@@ -81,6 +81,11 @@ http.get("http://www.google.com", async (res) => {
 if (app_settings["backend_init"]){
     worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
     EvLogger.log("DEBUG", ["Starting BackendWorker because flag backend_init=true", "Starting Backend because flag backend_init is=true"])
+
+    var backend_settings = {
+        "noise": app_settings["noise"]
+    }
+    worker.postMessage(["action", "settings", JSON.stringify(backend_settings)])
 }
 else{
     turn_on_backend = false

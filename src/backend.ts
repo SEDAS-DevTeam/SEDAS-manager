@@ -163,6 +163,11 @@ const core_server = net.createServer((socket) => {
                         case "interrupt":
                             parentPort.postMessage("debug: SIGINT for core.py")
                             core_process.kill()
+
+                        //passing settings to backend process
+                        case "settings":
+                            socket.write(`settings ${message[2]}`)
+                            break
                     }
                 //data messages
                 case "data":

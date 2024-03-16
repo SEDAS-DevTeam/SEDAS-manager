@@ -18,12 +18,12 @@ thread_voice = None
 thread_text = None
 thread_speech = None
 PORT = 36000
-
 threads_active = True
+settings_json = None
 
 def check_server(client_socket):
     while True:
-        global threads_active
+        global threads_active, settings_json
         #
         # Backend to core.py communication
         #
@@ -50,8 +50,16 @@ def check_server(client_socket):
                 threads_active = False
 
                 client_socket.close()
+            elif "settings" in data_from_parent[1]:
+                #acccept settings data chunks
+                accept_settings = True
+
         elif data_from_parent[0] == "data-for-speech":
             queue_in_speech.append(data_from_parent[1])
+
+        if "settings" in data_from_parent_str:
+            data_from_parent_str.replace("settings", "")
+            settings_json = json.loads(data_from_parent_str)
 
 if __name__ == "__main__":
     app_settings_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/data/settings.json")

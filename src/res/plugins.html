@@ -5,7 +5,7 @@
         <link rel="stylesheet" href="styles/plugins.css">
         
         <meta charset="utf-8" />
-        <script src="scripts/controller.js"></script>
+        <script src="scripts/plugins.js"></script>
     </head>
     <body style="margin-left: 20px; margin-right: 20px;" id="scrollable">
         <div id="top-content">
@@ -26,8 +26,8 @@
             <h2>Plugins repository</h2>
             <hr>
             
-            <div>
-                <p class="">Refresh plugins tab</p><i class="fa fa-refresh" aria-hidden="true"></i>
+            <div style="margin-bottom: 10px;">
+                <p class="inline-text">Refresh plugins tab</p><i class="fa fa-refresh" aria-hidden="true" id="refresh" onclick="refresh(this)"></i>
             </div>
             <table id="plugins-tab">
                 <tr>

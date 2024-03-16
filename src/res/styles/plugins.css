@@ -4,6 +4,10 @@
     border-radius:6px;
 }
 
+tr:nth-child(even) {
+    background-color: white;
+}
+
 .indicator-but{
     border-radius: 5px;
     font-size: smaller;
@@ -20,4 +24,19 @@
     background-color: rgb(216, 216, 216);
     color: rgb(133, 133, 133);
     border-color: rgb(133, 133, 133);
+}
+
+.inline-text{
+    display: inline;
+    margin-right: 10px;
+    color: black;
+}
+
+i#refresh:hover{
+    color: #5271ff;
+    cursor: pointer;
+}
+
+i#refresh{
+    transition: all 0.5s;
 }

@@ -89,6 +89,20 @@ else{
 database_worker = new Worker(path.join(ABS_PATH, "/src/database.js"))
 EvLogger.log("DEBUG", ["Initialized BackupDB", "Initialized Sqlite3 database for backup"])
 
+if (app_settings["saving_frequency"].includes("min")){
+    backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 60 * 1000
+}
+else if (app_settings["saving_frequency"].includes("hour")){
+    backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 3600 * 1000
+}
+else if (app_settings["saving_frequency"].includes("never")){
+    backup_db_on = false
+    //by default set to 5 mins
+    backupdb_saving_frequency = 5 * 60 * 1000
+}
+
+EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_saving_frequency / 1000} seconds`)
+
 const main_menu_dict = {
     width: 800,
     height: 600,
@@ -471,20 +485,6 @@ app.on("ready", async () => {
     //update audio devices
     EvLogger.log("DEBUG", ["Updating audio devices...", "Updating audio device list using get_info.py"])
     const update_devices = spawn("python3", [PATH_TO_AUDIO_UPDATE])
-
-    if (app_settings["saving_frequency"].includes("min")){
-        backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 60 * 1000
-    }
-    else if (app_settings["saving_frequency"].includes("hour")){
-        backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 3600 * 1000
-    }
-    else if (app_settings["saving_frequency"].includes("never")){
-        backup_db_on = false
-        //by default set to 5 mins
-        backupdb_saving_frequency = 5 * 60 * 1000
-    }
-
-    EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_saving_frequency / 1000} seconds`)
 
     EvLogger.add_record("DEBUG", "Get display coords info for better window positioning")
     //get screen info

@@ -546,7 +546,7 @@ function process_init_data(data, reset = false){
             draw_connection()
         }
     }
-    else if (page.includes("controller_gen")){
+    else if (page.includes("controller_set")){
         if (map_name != undefined){
             //loaded from backup, change map name
             document.getElementById("confirmresult").innerHTML = map_name
@@ -650,7 +650,7 @@ window.onload = () => {
 
     //didn't want to put it into separated files for better organisation
     switch(page_name){
-        case "controller_gen.html":
+        case "controller_set.html":
             //event listeners
 
             document.addEventListener("click", () => {

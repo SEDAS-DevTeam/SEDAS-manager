@@ -28,6 +28,10 @@
     margin-left: 50px;
 }
 
+.result{
+    margin-bottom: 20px;
+}
+
 td i{
     cursor: pointer;
 }
@@ -275,4 +279,9 @@ input:checked + .slider:before {
     cursor: pointer;
     font-size: 24px;
 
+}
+
+#regen-map{
+    padding: 5px 10px;
+    font-size: 20px;
 }

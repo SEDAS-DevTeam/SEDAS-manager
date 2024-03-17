@@ -15,7 +15,7 @@
             </div>
             <hr>
             <div class="topnav" id="controller-topnav">
-                <a href="controller_gen.html">Generation</a>
+                <a href="controller_set.html">Setup</a>
                 <a href="controller_mon.html">Monitors</a>
                 <a href="controller_sim.html" class="active">Simulation</a>
                 <a href="plugins.html">Plugins</a>
@@ -26,17 +26,19 @@
             You did not select any map to be rendered
         </div>
         <div class="div-indent">
-            <h2>Simulation control</h2>
+            <div>
+                <h2 style="display: inline; margin-right: 15px;">Simulation control</h2>
+                <button id="sim_button" class="startsim">START</button>
+            </div>
             <hr>
-            <h2 id="ai-control-header">AI control</h2>
+            <h3 id="ai-control-header">AI control</h3>
             <div style="margin-left: 20px;">
                 <label class="switch">
                     <input type="checkbox" id="ai-control-switch">
                     <span class="slider"></span>
                 </label>
             </div>
-
-            <button id="sim_button" class="startsim">START</button>
+            <hr>
         </div>
         <div class="div-indent" id="main-content">
             <h3>Plane spawn</h3>

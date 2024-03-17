@@ -58,8 +58,8 @@ def check_server(client_socket):
             queue_in_speech.append(data_from_parent[1])
 
         if "settings" in data_from_parent_str:
-            data_from_parent_str.replace("settings", "")
-            settings_json = json.loads(data_from_parent_str)
+            data = data_from_parent_str.replace("settings", "")
+            settings_json = json.loads(data)
 
 if __name__ == "__main__":
     app_settings_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/data/settings.json")
@@ -100,20 +100,21 @@ if __name__ == "__main__":
     client_socket.sendall(b"debug: Initialized all model threads")
 
     while threads_active:
-
         #
         # core.py to Voice/Speech/Text algorithms
         #
         if len(queue_out_voice) != 0:
-            print("test")
             data_from_voice = queue_out_voice.pop(0)
-            client_socket.sendall(f"debug: {data_from_voice}".encode())
             
-            queue_in_text.put(f"input: {data_from_voice}")
+            queue_in_text.append(f"input: {data_from_voice}")
+
+            client_socket.sendall(f"debug: got data from voice {data_from_voice}".encode())
 
         if len(queue_out_text) != 0:
             data_from_text = queue_out_text.pop(0)
             client_socket.sendall(f"data: {data_from_text}".encode())
+
+            client_socket.sendall(f"debug: got data from text {data_from_text}".encode())
 
 thread_voice.join()
 thread_voice.join()

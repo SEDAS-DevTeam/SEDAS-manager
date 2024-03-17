@@ -65,8 +65,7 @@ const NUMS = {
     "9": "niner"
 }
 
-function command_processor(command_text: string){
-    let command_args = command_text.split(" ")
+function command_processor(command_args: string[]){
     let response: string = ""
 
     //translate plane name back from nato
@@ -114,11 +113,17 @@ const core_server = net.createServer((socket) => {
         let value_command = data_str.split(":");
         switch(value_command[0]){
             case "data":
-                console.log(value_command[1])
-    
                 //check if plane exists
                 let exists: boolean = false
-                var callsign = value_command[1].split(" ")[0]
+                var args = value_command[1].split(" ")
+                for (let i = 0; i < args.length; i++){
+                    //strip input string of useless spaces
+                    if (args[i].length == 0){
+                        args.splice(i, 1)
+                    }
+                }
+                var callsign = args[0]
+
                 for (let i = 0; i < plane_data.length; i++){
                     if (plane_data[i].callsign == callsign){
                         exists = true
@@ -127,11 +132,12 @@ const core_server = net.createServer((socket) => {
                 }
                 
                 if (exists){
-                    var message: string = command_processor(value_command[1])
+                    var message: string = command_processor(args)
+
                     //send message to generate speech
                     socket.write(`data-for-speech: ${message}\n`)
     
-                    parentPort.postMessage("command: " + value_command) //post to main process for updates
+                    parentPort.postMessage("command:" + args.join(" ")) //post to main process for updates
                 }
                 break
             case "debug":

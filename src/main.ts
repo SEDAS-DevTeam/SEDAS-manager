@@ -514,11 +514,12 @@ if (turn_on_backend){
     worker.on("message", (message: string) => {
         //processing from backend.js
         let arg = message.split(":")[0]
-        let content = message.split(":")[1].slice(1)
+        let content = message.split(":")[1]
 
         switch(arg){
             case "command":
                 let command_args = content.split(" ")
+                console.log(command_args)
 
                 //search plane by callsign
                 for(let i = 0; i < PlaneDatabase.DB.length; i++){

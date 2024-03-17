@@ -4,17 +4,17 @@
 
 <hr>
 
-**About**
+**About**<br>
 This project is new concept of ATC simulator both for beginners and advanced users. It utilises of neural networks to imitate real pilots on the other communication end and also function as a personal trainer. Goal of this desktop application is to make ATC learning easier for hobbyists and begineer ATC students. Project is still in early developement.
 
 <hr>
 
-**Technical**
+**Technical**<br>
 Application is made in `electron`, with the help of `sqlite3`, app also uses `python` to implement the **AI** part. It is also packaged using `electron-packager`. Frontend is fully made in `VanillaJS`.
 
 <hr>
 
-**ATC**
+**ATC**<br>
 See `/doc/sources/readme.md` for more information about **ATC sources i used**.
 
 ## Installation:
@@ -42,14 +42,14 @@ NOTE: `npm run clear` to clear all build files
 # Wiki:
 SEDAS has its own wiki, all written in `markdown`
 
-[1. About SEDAS]()
-[2. functionalities]()
-[3. SEDAS window documentation]()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.1. Main menu]()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.1. Settings]()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2. Controller window]()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.1. Generation]()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.2. Monitors]()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.3. Simulation]()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.4. Worker window]()
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.5. Misc (Departure/Arrivals, Weather forecast, etc.)]()
+[1. About SEDAS]()<br>
+[2. functionalities]()<br>
+[3. SEDAS window documentation]()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.1. Main menu]()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.1. Settings]()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2. Controller window]()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.1. Generation]()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.2. Monitors]()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.3. Simulation]()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.4. Worker window]()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [3.2.5. Misc (Departure/Arrivals, Weather forecast, etc.)]()<br>

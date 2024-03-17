@@ -5,6 +5,8 @@ var APP_DATA = undefined
 var plane_paths = []
 var scale = 0
 
+var curr_rel_dist = [0, 0] //x, y
+
 /*
 in format
 [{
@@ -102,6 +104,28 @@ function process_map_data(){
     renderScale(scale)
 }
 
+function check_trans_altitude(plane_data){
+    //TODO: is set up only for 1000 transition altitude
+    let plane_level = ""
+
+    //check if altitude does exceed transition altitude
+    if (plane_data.level > parseInt(APP_DATA["transition_altitude"])){
+        let val = Math.floor(plane_data.level / 100).toString()
+        if (val.length < 3){
+            for (let i = 0; i < 3 - val.length; i++){
+                val = "0" + val
+            }
+        }
+
+        //convert to FL
+        plane_level = "FL " + val
+    }
+    else{
+        plane_level = plane_data.level + " ft"
+    }
+    return plane_level
+}
+
 function render_planes(){
     //check saved coordinates if we deleted any plane
     for (let i = 0; i < plane_label_coords.length; i++){
@@ -124,6 +148,8 @@ function render_planes(){
         let label_x = 0
         let label_y = 0
 
+        plane_level = check_trans_altitude(plane_data[i])
+
         let found_plane = false
         for (let i2 = 0; i2 < plane_label_coords.length; i2++){
             if(plane_label_coords[i2]["id"] == plane_data[i]["id"]){
@@ -142,24 +168,6 @@ function render_planes(){
         if (!found_plane){
             label_x = plane_data[i]["x"] + 50
             label_y = plane_data[i]["y"] - 50
-        }
-
-        //TODO: is set up only for 1000 transition altitude
-        let plane_level = ""
-        //check if altitude does exceed transition altitude
-        if (plane_data[i].level > parseInt(APP_DATA["transition_altitude"])){
-            let val = Math.floor(plane_data[i].level / 100).toString()
-            if (val.length < 3){
-                for (let i = 0; i < 3 - val.length; i++){
-                    val = "0" + val
-                }
-            }
-
-            //convert to FL
-            plane_level = "FL " + val
-        }
-        else{
-            plane_level = plane_data[i].level + " ft"
         }
 
         //add metrics and other functionalities to label values
@@ -185,16 +193,24 @@ function render_planes(){
 
 function update_labels(curr_x, curr_y){
     renderCanvas(3)
-    let label_coords = renderPlaneInfo(curr_plane["x"], curr_plane["y"], curr_x, curr_y, {
-        "callsign": curr_plane["callsign"],
-        "level": curr_plane["level"],
-        "speed": curr_plane["speed"],
-        "code": undefined
-    })
 
-    for (let i = 0; i < plane_label_coords.length; i++){
-       if (plane_label_coords[i]["id"] == curr_plane["id"]){
-            //do not rerender currently selected plane
+    for (let i = 0; i < plane_label_coords.length; i++){        
+        if (plane_label_coords[i]["id"] == curr_plane["id"]){
+            // render moved plane label
+
+            //update x and y by cursor location
+            x = curr_x - curr_rel_dist[0]
+            y = curr_y - curr_rel_dist[1]
+
+            plane_level = check_trans_altitude(curr_plane)
+
+            let label_coords = renderPlaneInfo(curr_plane["x"], curr_plane["y"], x, y, {
+                "callsign": curr_plane["callsign"],
+                "level": plane_level,
+                "speed": curr_plane["speed"],
+                "code": undefined
+            })
+
             plane_label_coords[i] = {
                 "id": curr_plane["id"],
                 "coords": label_coords,
@@ -202,6 +218,8 @@ function update_labels(curr_x, curr_y){
             }
         }
         else{
+            //render rest of the plane labels
+
             for(let i2 = 0; i2 < plane_data.length; i2++){
                 if (plane_label_coords[i]["id"] == plane_data[i2]["id"]){
                     //rerender rest of unused labels onmousemove
@@ -273,6 +291,8 @@ document.onmousedown = (event) => {
                 is_dragging = true
 
                 curr_plane = plane_data[i]
+
+                curr_rel_dist = [Math.abs(curr_x - curr_coords[2]), Math.abs(curr_y - curr_coords[3])]
             }
         }
     }
@@ -280,6 +300,7 @@ document.onmousedown = (event) => {
 
 document.onmouseup = () => {
     is_dragging = false
+    curr_rel_dist = [0, 0]
 }
 
 document.onmousemove = (event) => {

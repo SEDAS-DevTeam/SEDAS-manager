@@ -247,6 +247,8 @@ function renderPlaneInfo(x_plane, y_plane, x, y, plane_info){
   context1.lineTo(x2, y2)
   context1.stroke()
 
+
+  //     x2 (right)   y1 (bot)     x2 (left)   y2 (top)
   return [x1_text, init_y + height, x2 - width, init_y]
 }
 

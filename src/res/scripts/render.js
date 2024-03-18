@@ -195,10 +195,11 @@ function renderPlaneInfo(x_plane, y_plane, x, y, plane_info){
   let proc_x = x;
   let proc_y = y;
 
-  let init_y = proc_y
-
   let width = MAX_RECT_WIDTH;
   let height = 0;
+
+  let init_y = proc_y
+  let init_x = proc_x + width
 
   for (const [key, value] of Object.entries(plane_info)) {
     if (value == undefined){
@@ -209,10 +210,6 @@ function renderPlaneInfo(x_plane, y_plane, x, y, plane_info){
     proc_y -= LINE_INDENT
     height += (INFO_TEXT_SIZE + LINE_INDENT / 2) //This feels illegal
   }
-
-  let x1_text = proc_x + width
-  let y1_text = proc_y
-
 
   context1.strokeStyle = "white"
   context1.lineWidth = PLANE_POINTER_WIDTH
@@ -225,31 +222,50 @@ function renderPlaneInfo(x_plane, y_plane, x, y, plane_info){
 
   context1.moveTo(x_plane, y_plane)
 
-  let x2 = 0;
-  let y2 = 0;
-  if (proc_x < x){
-    //label is on the left
-    x2 = x1_text + width
+  //center of text rect
+  let x_center = proc_x + (width / 2)
+  let y_center = proc_y + (height / 2)
+
+  let x2 = 0
+  let y2 = 0
+
+  let d_x = Math.abs(x_center - x_plane)
+  let d_y = Math.abs(y_center - y_plane)
+
+  if (d_x < (width / 2) && d_y < (height / 2)){
+    //do not render anything (plane info is on plane)
+
+    //     x2 (right)   y1 (bot)     x2 (left)   y2 (top)
+    return [init_x, init_y + height, init_x - width, init_y]
+  }
+
+  let angle = Math.atan(d_x / d_y)
+  let a = (width / 2) * Math.sin(angle)
+  let b = (width / 2) * Math.cos(angle)
+
+  if (x_center > x_plane){
+    //right position
+    x2 = x_center - a
   }
   else{
-    //label is on the right
-    x2 = x1_text
+    //left position
+    x2 = x_center + a
   }
-  if (proc_y < y){
-    //label is on the top
-    y2 = y1_text + height
+
+  if (y_center > y_plane){
+    //bot position
+    y2 = y_center - b
   }
   else{
-    //label is ont the bot
-    y2 = y1_text
+    //top position
+    y2 = y_center + b
   }
 
   context1.lineTo(x2, y2)
   context1.stroke()
 
-
   //     x2 (right)   y1 (bot)     x2 (left)   y2 (top)
-  return [x1_text, init_y + height, x2 - width, init_y]
+  return [init_x, init_y + height, init_x - width, init_y]
 }
 
 function renderPlanePath(coordinates){

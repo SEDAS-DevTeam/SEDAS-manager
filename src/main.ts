@@ -322,7 +322,7 @@ function main_app(backup_db: any = undefined){
     coords = get_window_coords(-1)
 
     EvLogger.add_record("DEBUG", "controller show")
-    controllerWindow = new Window(controller_dict, "./res/controller_gen.html", coords, "controller")
+    controllerWindow = new Window(controller_dict, "./res/controller_set.html", coords, "controller")
     
     for (let i = 0; i < workers.length; i++){
         workers[i].show()

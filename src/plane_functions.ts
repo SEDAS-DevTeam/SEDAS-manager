@@ -1,3 +1,5 @@
+import { v4 } from "uuid"
+
 //low level functions
 function deg_to_rad(deg){
     return deg * (Math.PI / 180)
@@ -5,6 +7,10 @@ function deg_to_rad(deg){
 
 function rad_to_deg(rad){
     return Math.round(rad * (180 / Math.PI))
+}
+
+export function generate_plane_hash(){
+    return v4()
 }
 
 export class PlaneDB{
@@ -26,6 +32,7 @@ export class PlaneDB{
     }
 
     public update_worker_data(monitor_data: any){
+        console.log(monitor_data)
         this.monitor_DB = []
 
         for (let i = 0; i < monitor_data.length; i++){
@@ -73,7 +80,7 @@ export class PlaneDB{
         }
     }
 
-    public delete_record(id: number){
+    public delete_record(id: string){
         //delete from planes database
         for (let i = 0; i < this.DB.length; i++){
             if (this.DB[i].id == id){
@@ -84,8 +91,8 @@ export class PlaneDB{
         //delete from monitors database
         for (let i = 0; i < this.monitor_DB.length; i++){
             for (let i_planes = 0; i_planes < this.monitor_DB[i]["planes_id"].length; i_planes++){
-                if(this.monitor_DB[i]["planes_id"][i_planes][i_planes] == id){
-                    this.monitor_DB.splice(i_planes, 1)
+                if(this.monitor_DB[i]["planes_id"][i_planes] == id){
+                    this.monitor_DB[i]["planes_id"].splice(i_planes, 1)
                 }
             }
         }
@@ -236,7 +243,6 @@ export class PlaneDB{
                     }
 
                     var divider = ((this.DB[i_plane].heading < 180) ? this.DB[i_plane].heading + 180 : this.DB[i_plane].heading - 180)
-                    console.log(divider)
                     if (parseInt(this.DB[i_plane].updated_heading) > divider || parseInt(this.DB[i_plane].updated_heading) < this.DB[i_plane].heading){
                         //turn left
                         this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) - this.plane_turn_DB[i]["rate_of_turn"]
@@ -274,7 +280,7 @@ export class PlaneDB{
 }
 
 export class Plane{
-    public id: number;
+    public id: string;
     public callsign: string;
 
     public heading: number;
@@ -293,7 +299,7 @@ export class Plane{
     public x: number;
     public y: number;
 
-    public constructor(id: number, callsign: string, 
+    public constructor(id: string, callsign: string, 
         heading: number, heading_up: number, 
         level: number, level_up: number,
         speed: number, speed_up: number,

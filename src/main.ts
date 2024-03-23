@@ -6,7 +6,7 @@ import {spawn} from "node:child_process"
 import path from "path"
 import http from "http"
 import * as read_map from "./read_map"
-import { Plane, PlaneDB } from "./plane_functions";
+import { Plane, PlaneDB, generate_plane_hash } from "./plane_functions";
 import { update_all } from "./fetch";
 import {EventLogger} from "./logger"
 
@@ -23,7 +23,7 @@ var displays = [];
 var workers = [];
 var map_config = [];
 var map_data: any = undefined;
-var curr_plane_id: number = 0;
+var curr_plane_id: string = "";
 var PlaneDatabase: any;
 var backupdb_saving_frequency: number = 0;
 var backup_db_on: boolean = true
@@ -170,7 +170,7 @@ const worker_dict = {
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
-}  
+}
 
 function get_window_coords(idx: number, window_dict: any = undefined){
     let x: number
@@ -270,21 +270,6 @@ async function exit_app(){
     }
     EvLogger.add_record("DEBUG", "terminating database worker")
     database_worker.terminate()
-    
-    //close windows
-    EvLogger.add_record("DEBUG", "closing all windows")
-    if (controllerWindow){
-        controllerWindow.close()
-    }
-    for(let i = 0; i < workers.length; i++){
-        if (workers[i]){
-            workers[i].close()
-        }
-    }
-
-    if (exitWindow){
-        exitWindow.close()
-    }
 
     EvLogger.add_record("DEBUG", "exit")
     app.exit(0)
@@ -323,16 +308,18 @@ function main_app(backup_db: any = undefined){
 
     EvLogger.add_record("DEBUG", "controller show")
     controllerWindow = new Window(controller_dict, "./res/controller_set.html", coords, "controller")
+    controllerWindow.checkClose(() => {
+        if (app_running){
+            //app is running => close by tray button
+            exit_app()
+        }
+    })
     
     for (let i = 0; i < workers.length; i++){
         workers[i].show()
         workers[i].checkClose()
     }
     controllerWindow.show()
-    controllerWindow.checkClose(() => {
-        //additional callback for controller window (invoke closing to every other window)
-        exit_app()
-    })
 
     if (turn_on_backend){
         //setup voice recognition and ACAI backend
@@ -349,18 +336,20 @@ function main_app(backup_db: any = undefined){
     //run local plane DB
     PlaneDatabase = new PlaneDB(workers);
     if (backup_db){
-        curr_plane_id = 0 //reset planeID
+        //run if backup db is avaliable
+        redir_to_main = true
 
         for (let i = 0; i < backup_db["planes"].length; i++){
             //get monitor-type spawn
             let monit_type: string;
             for (let i2 = 0; i2 < backup_db["monitor-planes"].length; i2++){
-                if (backup_db["monitor-planes"][i2]["planes_id"].includes(curr_plane_id)){
+                if (backup_db["monitor-planes"][i2]["planes_id"].includes(backup_db["planes"][i2]["id"])){
                     monit_type = backup_db["monitor-planes"][i2]["type"]
                     break
                 }
             }
 
+            curr_plane_id = generate_plane_hash()
             let plane = new Plane(curr_plane_id, backup_db["planes"][i]["callsign"], 
                     backup_db["planes"][i]["heading"], backup_db["planes"][i]["updated_heading"],
                     backup_db["planes"][i]["level"], backup_db["planes"][i]["updated_level"],
@@ -370,7 +359,6 @@ function main_app(backup_db: any = undefined){
                     backup_db["planes"][i]["x"], backup_db["planes"][i]["y"])
 
             PlaneDatabase.add_record(plane, monit_type)
-            curr_plane_id += 1
         }
 
         //send reloaded plane database to all windows
@@ -473,7 +461,7 @@ class Window{
             this.checkClose(() => {
                 if (!redir_to_main){
                     EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got close-app request, saving logs and quitting app..."])
-                    exit_app();
+                    exit_app()
                 }
             })
         }
@@ -544,7 +532,7 @@ if (turn_on_backend){
     })
 }
 
-//database.wirjer events
+//database worker events
 database_worker.on("message", (message: string) => {
     if (Array.isArray(message)){
         switch(message[0]){
@@ -806,7 +794,7 @@ ipcMain.handle("message", (event, data) => {
                 }
             }
             
-
+            curr_plane_id = generate_plane_hash()
             let plane = new Plane(curr_plane_id, plane_data["name"], 
                             plane_data["heading"], plane_data["heading"],
                             plane_data["level"], plane_data["level"],
@@ -815,7 +803,6 @@ ipcMain.handle("message", (event, data) => {
                             plane_data["arrival_time"],
                             x, y)
             PlaneDatabase.add_record(plane, plane_data["monitor"])
-            curr_plane_id += 1
 
             send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
             break
@@ -843,7 +830,6 @@ ipcMain.handle("message", (event, data) => {
             break
         case "plane-delete-record":
             PlaneDatabase.delete_record(data[1][1])
-
             send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
             break
         case "send-plane-data":

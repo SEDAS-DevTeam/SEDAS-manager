@@ -50,9 +50,7 @@ def check_server(client_socket):
                 threads_active = False
 
                 client_socket.close()
-            elif "settings" in data_from_parent[1]:
-                #acccept settings data chunks
-                accept_settings = True
+
 
         elif data_from_parent[0] == "data-for-speech":
             client_socket.sendall(b"debug: got data for speech")

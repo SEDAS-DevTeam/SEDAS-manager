@@ -257,7 +257,7 @@ async function exit_app(){
         //disable voice recognition and ACAI backend
         EvLogger.add_record("DEBUG", "stopping voice-recognition")
         worker.postMessage(["action", "stop-neural"])
-        
+
         await sleep(1000)
 
         //kill voice recognition

@@ -21,8 +21,6 @@ var exitWindow: Window;
 var sender_win_name: string = "";
 var displays = [];
 var workers = [];
-var map_config = [];
-var map_data: any = undefined;
 var curr_plane_id: string = "";
 var PlaneDatabase: any;
 var backupdb_saving_frequency: number = 0;
@@ -38,6 +36,13 @@ var app_settings: any;
 var worker: Worker;
 var database_worker: Worker;
 var turn_on_backend: boolean = true;
+
+//map variables
+var longitude: any;
+var latitude: any;
+var zoom: any;
+var map_config = [];
+var map_data: any = undefined;
 
 //simulation-based declarations
 var simulation_dict = {
@@ -661,7 +666,7 @@ ipcMain.handle("message", (event, data) => {
             }
             break
         case "set-map":
-            //retrieve all airport data
+            //getting map info from user input (invoked from controller)
             let filename = data[1][1]
 
             //save map data to variable
@@ -672,15 +677,33 @@ ipcMain.handle("message", (event, data) => {
             let map_config_raw = fs.readFileSync(PATH_TO_MAPS + map_data["CONFIG"], "utf-8")
             map_name = JSON.parse(map_config_raw)["AIRPORT_NAME"];
 
-            //set map data to all workers
+            //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
+            if (map_data == undefined){
+                //map wasn't selected
+                longitude = undefined
+                latitude = undefined
+                zoom = undefined
+            }
+            else{
+                longitude = map_data["long"]
+                latitude = map_data["lat"]
+                zoom = map_data["zoom"]
+            }
+
             for (let i = 0; i < workers.length; i++){
-                workers[i].send_message("map-data", [map_data, workers[i].win_type])
+                worker[i].send_message("ask-for-render") //send workers command to fire "render-map" event
             }
             break
         case "render-map":
-            //set map data to all workers
+            //rendering map data for user (invoked from worker)
             for (let i = 0; i < workers.length; i++){
                 workers[i].send_message("map-data", [map_data, workers[i].win_type])
+            }
+
+            for (let i = 0; i < workers.length; i++){
+                if (workers[i]["win_type"] == "weather"){
+                    workers[i].send_message("geo-data", [latitude, longitude, zoom])
+                }
             }
             break
         case "get-points":
@@ -760,11 +783,6 @@ ipcMain.handle("message", (event, data) => {
             }
             break
         case "send-location-data":
-            //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
-            let longitude = map_data["long"]
-            let latitude = map_data["lat"]
-            let zoom = map_data["zoom"]
-
             for (let i = 0; i < workers.length; i++){
                 if (workers[i]["win_type"] == "weather"){
                     workers[i].send_message("geo-data", [latitude, longitude, zoom])

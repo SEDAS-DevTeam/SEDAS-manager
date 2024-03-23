@@ -322,6 +322,9 @@ window.electronAPI.on_map_data((data) => {
     map_data = data //set map data to global on session
     process_map_data()
 })
+window.electronAPI.on_message("ask-for-render", () => {
+    window.electronAPI.send_message("worker", ["render-map"])
+})
 window.electronAPI.on_message("update-plane-db", (data) => { //for updating plane list
     plane_data = data
 

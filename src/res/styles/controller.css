@@ -129,8 +129,10 @@ div.popup-box p{
     margin-bottom: 25px;
 }
 
-#scrollable{
+#controller-body{
     overflow-y: scroll;
+    margin-left: 20px; 
+    margin-right: 20px
 }
 
 .grid-container {

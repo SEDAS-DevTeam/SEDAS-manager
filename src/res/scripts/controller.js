@@ -49,6 +49,7 @@ function render_map(){
     }
     
     window.electronAPI.send_message("controller", ["set-map", selected_map])
+    
 
 }
 

@@ -197,21 +197,29 @@ function ask_for_loc(){
     window.electronAPI.send_message("weather", ["send-location-data"])
 }
 
+function create_warn_header(message){
+    let info_text = document.createElement("h1")
+    info_text.id = "info-label"
+    info_text.innerHTML = message
+
+    document.getElementById("mapid").appendChild(info_text)
+}
+
 //play loop to render frames
 setInterval(play_loop, 500)
 
 window.electronAPI.on_message("geo-data", (data) => {
     console.log(data)
-    if (!(data[0] == "none" && data[1] == "none")){
-        map.setView([data[0], data[1]], data[2]);
+    if (data[0] == "none" && data[1] == "none"){
+        //map doesn't have location data
+        create_warn_header("Current map does not support location data for weather services")
+    }
+    else if (data[0] == undefined && data[1] == undefined){
+        //map is not even selected
+        create_warn_header("Nothing to render because no map was selected")
     }
     else{
-        //map has not location data
-
-        let info_text = document.createElement("h1")
-        info_text.id = "info-label"
-        info_text.innerHTML = "Current map does not support location data for weather services"
-
-        document.getElementById("mapid").appendChild(info_text)
+        //map has location data
+        map.setView([data[0], data[1]], data[2]);
     }
 })

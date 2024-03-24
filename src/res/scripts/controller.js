@@ -11,34 +11,73 @@ var ALL = []
 
 var Windows = []
 var monitor_objects = []
-var INIT_DATA = [] //store it in this session
+var INIT_DATA = [] //storing all vital data like airport list, command preset list, aircraft preset list in current session
 var APP_DATA = undefined
 
 var desc_rendered = false
 var curr_desc = -1
+
+//user selection variables
 var selected_map = ""
+var selected_aircraft_preset = ""
+var selected_command_preset = ""
+var selected_name = ""
+
+var selected_hours = 0
+var selected_mins = 0
 
 var already_generated_names = []
-var selected_name = ""
 var all_points = []
 var monitor_data = [] //data for storing monitors
 var plane_data = [] //data for storing all planes
 var map_checked = false
 
-//selected time
-var selected_hours = 0
-var selected_mins = 0
-
 /*
 CHOOSING WHICH MAP TO GENERATE ON WHICH MONITOR
 */
 
-function selection(idx){
-    let sel_map = INIT_DATA[2][idx]["FILENAME"]
-    let sel_map_name = INIT_DATA[2][idx]["AIRPORT_NAME"]
+function selection(button_elem){
+    let sel_id = button_elem.id
+    let prefix = sel_id.split("-")[0]
 
-    document.getElementById("confirmresult").innerHTML = sel_map_name
-    selected_map = sel_map
+    let selection_path;
+    let selection_name;
+
+    switch(prefix){
+        case "aircraft":
+            for (let i = 0; i < INIT_DATA[5].length; i++){
+                if (sel_id == INIT_DATA[5][i]["hash"]){
+                    selection_path = INIT_DATA[5][i]["path"]
+                    selection_name = INIT_DATA[5][i]["name"]
+                }
+            }
+            document.getElementById("confirmresult-aircraft").innerHTML = selection_name
+            selected_aircraft_preset = selection_path
+            
+            break
+        case "command":
+            for (let i = 0; i < INIT_DATA[6].length; i++){
+                if (sel_id == INIT_DATA[6][i]["hash"]){
+                    selection_path = INIT_DATA[5][i]["path"]
+                    selection_name = INIT_DATA[5][i]["name"]
+                }
+            }
+            document.getElementById("confirmresult-command").innerHTML = selection_name
+            selected_command_preset = selection_path
+
+            break
+        case "airport":
+            for (let i = 0; i < INIT_DATA[2].length; i++){
+                if (sel_id == INIT_DATA[2][i]["hash"]){
+                    selection_path = INIT_DATA[2][i]["content"]["FILENAME"]
+                    selection_name = INIT_DATA[2][i]["content"]["AIRPORT_NAME"]
+                }
+            }
+            document.getElementById("confirmresult-airport").innerHTML = selection_name
+            selected_map = selection_path
+
+            break
+    }
 
 }
 
@@ -48,9 +87,7 @@ function render_map(){
         return
     }
     
-    window.electronAPI.send_message("controller", ["set-map", selected_map])
-    
-
+    window.electronAPI.send_message("controller", ["set-enviroment", selected_map, selected_command_preset, selected_aircraft_preset])
 }
 
 /*
@@ -409,26 +446,79 @@ function ai_control_change(elem){
 }
 
 /*
-Controller_GEN features
+Controller_SET features
 */
 
 function regen_map(){
     window.electronAPI.send_message("controller", ["regenerate-map"])
 }
 
+function generate_aircrafts_from_sources(){
+    let aircraft_data = INIT_DATA[5]
+    for (let i = 0; i < aircraft_data.length; i++){
+        let record = document.createElement("tr")
+        let name = aircraft_data[i]["name"]
+
+        let name_obj = document.createElement("td")
+        name_obj.innerHTML = name
+        let inspect_obj = document.createElement("td")
+        let select_obj = document.createElement("td")
+
+        let select_button = document.createElement("button")
+        select_button.classList.add("tablebutton")
+        select_button.innerHTML = "Select"
+        select_button.id = aircraft_data[i]["hash"]
+        select_obj.append(select_button)
+
+        record.appendChild(name_obj)
+        record.appendChild(inspect_obj)
+        record.appendChild(select_obj)
+
+        document.querySelector("table#aircrafts").appendChild(record)
+    }
+}
+
+function generate_commands_from_sources(){
+    let command_data = INIT_DATA[6]
+    for (let i = 0; i < command_data.length; i++){
+        let record = document.createElement("tr")
+        let name = command_data[i]["name"]
+
+        let name_obj = document.createElement("td")
+        name_obj.innerHTML = name
+        let inspect_obj = document.createElement("td")
+        let select_obj = document.createElement("td")
+
+        let select_button = document.createElement("button")
+        select_button.classList.add("tablebutton")
+        select_button.innerHTML = "Select"
+        select_button.id = command_data[i]["hash"]
+        select_obj.append(select_button)
+
+        record.appendChild(name_obj)
+        record.appendChild(inspect_obj)
+        record.appendChild(select_obj)
+
+        document.querySelector("table#commands").appendChild(record)
+    }
+}
+
 function generate_airports_from_sources(){
     let airport_data = INIT_DATA[2]
     for (let i = 0; i < airport_data.length; i++){
+        let airport = airport_data[i]["content"]
+        let airport_hash = airport_data[i]["hash"]
+
         let record = document.createElement("tr")
 
         let i2 = 0;
-        for (const [key, value] of Object.entries(airport_data[i])) {
+        for (const [key, value] of Object.entries(airport)) {
             if (i2 == 0){
                 //skip first FILENAME record
                 i2 += 1
                 continue
             }
-            if (i2 == Object.keys(airport_data[i]).length - 1){
+            if (i2 == Object.keys(airport).length - 1){
                 //skip DESC
                 break
             }
@@ -451,9 +541,10 @@ function generate_airports_from_sources(){
         popup_box.classList.add("popup-box");
         select_button.classList.add("tablebutton")
         select_button.innerHTML = "Select"
+        select_button.id = airport_hash
 
         desc.classList.add("desc");
-        desc.innerHTML = airport_data[i]["DESC"]
+        desc.innerHTML = airport["DESC"]
 
         popup_box.appendChild(desc)
 
@@ -464,7 +555,7 @@ function generate_airports_from_sources(){
         record.appendChild(desc_obj)
         record.appendChild(select_obj)
 
-        document.querySelector("table").appendChild(record)
+        document.querySelector("table#airports").appendChild(record)
     }
 }
 
@@ -550,16 +641,19 @@ function process_init_data(data, reset = false){
     else if (page.includes("controller_set")){
         if (map_name != undefined){
             //loaded from backup, change map name
-            document.getElementById("confirmresult").innerHTML = map_name
+            //TODO is fired even though not 
+            document.getElementById("confirmresult-airport").innerHTML = map_name
         }
 
         generate_airports_from_sources() //initial airport data generation from configs sent through IPC
+        generate_aircrafts_from_sources() //initial aircraft data generation from json files sent through IPC
+        generate_commands_from_sources() //initial commands data generation from json files sent through IPC
 
         //add listeners to select buttons
         let select_buttons = document.getElementsByClassName("tablebutton")
         for (let i = 0; i < select_buttons.length; i++){
             select_buttons[i].addEventListener("click", () => {
-                selection(i)
+                selection(select_buttons[i])
             })
         }
 

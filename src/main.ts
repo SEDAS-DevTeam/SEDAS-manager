@@ -5,8 +5,8 @@ import {Worker} from "worker_threads"
 import {spawn} from "node:child_process"
 import path from "path"
 import http from "http"
-import * as read_map from "./read_map"
-import { Plane, PlaneDB, generate_plane_hash } from "./plane_functions";
+import * as utils from "./utils"
+import { Plane, PlaneDB } from "./plane_functions";
 import { update_all } from "./fetch";
 import {EventLogger} from "./logger"
 
@@ -28,7 +28,6 @@ var backup_db_on: boolean = true
 var scale: number = 0;
 var running: boolean = false
 var coords = [0, 0]
-var map_name: string = ""
 var app_running: boolean = true
 var redir_to_main: boolean = false
 var EvLogger: EventLogger;
@@ -43,6 +42,11 @@ var latitude: any;
 var zoom: any;
 var map_config = [];
 var map_data: any = undefined;
+var map_name: string = ""
+
+//other sim data
+var aircraft_presets_list = []
+var command_presets_list = []
 
 //simulation-based declarations
 var simulation_dict = {
@@ -60,7 +64,11 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
 const ABS_PATH = path.resolve("")
 const PATH_TO_AUDIO_UPDATE: string = path.join(ABS_PATH, "/src/res/neural/get_info.py")
+
+//simulation files
 const PATH_TO_MAPS: string = path.join(ABS_PATH, "/src/res/data/sim/maps/")
+const PATH_TO_COMMANDS: string = path.join(ABS_PATH, "/src/res/data/sim/commands/")
+const PATH_TO_AIRCRAFTS: string = path.join(ABS_PATH, "/src/res/data/sim/planes/")
 
 //read JSON
 const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
@@ -356,7 +364,7 @@ function main_app(backup_db: any = undefined){
                 }
             }
 
-            curr_plane_id = generate_plane_hash()
+            curr_plane_id = utils.generate_hash()
             let plane = new Plane(curr_plane_id, backup_db["planes"][i]["callsign"], 
                     backup_db["planes"][i]["heading"], backup_db["planes"][i]["updated_heading"],
                     backup_db["planes"][i]["level"], backup_db["planes"][i]["updated_level"],
@@ -646,17 +654,48 @@ ipcMain.handle("message", (event, data) => {
             else if (data[0] == "controller"){
                 //sending monitor data
 
-                //sending airport map data
+                //acquiring airport map data
                 map_config = []
-                var map_files = read_map.list_map_files()
+                var map_files = utils.list_files(PATH_TO_MAPS)
                 for (let i = 0; i < map_files.length; i++){
-                    let map = read_map.read_map_from_file(map_files[i])
+                    let map = utils.read_file_content(PATH_TO_MAPS, map_files[i])
                     if (map_files[i].includes("config")){
-                        map_config.push(map)
+                        map_config.push({
+                            "hash": "airport-" + utils.generate_hash(),
+                            "content": map
+                        })
                     }
                 }
 
-                controllerWindow.send_message("init-info", ["window-info", JSON.stringify(workers), map_config, JSON.stringify(app_settings), map_name])
+                //acquiring list of aircraft presets
+                aircraft_presets_list = []
+                let aircraft_files = utils.list_files(PATH_TO_AIRCRAFTS)
+                for (let i = 0; i < aircraft_files.length; i++){
+                    let aircraft_config = utils.read_file_content(PATH_TO_AIRCRAFTS, aircraft_files[i])
+                    aircraft_presets_list.push({
+                        "path": aircraft_files[i],
+                        "hash": "aircraft-" + utils.generate_hash(),
+                        "name": aircraft_config["info"]["name"],
+                        "content": JSON.stringify(aircraft_config["all_planes"])
+                    })
+                }
+
+                //acquiring list of command presets
+                command_presets_list = []
+                let command_files = utils.list_files(PATH_TO_COMMANDS)
+                for (let i = 0; i < command_files.length; i++){
+                    let commands_config = utils.read_file_content(PATH_TO_COMMANDS, command_files[i])
+                    command_presets_list.push({
+                        "path": command_files[i],
+                        "hash": "command-" + utils.generate_hash(),
+                        "name": commands_config["info"]["name"],
+                        "content": JSON.stringify(commands_config["commands"])
+                    })
+                }
+
+                controllerWindow.send_message("init-info", ["window-info", JSON.stringify(workers), map_config, 
+                                                            JSON.stringify(app_settings), map_name, aircraft_presets_list, 
+                                                            command_presets_list])
             }
             else if (data[0] == "worker"){
                 //send to all workers
@@ -665,12 +704,16 @@ ipcMain.handle("message", (event, data) => {
                 }
             }
             break
-        case "set-map":
-            //getting map info from user input (invoked from controller)
-            let filename = data[1][1]
+        case "set-enviroment":
+            //getting map info, command preset info, aircraft preset info from user
+            let filename_map = data[1][1]
+            let filename_command = data[1][1]
+            let filename_aircraft = data[1][1]
+
+            console.log(filename_map, filename_command, filename_aircraft)
 
             //save map data to variable
-            map_data = read_map.read_map_from_file(filename)
+            map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
             //read scale, parse it and save it to another variable
             scale = parse_scale(map_data["scale"])
             //save map name for other usage
@@ -814,7 +857,7 @@ ipcMain.handle("message", (event, data) => {
                 }
             }
             
-            curr_plane_id = generate_plane_hash()
+            curr_plane_id = utils.generate_hash()
             let plane = new Plane(curr_plane_id, plane_data["name"], 
                             plane_data["heading"], plane_data["heading"],
                             plane_data["level"], plane_data["level"],

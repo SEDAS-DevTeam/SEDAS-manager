@@ -1,4 +1,7 @@
 {
+    "info": {
+        "name": "Aircraft preset 1"
+    },
     "airlines": [
         {
             "name": "Aer Lingus",

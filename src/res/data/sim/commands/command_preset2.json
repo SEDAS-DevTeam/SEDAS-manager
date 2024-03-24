@@ -1,4 +1,7 @@
 {
+    "info": {
+        "name": "command preset 2"
+    },
     "commands": [
         {
             "input": "test",

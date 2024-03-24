@@ -13,6 +13,7 @@ package-lock.json
 /src/database.js
 /src/plane_functions.js
 /src/fetch.js
+/src/utils.js
 
 /src/*.map
 

@@ -14,7 +14,7 @@
   "files": [
     "./src/backend.ts",
     "./src/main.ts",
-    "./src/read_map.ts",
+    "./src/utils.ts",
     "./src/database.ts",
     "./src/plane_functions.ts",
     "./src/fetch.ts",

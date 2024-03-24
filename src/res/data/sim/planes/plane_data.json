@@ -1,4 +1,7 @@
 {
+    "info": {
+        "name": "Aircraft preset 2"
+    },
     "all_planes": [
         {
             "manufacturer": "Airbus",

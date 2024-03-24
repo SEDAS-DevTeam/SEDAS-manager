@@ -1,5 +1,3 @@
-import { v4 } from "uuid"
-
 //low level functions
 function deg_to_rad(deg){
     return deg * (Math.PI / 180)
@@ -7,10 +5,6 @@ function deg_to_rad(deg){
 
 function rad_to_deg(rad){
     return Math.round(rad * (180 / Math.PI))
-}
-
-export function generate_plane_hash(){
-    return v4()
 }
 
 export class PlaneDB{

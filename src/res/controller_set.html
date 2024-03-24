@@ -28,7 +28,7 @@
             <h3><button class="inline-but" id="regen-map">Regenerate map</button>randomized regeneration</h3>
             
             <h3>or search for any airport in search:</h3>
-            <table>
+            <table id="airports">
                 <tr>
                     <th>Airport</th>
                     <th>Type</th>
@@ -45,14 +45,41 @@
 
             <h3>Selected map:</h3>
             <div class="result">
-                <h2 id="confirmresult">None</h2>
-                <button id="confirm">Confirm</button>
+                <h2 id="confirmresult-airport">None</h2>
             </div>
             <hr>
             <h3>Aircraft preset selection</h3>
+            <table id="aircrafts">
+                <tr>
+                    <th>Aircraft preset name</th>
+                    <th>Inspect</th>
+                    <th>
+                        <form><input type="text" placeholder="Search.." name="search"></form>
+                    </th>
+                </tr>
+            </table>
+
+            <h3>Selected aircraft preset:</h3>
+            <div class="result">
+                <h2 id="confirmresult-airport">None</h2>
+            </div>
             <hr>
-            <h3>Custom command selection</h3>
+            <h3>Commands preset selection</h3>
+            <table id="commands">
+                <tr>
+                    <th>Command Preset name</th>
+                    <th>Inspect</th>
+                    <th>
+                        <form><input type="text" placeholder="Search.." name="search"></form>
+                    </th>
+                </tr>
+            </table>
+            <h3>Selected command preset:</h3>
+            <div class="result">
+                <h2 id="confirmresult-airport">None</h2>
+            </div>
             <hr>
+            <button id="confirm">Confirm</button>
         </div>
     </body>
 </html>

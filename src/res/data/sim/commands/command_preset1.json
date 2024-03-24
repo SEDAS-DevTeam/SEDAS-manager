@@ -1,4 +1,7 @@
 {
+    "info": {
+        "name": "command preset 1"
+    },
     "commands": [
         {
             "input": "<callsign>, fly heading <value>",

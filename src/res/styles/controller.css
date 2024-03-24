@@ -132,7 +132,12 @@ div.popup-box p{
 #controller-body{
     overflow-y: scroll;
     margin-left: 20px; 
-    margin-right: 20px
+    margin-right: 20px;
+}
+
+#confirm{
+    margin-bottom: 20px;
+    margin-top: 20px;
 }
 
 .grid-container {

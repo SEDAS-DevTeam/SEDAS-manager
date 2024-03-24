@@ -58,8 +58,8 @@ function selection(button_elem){
         case "command":
             for (let i = 0; i < INIT_DATA[6].length; i++){
                 if (sel_id == INIT_DATA[6][i]["hash"]){
-                    selection_path = INIT_DATA[5][i]["path"]
-                    selection_name = INIT_DATA[5][i]["name"]
+                    selection_path = INIT_DATA[6][i]["path"]
+                    selection_name = INIT_DATA[6][i]["name"]
                 }
             }
             document.getElementById("confirmresult-command").innerHTML = selection_name
@@ -75,7 +75,6 @@ function selection(button_elem){
             }
             document.getElementById("confirmresult-airport").innerHTML = selection_name
             selected_map = selection_path
-
             break
     }
 

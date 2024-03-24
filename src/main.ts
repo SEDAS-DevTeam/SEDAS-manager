@@ -707,8 +707,8 @@ ipcMain.handle("message", (event, data) => {
         case "set-enviroment":
             //getting map info, command preset info, aircraft preset info from user
             let filename_map = data[1][1]
-            let filename_command = data[1][1]
-            let filename_aircraft = data[1][1]
+            let filename_command = data[1][2]
+            let filename_aircraft = data[1][3]
 
             console.log(filename_map, filename_command, filename_aircraft)
 

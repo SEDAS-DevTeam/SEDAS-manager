@@ -691,7 +691,7 @@ ipcMain.handle("message", (event, data) => {
             }
 
             for (let i = 0; i < workers.length; i++){
-                worker[i].send_message("ask-for-render") //send workers command to fire "render-map" event
+                workers[i].send_message("ask-for-render") //send workers command to fire "render-map" event
             }
             break
         case "render-map":

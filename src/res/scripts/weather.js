@@ -18,10 +18,9 @@ var loadedTilesCount = 0;
 
 var map;
 
-window.onload = () => {
-    /*
-     * Load whole map
-    */
+function initialize_map(){
+    document.getElementById("warn-popup").style.visibility = "hidden"
+
     map = L.map('mapid') 
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -42,7 +41,9 @@ window.onload = () => {
 
     //start playing
     play()
+}
 
+window.onload = () => {
     //ask for location where to focus
     ask_for_loc()
 }
@@ -185,7 +186,8 @@ function play() {
 }
 
 function play_loop(){
-    if (is_playing){
+    console.log(map)
+    if (is_playing && map != undefined){
         showFrame(animationPosition + 1);
     }
 }
@@ -198,11 +200,24 @@ function ask_for_loc(){
 }
 
 function create_warn_header(message){
+
+    //removing all remaining warning popup children
+    let warn_popup = document.getElementById("warn-popup")
+    warn_popup.style.visibility = "visible"
+    warn_popup.innerHTML = ""
+
     let info_text = document.createElement("h1")
-    info_text.id = "info-label"
+    info_text.id = "warn-text"
     info_text.innerHTML = message
 
-    document.getElementById("mapid").appendChild(info_text)
+    document.getElementById("warn-popup").appendChild(info_text)
+}
+
+function remove_map(){
+    if (map != undefined){
+        map.remove()
+        map = undefined
+    }
 }
 
 //play loop to render frames
@@ -211,14 +226,20 @@ setInterval(play_loop, 500)
 window.electronAPI.on_message("geo-data", (data) => {
     console.log(data)
     if (data[0] == "none" && data[1] == "none"){
+        remove_map()
+
         //map doesn't have location data
         create_warn_header("Current map does not support location data for weather services")
     }
     else if (data[0] == undefined && data[1] == undefined){
+        remove_map()
+
         //map is not even selected
         create_warn_header("Nothing to render because no map was selected")
     }
     else{
+        initialize_map()
+
         //map has location data
         map.setView([data[0], data[1]], data[2]);
     }

@@ -44,18 +44,15 @@ var map_config = [];
 var map_data: any = undefined;
 var map_name: string = ""
 
-//other sim data
+//aircraft preset variables
 var aircraft_presets_list = []
-var command_presets_list = []
+var aircraft_preset_data: any = undefined;
+var aircraft_preset_name: string = ""
 
-//simulation-based declarations
-var simulation_dict = {
-    "planes": null,
-    "monitor-planes": null,
-    "map": null,
-    "map-name": "",
-    "monitor-data": null
-} //this dictionary is used for saving all necessary simulation data to database (used for recovery)
+//command preset variables
+var command_presets_list = []
+var command_preset_data: any = undefined;
+var command_preset_name: string = ""
 
 /*
 APP INIT 1
@@ -704,21 +701,25 @@ ipcMain.handle("message", (event, data) => {
                 }
             }
             break
-        case "set-enviroment":
+        case "set-enviromnent":
             //getting map info, command preset info, aircraft preset info from user
             let filename_map = data[1][1]
             let filename_command = data[1][2]
             let filename_aircraft = data[1][3]
 
-            console.log(filename_map, filename_command, filename_aircraft)
-
             //save map data to variable
             map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
-            //read scale, parse it and save it to another variable
+            //read scale
             scale = parse_scale(map_data["scale"])
-            //save map name for other usage
+            //save map name for backup usage
             let map_config_raw = fs.readFileSync(PATH_TO_MAPS + map_data["CONFIG"], "utf-8")
             map_name = JSON.parse(map_config_raw)["AIRPORT_NAME"];
+
+            command_preset_data = utils.read_file_content(PATH_TO_COMMANDS, filename_command)
+            command_preset_name = command_preset_data["info"]["name"]
+
+            aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft)
+            aircraft_preset_name = command_preset_data["info"]["name"]
 
             //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
             if (map_data == undefined){
@@ -977,12 +978,16 @@ setInterval(() => {
 setInterval(() => {
     if (app_running){
         if (backup_db_on && (PlaneDatabase != undefined) && (map_data != undefined) && (workers.length != 0)){
-            simulation_dict = {
+            let simulation_dict = {
                 "planes": PlaneDatabase.DB,
                 "monitor-planes": PlaneDatabase.monitor_DB,
+                "monitor-data": workers,
                 "map": map_data,
                 "map-name": map_name,
-                "monitor-data": workers
+                "command-preset": command_preset_data,
+                "command-preset-name": command_preset_name,
+                "aircraft-preset": aircraft_preset_data,
+                "aircraft-preset-name": aircraft_preset_name
             }
     
             //save to local db using database.ts 

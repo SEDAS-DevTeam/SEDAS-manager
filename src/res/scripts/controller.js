@@ -86,7 +86,7 @@ function render_map(){
         return
     }
     
-    window.electronAPI.send_message("controller", ["set-enviroment", selected_map, selected_command_preset, selected_aircraft_preset])
+    window.electronAPI.send_message("controller", ["set-environment", selected_map, selected_command_preset, selected_aircraft_preset])
 }
 
 /*

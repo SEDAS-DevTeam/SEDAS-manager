@@ -1,0 +1,289 @@
+{
+    "all_planes": [
+        {
+            "manufacturer": "Airbus",
+            "planes": [
+                {
+                    "name": "A319"
+                },
+                {
+                    "name": "A319neo"
+                },
+                {
+                    "name": "A320"
+                },
+                {
+                    "name": "A320neo"
+                },
+                {
+                    "name": "A321"
+                },
+                {
+                    "name": "A321neo"
+                },
+                {
+                    "name": "A321neoXLR"
+                },
+                {
+                    "name": "A330"
+                },
+                {
+                    "name": "A350"
+                },
+                {
+                    "name": "A380"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Antonov",
+            "planes": [
+                {
+                    "name": "AN-28",
+                    "desc": ""
+                },
+                {
+                    "name": "PZL M-28",
+                    "desc": "Polish version of AN-28"
+                },
+                {
+                    "name": "AN-124"
+                },
+                {
+                    "name": "AN-225"
+                }
+            ]
+        },
+        {
+            "manufacturer": "ATR",
+            "planes": [
+                {
+                    "name": "ATR 42"
+                },
+                {
+                    "name": "ATR 72"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Beechcraft",
+            "planes": [
+                {
+                    "name": "Beechcraft King Air"
+                },
+                {
+                    "name": "Beechcraft 99"
+                },
+                {
+                    "name": "Beechcraft 400"
+                },
+                {
+                    "name": "Beechraft 1900"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Boeing",
+            "planes": [
+                {
+                    "name": "B737"
+                },
+                {
+                    "name": "B737 MAX"
+                },
+                {
+                    "name": "B747"
+                },
+                {
+                    "name": "B757"
+                },
+                {
+                    "name": "B767"
+                },
+                {
+                    "name": "B777"
+                },
+                {
+                    "name": "B787"
+                }
+            ]
+        },
+        {
+            "manufacturer": "British Aerospace",
+            "planes": [
+                {
+                    "name": "BAE 146"
+                },
+                {
+                    "name": "Jetstream 31"
+                },
+                {
+                    "name": "jetstream 41"
+                }
+            ]
+        },
+        {
+            "manufacturer": "CASA",
+            "planes": [
+                {
+                    "name": "CASA 235"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Cessna",
+            "planes": [
+                {
+                    "name": "Cessna 208"
+                },
+                {
+                    "name": "Cessna 402"
+                },
+                {
+                    "name": "Cessna 411"
+                },
+                {
+                    "name": "Cessna 421"
+                },
+                {
+                    "name": "Cessna 425"
+                },
+                {
+                    "name": "Cessna 441"
+                },
+                {
+                    "name": "Cessna Citation"
+                }
+            ]
+        },
+        {
+            "manufacturer": "COMAC",
+            "planes": [
+                {
+                    "name": "ARJ21"
+                },
+                {
+                    "name": "C919"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Dassault",
+            "planes": [
+                {
+                    "name": "Falcon 900"
+                },
+                {
+                    "name": "Falcon 2000"
+                }
+            ]
+        },
+        {
+            "manufacturer": "De havilland",
+            "planes": [
+                {
+                    "name": "DHC-6"
+                },
+                {
+                    "name": "DHC-8"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Dornier",
+            "planes": [
+                {
+                    "name": "DO 228"
+                },
+                {
+                    "name": "DO 328"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Embraer",
+            "planes": [
+                {
+                    "name": "Embraer 145"
+                },
+                {
+                    "name": "Embraer 170"
+                },
+                {
+                    "name": "Embraer 190"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Gulfstream",
+            "planes": [
+                {
+                    "name": "Gulfstream IV"
+                },
+                {
+                    "name": "Gulfstream V"
+                }
+            ]
+        },
+        {
+            "manufacturer": "IAI",
+            "planes": [
+                {
+                    "name": "IAI 1124"
+                },
+                {
+                    "name": "IAI 1126"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Learjet",
+            "planes": [
+                {
+                    "name": "Learjet 45"
+                },
+                {
+                    "name": "Learjet 60;"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Pilatius",
+            "planes":  [
+                {
+                    "name": "PC-12"
+                },
+                {
+                    "name": "PC-24"
+                }
+            ]
+        },
+        {
+            "manufacturer": "SAAB",
+            "planes": [
+                {
+                    "name": "SAAB 340"
+                },
+                {
+                    "name": "SAAB 2000"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Suchoj",
+            "planes": [
+                {
+                    "name": "Superjet 100"
+                }
+            ]
+        },
+        {
+            "manufacturer": "Xian Ma",
+            "planes": [
+                {
+                    "name": "MA-60"
+                }
+            ]
+        }
+    ]
+}

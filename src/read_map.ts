@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path"
 
 const ABS_PATH = path.resolve("")
-const PATH_TO_FILES: string = path.join(ABS_PATH, "/src/res/maps/")
+const PATH_TO_FILES: string = path.join(ABS_PATH, "/src/res/data/sim/maps/")
 
 export function read_map_from_file(file_name){
     let map_raw = fs.readFileSync(PATH_TO_FILES + file_name, "utf-8")

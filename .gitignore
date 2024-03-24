@@ -16,9 +16,6 @@ package-lock.json
 
 /src/*.map
 
-#redis files
-dump.rdb
-
 #pycache files
 /src/res/neural/cache/__pycache__/
 
@@ -27,17 +24,17 @@ dump.rdb
 !/src/res/neural/alg_cache/.gitkeep
 
 #fetched conf files
-/src/res/alg_data/*
-!/src/res/alg_data/.gitkeep
+/src/res/data/alg/*
+!/src/res/data/alg/.gitkeep
 
 #fetched tmp files
-/src/res/tmp_data/*
-!/src/res/tmp_data/.gitkeep
+/src/res/data/tmp/*
+!/src/res/data/tmp/.gitkeep
 
 #app logs
 /src/logs/*
 !/src/logs/.gitkeep
 
 #locally generated settings files
-/src/res/data/in_device_list.json
-/src/res/data/out_device_list.json
+/src/res/data/app/in_device_list.json
+/src/res/data/app/out_device_list.json

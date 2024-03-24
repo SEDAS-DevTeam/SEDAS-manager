@@ -10,7 +10,7 @@ const PORT = 36000
 const QUERY_TIMEOUT: number = 10
 
 //read JSON
-const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/settings.json"), "utf-8")
+const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
 const app_settings = JSON.parse(app_settings_raw);
 
 //variables

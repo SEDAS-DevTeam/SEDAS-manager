@@ -2,8 +2,7 @@ import threading
 import json
 import os
 import sys
-import queue
-import time
+from pathlib import Path
 import socket
 
 #append all cache files to PATH
@@ -61,7 +60,7 @@ def check_server(client_socket):
             settings_json = json.loads(data)
 
 if __name__ == "__main__":
-    app_settings_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))) + "/data/settings.json")
+    app_settings_path = os.path.join(str(Path(__file__).parents[3]), "src/res/data/app/settings.json")
     app_settings_raw = open(app_settings_path)
     app_settings = json.load(app_settings_raw)
 

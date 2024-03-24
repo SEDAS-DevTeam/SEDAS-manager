@@ -1,6 +1,7 @@
 import pyaudio
 import speech_recognition as sr
 import os
+from pathlib import Path
 import json
 
 def get_audio_input_devices():
@@ -35,8 +36,8 @@ def get_audio_output_devices():
 
 if __name__ == "__main__":
     #write new devices into file
-    in_devices_path = os.getcwd()[:os.getcwd().index("SEDAC") + len("SEDAC")] + "/src/res/data/in_device_list.json"
-    out_devices_path = os.getcwd()[:os.getcwd().index("SEDAC") + len("SEDAC")] + "/src/res/data/out_device_list.json"
+    in_devices_path = os.path.join(str(Path(__file__).parents[3]), "/src/res/data/app/in_device_list.json")
+    out_devices_path = os.path.join(str(Path(__file__).parents[3]), "/src/res/data/app/out_device_list.json")
 
     if os.path.exists(in_devices_path):
         os.remove(in_devices_path)

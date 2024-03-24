@@ -60,10 +60,10 @@ process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
 const ABS_PATH = path.resolve("")
 const PATH_TO_AUDIO_UPDATE: string = path.join(ABS_PATH, "/src/res/neural/get_info.py")
-const PATH_TO_MAPS: string = path.join(ABS_PATH, "/src/res/maps/")
+const PATH_TO_MAPS: string = path.join(ABS_PATH, "/src/res/data/sim/maps/")
 
 //read JSON
-const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/settings.json"), "utf-8")
+const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
 app_settings = JSON.parse(app_settings_raw);
 
 //initialize EventLogger (first initialization to log other ones)
@@ -577,7 +577,7 @@ ipcMain.handle("message", (event, data) => {
             //save settings
             EvLogger.add_record("DEBUG", "saving settings")
 
-            fs.writeFileSync(path.join(ABS_PATH, "/src/res/data/settings.json"), data[1][1])
+            fs.writeFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), data[1][1])
             break
         case "redirect-to-settings":
             //message call to redirect to settings
@@ -623,21 +623,21 @@ ipcMain.handle("message", (event, data) => {
 
                 //ACAI backend
 
-                const speech_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/alg_data/speech_config.json"), "utf-8")
+                const speech_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/speech_config.json"), "utf-8")
                 const speech_config = JSON.parse(speech_config_raw);
 
-                const text_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/alg_data/text_config.json"), "utf-8")
+                const text_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/text_config.json"), "utf-8")
                 const text_config = JSON.parse(text_config_raw);
 
-                const voice_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/alg_data/voice_config.json"), "utf-8")
+                const voice_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/voice_config.json"), "utf-8")
                 const voice_config = JSON.parse(voice_config_raw);
 
                 //audio devices
 
-                const in_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/in_device_list.json"), "utf-8")
+                const in_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/in_device_list.json"), "utf-8")
                 const in_devices = JSON.parse(in_devices_raw)
 
-                const out_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/out_device_list.json"), "utf-8")
+                const out_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/out_device_list.json"), "utf-8")
                 const out_devices = JSON.parse(out_devices_raw)
 
                 //sending app data and alg configs

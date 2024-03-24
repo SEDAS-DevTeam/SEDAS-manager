@@ -1,0 +1,9 @@
+{
+    "commands": [
+        {
+            "input": "test",
+            "output": "test",
+            "comm": "test"
+        }
+    ]
+}

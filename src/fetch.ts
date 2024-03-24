@@ -1,10 +1,11 @@
 import {get} from 'https'
+import path from "path"
 
 import { createWriteStream } from 'fs'
-import {join} from "path"
 
-const PATH_TO_CACHE: string = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/neural/alg_cache"
-const PATH_TO_CONFIG: string = __dirname.substring(0, __dirname.indexOf("SEDAC") + "SEDAC".length) + "/src/res/alg_data"
+const ABS_PATH = path.resolve("")
+const PATH_TO_CACHE: string = path.join(ABS_PATH, "/src/res/neural/alg_cache")
+const PATH_TO_CONFIG: string = path.join(ABS_PATH, "/src/res/data/alg/")
 
 const URL: string = "https://raw.githubusercontent.com/HelloWorld7894/SEDAC-networks/main/src/"
 
@@ -12,8 +13,8 @@ async function fetch_file_src(header: string, filename: string){
     return new Promise<void>(resolve => {
         var des_url: string = URL + header
 
-        var file = createWriteStream(join(PATH_TO_CACHE, filename))
-        var request = get(join(des_url, filename), (response) => {
+        var file = createWriteStream(path.join(PATH_TO_CACHE, filename))
+        var request = get(path.join(des_url, filename), (response) => {
             response.pipe(file)
 
             file.on("finish", () => {
@@ -28,8 +29,8 @@ async function fetch_file_conf(header: string, filename: string){
     return new Promise<void>(resolve => {
         var des_url: string = URL + header
 
-        var file = createWriteStream(join(PATH_TO_CONFIG, filename))
-        var request = get(join(des_url, filename), (response) => {
+        var file = createWriteStream(path.join(PATH_TO_CONFIG, filename))
+        var request = get(path.join(des_url, filename), (response) => {
             response.pipe(file)
 
             file.on("finish", () => {

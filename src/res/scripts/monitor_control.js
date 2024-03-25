@@ -1,66 +1,18 @@
-//ELEMENT DRAGGING DEFS
-var pos_init_X = 0, pos_init_Y = 0, pos_new_X = 0, pos_new_Y = 0
-var dragged_element = undefined
-
 //ELEMENT INIT DEFS
 const MONITOR_INIT_STRING = '<div class="monitor-header">Monitor </div><select id="functions" class="monitor-functions" name="functions"><option value="TWR">TWR control</option><option value="APP">APP control</option><option value="ACC">ACC control</option><option value="weather">weather forecast</option><option value="dep_arr">departure/arrival list</option></select>'
-const MODES_TO_IDX = {
-  "TWR": 0,
-  "APP": 1,
-  "ACC": 2,
-  "weather": 3, //weather forecast
-  "dep_arr": 4 //departure/arrivals
-}
+const MODES = ["TWR", "APP", "ACC", "weather", "dep_arr"]
 const MONITOR_X_SPACE = 250
 const MONITOR_Y = 200
 
-//ELEMENT DRAGGING
-function drag_element(element, idx){
-  let monitor_header = document.getElementById("monitor" + idx).getElementsByClassName("monitor-header")[0]
-
-  monitor_header.onmousedown = (event) => {
-    event.preventDefault()
-
-    dragged_element = element
-
-    pos_init_X = event.clientX
-    pos_init_Y = event.clientY
-
-    document.onmouseup = stop_drag
-    document.getElementById("field").onmousemove = drag_elem_to_loc
-    //monitor_header.onmousemove = drag_elem_to_loc //This breaks whole bounding box thing //TODO:
-  }
-}
-
-function stop_drag(){
-
-  document.onmouseup = null
-  document.getElementById("field").onmousemove = null
-  let monitors = document.getElementsByClassName("monitor-header")
-  for (let i = 0; i < monitors.length; i++){
-    monitors[i].onmousemove = null
-  };
-}
-
-function drag_elem_to_loc(event){
-  event.preventDefault()
-
-  pos_new_X = pos_init_X - event.clientX
-  pos_new_Y = pos_init_Y - event.clientY
-  pos_init_X = event.clientX;
-  pos_init_Y = event.clientY;
-
-  dragged_element.style.top = (dragged_element.offsetTop - pos_new_Y) + "px"
-  dragged_element.style.left = (dragged_element.offsetLeft - pos_new_X) + "px"
-
-  draw_connection() //redraw connection again
-
-}
+//other vars
+var focus_out = false
+var curr_text;
+var input;
+var is_in_form = false
 
 //ELEMENT INIT
 
 function insert_selected(idx){
-  console.log(idx)
   var regex = /option/gi, result, indices = [], indices_mod = [];
   while ( (result = regex.exec(MONITOR_INIT_STRING)) ) {
       indices.push(result.index);
@@ -76,9 +28,42 @@ function insert_selected(idx){
   return out.slice(0, option_index) + "selected " + out.slice(option_index)
 }
 
-function rename(innerhtml_string, idx){
-  let header_idx = innerhtml_string.indexOf("Monitor ") + "Monitor ".length
-  return innerhtml_string.slice(0, header_idx) + idx + innerhtml_string.slice(header_idx)
+function on_form_exit(curr_text, input){
+  let parent = curr_text.parentNode
+  parent.innerHTML = ""
+
+  //user exited form
+  let new_text = document.createElement("p")
+  new_text.classList.add("monitor-header-text")
+  new_text.innerHTML = input.value
+  new_text.addEventListener("dblclick", (event) => {
+    rename_monitor(event)
+  })
+
+  parent.appendChild(new_text)
+
+  is_in_form = false
+}
+
+function rename_monitor(event){
+  curr_text = event.target
+
+  is_in_form = true
+  var val = curr_text.innerHTML;
+  input = document.createElement("input");
+  input.id = "curr-input"
+
+  input.value = val;
+  input.onblur = () => {
+    if (!focus_out){
+      on_form_exit(curr_text, input)
+    }
+    focus_out = false
+  }
+
+  curr_text.innerHTML = "";
+  curr_text.appendChild(input);
+  input.focus();
 }
 
 function element_init(element_data, idx){
@@ -86,14 +71,35 @@ function element_init(element_data, idx){
 
   let worker_type = element_data["win_type"]
 
-  let monitor_innerhtml = insert_selected(MODES_TO_IDX[worker_type])
-  monitor_innerhtml = rename(monitor_innerhtml, idx + 1)
+  //let monitor_innerhtml = insert_selected(MODES_TO_IDX[worker_type])
+  //console.log(monitor_innerhtml)
+  //monitor_innerhtml = rename(monitor_innerhtml, idx + 1)
 
   let monitor_elem = document.createElement("div")
 
-  monitor_elem.innerHTML = monitor_innerhtml
   monitor_elem.classList.add("monitor-content")
   monitor_elem.id = "monitor" + idx
+
+  let monitor_header = document.createElement("div")
+  monitor_header.classList.add("monitor-header")
+  monitor_header.innerHTML = `<p class="monitor-header-text">Monitor ${idx}</p>`
+
+  let mode_list = document.createElement("select")
+  mode_list.classList.add("monitor-functions")
+  for (let i = 0; i < MODES.length; i++){
+    let mode_elem = document.createElement("option")
+    mode_elem.value = MODES[i]
+    mode_elem.innerHTML = MODES[i]
+
+    if (worker_type == MODES[i]){
+      mode_elem.selected = true
+    }
+
+    mode_list.appendChild(mode_elem)
+  }
+
+  monitor_elem.appendChild(monitor_header)
+  monitor_elem.appendChild(mode_list)
 
   //set monitor to specific x,y
   monitor_elem.style.top = document.getElementById("top-content").offsetHeight + MONITOR_Y + "px"
@@ -101,39 +107,16 @@ function element_init(element_data, idx){
 
 
   document.getElementById("page-content").appendChild(monitor_elem)
-
+  
+  //set text to clickable
+  document.getElementsByClassName("monitor-header-text")[idx].addEventListener('dblclick', (event) => {
+    rename_monitor(event)
+  })
 }
 
-function draw_connection(){
-  let field = document.getElementById("field")
-  let offset_x = field.getBoundingClientRect().left
-  let offset_y = field.getBoundingClientRect().top
-
-  let object_offsets = []
-
-  for (let i = 0; i < monitor_objects.length; i++){
-    let x1 = monitor_objects[i].getBoundingClientRect().left - offset_x
-    let x2 = x1 + monitor_objects[i].clientWidth - offset_x
-    
-    let y_top = monitor_objects[i].getBoundingClientRect().top - offset_y
-    let y_bot =  monitor_objects[i].getBoundingClientRect().bottom - offset_y
-    let w_half = (y_bot - y_top) / 2
-
-    object_offsets.push({
-      "x1": Math.round(x1),
-      "x2": Math.round(x2),
-      "y": Math.round(y_top + w_half)
-    })
+document.addEventListener("keydown", () => {
+  if (is_in_form){
+    focus_out = true
+    on_form_exit(curr_text, input)
   }
-
-  //erase connections
-  field.innerHTML = ""
-
-  //write connections
-  let path_str = ""
-  for(let i = 0; i < object_offsets.length - 1; i++){
-    path_str += `<line x1="${object_offsets[i]["x2"]}" y1="${object_offsets[i]["y"]}" x2="${object_offsets[i + 1]["x1"]}" y2="${object_offsets[i + 1]["y"]}" stroke="black"/>`
-  }
-
-  field.innerHTML = path_str
-}
+})

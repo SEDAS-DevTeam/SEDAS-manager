@@ -627,14 +627,6 @@ function process_init_data(data, reset = false){
             for (let i = 0; i < monitor_data.length; i++){
                 element_init(monitor_data[i], i)
             }
-            
-            //retrieve all monitors again, set them to draggable and draw connections
-            let DOM_monitor_objects = document.getElementsByClassName("monitor-content")
-            for (let i = 0; i < DOM_monitor_objects.length; i++){
-                monitor_objects.push(DOM_monitor_objects[i])
-                drag_element(monitor_objects[i], i)
-            }
-            draw_connection()
         }
     }
     else if (page.includes("controller_set")){

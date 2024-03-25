@@ -166,10 +166,24 @@ Canvases
 
 .monitor-header {
     padding: 10px;
-    cursor: move;
     z-index: 10;
     background-color: #2196F3;
     color: #fff;
+}
+
+.monitor-functions{
+    width: 100%;
+}
+
+.monitor-header-text{
+    color: white;
+    font-size: medium;
+    margin: 15px 10px;
+}
+
+#curr-input{
+    width: 70px;
+    height: 15px;
 }
 
 div.selected{

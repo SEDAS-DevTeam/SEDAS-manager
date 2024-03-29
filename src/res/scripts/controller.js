@@ -8,7 +8,6 @@ var LEVEL_VALS = []
 var SPEED_VALS = []
 var ALL = []
 
-
 var Windows = []
 var monitor_objects = []
 var INIT_DATA = [] //storing all vital data like airport list, command preset list, aircraft preset list in current session
@@ -621,11 +620,14 @@ function process_init_data(data, reset = false){
 
         if (data[0] == "window-info"){
             monitor_data = JSON.parse(data[1])
-            console.log(monitor_data)
 
             //initialize all the monitor objects
             for (let i = 0; i < monitor_data.length; i++){
-                element_init(monitor_data[i], i)
+                let x = i % 4
+                let y = Math.round(i / 4)
+                let elemParent = document.getElementById("monitor-panel").children[0].children[y].children[x]
+
+                element_init(monitor_data[i], i, elemParent)
             }
         }
     }
@@ -772,6 +774,7 @@ window.onload = () => {
 
             //event listeners
             document.getElementById("res_to_def").addEventListener("click", () => {
+                delete_monitor_elem()
                 process_init_data(INIT_DATA, true)
             })
             document.getElementById("apply-changes").addEventListener("click", () => {

@@ -1,0 +1,48 @@
+.monitor-content {
+    width: 200px;
+    z-index: 10;
+    background-color: #f1f1f1;
+    border: 1px solid #d3d3d3;
+    text-align: center;
+    cursor: move;
+}
+
+.monitor-drag {
+    position: absolute;
+}
+
+.monitor-header {
+    padding: 10px;
+    z-index: 10;
+    background-color: #2196F3;
+    color: #fff;
+}
+
+.monitor-functions{
+    width: 100%;
+}
+
+.monitor-header-text{
+    color: white;
+    font-size: medium;
+    margin: 15px 10px;
+}
+
+#curr-input{
+    width: 70px;
+    height: 15px;
+}
+
+#monitor-panel tr{
+    height: 100px;
+    border: 2px #5271ff solid;
+}
+
+#monitor-panel td{
+    width: 25%;
+    border: 2px #5271ff solid;
+}
+
+#monitor-panel{
+    margin-bottom: 25px;
+}

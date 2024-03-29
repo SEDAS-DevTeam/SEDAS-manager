@@ -5,13 +5,38 @@ const MONITOR_X_SPACE = 250
 const MONITOR_Y = 200
 
 //other vars
+var MAX_MONITORS_ROW = 4 //maximum monitor rows in monitor table, changeable in settings (TODO)
+var MAX_MONITORS_COL = 3 //maximum monitor rows in monitor column, also changeable in settings (TODO)
 var focus_out = false
 var curr_text;
 var input;
 var is_in_form = false
+var monitor_drag = false
+var curr_monit_elem;
+var init_monit_x;
+var init_monit_y;
+var curr_col;
+var curr_row;
 
-//ELEMENT INIT
+//element moving (in listeners)
+function elem_mousedown(event, monitor_elem){
+  var posX = event.clientX;
+  var posY = event.clientY;
 
+  init_monit_x = monitor_elem.getBoundingClientRect().left
+  init_monit_y = monitor_elem.getBoundingClientRect().top
+
+  monitor_elem.style.left = (posX - (monitor_elem.offsetWidth / 2)) + 'px';
+  monitor_elem.style.top = (posY - (monitor_elem.offsetHeight / 2)) + 'px';
+
+  //set monitor to draggable
+  monitor_elem.classList.add("monitor-drag")
+
+  monitor_drag = true
+  curr_monit_elem = monitor_elem
+}
+
+//element init
 function insert_selected(idx){
   var regex = /option/gi, result, indices = [], indices_mod = [];
   while ( (result = regex.exec(MONITOR_INIT_STRING)) ) {
@@ -66,14 +91,27 @@ function rename_monitor(event){
   input.focus();
 }
 
-function element_init(element_data, idx){
+function delete_monitor_elem(delete_element = undefined){
+  if (delete_element != undefined){
+    //standard procedure, delete all
+    let content = document.getElementById("monitor-panel").children[0]
+  
+    for (let i_y = 0; i_y < content.children.length; i_y++){
+      for (let i_x = 0; i_x < content.children[i_y].children.length; i_x++){
+        content.children[i_y].children[i_x].innerHTML = ""
+      }
+    }
+  }
+  else{
+    //delete only specific monitor elem
+    delete_element.remove()
+  }
+}
+
+function element_init(element_data, idx, elemParent){
   //align to specified x and y
 
   let worker_type = element_data["win_type"]
-
-  //let monitor_innerhtml = insert_selected(MODES_TO_IDX[worker_type])
-  //console.log(monitor_innerhtml)
-  //monitor_innerhtml = rename(monitor_innerhtml, idx + 1)
 
   let monitor_elem = document.createElement("div")
 
@@ -101,12 +139,72 @@ function element_init(element_data, idx){
   monitor_elem.appendChild(monitor_header)
   monitor_elem.appendChild(mode_list)
 
-  //set monitor to specific x,y
-  monitor_elem.style.top = document.getElementById("top-content").offsetHeight + MONITOR_Y + "px"
-  monitor_elem.style.left = (idx + 1) * MONITOR_X_SPACE + "px"
+  monitor_elem.addEventListener("mousedown", (event) => {
+    elem_mousedown(event, monitor_elem)
+  })
 
+  document.addEventListener("mouseup", (event) => {
+    let mouseX = event.x
+    let mouseY = event.y
 
-  document.getElementById("page-content").appendChild(monitor_elem)
+    //set monitor to undraggable
+    if (monitor_drag){
+      curr_monit_elem.classList.remove("monitor-drag")
+
+      monitor_drag = false
+    }
+
+    //also append monitor to different part of table if moved
+    let table = document.getElementById("monitor-panel")
+    let table_coords = table.getBoundingClientRect()
+    
+    let table_start_x = table_coords.left
+    let table_start_y = table_coords.top
+
+    let table_stop_x = table_coords.right
+    let table_stop_y = table_coords.bottom
+
+    let table_step_x = (table_stop_x - table_start_x) / MAX_MONITORS_ROW
+    let table_step_y = (table_stop_y - table_start_y) / MAX_MONITORS_COL
+
+    let diff_x = Math.abs(mouseX - init_monit_x)
+    let diff_y = Math.abs(mouseY - init_monit_y)
+
+    if (mouseX > table_stop_x || mouseX < table_start_x){
+      return //do nothing (out of bounds x)
+    }
+    else if ((mouseY > table_stop_y || mouseY < table_start_y)){
+      return //do nothing (out of bounds y) (written on two ifs for better visibility)
+    }
+    else if (!(diff_x > table_step_x || diff_y > table_step_y)){
+      return //do nothing (didnt cross the cell)
+    }
+    else{
+      //calculate row and column index
+      let row = Math.floor((mouseY - table_start_y) / table_step_y);
+      let column = Math.floor((mouseX - table_start_x) / table_step_x);
+
+      let copy_monit_elem = curr_monit_elem.cloneNode(true)
+      delete_monitor_elem(curr_monit_elem)
+      document.getElementById("monitor-panel").children[0].children[row].children[column].appendChild(copy_monit_elem)
+      copy_monit_elem.addEventListener("mousedown", (event) => {
+        elem_mousedown(event, copy_monit_elem)
+      })
+    }
+  })
+
+  document.addEventListener("mousemove", (event) => {
+    //monitor drag
+    if (monitor_drag){
+      var posX = event.clientX;
+      var posY = event.clientY;
+
+      curr_monit_elem.style.left = (posX - (curr_monit_elem.offsetWidth / 2)) + 'px';
+      curr_monit_elem.style.top = (posY - (curr_monit_elem.offsetHeight / 2)) + 'px';
+    }
+  })
+
+  elemParent.appendChild(monitor_elem)
   
   //set text to clickable
   document.getElementsByClassName("monitor-header-text")[idx].addEventListener('dblclick', (event) => {

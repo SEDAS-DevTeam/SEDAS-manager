@@ -28,6 +28,7 @@ function elem_mousedown(event, monitor_elem){
 
   monitor_elem.style.left = (posX - (monitor_elem.offsetWidth / 2)) + 'px';
   monitor_elem.style.top = (posY - (monitor_elem.offsetHeight / 2)) + 'px';
+  monitor_elem.style.width = parseInt(monitor_elem.offsetWidth) + "px"
 
   //set monitor to draggable
   monitor_elem.classList.add("monitor-drag")
@@ -139,7 +140,7 @@ function element_init(element_data, idx, elemParent){
   monitor_elem.appendChild(monitor_header)
   monitor_elem.appendChild(mode_list)
 
-  monitor_elem.addEventListener("mousedown", (event) => {
+  monitor_elem.getElementsByClassName("monitor-header")[0].addEventListener("mousedown", (event) => {
     elem_mousedown(event, monitor_elem)
   })
 
@@ -184,10 +185,24 @@ function element_init(element_data, idx, elemParent){
       let row = Math.floor((mouseY - table_start_y) / table_step_y);
       let column = Math.floor((mouseX - table_start_x) / table_step_x);
 
+      let mode_idx = undefined
+      let monit_functions = curr_monit_elem.getElementsByClassName("monitor-functions")[0]
+      for (let i = 0; i < monit_functions.children.length; i++){
+        if (monit_functions[i].selected){
+          mode_idx = MODES.indexOf(monit_functions[i].value)
+        }
+      }
+
       let copy_monit_elem = curr_monit_elem.cloneNode(true)
+      //add designated function to monitor
+      for (let i = 0; i < copy_monit_elem.getElementsByClassName("monitor-functions")[0].children.length; i++){
+        copy_monit_elem.getElementsByClassName("monitor-functions")[0].children[mode_idx].selected = true
+      }
+
       delete_monitor_elem(curr_monit_elem)
       document.getElementById("monitor-panel").children[0].children[row].children[column].appendChild(copy_monit_elem)
-      copy_monit_elem.addEventListener("mousedown", (event) => {
+
+      copy_monit_elem.getElementsByClassName("monitor-header")[0].addEventListener("mousedown", (event) => {
         elem_mousedown(event, copy_monit_elem)
       })
     }

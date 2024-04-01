@@ -97,10 +97,12 @@ function save_settings(){
     let saving_freq = document.getElementById("backup").value
     let path_limit = document.getElementById("path_limit").value
     let logging = (document.getElementById("logging").value == "true")
-    let database_port = document.getElementById("port").value
     let audio_out_device = document.getElementById("out_devices").value
     let audio_in_device = document.getElementById("in_devices").value
     let skip_backend_init = (document.getElementById("backend").value == "true")
+
+    let monitor_col = document.getElementById("monitor_col").value
+    let monitor_row = document.getElementById("monitor_row").value
 
     //simulation data
     let ai_aggression = document.getElementById("ai_aggression").value
@@ -129,10 +131,14 @@ function save_settings(){
         "saving_frequency": saving_freq,
         "plane_path_limit": path_limit,
         "logging": logging,
-        "port": database_port,
         "out_device-skip": audio_out_device,
         "in_device-skip": audio_in_device,
         "backend_init": skip_backend_init,
+        
+        //controller data
+        "max_monitor_col": monitor_col,
+        "max_monitor_row": monitor_row,
+
         //simulation data
         "ai_aggression": ai_aggression,
         "results": results,

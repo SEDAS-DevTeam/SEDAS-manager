@@ -19,3 +19,11 @@ body{
     margin-right: 40px;
     color: #5271ff;
 }
+
+.short-inp{
+    width: 100px;
+}
+
+.settings-elem{
+    margin-bottom: 5px;
+}

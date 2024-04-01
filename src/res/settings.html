@@ -29,8 +29,8 @@
                     <option value="rightmost">rigthmost</option>
                 </select>
                 <br>
-                <label for="limit">worker spawn limit</label>
-                <input type="text" name="limit" id="limit" class="settings-elem"> 
+                <label for="limit">worker spawn limit</label><br>
+                <input type="text" name="limit" id="limit" class="settings-elem">
                 <br>
                 <label for="alignment">window alignment</label>
                 <select id="alignment" name="alignment" class="settings-elem">
@@ -48,7 +48,7 @@
                     <option value="never">never</option>
                 </select>
                 <br>
-                <label for="path_limit">maximum plane path particles limit</label>
+                <label for="path_limit">maximum plane path particles limit</label><br>
                 <input type="text" name="path_limit" id="path_limit" class="settings-elem"> 
                 <br>
                 <label for="backup">debug logging</label>
@@ -56,10 +56,6 @@
                     <option value="false">false</option>
                     <option value="true">true</option>
                 </select>
-                <br>
-                <label for="port">database port</label>
-                <input type="text" name="port" id="port" class="settings-elem">
-                <span>(port 6379 is the default one)</span>
                 <br>
                 <label for="backup">output devices</label>
                 <select id="out_devices" name="out_devices" class="settings-elem skip">
@@ -75,6 +71,25 @@
                     <option value="true">true</option>
                 </select>
                 <br>
+                
+                <div class="set-header">
+                    <h2>Controller Settings</h2>
+                    <hr>
+                </div>
+
+                <h3>Monitors setup</h3>
+                <label for="monit_col" name="monit_col">Maximum number of monitor columns</label><br>
+                <input type="text" name="monit_col" id="monit_col" class="settings-elem short-inp"> 
+                <br>
+                <label for="monit_row" name="monit_row">Maximum number of monitor rows</label><br>
+                <input type="text" name="monit_row" id="monit_row" class="settings-elem short-inp"> 
+                
+                <h3>Simulation setup</h3>
+                
+                <h3>Simulation control</h3>
+
+                <h3>Plugins</h3>
+
                 <div class="set-header">
                     <h2>Simulation Settings</h2>
                     <hr>
@@ -110,36 +125,37 @@
                     <h2>Plane Settings</h2>
                     <hr>
                 </div>
-                <label for="bank_angle">standard bank angle</label>
-                <input type="text" name="bank_angle" id="bank_angle" class="settings-elem"> 
+                <h3>TODO: rework with plane presets</h3>
+                <label for="bank_angle">standard bank angle</label><br>
+                <input type="text" name="bank_angle" id="bank_angle" class="settings-elem short-inp"> 
                 <label for="bank_angle">(in degrees)</label>
                 <br>
-                <label for="min_speed">aircraft minimum speed</label>
-                <input type="text" name="min_speed" id="min_speed" class="settings-elem"> 
+                <label for="min_speed">aircraft minimum speed</label><br>
+                <input type="text" name="min_speed" id="min_speed" class="settings-elem short-inp"> 
                 <label for="min_speed">(in knots)</label>
                 <br>
-                <label for="max_speed">aircraft maximum speed</label>
-                <input type="text" name="max_speed" id="max_speed" class="settings-elem"> 
+                <label for="max_speed">aircraft maximum speed</label><br>
+                <input type="text" name="max_speed" id="max_speed" class="settings-elem short-inp"> 
                 <label for="max_speed">(in knots)</label>
                 <br>
-                <label for="min_level">aircraft minimum altitude</label>
+                <label for="min_level">aircraft minimum altitude</label><br>
                 <input type="text" name="min_level" id="min_level" class="settings-elem"> 
                 <label for="min_level">(in feets)</label>
                 <br>
-                <label for="max_level">aircraft maximum altitude</label>
+                <label for="max_level">aircraft maximum altitude</label><br>
                 <input type="text" name="max_level" id="max_level" class="settings-elem"> 
                 <label for="max_level">(in feets)</label>
                 <br>
-                <label for="std_pitch_up">aircraft standard climb angle</label>
-                <input type="text" name="std_pitch_up" id="std_pitch_up" class="settings-elem"> 
+                <label for="std_pitch_up">aircraft standard climb angle</label><br>
+                <input type="text" name="std_pitch_up" id="std_pitch_up" class="settings-elem short-inp"> 
                 <label for="std_pitch_up">(in degrees)</label>
                 <br>
-                <label for="std_pitch_down">aircraft standard descent angle</label>
-                <input type="text" name="std_pitch_down" id="std_pitch_down" class="settings-elem"> 
+                <label for="std_pitch_down">aircraft standard descent angle</label><br>
+                <input type="text" name="std_pitch_down" id="std_pitch_down" class="settings-elem short-inp"> 
                 <label for="std_pitch_down">(in degrees)</label>
                 <br>
-                <label for="std_accel">aircraft standard descent angle</label>
-                <input type="text" name="std_accel" id="std_accel" class="settings-elem"> 
+                <label for="std_accel">aircraft standard acceleration</label><br>
+                <input type="text" name="std_accel" id="std_accel" class="settings-elem short-inp"> 
                 <label for="std_accel">(in knots/seconds-squared)</label>
                 <br>
     
@@ -148,7 +164,7 @@
                     <h2>Enviroment Settings</h2>
                     <hr>
                 </div>
-                <label for="trans_alt">standart transition altitude</label>
+                <label for="trans_alt">standard transition altitude</label><br>
                 <input type="text" name="trans_alt" id="trans_alt" class="settings-elem"> 
                 <label for="trans_alt">(in feets)</label>
                 <br>

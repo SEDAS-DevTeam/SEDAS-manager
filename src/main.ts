@@ -35,6 +35,7 @@ var app_settings: any;
 var worker: Worker;
 var database_worker: Worker;
 var turn_on_backend: boolean = true;
+var internet_connection: any = true
 
 //map variables
 var longitude: any;
@@ -54,11 +55,7 @@ var command_presets_list = []
 var command_preset_data: any = undefined;
 var command_preset_name: string = ""
 
-/*
-APP INIT 1
-*/
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
-
+//paths
 const ABS_PATH = path.resolve("")
 const PATH_TO_AUDIO_UPDATE: string = path.join(ABS_PATH, "/src/res/neural/get_info.py")
 
@@ -67,56 +64,70 @@ const PATH_TO_MAPS: string = path.join(ABS_PATH, "/src/res/data/sim/maps/")
 const PATH_TO_COMMANDS: string = path.join(ABS_PATH, "/src/res/data/sim/commands/")
 const PATH_TO_AIRCRAFTS: string = path.join(ABS_PATH, "/src/res/data/sim/planes/")
 
-//read JSON
-const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
-app_settings = JSON.parse(app_settings_raw);
+/*
+APP INIT 1
+*/
 
-//initialize EventLogger (first initialization to log other ones)
-EvLogger = new EventLogger(app_settings["logging"]);
-EvLogger.add_record("DEBUG", "APP-INIT 1")
+function checkInternet(){
+    EvLogger.log("DEBUG", ["Internet connectivity check...", "Performing HTTP GET on google servers for internet check"])
+    return new Promise((resolve, reject) => {
+        http.get("http://www.google.com", async (res) => {
+            EvLogger.add_record("DEBUG", "Lookup successful, fetching algorithm files...")
+            resolve(true)
+        }).on("error", (err) => {
+            EvLogger.add_record("ERROR", "Lookup unsuccessful")
+            EvLogger.add_record("ERROR", err.message)
+            reject(false)
+        })
+    })
+}
 
-//check internet connectivity
-EvLogger.log("DEBUG", ["Internet connectivity check...", "Performing HTTP GET on google servers for internet check"])
-http.get("http://www.google.com", async (res) => {
-    EvLogger.add_record("DEBUG", "Lookup successful, fetching algorithm files...")
-    //fetch all python backend files
-    await update_all(EvLogger)
-    sleep(1000)
-}).on("error", (err) => {
-    EvLogger.add_record("ERROR", "Lookup unsuccessful")
-    EvLogger.add_record("ERROR", err.message)
-})
+async function app_init(){
+    //read JSON
+    const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
+    app_settings = JSON.parse(app_settings_raw);
 
-//workers
-if (app_settings["backend_init"]){
-    worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
-    EvLogger.log("DEBUG", ["Starting BackendWorker because flag backend_init=true", "Starting Backend because flag backend_init is=true"])
+    //initialize EventLogger (first initialization to log other ones)
+    EvLogger = new EventLogger(app_settings["logging"]);
+    EvLogger.add_record("DEBUG", "APP-INIT 1")
 
-    var backend_settings = {
-        "noise": app_settings["noise"]
+    //check internet connectivity
+    internet_connection = await checkInternet()
+    if (internet_connection){
+        await update_all(EvLogger)
     }
-    worker.postMessage(["action", "settings", JSON.stringify(backend_settings)])
-}
-else{
-    turn_on_backend = false
-    EvLogger.log("DEBUG", ["Not starting BackendWorker because flag backend_init=false", "Starting Backend because flag backend_init=false"])
-}
-database_worker = new Worker(path.join(ABS_PATH, "/src/database.js"))
-EvLogger.log("DEBUG", ["Initialized BackupDB", "Initialized Sqlite3 database for backup"])
 
-if (app_settings["saving_frequency"].includes("min")){
-    backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 60 * 1000
-}
-else if (app_settings["saving_frequency"].includes("hour")){
-    backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 3600 * 1000
-}
-else if (app_settings["saving_frequency"].includes("never")){
-    backup_db_on = false
-    //by default set to 5 mins
-    backupdb_saving_frequency = 5 * 60 * 1000
-}
+    //workers
+    if (app_settings["backend_init"]){
+        worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
+        EvLogger.log("DEBUG", ["Starting BackendWorker because flag backend_init=true", "Starting Backend because flag backend_init is=true"])
 
-EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_saving_frequency / 1000} seconds`)
+        var backend_settings = {
+            "noise": app_settings["noise"]
+        }
+        worker.postMessage(["action", "settings", JSON.stringify(backend_settings)])
+    }
+    else{
+        turn_on_backend = false
+        EvLogger.log("DEBUG", ["Not starting BackendWorker because flag backend_init=false", "Starting Backend because flag backend_init=false"])
+    }
+    database_worker = new Worker(path.join(ABS_PATH, "/src/database.js"))
+    EvLogger.log("DEBUG", ["Initialized BackupDB", "Initialized Sqlite3 database for backup"])
+
+    if (app_settings["saving_frequency"].includes("min")){
+        backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 60 * 1000
+    }
+    else if (app_settings["saving_frequency"].includes("hour")){
+        backupdb_saving_frequency = parseInt(app_settings["saving_frequency"].charAt(0)) * 3600 * 1000
+    }
+    else if (app_settings["saving_frequency"].includes("never")){
+        backup_db_on = false
+        //by default set to 5 mins
+        backupdb_saving_frequency = 5 * 60 * 1000
+    }
+
+    EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${backupdb_saving_frequency / 1000} seconds`)
+}
 
 const main_menu_dict = {
     width: 800,
@@ -483,9 +494,10 @@ class Window{
 }
 
 app.on("ready", async () => {
-    /*
-    APP INIT 2
-    */
+    //
+    //CODE FOR RUNNING APP
+    //
+    await app_init()
 
     //update audio devices
     EvLogger.log("DEBUG", ["Updating audio devices...", "Updating audio device list using get_info.py"])
@@ -507,492 +519,493 @@ app.on("ready", async () => {
     EvLogger.add_record("DEBUG", "main-menu show")
     mainMenu = new Window(main_menu_dict, "./res/main.html", [x, y])
     mainMenu.show()
-})
 
-//backend-worker events
-if (turn_on_backend){
-    worker.on("message", (message: string) => {
-        //processing from backend.js
-        let arg = message.split(":")[0]
-        let content = message.split(":")[1]
 
-        switch(arg){
-            case "command":
-                let command_args = content.split(" ")
-                console.log(command_args)
+    //backend-worker events
+    if (turn_on_backend){
+        worker.on("message", (message: string) => {
+            //processing from backend.js
+            let arg = message.split(":")[0]
+            let content = message.split(":")[1]
 
-                //search plane by callsign
-                for(let i = 0; i < PlaneDatabase.DB.length; i++){
-                    if (command_args[0] == PlaneDatabase.DB[i].callsign){
-                        if (command_args[1] == "change-heading"){
-                            PlaneDatabase.DB[i].updated_heading = parseInt(command_args[2])
+            switch(arg){
+                case "command":
+                    let command_args = content.split(" ")
+                    console.log(command_args)
+
+                    //search plane by callsign
+                    for(let i = 0; i < PlaneDatabase.DB.length; i++){
+                        if (command_args[0] == PlaneDatabase.DB[i].callsign){
+                            if (command_args[1] == "change-heading"){
+                                PlaneDatabase.DB[i].updated_heading = parseInt(command_args[2])
+                            }
+                            else if (command_args[1] == "change-speed"){
+                                PlaneDatabase.DB[i].updated_speed = parseInt(command_args[2])
+                            }
+                            else if (command_args[1] == "change-level"){
+                                PlaneDatabase.DB[i].updated_level = parseInt(command_args[2])
+                            }
                         }
-                        else if (command_args[1] == "change-speed"){
-                            PlaneDatabase.DB[i].updated_speed = parseInt(command_args[2])
+                    }
+                    break
+                case "debug":
+                    //used for debug logging
+                    EvLogger.log("DEBUG", [content, content])
+                    break
+            }
+        })
+    }
+
+    //database worker events
+    database_worker.on("message", (message: string) => {
+        if (Array.isArray(message)){
+            switch(message[0]){
+                case "db-data":
+                    var database_data = JSON.parse(message[1])
+                    map_data = database_data["map"]
+
+                    main_app(database_data) //start main app on backup restore
+                    break
+            }
+        }
+    })
+
+    //IPC listeners
+    ipcMain.handle("message", (event, data) => {
+        switch(data[1][0]){
+            //generic message channels
+            case "redirect-to-menu":
+                redir_to_main = false
+
+                //message call to redirect to main menu
+                EvLogger.add_record("DEBUG", "redirect-to-menu event")
+
+                settings.close()
+
+                //calculate x, y
+                coords = get_window_coords(-1, main_menu_dict)
+
+                EvLogger.add_record("DEBUG", "main-menu show")
+                mainMenu = new Window(main_menu_dict, "./res/main.html", coords)
+                mainMenu.show()
+
+                break
+            case "save-settings":
+                //save settings
+                EvLogger.add_record("DEBUG", "saving settings")
+
+                fs.writeFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), data[1][1])
+                break
+            case "redirect-to-settings":
+                //message call to redirect to settings
+                redir_to_main = true
+
+                EvLogger.add_record("DEBUG", "redirect-to-settings event")
+
+                mainMenu.close()
+
+                //calculate x, y
+                coords = get_window_coords(-1)
+
+                EvLogger.add_record("DEBUG", "settings show")
+                settings = new Window(settings_dict, "./res/settings.html", coords)
+                settings.show()
+                break
+            case "redirect-to-main":
+                //message call to redirect to main program (start)
+                redir_to_main = true
+                if (turn_on_backend){
+                    worker.postMessage(["action", "start-neural"])
+                }
+                main_app()
+                break
+            case "exit":
+                //spawning info window
+                EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got window-all-closed request, saving logs and quitting app..."])
+                exit_app()
+
+            case "invoke":
+                //TODO: find out why I have this written here
+                if (turn_on_backend){
+                    worker.postMessage(data[1][1])
+                }
+                break
+            //info retrival to Controller
+            case "send-info":
+                //this part of function is utilised both for controller window and settings window
+                //|settings window| uses this to acquire saved .json settings
+                //|controller window| uses this to acquire current worker/window data
+                
+                if (data[0] == "settings"){
+
+                    //ACAI backend
+
+                    const speech_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/speech_config.json"), "utf-8")
+                    const speech_config = JSON.parse(speech_config_raw);
+
+                    const text_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/text_config.json"), "utf-8")
+                    const text_config = JSON.parse(text_config_raw);
+
+                    const voice_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/voice_config.json"), "utf-8")
+                    const voice_config = JSON.parse(voice_config_raw);
+
+                    //audio devices
+
+                    const in_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/in_device_list.json"), "utf-8")
+                    const in_devices = JSON.parse(in_devices_raw)
+
+                    const out_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/out_device_list.json"), "utf-8")
+                    const out_devices = JSON.parse(out_devices_raw)
+
+                    //sending app data and alg configs
+                    settings.send_message("app-data", [app_settings, voice_config, text_config, speech_config, in_devices, out_devices])
+                }
+                else if (data[0] == "controller"){
+                    //sending monitor data
+
+                    //acquiring airport map data
+                    map_config = []
+                    var map_files = utils.list_files(PATH_TO_MAPS)
+                    for (let i = 0; i < map_files.length; i++){
+                        let map = utils.read_file_content(PATH_TO_MAPS, map_files[i])
+                        if (map_files[i].includes("config")){
+                            map_config.push({
+                                "hash": "airport-" + utils.generate_hash(),
+                                "content": map
+                            })
                         }
-                        else if (command_args[1] == "change-level"){
-                            PlaneDatabase.DB[i].updated_level = parseInt(command_args[2])
-                        }
+                    }
+
+                    //acquiring list of aircraft presets
+                    aircraft_presets_list = []
+                    let aircraft_files = utils.list_files(PATH_TO_AIRCRAFTS)
+                    for (let i = 0; i < aircraft_files.length; i++){
+                        let aircraft_config = utils.read_file_content(PATH_TO_AIRCRAFTS, aircraft_files[i])
+                        aircraft_presets_list.push({
+                            "path": aircraft_files[i],
+                            "hash": "aircraft-" + utils.generate_hash(),
+                            "name": aircraft_config["info"]["name"],
+                            "content": JSON.stringify(aircraft_config["all_planes"])
+                        })
+                    }
+
+                    //acquiring list of command presets
+                    command_presets_list = []
+                    let command_files = utils.list_files(PATH_TO_COMMANDS)
+                    for (let i = 0; i < command_files.length; i++){
+                        let commands_config = utils.read_file_content(PATH_TO_COMMANDS, command_files[i])
+                        command_presets_list.push({
+                            "path": command_files[i],
+                            "hash": "command-" + utils.generate_hash(),
+                            "name": commands_config["info"]["name"],
+                            "content": JSON.stringify(commands_config["commands"])
+                        })
+                    }
+
+                    controllerWindow.send_message("init-info", ["window-info", JSON.stringify(workers), map_config, 
+                                                                JSON.stringify(app_settings), map_name, aircraft_presets_list, 
+                                                                command_presets_list])
+                }
+                else if (data[0] == "worker"){
+                    //send to all workers
+                    for (let i = 0; i < workers.length; i++){
+                        workers[i].send_message("init-info", ["window-info", JSON.stringify(app_settings)])
                     }
                 }
                 break
-            case "debug":
-                //used for debug logging
-                EvLogger.log("DEBUG", [content, content])
+            case "set-environment":
+                //getting map info, command preset info, aircraft preset info from user
+                let filename_map = data[1][1]
+                let filename_command = data[1][2]
+                let filename_aircraft = data[1][3]
+
+                //save map data to variable
+                map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
+                //read scale
+                scale = parse_scale(map_data["scale"])
+                //save map name for backup usage
+                let map_config_raw = fs.readFileSync(PATH_TO_MAPS + map_data["CONFIG"], "utf-8")
+                map_name = JSON.parse(map_config_raw)["AIRPORT_NAME"];
+
+                command_preset_data = utils.read_file_content(PATH_TO_COMMANDS, filename_command)
+                command_preset_name = command_preset_data["info"]["name"]
+
+                aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft)
+                aircraft_preset_name = command_preset_data["info"]["name"]
+
+                //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
+                if (map_data == undefined){
+                    //map wasn't selected
+                    longitude = undefined
+                    latitude = undefined
+                    zoom = undefined
+                }
+                else{
+                    longitude = map_data["long"]
+                    latitude = map_data["lat"]
+                    zoom = map_data["zoom"]
+                }
+
+                for (let i = 0; i < workers.length; i++){
+                    workers[i].send_message("ask-for-render") //send workers command to fire "render-map" event
+                }
+                break
+            case "render-map":
+                //rendering map data for user (invoked from worker)
+                for (let i = 0; i < workers.length; i++){
+                    workers[i].send_message("map-data", [map_data, workers[i].win_type])
+                }
+
+                for (let i = 0; i < workers.length; i++){
+                    if (workers[i]["win_type"] == "weather"){
+                        workers[i].send_message("geo-data", [latitude, longitude, zoom])
+                    }
+                }
+                break
+            case "get-points":
+                let spec_data: any;
+                if (data[1][1].includes("ACC")){
+                    //selected monitor is in ACC mode
+                    spec_data = map_data["ACC"]
+                }
+                else if (data[1][1].includes("APP")){
+                    //selected monitor is in APP mode
+                    spec_data = map_data["APP"]
+                }
+                else if (data[1][1].includes("TWR")){
+                    //selected monitor is in TWR mode
+                    spec_data = map_data["TWR"]
+                }
+                let out_data = {}
+                for (const [key, value] of Object.entries(spec_data)) {
+                    if (key == "POINTS" || key == "ARP" || key == "SID" || key == "STAR" || key == "RUNWAY"){
+                        out_data[key] = value
+                    }
+                }
+                controllerWindow.send_message("map-points", JSON.stringify(out_data))
+                break
+            case "map-check":
+                if (map_data == undefined){
+                    EvLogger.add_record("WARN", "user did not check any map")
+                    controllerWindow.send_message("map-checked", JSON.stringify({"user-check": false}))
+                }
+                else {
+                    EvLogger.add_record("DEBUG", "user checked a map")
+                    controllerWindow.send_message("map-checked", JSON.stringify({"user-check": true}))
+                }
+                break
+            case "monitor-change-info":
+                //whenever controller decides to change monitor type
+                let mon_data = data[1][1]
+                for (let i = 0; i < workers.length; i++){
+                    if (workers[i].win_type != mon_data[i]["type"]){
+                        //rewrite current window type and render to another one
+                        let path_to_render = "";
+
+
+                        switch(mon_data[i]["type"]){
+                            case "ACC":
+                                //rewrite to Area control
+                                path_to_render = "./res/worker.html"
+                                //TODO: add rendering
+                                break
+                            case "APP":
+                                //rewrite to Approach control
+                                path_to_render = "./res/worker.html"
+                                //TODO: add rendering
+                                break
+                            case "TWR":
+                                //rewrite to tower
+                                path_to_render = "./res/worker.html"
+                                //TODO: add rendering
+                                break
+                            case "weather":
+                                //rewrite to weather forecast
+                                path_to_render = "./res/weather.html"
+                                break
+                            case "dep_arr":
+                                //rewrite to departure/arrival list
+                                path_to_render = "./res/dep_arr.html"
+                                break
+                        }
+
+                        workers[i].win_type = mon_data[i]["type"]
+                        workers[i].show(path_to_render)
+
+
+                    }
+                    //change worker data in monitor_data DB
+                    PlaneDatabase.update_worker_data(workers)
+                }
+                break
+            case "send-location-data":
+                for (let i = 0; i < workers.length; i++){
+                    if (workers[i]["win_type"] == "weather"){
+                        workers[i].send_message("geo-data", [latitude, longitude, zoom])
+                    }
+                }
+                break
+            //plane control
+            case "spawn-plane":
+                let plane_data = data[1][1]
+
+                //get current x, y coordinates according to selected points
+                let x = 0
+                let y = 0
+                //get according map data
+                let point_data = map_data[plane_data["monitor"].substring(plane_data["monitor"].length - 3, plane_data["monitor"].length)]
+                
+                //get departure point (ARP/POINTS/SID/STAR)
+                let corresponding_points = plane_data["departure"].split("_")
+                let point_name = corresponding_points[0]
+                let point_group = corresponding_points[1]
+
+
+
+                for (let i = 0; i < point_data[point_group].length; i++){
+                    if (point_name == point_data[point_group][i].name){
+                        //found corresponding point - set initial point
+                        x = point_data[point_group][i].x
+                        y = point_data[point_group][i].y
+                    }
+                }
+                
+                curr_plane_id = utils.generate_hash()
+                let plane = new Plane(curr_plane_id, plane_data["name"], 
+                                plane_data["heading"], plane_data["heading"],
+                                plane_data["level"], plane_data["level"],
+                                plane_data["speed"], plane_data["speed"],
+                                plane_data["departure"], plane_data["arrival"], 
+                                plane_data["arrival_time"],
+                                x, y)
+                PlaneDatabase.add_record(plane, plane_data["monitor"])
+
+                send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
+                break
+            case "plane-value-change":
+                for (let i = 0; i < PlaneDatabase.DB.length; i++){
+                    if(PlaneDatabase.DB[i].id == data[1][3]){
+                        switch(data[1][1]){
+                            case "item0":
+                                //heading change
+                                PlaneDatabase.DB[i].updated_heading = data[1][2]
+                                break
+                            case "item1":
+                                //level change
+                                PlaneDatabase.DB[i].updated_level = data[1][2]
+                                break
+                            case "item2":
+                                //speed change
+                                PlaneDatabase.DB[i].updated_speed = data[1][2]
+                                break
+                        }
+                    }
+                }
+                
+                send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
+                break
+            case "plane-delete-record":
+                PlaneDatabase.delete_record(data[1][1])
+                send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
+                break
+            case "send-plane-data":
+                //send plane data (works for all windows)
+                for (let i = 0; i < workers.length; i++){
+                    if (workers[i].win_type.includes(data[0])){
+                        workers[i].send_message("update-plane-db", PlaneDatabase.DB)
+                    }
+                }
+                break
+            case "stop-sim":
+                running = false
+
+                //send stop event to all workers
+                for (let i = 0; i < workers.length; i++){
+                    workers[i].send_message("sim-event", "stopsim")
+                }
+                controllerWindow.send_message("sim-event", "stopsim")
+                break
+            case "start-sim":
+                running = true
+
+                //send stop event to all workers
+                for (let i = 0; i < workers.length; i++){
+                    workers[i].send_message("sim-event", "startsim")
+                }
+                controllerWindow.send_message("sim-event", "startsim")
+                break
+            case "regenerate-map":
+                if (turn_on_backend){
+                    worker.postMessage(["action", "terrain"])
+                }
+                break
+            case "restore-sim":
+                database_worker.postMessage(["read-db"])
                 break
         }
     })
-}
 
-//database worker events
-database_worker.on("message", (message: string) => {
-    if (Array.isArray(message)){
-        switch(message[0]){
-            case "db-data":
-                var database_data = JSON.parse(message[1])
-                map_data = database_data["map"]
-
-                main_app(database_data) //start main app on backup restore
-                break
+    ipcMain.on("message-redirect", (event, data) => {
+        if (data[0] == "controller"){
+            console.log("from worker")
+            controllerWindow.send_message("message-redirect", data[1][0])
+            sender_win_name = "worker"
         }
-    }
-})
-
-//IPC listeners
-ipcMain.handle("message", (event, data) => {
-    switch(data[1][0]){
-        //generic message channels
-        case "redirect-to-menu":
-            redir_to_main = false
-
-            //message call to redirect to main menu
-            EvLogger.add_record("DEBUG", "redirect-to-menu event")
-
-            settings.close()
-
-            //calculate x, y
-            coords = get_window_coords(-1, main_menu_dict)
-
-            EvLogger.add_record("DEBUG", "main-menu show")
-            mainMenu = new Window(main_menu_dict, "./res/main.html", coords)
-            mainMenu.show()
-
-            break
-        case "save-settings":
-            //save settings
-            EvLogger.add_record("DEBUG", "saving settings")
-
-            fs.writeFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), data[1][1])
-            break
-        case "redirect-to-settings":
-            //message call to redirect to settings
-            redir_to_main = true
-
-            EvLogger.add_record("DEBUG", "redirect-to-settings event")
-
-            mainMenu.close()
-
-            //calculate x, y
-            coords = get_window_coords(-1)
-
-            EvLogger.add_record("DEBUG", "settings show")
-            settings = new Window(settings_dict, "./res/settings.html", coords)
-            settings.show()
-            break
-        case "redirect-to-main":
-            //message call to redirect to main program (start)
-            redir_to_main = true
-            if (turn_on_backend){
-                worker.postMessage(["action", "start-neural"])
-            }
-            main_app()
-            break
-        case "exit":
-            //spawning info window
-            EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got window-all-closed request, saving logs and quitting app..."])
-            exit_app()
-
-        case "invoke":
-            //TODO: find out why I have this written here
-            if (turn_on_backend){
-                worker.postMessage(data[1][1])
-            }
-            break
-        //info retrival to Controller
-        case "send-info":
-            //this part of function is utilised both for controller window and settings window
-            //|settings window| uses this to acquire saved .json settings
-            //|controller window| uses this to acquire current worker/window data
+        else if (data[0].includes("worker")){
+            console.log("from controller")
             
-            if (data[0] == "settings"){
+            let idx = parseInt(data[0].substring(6, 7))
+            workers[idx].send_message("message-redirect", data[1][0])
+            sender_win_name = "controller"
+        }
+    })
 
-                //ACAI backend
-
-                const speech_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/speech_config.json"), "utf-8")
-                const speech_config = JSON.parse(speech_config_raw);
-
-                const text_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/text_config.json"), "utf-8")
-                const text_config = JSON.parse(text_config_raw);
-
-                const voice_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/voice_config.json"), "utf-8")
-                const voice_config = JSON.parse(voice_config_raw);
-
-                //audio devices
-
-                const in_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/in_device_list.json"), "utf-8")
-                const in_devices = JSON.parse(in_devices_raw)
-
-                const out_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/out_device_list.json"), "utf-8")
-                const out_devices = JSON.parse(out_devices_raw)
-
-                //sending app data and alg configs
-                settings.send_message("app-data", [app_settings, voice_config, text_config, speech_config, in_devices, out_devices])
+    //update all planes on one second
+    setInterval(() => {
+        if (PlaneDatabase != undefined && map_data != undefined){
+            if (running){
+                PlaneDatabase.update_planes(scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]),
+                                        parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
             }
-            else if (data[0] == "controller"){
-                //sending monitor data
-
-                //acquiring airport map data
-                map_config = []
-                var map_files = utils.list_files(PATH_TO_MAPS)
-                for (let i = 0; i < map_files.length; i++){
-                    let map = utils.read_file_content(PATH_TO_MAPS, map_files[i])
-                    if (map_files[i].includes("config")){
-                        map_config.push({
-                            "hash": "airport-" + utils.generate_hash(),
-                            "content": map
-                        })
-                    }
-                }
-
-                //acquiring list of aircraft presets
-                aircraft_presets_list = []
-                let aircraft_files = utils.list_files(PATH_TO_AIRCRAFTS)
-                for (let i = 0; i < aircraft_files.length; i++){
-                    let aircraft_config = utils.read_file_content(PATH_TO_AIRCRAFTS, aircraft_files[i])
-                    aircraft_presets_list.push({
-                        "path": aircraft_files[i],
-                        "hash": "aircraft-" + utils.generate_hash(),
-                        "name": aircraft_config["info"]["name"],
-                        "content": JSON.stringify(aircraft_config["all_planes"])
-                    })
-                }
-
-                //acquiring list of command presets
-                command_presets_list = []
-                let command_files = utils.list_files(PATH_TO_COMMANDS)
-                for (let i = 0; i < command_files.length; i++){
-                    let commands_config = utils.read_file_content(PATH_TO_COMMANDS, command_files[i])
-                    command_presets_list.push({
-                        "path": command_files[i],
-                        "hash": "command-" + utils.generate_hash(),
-                        "name": commands_config["info"]["name"],
-                        "content": JSON.stringify(commands_config["commands"])
-                    })
-                }
-
-                controllerWindow.send_message("init-info", ["window-info", JSON.stringify(workers), map_config, 
-                                                            JSON.stringify(app_settings), map_name, aircraft_presets_list, 
-                                                            command_presets_list])
+            if (app_running){
+                //send updated plane database to all
+                send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
             }
-            else if (data[0] == "worker"){
-                //send to all workers
-                for (let i = 0; i < workers.length; i++){
-                    workers[i].send_message("init-info", ["window-info", JSON.stringify(app_settings)])
-                }
-            }
-            break
-        case "set-environment":
-            //getting map info, command preset info, aircraft preset info from user
-            let filename_map = data[1][1]
-            let filename_command = data[1][2]
-            let filename_aircraft = data[1][3]
+        }
+    }, 1000)
 
-            //save map data to variable
-            map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
-            //read scale
-            scale = parse_scale(map_data["scale"])
-            //save map name for backup usage
-            let map_config_raw = fs.readFileSync(PATH_TO_MAPS + map_data["CONFIG"], "utf-8")
-            map_name = JSON.parse(map_config_raw)["AIRPORT_NAME"];
-
-            command_preset_data = utils.read_file_content(PATH_TO_COMMANDS, filename_command)
-            command_preset_name = command_preset_data["info"]["name"]
-
-            aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft)
-            aircraft_preset_name = command_preset_data["info"]["name"]
-
-            //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
-            if (map_data == undefined){
-                //map wasn't selected
-                longitude = undefined
-                latitude = undefined
-                zoom = undefined
+    setInterval(() => {
+        if (app_running && turn_on_backend){
+            //sending plane status every 500ms for backend
+            if (PlaneDatabase == undefined){
+                worker.postMessage(["data", []]) //send empty array so the backend can still function without any problems
             }
             else{
-                longitude = map_data["long"]
-                latitude = map_data["lat"]
-                zoom = map_data["zoom"]
+                worker.postMessage(["data", PlaneDatabase.DB])
             }
-
-            for (let i = 0; i < workers.length; i++){
-                workers[i].send_message("ask-for-render") //send workers command to fire "render-map" event
-            }
-            break
-        case "render-map":
-            //rendering map data for user (invoked from worker)
-            for (let i = 0; i < workers.length; i++){
-                workers[i].send_message("map-data", [map_data, workers[i].win_type])
-            }
-
-            for (let i = 0; i < workers.length; i++){
-                if (workers[i]["win_type"] == "weather"){
-                    workers[i].send_message("geo-data", [latitude, longitude, zoom])
-                }
-            }
-            break
-        case "get-points":
-            let spec_data: any;
-            if (data[1][1].includes("ACC")){
-                //selected monitor is in ACC mode
-                spec_data = map_data["ACC"]
-            }
-            else if (data[1][1].includes("APP")){
-                //selected monitor is in APP mode
-                spec_data = map_data["APP"]
-            }
-            else if (data[1][1].includes("TWR")){
-                //selected monitor is in TWR mode
-                spec_data = map_data["TWR"]
-            }
-            let out_data = {}
-            for (const [key, value] of Object.entries(spec_data)) {
-                if (key == "POINTS" || key == "ARP" || key == "SID" || key == "STAR" || key == "RUNWAY"){
-                    out_data[key] = value
-                }
-            }
-            controllerWindow.send_message("map-points", JSON.stringify(out_data))
-            break
-        case "map-check":
-            if (map_data == undefined){
-                EvLogger.add_record("WARN", "user did not check any map")
-                controllerWindow.send_message("map-checked", JSON.stringify({"user-check": false}))
-            }
-            else {
-                EvLogger.add_record("DEBUG", "user checked a map")
-                controllerWindow.send_message("map-checked", JSON.stringify({"user-check": true}))
-            }
-            break
-        case "monitor-change-info":
-            //whenever controller decides to change monitor type
-            let mon_data = data[1][1]
-            for (let i = 0; i < workers.length; i++){
-                if (workers[i].win_type != mon_data[i]["type"]){
-                    //rewrite current window type and render to another one
-                    let path_to_render = "";
-
-
-                    switch(mon_data[i]["type"]){
-                        case "ACC":
-                            //rewrite to Area control
-                            path_to_render = "./res/worker.html"
-                            //TODO: add rendering
-                            break
-                        case "APP":
-                            //rewrite to Approach control
-                            path_to_render = "./res/worker.html"
-                            //TODO: add rendering
-                            break
-                        case "TWR":
-                            //rewrite to tower
-                            path_to_render = "./res/worker.html"
-                            //TODO: add rendering
-                            break
-                        case "weather":
-                            //rewrite to weather forecast
-                            path_to_render = "./res/weather.html"
-                            break
-                        case "dep_arr":
-                            //rewrite to departure/arrival list
-                            path_to_render = "./res/dep_arr.html"
-                            break
-                    }
-
-                    workers[i].win_type = mon_data[i]["type"]
-                    workers[i].show(path_to_render)
-
-
-                }
-                //change worker data in monitor_data DB
-                PlaneDatabase.update_worker_data(workers)
-            }
-            break
-        case "send-location-data":
-            for (let i = 0; i < workers.length; i++){
-                if (workers[i]["win_type"] == "weather"){
-                    workers[i].send_message("geo-data", [latitude, longitude, zoom])
-                }
-            }
-            break
-        //plane control
-        case "spawn-plane":
-            let plane_data = data[1][1]
-
-            //get current x, y coordinates according to selected points
-            let x = 0
-            let y = 0
-            //get according map data
-            let point_data = map_data[plane_data["monitor"].substring(plane_data["monitor"].length - 3, plane_data["monitor"].length)]
-            
-            //get departure point (ARP/POINTS/SID/STAR)
-            let corresponding_points = plane_data["departure"].split("_")
-            let point_name = corresponding_points[0]
-            let point_group = corresponding_points[1]
-
-
-
-            for (let i = 0; i < point_data[point_group].length; i++){
-                if (point_name == point_data[point_group][i].name){
-                    //found corresponding point - set initial point
-                    x = point_data[point_group][i].x
-                    y = point_data[point_group][i].y
-                }
-            }
-            
-            curr_plane_id = utils.generate_hash()
-            let plane = new Plane(curr_plane_id, plane_data["name"], 
-                            plane_data["heading"], plane_data["heading"],
-                            plane_data["level"], plane_data["level"],
-                            plane_data["speed"], plane_data["speed"],
-                            plane_data["departure"], plane_data["arrival"], 
-                            plane_data["arrival_time"],
-                            x, y)
-            PlaneDatabase.add_record(plane, plane_data["monitor"])
-
-            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
-            break
-        case "plane-value-change":
-            for (let i = 0; i < PlaneDatabase.DB.length; i++){
-                if(PlaneDatabase.DB[i].id == data[1][3]){
-                    switch(data[1][1]){
-                        case "item0":
-                            //heading change
-                            PlaneDatabase.DB[i].updated_heading = data[1][2]
-                            break
-                        case "item1":
-                            //level change
-                            PlaneDatabase.DB[i].updated_level = data[1][2]
-                            break
-                        case "item2":
-                            //speed change
-                            PlaneDatabase.DB[i].updated_speed = data[1][2]
-                            break
-                    }
-                }
-            }
-            
-            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
-            break
-        case "plane-delete-record":
-            PlaneDatabase.delete_record(data[1][1])
-            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
-            break
-        case "send-plane-data":
-            //send plane data (works for all windows)
-            for (let i = 0; i < workers.length; i++){
-                if (workers[i].win_type.includes(data[0])){
-                    workers[i].send_message("update-plane-db", PlaneDatabase.DB)
-                }
-            }
-            break
-        case "stop-sim":
-            running = false
-
-            //send stop event to all workers
-            for (let i = 0; i < workers.length; i++){
-                workers[i].send_message("sim-event", "stopsim")
-            }
-            controllerWindow.send_message("sim-event", "stopsim")
-            break
-        case "start-sim":
-            running = true
-
-            //send stop event to all workers
-            for (let i = 0; i < workers.length; i++){
-                workers[i].send_message("sim-event", "startsim")
-            }
-            controllerWindow.send_message("sim-event", "startsim")
-            break
-        case "regenerate-map":
-            if (turn_on_backend){
-                worker.postMessage(["action", "terrain"])
-            }
-            break
-        case "restore-sim":
-            database_worker.postMessage(["read-db"])
-            break
-    }
-})
-
-ipcMain.on("message-redirect", (event, data) => {
-    if (data[0] == "controller"){
-        console.log("from worker")
-        controllerWindow.send_message("message-redirect", data[1][0])
-        sender_win_name = "worker"
-    }
-    else if (data[0].includes("worker")){
-        console.log("from controller")
-        
-        let idx = parseInt(data[0].substring(6, 7))
-        workers[idx].send_message("message-redirect", data[1][0])
-        sender_win_name = "controller"
-    }
-})
-
-//update all planes on one second
-setInterval(() => {
-    if (PlaneDatabase != undefined && map_data != undefined){
-        if (running){
-            PlaneDatabase.update_planes(scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]),
-                                    parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
         }
+    }, 1000)
+
+    //on every n minutes, save to local DB if app crashes
+    setInterval(() => {
         if (app_running){
-            //send updated plane database to all
-            send_to_all(PlaneDatabase.DB, PlaneDatabase.monitor_DB, PlaneDatabase.plane_paths_DB)
-        }
-    }
-}, 1000)
-
-setInterval(() => {
-    if (app_running && turn_on_backend){
-        //sending plane status every 500ms for backend
-        if (PlaneDatabase == undefined){
-            worker.postMessage(["data", []]) //send empty array so the backend can still function without any problems
-        }
-        else{
-            worker.postMessage(["data", PlaneDatabase.DB])
-        }
-    }
-}, 1000)
-
-//on every n minutes, save to local DB if app crashes
-setInterval(() => {
-    if (app_running){
-        if (backup_db_on && (PlaneDatabase != undefined) && (map_data != undefined) && (workers.length != 0)){
-            let simulation_dict = {
-                "planes": PlaneDatabase.DB,
-                "monitor-planes": PlaneDatabase.monitor_DB,
-                "monitor-data": workers,
-                "map": map_data,
-                "map-name": map_name,
-                "command-preset": command_preset_data,
-                "command-preset-name": command_preset_name,
-                "aircraft-preset": aircraft_preset_data,
-                "aircraft-preset-name": aircraft_preset_name
+            if (backup_db_on && (PlaneDatabase != undefined) && (map_data != undefined) && (workers.length != 0)){
+                let simulation_dict = {
+                    "planes": PlaneDatabase.DB,
+                    "monitor-planes": PlaneDatabase.monitor_DB,
+                    "monitor-data": workers,
+                    "map": map_data,
+                    "map-name": map_name,
+                    "command-preset": command_preset_data,
+                    "command-preset-name": command_preset_name,
+                    "aircraft-preset": aircraft_preset_data,
+                    "aircraft-preset-name": aircraft_preset_name
+                }
+        
+                //save to local db using database.ts 
+                database_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict, null, 2)])
+                EvLogger.log("DEBUG", ["Saving temporary backup...", "Saving temporary backup using database.ts"])
             }
-    
-            //save to local db using database.ts 
-            database_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict, null, 2)])
-            EvLogger.log("DEBUG", ["Saving temporary backup...", "Saving temporary backup using database.ts"])
         }
-    }
-}, backupdb_saving_frequency)
+    }, backupdb_saving_frequency)
+})

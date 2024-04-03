@@ -14,6 +14,7 @@ package-lock.json
 /src/plane_functions.js
 /src/fetch.js
 /src/utils.js
+/src/app_config.js
 
 /src/*.map
 

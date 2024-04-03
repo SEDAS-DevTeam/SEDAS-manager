@@ -1,5 +1,6 @@
-import {get} from 'https'
+import {get} from "https"
 import path from "path"
+import { EventLogger } from "./logger"
 
 import { createWriteStream } from 'fs'
 
@@ -41,7 +42,7 @@ async function fetch_file_conf(header: string, filename: string){
     })
 }
 
-export async function update_all(event_logger: any){
+export async function update_all(event_logger: EventLogger){
     /*
     fetching for source files
     */

@@ -81,7 +81,17 @@ function selection(button_elem){
 
 function render_map(){
     if (selected_map.length == 0){
-        alert("You did not select any of these maps!")
+        alert("You did not select any map")
+        return
+    }
+
+    if (selected_aircraft_preset.length == 0){
+        alert("You did not select any aircraft preset")
+        return
+    }
+
+    if (selected_command_preset.length == 0){
+        alert("You did not select any command preset")
         return
     }
     

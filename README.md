@@ -14,7 +14,7 @@ documentation is divided into two parts (**SEDAS main** and **SEDAS documentatio
     3. [Functionalities](#funcs)
     4. [Sources](/doc/sources/readme.md)
 2. [SEDAS documentation](/doc/wiki/)
-    1. [Installation](/doc/wiki/)
+    1. [Installation](/doc/wiki/installation.md)
     2. [Window documentation](/doc/wiki/windows/)
         1. [Main menu](/doc/wiki/windows/settings.md)
         2. [Settings](/doc/wiki/windows/settings.md)

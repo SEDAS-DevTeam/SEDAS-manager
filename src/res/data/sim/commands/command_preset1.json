@@ -4,19 +4,34 @@
     },
     "commands": [
         {
-            "input": "<callsign>, fly heading <value>",
-            "output": "<callsign>, flying heading <value>",
-            "comm": "change-heading"
+            "input": "fly heading <value>",
+            "readback": "flying heading <value>",
+            "bind": "change-heading <value>"
         },
         {
-            "input": "<callsign>, turn right heading <value>",
-            "output": "<callsign>, flying heading <value>",
-            "comm": "change-heading --right --<value>"
+            "input": "turn right heading <value>",
+            "readback": "flying heading <value>",
+            "bind": "change-heading --right <value>"
         },
         {
-            "input": "<callsign>, turn left heading <value>",
-            "output": "<callsign>, flying heading <value>",
-            "comm": "change-heading --left --<value>"
+            "input": "turn left heading <value>",
+            "readback": "flying heading <value>",
+            "bind": "change-heading --left <value>"
+        },
+        {
+            "input": "climb flight level <value>",
+            "readback": "climbing flight level <value>",
+            "bind": "change-level --climb <value>"
+        },
+        {
+            "input": "descend flight level <value>",
+            "readback": "descending flight level <value>",
+            "bind": "change-level --descend <value>"
+        },
+        {
+            "input": "report <value>",
+            "readback": "currently maintaining <value>",
+            "bind": ""
         }
     ]
 }

@@ -8,7 +8,9 @@ import path from "path"
 //init
 const ABS_PATH = path.resolve("")
 
-
+/*
+    Window configs for electron
+*/
 export const main_menu_dict = {
     width: 800,
     height: 600,

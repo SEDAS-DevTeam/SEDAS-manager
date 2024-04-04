@@ -1,3 +1,5 @@
+
+
 //low level functions
 function deg_to_rad(deg){
     return deg * (Math.PI / 180)
@@ -259,9 +261,7 @@ export class PlaneDB{
             }
         }
 
-        /*
-        PLANE PATH CHANGES
-        */
+        //plane path changes
         for (let i = 0; i < this.plane_paths_DB.length; i++){
             if (!isNaN(path_limit)){
                 if (this.plane_paths_DB[i]["coords"].length > path_limit){
@@ -292,6 +292,30 @@ export class Plane{
     public arrival_time: string;
     public x: number;
     public y: number;
+
+    /*
+        Plane command config
+    */
+    public command_config = {
+        "commands": [
+            {
+                "comm": "change-heading",
+                "variations": {
+                    "left": "bllasda",
+                    "right": "bllasda",
+                    "point": "bllasda"
+                }
+            },
+            {
+                "comm": "change-speed",
+                "variations": []
+            },
+            {
+                "comm": "change-level",
+                "variations": ["expedite", "climb", "descend"]
+            }
+        ]
+    }
 
     public constructor(id: string, callsign: string, 
         heading: number, heading_up: number, 

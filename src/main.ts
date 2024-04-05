@@ -237,6 +237,7 @@ class MainApp{
     public add_listener_IPC(){
         //IPC listeners
         ipcMain.handle("message", (event, data) => {
+            console.log(data)
             switch(data[1][0]){
                 //generic message channels
                 case "redirect-to-menu": {
@@ -628,6 +629,10 @@ class MainApp{
                 case "restore-sim": {
                     this.backup_worker.postMessage(["read-db"])
                     break
+                }
+                //messages from wiki tab
+                case "get-path": {
+                    console.log(ABS_PATH)
                 }
             }
         })

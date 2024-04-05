@@ -1,13 +1,10 @@
 <!--header of the doc file-->
 <hr>
 
-## Table of contents
-documentation is divided into two parts (**SEDAS main** and **SEDAS documentation**), main is located on `README.md` and contatins basic info about this project, while documentation is located in separate markdown files
-
-1. [SEDAS main](https://github.com/HelloWorld7894/SEDAS-manager)
-    1. [About SEDAS](https://github.com/HelloWorld7894/SEDAS-manager#about)
-    2. [Technical](https://github.com/HelloWorld7894/SEDAS-manager#technical)
-    3. [Functionalities](https://github.com/HelloWorld7894/SEDAS-manager#funcs)
+1. [SEDAS main](/README.md)
+    1. [About SEDAS](/README.md#about)
+    2. [Technical](/README.md#technical)
+    3. [Functionalities](/README.md#funcs)
     4. [Sources](/doc/sources/readme.md)
 2. [SEDAS documentation](/doc/wiki/)
     1. [Installation](/doc/wiki/installation.md)

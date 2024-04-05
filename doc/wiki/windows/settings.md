@@ -6,7 +6,7 @@
     2. [Technical](/README.md#technical)
     3. [Functionalities](/README.md#funcs)
     4. [Sources](/doc/sources/readme.md)
-2. [SEDAS documentation](/doc/wiki/)
+2. [SEDAS documentation](/doc/doc_main.md)
     1. [Installation](/doc/wiki/installation.md)
     2. [Window documentation](/doc/wiki/windows/)
         1. [Main menu](/doc/wiki/windows/settings.md)

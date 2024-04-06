@@ -18,8 +18,8 @@ import * as utils from "./utils"
 import * as app_config from "./app_config"
 
 //window variable declarations
-var mainMenu: Window;
-var settings: Window;
+var mainMenuWindow: Window;
+var settingsWindow: Window;
 var controllerWindow: Window;
 var workerWindow: Window;
 var exitWindow: Window;
@@ -237,7 +237,6 @@ class MainApp{
     public add_listener_IPC(){
         //IPC listeners
         ipcMain.handle("message", (event, data) => {
-            console.log(data)
             switch(data[1][0]){
                 //generic message channels
                 case "redirect-to-menu": {
@@ -245,15 +244,23 @@ class MainApp{
 
                     //message call to redirect to main menu
                     EvLogger.add_record("DEBUG", "redirect-to-menu event")
-
-                    settings.close()
+                    
+                    if (data[0] == "settings"){
+                        settingsWindow.close()
+                    }
+                    else if (data[0] == "controller"){
+                        controllerWindow.close()
+                        for (let i = 0; i < this.workers.length; i++){
+                            this.workers[i].close()
+                        }
+                    }
 
                     //calculate x, y
                     let coords = utils.get_window_coords(app_settings, this.displays, -1, app_config.main_menu_dict)
 
                     EvLogger.add_record("DEBUG", "main-menu show")
-                    mainMenu = new Window(this.app_status, app_config.main_menu_dict, "./res/main.html", coords)
-                    mainMenu.show()
+                    mainMenuWindow = new Window(this.app_status, app_config.main_menu_dict, "./res/main.html", coords)
+                    mainMenuWindow.show()
 
                     break
                 }
@@ -270,14 +277,14 @@ class MainApp{
 
                     EvLogger.add_record("DEBUG", "redirect-to-settings event")
 
-                    mainMenu.close()
+                    mainMenuWindow.close()
 
                     //calculate x, y
                     let coords = utils.get_window_coords(app_settings, this.displays, -1)
 
                     EvLogger.add_record("DEBUG", "settings show")
-                    settings = new Window(this.app_status, app_config.settings_dict, "./res/settings.html", coords)
-                    settings.show()
+                    settingsWindow = new Window(this.app_status, app_config.settings_dict, "./res/settings.html", coords)
+                    settingsWindow.show()
                     break
                 }
                 case "redirect-to-main": {
@@ -329,7 +336,7 @@ class MainApp{
                         const out_devices = JSON.parse(out_devices_raw)
 
                         //sending app data and alg configs
-                        settings.send_message("app-data", [app_settings, voice_config, text_config, speech_config, in_devices, out_devices])
+                        settingsWindow.send_message("app-data", [app_settings, voice_config, text_config, speech_config, in_devices, out_devices])
                     }
                     else if (data[0] == "controller"){
                         //sending monitor data
@@ -769,12 +776,13 @@ class MainApp{
         let [x, y] = utils.get_window_coords(app_settings, this.displays, -1, app_config.main_menu_dict)
 
         EvLogger.add_record("DEBUG", "main-menu show")
-        mainMenu = new Window(this.app_status, app_config.main_menu_dict, "./res/main.html", [x, y])
-        mainMenu.show()
+        mainMenuWindow = new Window(this.app_status, app_config.main_menu_dict, "./res/main.html", [x, y])
+        mainMenuWindow.show()
     }
 
     public async main_app(backup_db: any = undefined){
-        mainMenu.close()
+        mainMenuWindow.close()
+        this.workers = []
 
         //calculate x, y
         //leftmost or rightmost tactic
@@ -807,8 +815,8 @@ class MainApp{
         EvLogger.add_record("DEBUG", "controller show")
         controllerWindow = new Window(this.app_status, app_config.controller_dict, "./res/controller_set.html", coords, "controller")
         controllerWindow.checkClose(() => {
-            if (this.app_status["app-running"]){
-                //app is running => close by tray button
+            if (this.app_status["app-running"] && this.app_status["redir-to-main"]){
+                //app is running and is redirected to main => close by tray button
                 this.exit_app()
             }
         })

@@ -902,8 +902,12 @@ window.onload = () => {
     }
 
     //set for all pages
-    document.getElementById("main-header-button").addEventListener("click", () => {
+    document.getElementById("exit-button").addEventListener("click", () => {
         window.electronAPI.send_message("controller", ["exit"])
+    })
+
+    document.getElementById("menu-button").addEventListener("click", () => {
+        window.electronAPI.send_message("controller", ["redirect-to-menu"])
     })
 
     //general messages

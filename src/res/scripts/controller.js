@@ -438,18 +438,41 @@ function change_according_points(){
     window.electronAPI.send_message("controller", ["get-points", selectedValue])
 }
 
-function ai_control_change(elem){
+function switch_change_ai(elem){
     if (elem.checked){
-        window.electronAPI.send_message("controller", ["ai-control-start"])
+        window.electronAPI.send_message("controller", "ai-control-start")
 
         //disable visibility on whole content
-        document.getElementById("main-content").style.visibility = "hidden"
+        document.querySelectorAll("#main-content").forEach(elem => {
+            elem.style.visibility = "hidden"
+        })
     }
     else{
-        window.electronAPI.send_message("controller", ["ai-control-stop"])
+        window.electronAPI.send_message("controller", "ai-control-stop")
 
         //enable visibility on whole content
-        document.getElementById("main-content").style.visibility = "visible"
+        document.querySelectorAll("#main-content").forEach(elem => {
+            elem.style.visibility = "visible"
+        })
+    }
+}
+
+function switch_change_wind(elem){
+    if (elem.checked){
+        window.electronAPI.send_message("controller", "wind-control-start")
+
+        //disable visibility on whole content
+        document.querySelectorAll("#wind-control").forEach(elem => {
+            elem.style.visibility = "visible"
+        })
+    }
+    else{
+        window.electronAPI.send_message("controller", "wind-control-stop")
+
+        //enable visibility on whole content
+        document.querySelectorAll("#wind-control").forEach(elem => {
+            elem.style.visibility = "hidden"
+        })
     }
 }
 
@@ -815,7 +838,11 @@ window.onload = () => {
             })
 
             document.getElementById("ai-control-switch").addEventListener("change", (event) => {
-                ai_control_change(event.target)
+                switch_change_ai(event.target)
+            })
+
+            document.getElementById("wind-control-switch").addEventListener("change", (event) => {
+                switch_change_wind(event.target, ["wind-control-start", "wind-control-stop", "#wind-control"])
             })
 
             document.getElementById("sim_button").addEventListener("click", (event) => {

@@ -133,6 +133,7 @@ div.popup-box p{
     overflow-y: scroll;
     margin-left: 20px; 
     margin-right: 20px;
+    margin-bottom: 20px;
 }
 
 #confirm{
@@ -231,6 +232,10 @@ div.popup-box p{
     margin-top: 10px;
 }
 
+#wind-control{
+    visibility: hidden;
+}
+
 /*Controller SIM switch*/
 .switch {
     position: relative;
@@ -280,6 +285,12 @@ input:focus + .slider {
   
 input:checked + .slider:before {
     transform: translateX(26px);
+}
+
+span.inline-text{
+    margin-top: 6px;
+    margin-left: 10px;
+    position: absolute;
 }
 
 #delete-icon{

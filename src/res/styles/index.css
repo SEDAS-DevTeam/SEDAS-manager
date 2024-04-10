@@ -156,11 +156,16 @@ Canvases
     color: black;
 }
 
-div.selected{
+.selected{
     background-color: #5271ff;
+    color: white;
 }
 
 .div-indent{
     margin-left: 20px; 
     margin-right: 20px;
+}
+
+#scrollable{
+    overflow-y: scroll;
 }

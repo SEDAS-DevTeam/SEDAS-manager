@@ -2,14 +2,15 @@
 <html>
     <head>
         <link rel="stylesheet" href="styles/index.css">
+        <link rel="stylesheet" href="styles/wiki.css">
+
         <meta charset="utf-8" />
         <script src="scripts/controller.js"></script>
-        <script type="module" src="../../node_modules/zero-md/dist/zero-md.min.js"></script>
     </head>
     <body style="margin-left: 20px; margin-right: 20px;" id="scrollable">
         <div id="top-content">
             <div>
-                <h1 id="main-header">SEDAC manager Wiki</h1>
+                <h1 id="main-header">SEDAS manager Wiki</h1>
                 <button id="exit-button">Exit</button>
                 <button id="menu-button">Back to menu</button>
             </div>
@@ -21,7 +22,15 @@
                 <a href="plugins.html">Plugins</a>
                 <a href="wiki.html" class="active">Wiki</a>
             </div>
-            <zero-md src="../../README.md" id="wiki-content" style="margin-top: 15px;"></zero-md>
+        </div>
+        <div style="margin-top: 15px; height: 80%;">
+            <div>
+                <button class="change-iframe">SEDAS documentation</button>
+                <button class="change-iframe">IVAO</button>
+            </div>
+            <div id="parent-iframe">
+                <iframe id="wiki-content" style="margin-top: 15px;" frameborder="0" allowfullscreen></iframe>
+            </div>
         </div>
     </body>
 </html>

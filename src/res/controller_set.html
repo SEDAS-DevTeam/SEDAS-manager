@@ -28,7 +28,7 @@
             
             <!--1. dropdown content-->
             <div>
-                <i class="fa-solid fa-caret-down"></i>
+                <i class="drop-button fa-solid fa-caret-down"></i>
                 <h3 class="header-inline">Map selection</h3>
             </div>
             <div class="dropdown-content">
@@ -58,7 +58,7 @@
 
             <!--2. dropdown content-->
             <div>
-                <i class="fa-solid fa-caret-down"></i>
+                <i class="drop-button fa-solid fa-caret-down"></i>
                 <h3 class="header-inline">Aircraft preset selection</h3>
             </div>
             <div class="dropdown-content">
@@ -80,19 +80,24 @@
             <hr>
 
             <!--3. dropdown content-->
-            <h3 class="header-inline">Commands preset selection</h3>
-            <table id="commands">
-                <tr>
-                    <th>Command Preset name</th>
-                    <th>Inspect</th>
-                    <th>
-                        <form><input type="text" placeholder="Search.." name="search"></form>
-                    </th>
-                </tr>
-            </table>
-            <h3>Selected command preset:</h3>
-            <div class="result">
-                <h2 id="confirmresult-command">None</h2>
+            <div>
+                <i class="drop-button fa-solid fa-caret-down"></i>
+                <h3 class="header-inline">Commands preset selection</h3>
+            </div>
+            <div class="dropdown-content">
+                <table id="commands">
+                    <tr>
+                        <th>Command Preset name</th>
+                        <th>Inspect</th>
+                        <th>
+                            <form><input type="text" placeholder="Search.." name="search"></form>
+                        </th>
+                    </tr>
+                </table>
+                <h3>Selected command preset:</h3>
+                <div class="result">
+                    <h2 id="confirmresult-command">None</h2>
+                </div>
             </div>
             <hr>
             <button id="confirm">Confirm</button>

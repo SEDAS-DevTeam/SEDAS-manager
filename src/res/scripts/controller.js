@@ -772,6 +772,32 @@ window.onload = () => {
     //window is loaded, send command to send all info from backend
     window.electronAPI.send_message("controller", ["send-info"])
 
+    //set for all elements globally
+    
+    //set click event listeners for dropdown
+    let drop_buttons = document.getElementsByClassName("drop-button")
+    let drop_contents = document.getElementsByClassName("dropdown-content")
+    for (let i = 0; i < drop_buttons.length; i++){
+        drop_buttons[i].addEventListener("click", (event) => {
+            if (event.target.classList.contains("fa-caret-down")){
+                console.log("hide")
+                //dropdown is visible
+                drop_contents[i].style.display = "none"
+
+                event.target.classList.remove("fa-caret-down")
+                event.target.classList.add("fa-caret-right")
+            }
+            else{
+                console.log("show")
+                //dropdown is hidden
+                drop_contents[i].style.display = "block"
+
+                event.target.classList.remove("fa-caret-right")
+                event.target.classList.add("fa-caret-down")
+            }
+        })
+    }
+
     var path = window.location.pathname;
     var page_name = path.split("/").pop();
 
@@ -799,6 +825,7 @@ window.onload = () => {
             document.getElementById("regen-map").addEventListener("click", () => {
                 regen_map()
             })
+
             break
 
         case "controller_mon.html":

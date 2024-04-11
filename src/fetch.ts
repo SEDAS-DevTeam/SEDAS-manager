@@ -8,7 +8,7 @@ const ABS_PATH = path.resolve("")
 const PATH_TO_CACHE: string = path.join(ABS_PATH, "/src/res/neural/alg_cache")
 const PATH_TO_CONFIG: string = path.join(ABS_PATH, "/src/res/data/alg/")
 
-const URL: string = "https://raw.githubusercontent.com/SEDAS-DevTeam/SEDAS-networks/tree/main/src"
+const URL: string = "https://raw.githubusercontent.com/SEDAS-DevTeam/SEDAS-networks/main/src/"
 
 async function fetch_file_src(header: string, filename: string){
     return new Promise<void>(resolve => {

@@ -18,7 +18,7 @@ body{
     overflow: hidden;
 }
 
-h1, h2, h3, p, a, span{
+h1, h2, h3, p, a, span, li{
     color: #5271ff;
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
@@ -186,10 +186,14 @@ Canvases
 }
 
 #parent-iframe{
-    height: 100%;
+    height: 70%;
 }
 
 .drop-button:hover{
     color: #5271ff;
     cursor: pointer;
+}
+
+#bot-content{
+    margin-top: 40px;
 }

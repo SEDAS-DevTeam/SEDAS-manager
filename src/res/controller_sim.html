@@ -32,97 +32,120 @@
                 <button id="sim_button" class="startsim">START</button>
             </div>
             <hr>
-            <h3 id="ai-control-header">AI control</h3>
-            <div style="margin-left: 20px;">
+    
+            <!--1. dropdown content-->
+            <div>
+                <i class="drop-button fa-solid fa-caret-down"></i>
+                <h3 id="ai-control-header" class="header-inline">AI control</h3>
+            </div>
+            <div class="dropdown-content">
                 <label class="switch">
                     <input type="checkbox" id="ai-control-switch">
                     <span class="slider"></span>
                 </label>
             </div>
             <hr>
-        </div>
-        <div class="div-indent" id="main-content">
-            <h3>Plane spawn</h3>
-            <div class="plane-cell">
-                <div class="plane-block">
-                    <p class="header">NAME: </p>
-                    <div id="rand-gen-but">
-                        <button class="choice-but">LX123</button>
-                        <button class="choice-but">LX123</button>
-                        <button class="choice-but">LX123</button>
-                        <button class="choice-but">LX123</button>
-                    </div>
-                    <button class="randomize-but">Randomize</button>
-                    <form><input type="text" placeholder="Type callsign..." name="callsign" class="choice-text"></form>
-                </div>
-                <div class="plane-block">
-                    <p class="header">HEADING: <span class="val-out"></span></p>
-                    <input type="range" class="val-range">
-                </div>
-                <div class="plane-block">
-                    <p class="header">LEVEL: <span class="val-out"></span></p>
-                    <input type="range" class="val-range">
-                </div>
-                <div class="plane-block">
-                    <p class="header">SPEED: <span class="val-out"></span></p>
-                    <input type="range" class="val-range">
-                </div>
-                <div class="plane-block">
-                    <p class="header">MONITOR</p>
-                    <select id="monitor_spawn">
-                    </select>
-                </div>
-                <div class="plane-block" style="margin-left: 20px;">
-                    <p class="header">DEPARTURE POINT</p>
-                    <select id="departure_point">
-                    </select>
-                </div>
-                <div class="plane-block" style="margin-left: 20px;">
-                    <p class="header">ARRIVAL POINT</p>
-                    <select id="arrival_point">
-                    </select>
-                </div>
-                <div class="time-block-full">
-                    <p class="header" style="display: inline-block;">ARRIVAL TIME: (note: is in 24-hour format)</p>
-                    <div style="display: inline-block; margin-left: 25px;">
-                        <div id="time-block">
-                            <div class="time-row">
-                                <i class="fa-solid fa-arrow-up arr-up" style="margin-left: 5px;"></i>
-                                <i class="fa-solid fa-arrow-up arr-up"></i>
-                            </div>
-                            <div class="time-row">
-                                <p class="time-col" id="hours">00</p>
-                                <p class="time-col" id="minutes">00</p>
-                            </div>
-                            <div class="time-row">
-                                <i class="fa-solid fa-arrow-down arr-down" style="margin-left: 5px;"></i>
-                                <i class="fa-solid fa-arrow-down arr-down"></i>
-                            </div>
-                        </div>
-                    </div>
-                    <p>Prediction by selected points: 00:00</p>
-                    <button>Select predicted time</button>
-                </div>
-                <button id="confirm-button-plane">Confirm</button>
-            </div>
-            <hr>
-            <h3>Plane control</h3>
-            <div id="plane-list">
-                <form><input type="text" placeholder="Search for aircraft name..." name="callsign" class="plane-search"></form>
-            </div>
-            
-            <hr>
-            <h3>Environment control</h3>
-            <div class="div-indent">
+    
+            <div id="main-content">
+                <!--2. dropdown content-->
                 <div>
-                    <label class="switch">
-                        <input type="checkbox" id="wind-control-switch">
-                        <span class="slider"></span>
-                    </label>
-                    <span class="inline-text">Enable wind control</span>
+                    <i class="drop-button fa-solid fa-caret-down"></i>
+                    <h3 class="header-inline">Plane spawn</h3>
                 </div>
-                <div id="wind-control">
-                    <h2>TODO: wind control</h2>
+                <div class="dropdown-content">
+                    <div class="plane-cell">
+                        <div class="plane-block">
+                            <p class="header">NAME: </p>
+                            <div id="rand-gen-but">
+                                <button class="choice-but">LX123</button>
+                                <button class="choice-but">LX123</button>
+                                <button class="choice-but">LX123</button>
+                                <button class="choice-but">LX123</button>
+                            </div>
+                            <button class="randomize-but">Randomize</button>
+                            <form><input type="text" placeholder="Type callsign..." name="callsign" class="choice-text"></form>
+                        </div>
+                        <div class="plane-block">
+                            <p class="header">HEADING: <span class="val-out"></span></p>
+                            <input type="range" class="val-range">
+                        </div>
+                        <div class="plane-block">
+                            <p class="header">LEVEL: <span class="val-out"></span></p>
+                            <input type="range" class="val-range">
+                        </div>
+                        <div class="plane-block">
+                            <p class="header">SPEED: <span class="val-out"></span></p>
+                            <input type="range" class="val-range">
+                        </div>
+                        <div class="plane-block">
+                            <p class="header">MONITOR</p>
+                            <select id="monitor_spawn">
+                            </select>
+                        </div>
+                        <div class="plane-block" style="margin-left: 20px;">
+                            <p class="header">DEPARTURE POINT</p>
+                            <select id="departure_point">
+                            </select>
+                        </div>
+                        <div class="plane-block" style="margin-left: 20px;">
+                            <p class="header">ARRIVAL POINT</p>
+                            <select id="arrival_point">
+                            </select>
+                        </div>
+                        <div class="time-block-full">
+                            <p class="header" style="display: inline-block;">ARRIVAL TIME: (note: is in 24-hour format)</p>
+                            <div style="display: inline-block; margin-left: 25px;">
+                                <div id="time-block">
+                                    <div class="time-row">
+                                        <i class="fa-solid fa-arrow-up arr-up" style="margin-left: 5px;"></i>
+                                        <i class="fa-solid fa-arrow-up arr-up"></i>
+                                    </div>
+                                    <div class="time-row">
+                                        <p class="time-col" id="hours">00</p>
+                                        <p class="time-col" id="minutes">00</p>
+                                    </div>
+                                    <div class="time-row">
+                                        <i class="fa-solid fa-arrow-down arr-down" style="margin-left: 5px;"></i>
+                                        <i class="fa-solid fa-arrow-down arr-down"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>Prediction by selected points: 00:00</p>
+                            <button>Select predicted time</button>
+                        </div>
+                        <button id="confirm-button-plane">Confirm</button>
+                    </div>
+                </div>
+                <hr>
+    
+                <!--3. dropdown content-->
+                <div>
+                    <i class="drop-button fa-solid fa-caret-down"></i>
+                    <h3 class="header-inline">Plane control</h3>
+                </div>
+                <div class="dropdown-content">
+                    <div id="plane-list">
+                        <form><input type="text" placeholder="Search for aircraft name..." name="callsign" class="plane-search"></form>
+                    </div>
+                </div>
+                <hr>
+    
+                <!--4. dropdown content-->
+                <div>
+                    <i class="drop-button fa-solid fa-caret-down"></i>
+                    <h3 class="header-inline">Environment control</h3>
+                </div>
+                <div class="dropdown-content">
+                    <div>
+                        <label class="switch">
+                            <input type="checkbox" id="wind-control-switch">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="inline-text">Enable wind control</span>
+                    </div>
+                    <div id="wind-control">
+                        <h2>TODO: wind control</h2>
+                    </div>
                 </div>
             </div>
         </div>

@@ -169,3 +169,12 @@ Canvases
 #scrollable{
     overflow-y: scroll;
 }
+
+.header-inline{
+    display: inline-block;
+    margin: 5px
+}
+
+.dropdown-content{
+    margin-left: 20px;
+}

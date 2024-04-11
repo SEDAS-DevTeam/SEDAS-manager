@@ -25,47 +25,62 @@
         <div style="margin-left: 20px; margin-right: 20px;">
             <h2>Simulation setup</h2>
             <hr>
-            <h3>Map selection</h3>
-            <h3><button class="inline-but" id="regen-map">Regenerate map</button>randomized regeneration</h3>
             
-            <h3>or search for any airport in search:</h3>
-            <table id="airports">
-                <tr>
-                    <th>Airport</th>
-                    <th>Type</th>
-                    <th>Code</th>
-                    <th>Country</th>
-                    <th>City</th>
-                    <th>Description</th>
-                    <th>
-                        <form><input type="text" placeholder="Search.." name="search"></form>
-                    </th>
-                </tr>
-            </table>
-            <p>Data was gathered from the World Bank International airports dataset</p>
+            <!--1. dropdown content-->
+            <div>
+                <i class="fa-solid fa-caret-down"></i>
+                <h3 class="header-inline">Map selection</h3>
+            </div>
+            <div class="dropdown-content">
+                <h3><button class="inline-but" id="regen-map">Regenerate map</button>randomized regeneration</h3>
+                <h3>or search for any airport in search:</h3>
+                <table id="airports">
+                    <tr>
+                        <th>Airport</th>
+                        <th>Type</th>
+                        <th>Code</th>
+                        <th>Country</th>
+                        <th>City</th>
+                        <th>Description</th>
+                        <th>
+                            <form><input type="text" placeholder="Search.." name="search"></form>
+                        </th>
+                    </tr>
+                </table>
+                <p>Data was gathered from the World Bank International airports dataset</p>
 
-            <h3>Selected map:</h3>
-            <div class="result">
-                <h2 id="confirmresult-airport">None</h2>
+                <h3>Selected map:</h3>
+                <div class="result">
+                    <h2 id="confirmresult-airport">None</h2>
+                </div>
             </div>
             <hr>
-            <h3>Aircraft preset selection</h3>
-            <table id="aircrafts">
-                <tr>
-                    <th>Aircraft preset name</th>
-                    <th>Inspect</th>
-                    <th>
-                        <form><input type="text" placeholder="Search.." name="search"></form>
-                    </th>
-                </tr>
-            </table>
 
-            <h3>Selected aircraft preset:</h3>
-            <div class="result">
-                <h2 id="confirmresult-aircraft">None</h2>
+            <!--2. dropdown content-->
+            <div>
+                <i class="fa-solid fa-caret-down"></i>
+                <h3 class="header-inline">Aircraft preset selection</h3>
+            </div>
+            <div class="dropdown-content">
+                <table id="aircrafts">
+                    <tr>
+                        <th>Aircraft preset name</th>
+                        <th>Inspect</th>
+                        <th>
+                            <form><input type="text" placeholder="Search.." name="search"></form>
+                        </th>
+                    </tr>
+                </table>
+
+                <h3>Selected aircraft preset:</h3>
+                <div class="result">
+                    <h2 id="confirmresult-aircraft">None</h2>
+                </div>
             </div>
             <hr>
-            <h3>Commands preset selection</h3>
+
+            <!--3. dropdown content-->
+            <h3 class="header-inline">Commands preset selection</h3>
             <table id="commands">
                 <tr>
                     <th>Command Preset name</th>

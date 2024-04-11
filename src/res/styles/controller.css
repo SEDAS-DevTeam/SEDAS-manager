@@ -303,3 +303,8 @@ span.inline-text{
     padding: 5px 10px;
     font-size: 20px;
 }
+
+h3{
+    margin-top: 7px;
+    margin-bottom: 7px;
+}

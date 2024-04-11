@@ -101,8 +101,8 @@ function save_settings(){
     let audio_in_device = document.getElementById("in_devices").value
     let skip_backend_init = (document.getElementById("backend").value == "true")
 
-    let monitor_col = document.getElementById("monitor_col").value
-    let monitor_row = document.getElementById("monitor_row").value
+    let monitor_col = document.getElementById("monit_col").value
+    let monitor_row = document.getElementById("monit_row").value
 
     //simulation data
     let ai_aggression = document.getElementById("ai_aggression").value
@@ -161,6 +161,8 @@ function save_settings(){
     console.log(data_str)
 
     window.electronAPI.send_message('settings', ['save-settings', data_str])
+
+    alert("Saved the settings! (Restart app so the changes take effect)")
 }
 
 window.electronAPI.on_message("app-data", (data) => {

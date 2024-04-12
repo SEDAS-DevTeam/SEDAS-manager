@@ -164,6 +164,13 @@ function MoveSlider(idx){
 }
 
 function OnInput(elem){
+    let choice_buttons = document.getElementsByClassName("choice-but")
+    for (let i = 0; i < choice_buttons.length; i++){
+        if (choice_buttons[i].classList.contains("selected-choice")){
+            choice_buttons[i].classList.remove("selected-choice")
+        }
+    }
+
     elem.value = elem.value.toUpperCase()
 
     if(elem.value.length == 0){
@@ -329,8 +336,10 @@ function refresh_plane_data(){
 
 function on_choice_select(n){
     let buttons = document.getElementsByClassName("choice-but")
-    if (document.getElementsByClassName("choice-text")[0].value.length != 0){
-        return
+    let choice_text = document.getElementsByClassName("choice-text")[0]
+    if (choice_text.value.length != 0){
+        choice_text.id = ""
+        choice_text.value = ""
     }
 
     if(buttons[n].classList.contains("selected-choice")){

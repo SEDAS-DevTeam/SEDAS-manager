@@ -1,3 +1,6 @@
+//variables
+var app_data_template = []
+
 window.onload = () => {
     //ask for settings to load
     window.electronAPI.send_message("settings", ["send-info"])
@@ -13,9 +16,14 @@ window.onload = () => {
 
 //load settings
 function load_settings(data){
+
     let app_data = data[0]
     let config_data = data.slice(1, 4)
     let device_data = data.slice(4, 6)
+
+    for (const [key, value] of Object.entries(app_data)) {
+        app_data_template.push(key)
+    }
 
     //load all app data
     var all_settings_elem = document.getElementsByClassName("settings-elem")
@@ -90,73 +98,28 @@ function load_settings(data){
 function save_settings(){
     //parse form data
 
-    //general data
-    let loc_data = document.getElementById("location").value
-    let limit_data = document.getElementById("limit").value
-    let align_data = document.getElementById("alignment").value
-    let saving_freq = document.getElementById("backup").value
-    let path_limit = document.getElementById("path_limit").value
-    let logging = (document.getElementById("logging").value == "true")
-    let audio_out_device = document.getElementById("out_devices").value
-    let audio_in_device = document.getElementById("in_devices").value
-    let skip_backend_init = (document.getElementById("backend").value == "true")
-
-    let monitor_col = document.getElementById("monit_col").value
-    let monitor_row = document.getElementById("monit_row").value
-
-    //simulation data
-    let ai_aggression = document.getElementById("ai_aggression").value
-    let results = document.getElementById("result").checked
-    let voice_alg = document.getElementById("voice_recog").value
-    let text_alg = document.getElementById("text_process").value
-    let speech_alg = document.getElementById("speech_synth").value
-    let noise_addition = document.getElementById("noise").checked
-
-    //plane data
-    let bank_angle = document.getElementById("bank_angle").value
-    let min_speed = document.getElementById("min_speed").value
-    let max_speed = document.getElementById("max_speed").value
-    let min_altitude = document.getElementById("min_level").value
-    let max_altitude = document.getElementById("max_level").value 
-    let trans_altitude = document.getElementById("trans_alt").value
-    let standard_pitch_up = document.getElementById("std_pitch_up").value
-    let standard_pitch_down = document.getElementById("std_pitch_down").value
-    let standard_acceleration = document.getElementById("std_accel").value
-
-    let data = {
-        //general data
-        "controller-loc": loc_data,
-        "worker-spawn": limit_data,
-        "alignment": align_data,
-        "saving_frequency": saving_freq,
-        "plane_path_limit": path_limit,
-        "logging": logging,
-        "out_device-skip": audio_out_device,
-        "in_device-skip": audio_in_device,
-        "backend_init": skip_backend_init,
-        
-        //controller data
-        "max_monitor_col": monitor_col,
-        "max_monitor_row": monitor_row,
-
-        //simulation data
-        "ai_aggression": ai_aggression,
-        "results": results,
-        "voice_alg-skip": voice_alg, //-skip is for values that are skipped on initial loading
-        "text_alg-skip": text_alg,
-        "speech_alg-skip": speech_alg,
-        "noise": noise_addition,
-        //plane data
-        "std_bank_angle": bank_angle,
-        "min_speed": min_speed,
-        "max_speed": max_speed,
-        "min_alt": min_altitude,
-        "max_alt": max_altitude,
-        "standard_pitch_up": standard_pitch_up,
-        "standard_pitch_down": standard_pitch_down,
-        "standard_accel": standard_acceleration,
-        "transition_altitude": trans_altitude
+    if (app_data_template.length == 0){
+        //values not loaded yet
+        alert("Values are not loaded yet! Please wait or restart if problem persists")
     }
+
+    let data = {}
+    for (let i = 0; i < app_data_template.length; i++){
+        let data_source = document.getElementById(app_data_template[i])
+        let source_out;
+        if (data_source.tagName == "SELECT"){
+            source_out = (document.getElementById(app_data_template[i]).value == "true")
+        }
+        else if (data_source.tagName == "INPUT" && data_source.type == "checkbox"){
+            source_out = document.getElementById(app_data_template[i]).checked
+        }
+        else if (data_source.tagName == "INPUT" && data_source.type == "text"){
+            source_out = document.getElementById(app_data_template[i]).value
+        }
+
+        data[app_data_template[i]] = source_out
+    }
+
     let data_str = JSON.stringify(data, null, 4)
     console.log(data_str)
 
@@ -165,7 +128,4 @@ function save_settings(){
     alert("Saved the settings! (Restart app so the changes take effect)")
 }
 
-window.electronAPI.on_message("app-data", (data) => {
-    //load everything
-    load_settings(data)
-})
+window.electronAPI.on_message("app-data", load_settings)

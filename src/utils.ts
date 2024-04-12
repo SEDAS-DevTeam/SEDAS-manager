@@ -38,7 +38,7 @@ export function checkInternet(EvLogger: EventLogger){
         }).on("error", (err) => {
             EvLogger.add_record("ERROR", "Lookup unsuccessful")
             EvLogger.add_record("ERROR", err.message)
-            reject(false)
+            resolve(false)
         })
     })
 }
@@ -69,13 +69,13 @@ export function get_window_coords(app_settings: any, displays: any[], idx: numbe
     }
 
     if (idx == -1){
-        if (app_settings["controller-loc"] == "leftmost"){
+        if (app_settings["controller_loc"] == "leftmost"){
             x = displays[0].x
             y = displays[0].y
 
             last_display = displays[0]
         }
-        else if (app_settings["controller-loc"] == "rightmost"){
+        else if (app_settings["controller_loc"] == "rightmost"){
             x = displays[displays.length - 1].x
             y = displays[displays.length - 1].y
 
@@ -83,6 +83,7 @@ export function get_window_coords(app_settings: any, displays: any[], idx: numbe
         }
     }
     else{ //idx != -1: other worker windows
+        console.log("balls2")
         if (app_settings["controller-loc"] == "leftmost"){
             if (displays.length == idx + 1){
                 return [-2, -2]

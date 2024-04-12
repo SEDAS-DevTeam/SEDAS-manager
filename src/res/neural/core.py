@@ -106,13 +106,13 @@ if __name__ == "__main__":
             
             queue_in_text.append(f"input: {data_from_voice}")
 
-            #client_socket.sendall(f"debug: got data from voice {data_from_voice}".encode())
+            client_socket.sendall(f"debug: got data from voice {data_from_voice}".encode())
 
         if len(queue_out_text) != 0:
             data_from_text = queue_out_text.pop(0)
             client_socket.sendall(f"data: {data_from_text}".encode())
 
-            #client_socket.sendall(f"debug: got data from text {data_from_text}".encode())
+            client_socket.sendall(f"debug: got data from text {data_from_text}".encode())
 
 thread_voice.join()
 thread_voice.join()

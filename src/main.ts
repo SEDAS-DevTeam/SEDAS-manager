@@ -40,6 +40,7 @@ class Window{
     public isClosed: boolean = false;
     public win_coordinates: number[];
     private path_load: string;
+    private localConfig: any = {}; //contains local config of window
 
     public close(){
         if (!this.isClosed){
@@ -71,16 +72,23 @@ class Window{
         })
     }
 
-    public constructor(app_status: Record<string, boolean>, config: any, path: string, coords: number[], window_type: string = "none"){
+    public constructor(app_status: Record<string, boolean>, config: any, path: string, coords: number[], window_type: string = "none", display_res: number[] = []){
         this.win_coordinates = coords //store to use later
-        
-        config.x = coords[0]
-        config.y = coords[1]
 
         //retype window_type
         this.win_type = window_type
 
-        this.window = new BrowserWindow(config);
+        Object.assign(this.localConfig, config)
+        if (display_res.length > 0 && !display_res.includes(undefined)){
+            //set resolution according to display resolution
+            this.localConfig.width = display_res[0]
+            this.localConfig.height = display_res[1]
+        }
+
+        this.localConfig.x = coords[0]
+        this.localConfig.y = coords[1]
+
+        this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
         this.window.webContents.openDevTools()
 
@@ -256,7 +264,8 @@ class MainApp{
                     }
 
                     //calculate x, y
-                    let coords = utils.get_window_coords(app_settings, this.displays, -1, app_config.main_menu_dict)
+                    let win_info = utils.get_window_info(app_settings, this.displays, -1, app_config.main_menu_dict)
+                    let coords = win_info.slice(0, 2)
 
                     EvLogger.add_record("DEBUG", "main-menu show")
                     mainMenuWindow = new Window(this.app_status, app_config.main_menu_dict, "./res/main.html", coords)
@@ -280,10 +289,12 @@ class MainApp{
                     mainMenuWindow.close()
 
                     //calculate x, y
-                    let coords = utils.get_window_coords(app_settings, this.displays, -1)
+                    let win_info = utils.get_window_info(app_settings, this.displays, -1)
+                    let coords = win_info.slice(0, 2)
+                    let display_info = win_info.slice(2, 4)
 
                     EvLogger.add_record("DEBUG", "settings show")
-                    settingsWindow = new Window(this.app_status, app_config.settings_dict, "./res/settings.html", coords)
+                    settingsWindow = new Window(this.app_status, app_config.settings_dict, "./res/settings.html", coords, "settings", display_info)
                     settingsWindow.show()
                     break
                 }
@@ -773,10 +784,11 @@ class MainApp{
         this.displays = displays_mod
         
         //calculate x, y
-        let [x, y] = utils.get_window_coords(app_settings, this.displays, -1, app_config.main_menu_dict)
+        let win_info = utils.get_window_info(app_settings, this.displays, -1, app_config.main_menu_dict)
+        let coords = win_info.slice(0, 2)
 
         EvLogger.add_record("DEBUG", "main-menu show")
-        mainMenuWindow = new Window(this.app_status, app_config.main_menu_dict, "./res/main.html", [x, y])
+        mainMenuWindow = new Window(this.app_status, app_config.main_menu_dict, "./res/main.html", coords)
         mainMenuWindow.show()
     }
 
@@ -786,8 +798,12 @@ class MainApp{
 
         //calculate x, y
         //leftmost or rightmost tactic
+        //spawning worker windows
         for(let i = 0; i < this.displays.length; i++){
-            let coords = utils.get_window_coords(this.app_settings, this.displays, i)
+            let win_info = utils.get_window_info(this.app_settings, this.displays, i)
+            let coords = win_info.slice(0, 2)
+            let display_info = win_info.slice(2, 4)
+            
             //stop sequence (display limit reached)
             if (coords[0] == -2){
                 break
@@ -799,21 +815,25 @@ class MainApp{
             EvLogger.add_record("DEBUG", "worker show")
             if (backup_db){
                 //backup was created, reload workers
-                workerWindow = new Window(this.app_status, app_config.worker_dict, backup_db["monitor-data"][i]["path_load"], backup_db["monitor-data"][i]["win_coordinates"], backup_db["monitor-data"][i]["win_type"])
+                workerWindow = new Window(this.app_status, app_config.worker_dict, backup_db["monitor-data"][i]["path_load"], backup_db["monitor-data"][i]["win_coordinates"], backup_db["monitor-data"][i]["win_type"], display_info)
                 workerWindow.isClosed = backup_db["monitor-planes"][i]["isClosed"]
             }
             else{
                 //backup was not created, create new workers
-                workerWindow = new Window(this.app_status, app_config.worker_dict, "./res/worker.html", coords, "ACC")
+                console.log(coords)
+                workerWindow = new Window(this.app_status, app_config.worker_dict, "./res/worker.html", coords, "ACC", display_info)
             }
             
             this.workers.push(workerWindow)
         }
 
-        let coords = utils.get_window_coords(this.app_settings, this.displays, -1)
+        //spawning controller window
+        let win_info = utils.get_window_info(this.app_settings, this.displays, -1)
+        let coords = win_info.slice(0, 2)
+        let display_info = win_info.slice(2, 4)
 
         EvLogger.add_record("DEBUG", "controller show")
-        controllerWindow = new Window(this.app_status, app_config.controller_dict, "./res/controller_set.html", coords, "controller")
+        controllerWindow = new Window(this.app_status, app_config.controller_dict, "./res/controller_set.html", coords, "controller", display_info)
         controllerWindow.checkClose(() => {
             if (this.app_status["app-running"] && this.app_status["redir-to-main"]){
                 //app is running and is redirected to main => close by tray button
@@ -875,7 +895,9 @@ class MainApp{
 
     public async exit_app(){
         //spawning info window
-        let coords = utils.get_window_coords(this.app_settings, this.displays, -1, app_config.exit_dict)
+        let win_info = utils.get_window_info(this.app_settings, this.displays, -1, app_config.exit_dict)
+        let coords = win_info.slice(0, 2)
+
         exitWindow = new Window(this.app_status, app_config.exit_dict, "./res/exit.html", coords)
         exitWindow.show()
 

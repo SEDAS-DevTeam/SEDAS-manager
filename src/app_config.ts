@@ -64,8 +64,8 @@ export const worker_dict = {
     title: "SEDAC",
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
-    //frame: false,
-    //focusable: false,
+    frame: false,
+    focusable: false,
     webPreferences: {
         preload: path.join(ABS_PATH, "src/res/scripts/preload.js")
     }

@@ -43,21 +43,29 @@ export function checkInternet(EvLogger: EventLogger){
     })
 }
 
-export function get_window_coords(app_settings: any, displays: any[], idx: number, window_dict: any = undefined){
-    let x: number
-    let y: number
+export function get_window_info(app_settings: any, displays: any[], idx: number, window_dict: any = undefined){
+    let x: number;
+    let y: number;
+    let width: number;
+    let height: number;
 
     let last_display: any;
 
     if (app_settings["alignment"] == "free"){
         x = undefined
         y = undefined
-        return [x, y]
+        width = undefined
+        height = undefined
+
+        return [x, y, width, height]
     }
 
     if (displays.length == 1){
         x = displays[0].x
         y = displays[0].y
+
+        width = displays[0].width
+        height = displays[0].height
 
         last_display = displays[0]
 
@@ -65,7 +73,7 @@ export function get_window_coords(app_settings: any, displays: any[], idx: numbe
             x = x + (last_display.width / 2) - (window_dict.width / 2)
             y = y + (last_display.height / 2) - (window_dict.height / 2)
         }
-        return [x, y]
+        return [x, y, width, height]
     }
 
     if (idx == -1){
@@ -73,34 +81,44 @@ export function get_window_coords(app_settings: any, displays: any[], idx: numbe
             x = displays[0].x
             y = displays[0].y
 
+            width = displays[0].width
+            height = displays[0].height
+
             last_display = displays[0]
         }
         else if (app_settings["controller_loc"] == "rightmost"){
             x = displays[displays.length - 1].x
             y = displays[displays.length - 1].y
 
+            width = displays[displays.length - 1].width
+            height = displays[displays.length - 1].height
+
             last_display = displays[displays.length - 1]
         }
     }
     else{ //idx != -1: other worker windows
-        console.log("balls2")
-        if (app_settings["controller-loc"] == "leftmost"){
+        if (app_settings["controller_loc"] == "leftmost"){
             if (displays.length == idx + 1){
-                return [-2, -2]
+                return [-2, -2] //signalizes "break"
             }
-
             x = displays[idx + 1].x
             y = displays[idx + 1].y
 
+            width = displays[idx + 1].width
+            height = displays[idx + 1].height
+
             last_display = displays[idx + 1]
         }
-        else if (app_settings["controller-loc"] == "rightmost"){
+        else if (app_settings["controller_loc"] == "rightmost"){
             if (displays.length == idx){
                 return [-2, -2] //signalizes "break"
             }
             if(idx == 0){
                 return [-3, -3] //signalizes "skip"
             }
+
+            x = displays[idx - 1].x
+            y = displays[idx - 1].y
 
             x = displays[idx - 1].x
             y = displays[idx - 1].y
@@ -114,7 +132,7 @@ export function get_window_coords(app_settings: any, displays: any[], idx: numbe
         y = y + (last_display.height / 2) - (window_dict.height / 2)
     }
 
-    return [x, y]
+    return [x, y, width, height]
 }
 
 export function sleep(ms) {

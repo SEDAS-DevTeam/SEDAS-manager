@@ -390,9 +390,9 @@ class MainApp{
                                 "content": JSON.stringify(commands_config["commands"])
                             })
                         }
-
+                        EvLogger.log("DEBUG", [`Selected presets: ${[this.map_name, this.command_preset_name, this.aircraft_preset_name]}`, `Selected presets: ${[this.map_name, this.command_preset_name, this.aircraft_preset_name]}`])
                         controllerWindow.send_message("init-info", ["window-info", JSON.stringify(this.workers), this.map_configs_list, 
-                                                                    JSON.stringify(app_settings), this.map_name, this.aircraft_presets_list, 
+                                                                    JSON.stringify(app_settings), [this.map_name, this.command_preset_name, this.aircraft_preset_name], this.aircraft_presets_list, 
                                                                     this.command_presets_list])
                     }
                     else if (data[0] == "worker"){
@@ -421,7 +421,7 @@ class MainApp{
                     this.command_preset_name = this.command_preset_data["info"]["name"]
 
                     this.aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft)
-                    this.aircraft_preset_name = this.command_preset_data["info"]["name"]
+                    this.aircraft_preset_name = this.aircraft_preset_data["info"]["name"]
 
                     //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
                     if (this.map_data == undefined){

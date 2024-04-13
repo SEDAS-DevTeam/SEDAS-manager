@@ -643,7 +643,10 @@ function show_description(idx){
 function process_init_data(data, reset = false){
     //save app data
     APP_DATA = JSON.parse(data[3])
-    let map_name = data[4]
+
+    let map_name = data[4][0]
+    let command_preset_name = data[4][1]
+    let aircraft_preset_name = data[4][2]
 
     if (reset){
         //delete all monitors
@@ -681,9 +684,10 @@ function process_init_data(data, reset = false){
     }
     else if (page.includes("controller_set")){
         if (map_name != undefined){
-            //loaded from backup, change map name
-            //TODO is fired even though not 
+            //loaded from backup, change map name 
             document.getElementById("confirmresult-airport").innerHTML = map_name
+            document.getElementById("confirmresult-command").innerHTML = command_preset_name
+            document.getElementById("confirmresult-aircraft").innerHTML = aircraft_preset_name
         }
 
         generate_airports_from_sources() //initial airport data generation from configs sent through IPC

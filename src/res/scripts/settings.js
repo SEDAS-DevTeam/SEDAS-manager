@@ -107,14 +107,17 @@ function save_settings(){
     for (let i = 0; i < app_data_template.length; i++){
         let data_source = document.getElementById(app_data_template[i])
         let source_out;
-        if (data_source.tagName == "SELECT"){
-            source_out = (document.getElementById(app_data_template[i]).value == "true")
+        if (data_source.classList.contains("bin-choice")){
+            source_out = (data_source.value == "true")
+        }
+        else if (data_source.tagName == "SELECT"){
+            source_out = data_source.value
         }
         else if (data_source.tagName == "INPUT" && data_source.type == "checkbox"){
-            source_out = document.getElementById(app_data_template[i]).checked
+            source_out = data_source.checked
         }
         else if (data_source.tagName == "INPUT" && data_source.type == "text"){
-            source_out = document.getElementById(app_data_template[i]).value
+            source_out = data_source.value
         }
 
         data[app_data_template[i]] = source_out

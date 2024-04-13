@@ -737,7 +737,7 @@ class MainApp{
         //check internet connectivity
         this.app_status["internet-connection"] = Boolean(await utils.checkInternet(EvLogger))
 
-        if (this.app_status["internet-connection"]){
+        if (this.app_status["internet-connection"] && this.app_settings["fetch_alg"]){
             await update_all(EvLogger)
         }
 

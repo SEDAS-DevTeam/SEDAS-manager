@@ -33,7 +33,7 @@ export function checkInternet(EvLogger: EventLogger){
     EvLogger.log("DEBUG", ["Internet connectivity check...", "Performing HTTP GET on google servers for internet check"])
     return new Promise((resolve, reject) => {
         http.get("http://www.google.com", async (res) => {
-            EvLogger.add_record("DEBUG", "Lookup successful, fetching algorithm files...")
+            EvLogger.add_record("DEBUG", "Lookup successful")
             resolve(true)
         }).on("error", (err) => {
             EvLogger.add_record("ERROR", "Lookup unsuccessful")

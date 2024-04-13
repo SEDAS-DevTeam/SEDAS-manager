@@ -50,7 +50,7 @@
                 <input type="text" name="plane_path_limit" id="plane_path_limit" class="settings-elem"> 
                 <br>
                 <label for="logging">debug logging</label>
-                <select id="logging" name="logging" class="settings-elem">
+                <select id="logging" name="logging" class="settings-elem bin-choice">
                     <option value="false">false</option>
                     <option value="true">true</option>
                 </select>
@@ -63,8 +63,14 @@
                 <select id="in_device-skip" name="in_device-skip" class="settings-elem skip">
                 </select>
                 <br>
-                <label for="backend_init">Initialize backend (for testing purposes)</label>
-                <select id="backend_init" name="backend_init" class="settings-elem">
+                <label for="backend_init">Initialize backend </label>
+                <select id="backend_init" name="backend_init" class="settings-elem bin-choice">
+                    <option value="false">false</option>
+                    <option value="true">true</option>
+                </select>
+                <br>
+                <label for="fetch_alg">Fetch algorithms on app startup</label>
+                <select id="fetch_alg" name="fetch_alg" class="settings-elem bin-choice">
                     <option value="false">false</option>
                     <option value="true">true</option>
                 </select>
@@ -145,7 +151,7 @@
                 <label for="max_alt">(in feets)</label>
                 <br>
                 <label for="standard_pitch_up">aircraft standard climb angle</label><br>
-                <input type="text" name="standard_pitch_up" id="std_pitch_up" class="settings-elem short-inp"> 
+                <input type="text" name="standard_pitch_up" id="standard_pitch_up" class="settings-elem short-inp"> 
                 <label for="standard_pitch_up">(in degrees)</label>
                 <br>
                 <label for="standard_pitch_down">aircraft standard descent angle</label><br>

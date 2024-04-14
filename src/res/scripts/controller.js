@@ -31,6 +31,9 @@ var monitor_data = [] //data for storing monitors
 var plane_data = [] //data for storing all planes
 var map_checked = false
 
+//frontend variables dict
+var frontend_vars = {}
+
 //wiki variables
 var sources = [
     "https://sedas-docs.readthedocs.io/en/latest/",
@@ -641,6 +644,9 @@ function show_description(idx){
 }
 
 function process_init_data(data, reset = false){
+    var path = window.location.pathname;
+    var page_name = path.split("/").pop().replace(".html", "");
+
     //save app data
     APP_DATA = JSON.parse(data[3])
 
@@ -661,127 +667,164 @@ function process_init_data(data, reset = false){
         alert("FATAL ERROR: There is nothing to process, no data sent")
     }
 
-    var path = window.location.pathname;
-    var page = path.split("/").pop();
-
     INIT_DATA = data //save it into global variable
 
-    if (page.includes("controller_mon")){
-        //when the controller page is redirected to monitors
+    //load frontend vars
+    frontend_vars = data[7]
 
-        if (data[0] == "window-info"){
-            monitor_data = JSON.parse(data[1])
+    let drop_buttons = document.getElementsByClassName("drop-button")
+    let drop_contents = document.getElementsByClassName("dropdown-content")
 
-            //initialize all the monitor objects
-            for (let i = 0; i < monitor_data.length; i++){
-                let x = i % 4
-                let y = Math.round(i / 4)
-                let elemParent = document.getElementById("monitor-panel").children[0].children[y].children[x]
+    let i_drop = 0;
+    //maybe add more later?
+    for (const [key, value] of Object.entries(frontend_vars[page_name])) {
+        if (key.includes("dropdown")){
+            if (value == "on"){
+                //visible
+                drop_contents[i_drop].style.display = "block"
 
-                element_init(monitor_data[i], i, elemParent)
+                drop_buttons[i_drop].classList.remove("fa-caret-right")
+                drop_buttons[i_drop].classList.add("fa-caret-down")
             }
+            else{
+                //hidden
+                drop_contents[i_drop].style.display = "none"
+
+                drop_buttons[i_drop].classList.remove("fa-caret-down")
+                drop_buttons[i_drop].classList.add("fa-caret-right")
+            }
+
+            i_drop += 1
         }
     }
-    else if (page.includes("controller_set")){
-        if (map_name != undefined){
-            //loaded from backup, change map name 
-            document.getElementById("confirmresult-airport").innerHTML = map_name
-            document.getElementById("confirmresult-command").innerHTML = command_preset_name
-            document.getElementById("confirmresult-aircraft").innerHTML = aircraft_preset_name
+
+    switch(page_name){
+        case "controller_mon": {
+            //when the controller page is redirected to monitors
+
+            if (data[0] == "window-info"){
+                monitor_data = JSON.parse(data[1])
+
+                //initialize all the monitor objects
+                for (let i = 0; i < monitor_data.length; i++){
+                    let x = i % 4
+                    let y = Math.round(i / 4)
+                    let elemParent = document.getElementById("monitor-panel").children[0].children[y].children[x]
+
+                    element_init(monitor_data[i], i, elemParent)
+                }
+            }
+
+            break
         }
+        case "controller_set": {
+            if (map_name != undefined){
+                //loaded from backup, change map name 
+                document.getElementById("confirmresult-airport").innerHTML = map_name
+                document.getElementById("confirmresult-command").innerHTML = command_preset_name
+                document.getElementById("confirmresult-aircraft").innerHTML = aircraft_preset_name
+            }
+    
+            generate_airports_from_sources() //initial airport data generation from configs sent through IPC
+            generate_aircrafts_from_sources() //initial aircraft data generation from json files sent through IPC
+            generate_commands_from_sources() //initial commands data generation from json files sent through IPC
+    
+            //add listeners to select buttons
+            let select_buttons = document.getElementsByClassName("tablebutton")
+            for (let i = 0; i < select_buttons.length; i++){
+                select_buttons[i].addEventListener("click", () => {
+                    selection(select_buttons[i])
+                })
+            }
+    
+            //add event listener for every description button 
+            var desc_elem = document.querySelectorAll("td i")
+            for(let i = 0; i < desc_elem.length; i++){
+                desc_elem[i].addEventListener("click", () => {
+                    show_description(i)
+                })
+            }
 
-        generate_airports_from_sources() //initial airport data generation from configs sent through IPC
-        generate_aircrafts_from_sources() //initial aircraft data generation from json files sent through IPC
-        generate_commands_from_sources() //initial commands data generation from json files sent through IPC
-
-        //add listeners to select buttons
-        let select_buttons = document.getElementsByClassName("tablebutton")
-        for (let i = 0; i < select_buttons.length; i++){
-            select_buttons[i].addEventListener("click", () => {
-                selection(select_buttons[i])
-            })
+            break
         }
+        case "controller_sim": {
+            if (!map_checked){
+                //user did not check, do nothing
+                return 
+            }
+    
+            //clear parent element innerHTML
+            document.getElementById("monitor_spawn").innerHTML = ""
+    
+            var monitor_data = JSON.parse(data[1])
+    
+            for (let i = 0; i < monitor_data.length; i++){
+                console.log(monitor_data[i])
+    
+                let monitor_option = document.createElement("option")
+                monitor_option.value = `monitor${i}${monitor_data[i]["win_type"]}`
+                monitor_option.innerHTML = `monitor ${i} (${monitor_data[i]["win_type"]})`
+                document.getElementById("monitor_spawn").appendChild(monitor_option)
+            }
+    
+            //modify ranges according to APP DATA
+            let min_speed = parseInt(APP_DATA["min_speed"])
+            let max_speed = parseInt(APP_DATA["max_speed"])
+    
+            let min_altitude = parseInt(APP_DATA["min_alt"])
+            let max_altitude = parseInt(APP_DATA["max_alt"])
+    
+            //modify ALL variable
+            ALL = [HEADING_VALS, LEVEL_VALS, SPEED_VALS]
+    
+    
+            for (let i = min_speed; i < max_speed; i += SPEED_STEP){
+                SPEED_VALS.push(i)
+            }
+            for (let i = min_altitude; i <= max_altitude; i += ALT_STEP){
+                LEVEL_VALS.push(i)
+            }
+    
+            //setting attributes to ranges
+            var range_elements = document.getElementsByClassName("val-range")
+            var label_elements = document.getElementsByClassName("val-out")
+    
+            range_elements[0].min = Math.min(...HEADING_VALS)
+            range_elements[0].max = Math.max(...HEADING_VALS)
+    
+            range_elements[1].min = Math.min(...LEVEL_VALS)
+            range_elements[1].max = Math.max(...LEVEL_VALS)
+    
+            range_elements[2].min = Math.min(...SPEED_VALS)
+            range_elements[2].max = Math.max(...SPEED_VALS)
+    
+            //set values for labels and ranges
+            range_elements[0].value = Math.min(...HEADING_VALS)
+            label_elements[0].innerHTML = Math.min(...HEADING_VALS)
+    
+            range_elements[1].value = Math.min(...LEVEL_VALS)
+            label_elements[1].innerHTML = Math.min(...LEVEL_VALS)
+    
+            range_elements[2].value = Math.min(...SPEED_VALS)
+            label_elements[2].innerHTML = Math.min(...SPEED_VALS)
+    
+            //set values steps
+            range_elements[0].step = HEAD_STEP
+            range_elements[1].step = ALT_STEP
+            range_elements[2].step = SPEED_STEP
+    
+            //change arrival and departure points onload
+            change_according_points()
 
-        //add event listener for every description button 
-        var desc_elem = document.querySelectorAll("td i")
-        for(let i = 0; i < desc_elem.length; i++){
-            desc_elem[i].addEventListener("click", () => {
-                show_description(i)
-            })
+            break
         }
-    }
-    else if (page.includes("controller_sim")){
-        if (!map_checked){
-            //user did not check, do nothing
-            return 
-        }
-
-        //clear parent element innerHTML
-        document.getElementById("monitor_spawn").innerHTML = ""
-
-        var monitor_data = JSON.parse(data[1])
-
-        for (let i = 0; i < monitor_data.length; i++){
-            console.log(monitor_data[i])
-
-            let monitor_option = document.createElement("option")
-            monitor_option.value = `monitor${i}${monitor_data[i]["win_type"]}`
-            monitor_option.innerHTML = `monitor ${i} (${monitor_data[i]["win_type"]})`
-            document.getElementById("monitor_spawn").appendChild(monitor_option)
-        }
-
-        //modify ranges according to APP DATA
-        let min_speed = parseInt(APP_DATA["min_speed"])
-        let max_speed = parseInt(APP_DATA["max_speed"])
-
-        let min_altitude = parseInt(APP_DATA["min_alt"])
-        let max_altitude = parseInt(APP_DATA["max_alt"])
-
-        //modify ALL variable
-        ALL = [HEADING_VALS, LEVEL_VALS, SPEED_VALS]
-
-
-        for (let i = min_speed; i < max_speed; i += SPEED_STEP){
-            SPEED_VALS.push(i)
-        }
-        for (let i = min_altitude; i <= max_altitude; i += ALT_STEP){
-            LEVEL_VALS.push(i)
-        }
-
-        //setting attributes to ranges
-        var range_elements = document.getElementsByClassName("val-range")
-        var label_elements = document.getElementsByClassName("val-out")
-
-        range_elements[0].min = Math.min(...HEADING_VALS)
-        range_elements[0].max = Math.max(...HEADING_VALS)
-
-        range_elements[1].min = Math.min(...LEVEL_VALS)
-        range_elements[1].max = Math.max(...LEVEL_VALS)
-
-        range_elements[2].min = Math.min(...SPEED_VALS)
-        range_elements[2].max = Math.max(...SPEED_VALS)
-
-        //set values for labels and ranges
-        range_elements[0].value = Math.min(...HEADING_VALS)
-        label_elements[0].innerHTML = Math.min(...HEADING_VALS)
-
-        range_elements[1].value = Math.min(...LEVEL_VALS)
-        label_elements[1].innerHTML = Math.min(...LEVEL_VALS)
-
-        range_elements[2].value = Math.min(...SPEED_VALS)
-        label_elements[2].innerHTML = Math.min(...SPEED_VALS)
-
-        //set values steps
-        range_elements[0].step = HEAD_STEP
-        range_elements[1].step = ALT_STEP
-        range_elements[2].step = SPEED_STEP
-
-        //change arrival and departure points onload
-        change_according_points()
     }
 }
 
 window.onload = () => {
+    var path = window.location.pathname;
+    var page_name = path.split("/").pop().replace(".html", "");
+
     //window is loaded, send command to send all info from backend
     window.electronAPI.send_message("controller", ["send-info"])
 
@@ -799,6 +842,8 @@ window.onload = () => {
 
                 event.target.classList.remove("fa-caret-down")
                 event.target.classList.add("fa-caret-right")
+
+                frontend_vars[page_name][`dropdown${i}`] = "off"
             }
             else{
                 console.log("show")
@@ -807,16 +852,17 @@ window.onload = () => {
 
                 event.target.classList.remove("fa-caret-right")
                 event.target.classList.add("fa-caret-down")
+
+                frontend_vars[page_name][`dropdown${i}`] = "on"
             }
+
+            window.electronAPI.send_message("controller", ["rewrite-frontend-vars", frontend_vars])
         })
     }
 
-    var path = window.location.pathname;
-    var page_name = path.split("/").pop();
-
     //didn't want to put it into separated files for better organisation
     switch(page_name){
-        case "controller_set.html":
+        case "controller_set":
             //event listeners
 
             document.addEventListener("click", () => {
@@ -841,7 +887,7 @@ window.onload = () => {
 
             break
 
-        case "controller_mon.html":
+        case "controller_mon":
             //set page content div height
             let page_content = document.getElementById("page-content")
             let top_content = document.getElementById("top-content")
@@ -866,7 +912,7 @@ window.onload = () => {
 
             break
 
-        case "controller_sim.html":
+        case "controller_sim":
             //running init code
 
             //check if user had already selected map
@@ -973,7 +1019,7 @@ window.onload = () => {
                 })
             }
             break
-        case "wiki.html":
+        case "wiki":
             let iframe_buttons = document.getElementsByClassName("change-iframe")
 
             //always try to load sedas docs

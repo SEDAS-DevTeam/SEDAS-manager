@@ -114,6 +114,15 @@ class MainApp{
     public workers: any = [];
     public sender_win_name: string;
 
+    //all variables related to frontend
+    public frontend_vars = {
+        "controller_mon": {},
+        "controller_set": {},
+        "controller_sim": {},
+        "wiki": {},
+        "glob": {} //variables used across windows
+    } //used to save variables that are then used on redirect between windows
+
     //all variables related to map
     public map_configs_list: any = [];
     public map_data: any;
@@ -393,7 +402,7 @@ class MainApp{
                         EvLogger.log("DEBUG", [`Selected presets: ${[this.map_name, this.command_preset_name, this.aircraft_preset_name]}`, `Selected presets: ${[this.map_name, this.command_preset_name, this.aircraft_preset_name]}`])
                         controllerWindow.send_message("init-info", ["window-info", JSON.stringify(this.workers), this.map_configs_list, 
                                                                     JSON.stringify(app_settings), [this.map_name, this.command_preset_name, this.aircraft_preset_name], this.aircraft_presets_list, 
-                                                                    this.command_presets_list])
+                                                                    this.command_presets_list, this.frontend_vars])
                     }
                     else if (data[0] == "worker"){
                         //send to all workers
@@ -651,6 +660,11 @@ class MainApp{
                 //messages from wiki tab
                 case "get-path": {
                     console.log(ABS_PATH)
+                    break
+                }
+                case "rewrite-frontend-vars": {
+                    this.frontend_vars = data[1][1]
+                    console.log(this.frontend_vars)
                 }
             }
         })

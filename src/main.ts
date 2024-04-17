@@ -209,22 +209,9 @@ class MainApp{
                 switch(arg){
                     case "command":
                         let command_args = content.split(" ")
-                        console.log(command_args)
 
-                        //search plane by callsign
-                        for(let i = 0; i < this.PlaneDatabase.DB.length; i++){
-                            if (command_args[0] == this.PlaneDatabase.DB[i].callsign){
-                                if (command_args[1] == "change-heading"){
-                                    this.PlaneDatabase.DB[i].updated_heading = parseInt(command_args[2])
-                                }
-                                else if (command_args[1] == "change-speed"){
-                                    this.PlaneDatabase.DB[i].updated_speed = parseInt(command_args[2])
-                                }
-                                else if (command_args[1] == "change-level"){
-                                    this.PlaneDatabase.DB[i].updated_level = parseInt(command_args[2])
-                                }
-                            }
-                        }
+                        //TODO: add args to set command
+                        this.PlaneDatabase.set_command(command_args[0], command_args[1], parseInt(command_args[2]))
                         break
                     case "debug":
                         //used for debug logging
@@ -589,27 +576,9 @@ class MainApp{
                     break
                 }
                 case "plane-value-change": {
-                    for (let i = 0; i < this.PlaneDatabase.DB.length; i++){
-                        if(this.PlaneDatabase.DB[i].id == data[1][3]){
-                            switch(data[1][1]){
-                                case "item0":
-                                    //heading change
-                                    this.PlaneDatabase.DB[i].updated_heading = data[1][2]
-                                    break
-                                case "item1":
-                                    //level change
-                                    this.PlaneDatabase.DB[i].updated_level = data[1][2]
-                                    break
-                                case "item2":
-                                    //speed change
-                                    this.PlaneDatabase.DB[i].updated_speed = data[1][2]
-                                    break
-
-                                //TODO: do more generally for more variables
-                            }
-                        }
-                    }
-                    
+                    console.log(data)
+                    //TODO: add args to set command
+                    this.PlaneDatabase.set_command(data[1][3], data[1][1], parseInt(data[1][2]))      
                     this.send_to_all(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
                     break
                 }

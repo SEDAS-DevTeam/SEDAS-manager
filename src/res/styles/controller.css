@@ -308,3 +308,20 @@ h3{
     margin-top: 7px;
     margin-bottom: 7px;
 }
+
+/*
+    Plane terminal
+*/
+#terminal-content{
+    width: 100%;
+    height: 400px;
+    background-color: #ccc;
+    overflow-y: scroll;
+}
+
+#terminal-log{
+    color: black;
+    margin-top: 5px;
+    margin-bottom: 0;
+    font-size: 20px;
+}

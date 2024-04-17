@@ -1,5 +1,9 @@
 //variable definitions
+
+//plane labels
 const PLANE_LABELS = ["Heading", "Level", "Speed"]
+const PLANE_CLASSES = ["change-heading", "change-level", "change-speed"]
+
 const SPEED_STEP = 10
 const ALT_STEP = 500
 const HEAD_STEP = 10
@@ -190,18 +194,18 @@ function plane_value_change(elem){
     
     header_full = header_full.split("(")[0]
     var header = header_full.substring(0, header_full.length - 1)
-    var plane_id;
+    var plane_callsign;
 
     //look at local db
     for (let i = 0; i < plane_data.length; i++){
         if (plane_data[i].callsign == header){
             //found corresponding plane
-            plane_id = plane_data[i].id
-            console.log(plane_data[i].id)
+            plane_callsign = plane_data[i].callsign
+            console.log(plane_callsign)
         }
     }
 
-    window.electronAPI.send_message("controller", ["plane-value-change", elem.classList[1], elem.innerHTML, plane_id])
+    window.electronAPI.send_message("controller", ["plane-value-change", elem.classList[1], elem.innerHTML, plane_callsign])
 }
 
 function delete_plane(elem){
@@ -250,7 +254,7 @@ function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival,
             }
 
             grid_row.innerHTML = elem_value
-            grid_row.classList.add("item" + i_row)
+            grid_row.classList.add(PLANE_CLASSES[i_row])
 
             //add onclick event to them
             grid_row.addEventListener("click", (event) => {

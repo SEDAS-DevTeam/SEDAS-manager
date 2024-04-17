@@ -18,12 +18,56 @@ export class PlaneDB{
     //temporary databases for plane movement
     public plane_turn_DB: any = []
 
+    /*
+        Plane command config (used for gui but also for backend)
+
+        NOTE: variations array is used only for listing parameters for command, processing is done in individual plane
+    */
+    public command_config = {
+        "commands": [
+            {
+                "comm": "change-heading",
+                "variations": ["left", "right", "standard"],
+                "exec": ((plane: Plane, command: string, args: string[], value: any) => {
+                    plane.change_heading(command, args, value)
+                })
+            },
+            {
+                "comm": "change-speed",
+                "variations": [],
+                "exec": ((plane: Plane, command: string, args: string[], value: any) => {
+                    plane.change_speed(command, args, value)
+                })
+            },
+            {
+                "comm": "change-level",
+                "variations": ["expedite", "climb", "descend"],
+                "exec": ((plane: Plane, command: string, args: string[], value: any) => {
+                    plane.change_level(command, args, value)
+                })
+            }
+        ]
+    }
+
     public constructor(monitor_data: any){
         for (let i = 0; i < monitor_data.length; i++){
             this.monitor_DB.push({
                 "type": monitor_data[i].win_type,
                 "planes_id": []
             })
+        }
+    }
+
+    public set_command(callsign: string, command: string, value: number, args: string[] = []){
+        for(let i = 0; i < this.DB.length; i++){
+            if (callsign == this.DB[i].callsign){
+                //find specific command context
+                this.command_config.commands.forEach(command_elem => {
+                    if (command == command_elem["comm"]){
+                        command_elem["exec"](this.DB[i], command, args, value)
+                    }
+                })
+            }
         }
     }
 
@@ -293,29 +337,8 @@ export class Plane{
     public x: number;
     public y: number;
 
-    /*
-        Plane command config
-    */
-    public command_config = {
-        "commands": [
-            {
-                "comm": "change-heading",
-                "variations": {
-                    "left": "bllasda",
-                    "right": "bllasda",
-                    "point": "bllasda"
-                }
-            },
-            {
-                "comm": "change-speed",
-                "variations": []
-            },
-            {
-                "comm": "change-level",
-                "variations": ["expedite", "climb", "descend"]
-            }
-        ]
-    }
+    //special args that represent subcommand for command
+    public special_comm: string[] = []
 
     public constructor(id: string, callsign: string, 
         heading: number, heading_up: number, 
@@ -428,5 +451,29 @@ export class Plane{
         //rewrite variables
         this.x = vals[0]
         this.y = vals[1]
+    }
+
+    /*
+        Functions for changing plane variables
+    */
+    public change_heading(command: string, args: string[], value: number){
+        if (args.length == 0) this.updated_heading = value
+        else{
+
+        }
+    }
+
+    public change_speed(command: string, args: string[], value: any){
+        if (args.length == 0) this.updated_speed = value
+        else{
+
+        }
+    }
+
+    public change_level(command: string, args: string[], value: any){
+        if (args.length == 0) this.updated_level = value
+        else{
+
+        }
     }
 }

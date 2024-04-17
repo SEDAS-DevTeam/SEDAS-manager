@@ -5,6 +5,7 @@
         <link rel="stylesheet" href="styles/controller.css">
         
         <meta charset="utf-8" />
+        <script src="scripts/plane_terminal.js"></script>
         <script src="scripts/controller.js"></script>
     </head>
     <body id="controller-body">
@@ -57,10 +58,10 @@
                         <div class="plane-block">
                             <p class="header">NAME: </p>
                             <div id="rand-gen-but">
-                                <button class="choice-but">LX123</button>
-                                <button class="choice-but">LX123</button>
-                                <button class="choice-but">LX123</button>
-                                <button class="choice-but">LX123</button>
+                                <button class="choice-but"></button>
+                                <button class="choice-but"></button>
+                                <button class="choice-but"></button>
+                                <button class="choice-but"></button>
                             </div>
                             <button class="randomize-but">Randomize</button>
                             <form><input type="text" placeholder="Type callsign..." name="callsign" class="choice-text"></form>
@@ -117,7 +118,7 @@
                     </div>
                 </div>
                 <hr>
-    
+
                 <!--3. dropdown content-->
                 <div>
                     <i class="drop-button fa-solid fa-caret-down"></i>
@@ -131,6 +132,20 @@
                 <hr>
     
                 <!--4. dropdown content-->
+                <div>
+                    <i class="drop-button fa-solid fa-caret-down"></i>
+                    <h3 class="header-inline">Plane terminal</h3>
+                </div>
+                <div class="dropdown-content">
+                    <div id="terminal-content">
+                        <div style="margin-top: 15px; margin-left: 15px;">
+                            <p id="terminal-log">[Time]: "Callsign" "Command" "Value"</p>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+    
+                <!--5. dropdown content-->
                 <div>
                     <i class="drop-button fa-solid fa-caret-down"></i>
                     <h3 class="header-inline">Environment control</h3>

@@ -13,3 +13,7 @@ function add_log(log_text){
 function remove_log(){
     document.getElementById("terminal-content").children[0].children[0].remove()
 }
+
+window.electronAPI.on_message("terminal-add", (comm_data) => {
+    add_log(`${comm_data[2]}: ${comm_data[1]} ${comm_data[0]}`)
+})

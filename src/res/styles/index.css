@@ -24,6 +24,10 @@ h1, h2, h3, p, a, span, li{
     font-weight: 400;
 }
 
+.warn-text{
+    color: red;
+}
+
 button{
     display: inline-block;
     background-color: white;

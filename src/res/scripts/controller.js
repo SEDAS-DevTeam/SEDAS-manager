@@ -34,6 +34,7 @@ var all_points = []
 var monitor_data = [] //data for storing monitors
 var plane_data = [] //data for storing all planes
 var map_checked = false
+var sim_running = false
 
 //frontend variables dict
 var frontend_vars = {}
@@ -756,6 +757,20 @@ function process_init_data(data, reset = false){
                 //user did not check, do nothing
                 return 
             }
+
+            let mask = document.getElementById("mask-plane-list")
+            let warn_text = document.getElementById("sim-not-running")
+            sim_running = data[8]["sim-running"]
+            if (sim_running){
+                mask.classList.remove("mask-unselect")
+                mask.classList.add("mask-select")
+                warn_text.style.display = "none"
+            }
+            else{
+                mask.classList.remove("mask-select")
+                mask.classList.add("mask-unselect")
+                warn_text.style.display = "block"
+            }
     
             //clear parent element innerHTML
             document.getElementById("monitor_spawn").innerHTML = ""
@@ -1063,6 +1078,11 @@ window.onload = () => {
         window.electronAPI.send_message("controller", ["redirect-to-menu"])
     })
 
+    document.getElementById("save-button").addEventListener("click", () => {
+        //TODO
+        alert("TODO")
+    })
+
     //general messages
     window.electronAPI.on_message("map-points", (data) => {
         process_monitor_points(data)
@@ -1070,10 +1090,10 @@ window.onload = () => {
     window.electronAPI.on_message("map-checked", (data) => {
         let data_temp = JSON.parse(data)
         if (data_temp["user-check"]){
-            document.getElementById("mask").style.visibility = "hidden"
+            document.getElementById("mask-sim").style.visibility = "hidden"
         }
         else{
-            document.getElementById("mask").style.visibility = "visible"
+            document.getElementById("mask-sim").style.visibility = "visible"
         }
 
         map_checked = data_temp["user-check"]
@@ -1096,14 +1116,31 @@ window.onload = () => {
     })
 
     window.electronAPI.on_message("sim-event", (data) => {
+        let mask = document.getElementById("mask-plane-list")
+        let warn_text = document.getElementById("sim-not-running")
+
         let elem = document.querySelector("button#sim_button")
         if (data == "stopsim"){
             elem.className = "startsim"
             elem.innerHTML = "RUN"
+
+            sim_running = false
+
+            mask.classList.remove("mask-select")
+            mask.classList.add("mask-unselect")
+
+            warn_text.style.display = "block"
         }
         else if (data == "startsim"){
             elem.className = "stopsim"
             elem.innerHTML = "STOP"
+
+            sim_running = true
+
+            mask.classList.remove("mask-unselect")
+            mask.classList.add("mask-select")
+
+            warn_text.style.display = "none"
         }
     })
 }

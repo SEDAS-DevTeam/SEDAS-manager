@@ -14,6 +14,7 @@
                 <h1 id="main-header">SEDAC manager Controller</h1>
                 <button id="exit-button">Exit</button>
                 <button id="menu-button">Back to menu</button>
+                <button id="save-button">Save</button>
             </div>
             <hr>
             <div class="topnav" id="controller-topnav">
@@ -24,7 +25,7 @@
                 <a href="wiki.html">Wiki</a>
             </div>
         </div>
-        <div id="mask">
+        <div class="upper-mask" id="mask-sim">
             You did not select any map to be rendered
         </div>
         <div class="div-indent">
@@ -125,8 +126,11 @@
                     <h3 class="header-inline">Plane control</h3>
                 </div>
                 <div class="dropdown-content">
-                    <div id="plane-list">
-                        <form><input type="text" placeholder="Search for aircraft name..." name="callsign" class="plane-search"></form>
+                    <p class="warn-text" id="sim-not-running">You have to start simulation first to change plane values</p>
+                    <div class="mask mask-unselect" id="mask-plane-list">
+                        <div id="plane-list">
+                            <form><input type="text" placeholder="Search for aircraft name..." name="callsign" class="plane-search"></form>
+                        </div>
                     </div>
                 </div>
                 <hr>

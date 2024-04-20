@@ -388,7 +388,7 @@ class MainApp{
                         }
                         controllerWindow.send_message("init-info", ["window-info", JSON.stringify(this.workers), this.map_configs_list, 
                                                                     JSON.stringify(app_settings), [this.map_name, this.command_preset_name, this.aircraft_preset_name], this.aircraft_presets_list, 
-                                                                    this.command_presets_list, this.frontend_vars])
+                                                                    this.command_presets_list, this.frontend_vars, this.app_status])
                     }
                     else if (data[0] == "worker"){
                         //send to all workers

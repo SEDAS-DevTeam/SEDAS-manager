@@ -2,6 +2,10 @@
 var app_data_template = []
 
 window.onload = () => {
+    //set wiki block to same height as settings-block
+    let height = document.getElementById("settings-block").offsetHeight
+    document.getElementById("wiki-block").setAttribute("style", `height: ${height}px`)
+
     //ask for settings to load
     window.electronAPI.send_message("settings", ["send-info"])
 

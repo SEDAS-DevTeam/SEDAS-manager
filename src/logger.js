@@ -52,37 +52,21 @@ class EventLogger {
         }
         return `${hours}:${mins}:${seconds}`;
     }
-    log(cat_name, messages) {
+    log(cat_name, message) {
         //messages is an array where first element is standard logging message followed by non-standard
         //debug mode message
-        if (!this.debug_mode) {
-            console.log(messages[0]); //for standard logging without debug mode
-        }
-        this.add_record(cat_name, messages[1]);
-    }
-    add_record(cat_name, content) {
         let time = this.get_time();
         this.data.push({
             time: time,
             cat: cat_name,
-            content: content
+            content: message
         });
-        let output = `[${time}] (${cat_name}) ${content}`;
-        //log to terminal if debug mode
+        let output = `[${time}] (${cat_name}) ${message}`;
         if (this.debug_mode) {
             console.log(output);
         }
         //log to main log file
         (0, fs_1.appendFileSync)(this.LOG_PATH, output + "\n");
-    }
-    filter(cat_name) {
-        let out_data = [];
-        for (let i = 0; i < this.data.length; i++) {
-            if (this.data[i].cat == cat_name) {
-                out_data.push(this.data[i]);
-            }
-        }
-        return out_data;
     }
 }
 exports.EventLogger = EventLogger;

@@ -1,5 +1,9 @@
 //variable definitions
+
+//plane labels
 const PLANE_LABELS = ["Heading", "Level", "Speed"]
+const PLANE_CLASSES = ["change-heading", "change-level", "change-speed"]
+
 const SPEED_STEP = 10
 const ALT_STEP = 500
 const HEAD_STEP = 10
@@ -14,6 +18,7 @@ var INIT_DATA = [] //storing all vital data like airport list, command preset li
 var APP_DATA = undefined
 
 var desc_rendered = false
+var clicked = false
 var curr_desc = -1
 
 //user selection variables
@@ -30,6 +35,7 @@ var all_points = []
 var monitor_data = [] //data for storing monitors
 var plane_data = [] //data for storing all planes
 var map_checked = false
+var sim_running = false
 
 //frontend variables dict
 var frontend_vars = {}
@@ -190,18 +196,18 @@ function plane_value_change(elem){
     
     header_full = header_full.split("(")[0]
     var header = header_full.substring(0, header_full.length - 1)
-    var plane_id;
+    var plane_callsign;
 
     //look at local db
     for (let i = 0; i < plane_data.length; i++){
         if (plane_data[i].callsign == header){
             //found corresponding plane
-            plane_id = plane_data[i].id
-            console.log(plane_data[i].id)
+            plane_callsign = plane_data[i].callsign
+            console.log(plane_callsign)
         }
     }
 
-    window.electronAPI.send_message("controller", ["plane-value-change", elem.classList[1], elem.innerHTML, plane_id])
+    window.electronAPI.send_message("controller", ["plane-value-change", elem.classList[1], elem.innerHTML, plane_callsign])
 }
 
 function delete_plane(elem){
@@ -250,7 +256,7 @@ function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival,
             }
 
             grid_row.innerHTML = elem_value
-            grid_row.classList.add("item" + i_row)
+            grid_row.classList.add(PLANE_CLASSES[i_row])
 
             //add onclick event to them
             grid_row.addEventListener("click", (event) => {
@@ -512,12 +518,18 @@ function generate_aircrafts_from_sources(){
         name_obj.innerHTML = name
         let inspect_obj = document.createElement("td")
         let select_obj = document.createElement("td")
+        let inspect = document.createElement("i")
+        inspect.classList.add("fa")
+        inspect.classList.add("fa-search")
+        inspect.setAttribute("aria-hidden", "true")
+        inspect.id = "aircraft"
 
         let select_button = document.createElement("button")
         select_button.classList.add("tablebutton")
         select_button.innerHTML = "Select"
         select_button.id = aircraft_data[i]["hash"]
         select_obj.append(select_button)
+        inspect_obj.append(inspect)
 
         record.appendChild(name_obj)
         record.appendChild(inspect_obj)
@@ -537,12 +549,19 @@ function generate_commands_from_sources(){
         name_obj.innerHTML = name
         let inspect_obj = document.createElement("td")
         let select_obj = document.createElement("td")
+        let inspect = document.createElement("i")
+        inspect.classList.add("fa")
+        inspect.classList.add("fa-search")
+        inspect.setAttribute("aria-hidden", "true")
+        inspect.id = "command"
 
         let select_button = document.createElement("button")
         select_button.classList.add("tablebutton")
         select_button.innerHTML = "Select"
         select_button.id = command_data[i]["hash"]
         select_obj.append(select_button)
+        
+        inspect_obj.appendChild(inspect)
 
         record.appendChild(name_obj)
         record.appendChild(inspect_obj)
@@ -578,14 +597,15 @@ function generate_airports_from_sources(){
 
         let desc_obj = document.createElement("td")
         let select_obj = document.createElement("td")
-        let logo = document.createElement("i")
+        let inspect = document.createElement("i")
         let popup_box = document.createElement("div")
         let desc = document.createElement("p")
         let select_button = document.createElement("button")
 
-        logo.classList.add("fa");
-        logo.classList.add("fa-search")
-        logo.setAttribute('aria-hidden', 'true');
+        inspect.classList.add("fa");
+        inspect.classList.add("fa-search")
+        inspect.setAttribute('aria-hidden', 'true')
+        inspect.id = "airport"
 
         popup_box.classList.add("popup-box");
         select_button.classList.add("tablebutton")
@@ -597,7 +617,7 @@ function generate_airports_from_sources(){
 
         popup_box.appendChild(desc)
 
-        desc_obj.appendChild(logo)
+        desc_obj.appendChild(inspect)
         desc_obj.appendChild(popup_box)
         select_obj.appendChild(select_button)
 
@@ -632,7 +652,7 @@ function send_monitor_data(){
     window.electronAPI.send_message("controller", ["monitor-change-info", data])
 }
 
-function show_description(idx){
+function show_description_airport(idx){
     let desc_data = document.querySelectorAll("div.popup-box")
     for (let i = 0; i < desc_data.length; i++){
         desc_data[i].style.visibility = "hidden"
@@ -640,7 +660,15 @@ function show_description(idx){
     desc_data[idx].style.visibility = "visible"
 
     desc_rendered = true
+    clicked = true
     curr_desc = idx
+}
+
+function ask_for_content(idx, type){
+    window.electronAPI.send_message("controller", ["json-description", idx, type])
+    desc_rendered = true
+    clicked = true
+    document.getElementsByClassName("desc-content")[0].style.visibility = "visible"
 }
 
 function process_init_data(data, reset = false){
@@ -737,11 +765,27 @@ function process_init_data(data, reset = false){
                 })
             }
     
-            //add event listener for every description button 
-            var desc_elem = document.querySelectorAll("td i")
-            for(let i = 0; i < desc_elem.length; i++){
-                desc_elem[i].addEventListener("click", () => {
-                    show_description(i)
+            //add listener to airport description button
+            var desc_elem_airport = document.querySelectorAll("td i#airport")
+            for(let i = 0; i < desc_elem_airport.length; i++){
+                desc_elem_airport[i].addEventListener("click", () => {
+                    show_description_airport(i)
+                })
+            }
+
+            //add listener to command description button
+            var desc_elem_command = document.querySelectorAll("td i#command")
+            for(let i = 0; i < desc_elem_command.length; i++){
+                desc_elem_command[i].addEventListener("click", () => {
+                    ask_for_content(i, "command")
+                })
+            }
+
+            //add listener to aircraft description button
+            var desc_elem_aircraft = document.querySelectorAll("td i#aircraft")
+            for(let i = 0; i < desc_elem_aircraft.length; i++){
+                desc_elem_aircraft[i].addEventListener("click", () => {
+                    ask_for_content(i, "aircraft")
                 })
             }
 
@@ -751,6 +795,20 @@ function process_init_data(data, reset = false){
             if (!map_checked){
                 //user did not check, do nothing
                 return 
+            }
+
+            let mask = document.getElementById("mask-plane-list")
+            let warn_text = document.getElementById("sim-not-running")
+            sim_running = data[8]["sim-running"]
+            if (sim_running){
+                mask.classList.remove("mask-unselect")
+                mask.classList.add("mask-select")
+                warn_text.style.display = "none"
+            }
+            else{
+                mask.classList.remove("mask-select")
+                mask.classList.add("mask-unselect")
+                warn_text.style.display = "block"
             }
     
             //clear parent element innerHTML
@@ -866,15 +924,20 @@ window.onload = () => {
             //event listeners
 
             document.addEventListener("click", () => {
+                if (clicked){
+                    clicked = false
+                    return
+                }
+
                 if (desc_rendered){
                     desc_rendered = false
-                }
-                else{
-                    try{
+
+                    let popup_elem = document.querySelectorAll("div.popup-box")[curr_desc]
+
+                    if (popup_elem != undefined){
                         document.querySelectorAll("div.popup-box")[curr_desc].style.visibility = "hidden"
-                    } catch(error){
-                        //do nothing (TODO, remove try catch)
                     }
+
                 }
             })
 
@@ -883,6 +946,11 @@ window.onload = () => {
             })
             document.getElementById("regen-map").addEventListener("click", () => {
                 regen_map()
+            })
+
+            document.getElementById("close-desc").addEventListener("click", () => {
+                desc_rendered = false
+                document.getElementsByClassName("desc-content")[0].style.visibility = "hidden"
             })
 
             break
@@ -1059,6 +1127,11 @@ window.onload = () => {
         window.electronAPI.send_message("controller", ["redirect-to-menu"])
     })
 
+    document.getElementById("save-button").addEventListener("click", () => {
+        //TODO
+        alert("TODO")
+    })
+
     //general messages
     window.electronAPI.on_message("map-points", (data) => {
         process_monitor_points(data)
@@ -1066,10 +1139,10 @@ window.onload = () => {
     window.electronAPI.on_message("map-checked", (data) => {
         let data_temp = JSON.parse(data)
         if (data_temp["user-check"]){
-            document.getElementById("mask").style.visibility = "hidden"
+            document.getElementById("mask-sim").style.visibility = "hidden"
         }
         else{
-            document.getElementById("mask").style.visibility = "visible"
+            document.getElementById("mask-sim").style.visibility = "visible"
         }
 
         map_checked = data_temp["user-check"]
@@ -1092,14 +1165,35 @@ window.onload = () => {
     })
 
     window.electronAPI.on_message("sim-event", (data) => {
+        let mask = document.getElementById("mask-plane-list")
+        let warn_text = document.getElementById("sim-not-running")
+
         let elem = document.querySelector("button#sim_button")
         if (data == "stopsim"){
             elem.className = "startsim"
             elem.innerHTML = "RUN"
+
+            sim_running = false
+
+            mask.classList.remove("mask-select")
+            mask.classList.add("mask-unselect")
+
+            warn_text.style.display = "block"
         }
         else if (data == "startsim"){
             elem.className = "stopsim"
             elem.innerHTML = "STOP"
+
+            sim_running = true
+
+            mask.classList.remove("mask-unselect")
+            mask.classList.add("mask-select")
+
+            warn_text.style.display = "none"
         }
+    })
+
+    window.electronAPI.on_message("description-data", (data) => {
+        document.getElementById("inner-content").innerHTML = process_JSON(data)
     })
 }

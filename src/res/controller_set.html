@@ -4,6 +4,9 @@
         <link rel="stylesheet" href="styles/index.css">
         <link rel="stylesheet" href="styles/controller.css">
         <meta charset="utf-8" />
+
+        <!--some util imports-->
+        <script src="scripts/utils/process_json.js"></script>
         <script src="scripts/controller.js"></script>
     </head>
     <body id="controller-body">
@@ -12,6 +15,7 @@
                 <h1 id="main-header">SEDAC manager Controller</h1>
                 <button id="exit-button">Exit</button>
                 <button id="menu-button">Back to menu</button>
+                <button id="save-button">Save</button>
             </div>
             <hr>
             <div class="topnav" id="controller-topnav">
@@ -21,6 +25,10 @@
                 <a href="plugins.html">Plugins</a>
                 <a href="wiki.html">Wiki</a>
             </div>
+        </div>
+        <div class="desc-content">
+            <i class="fa-solid fa-xmark" id="close-desc"></i><br><br>
+            <div id="inner-content"></div>
         </div>
         <div class="div-indent">
             <h2>Simulation setup</h2>

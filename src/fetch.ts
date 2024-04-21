@@ -49,13 +49,13 @@ export async function update_all(event_logger: EventLogger){
 
     //PlaneResponse
     await fetch_file_src("PlaneResponse", "voice_models.py")
-    event_logger.add_record("DEBUG", "Fetched voice models")
+    event_logger.log("DEBUG", "Fetched voice models")
 
     await fetch_file_src("PlaneResponse", "speech_models.py")
-    event_logger.add_record("DEBUG", "Fetched speech models")
+    event_logger.log("DEBUG", "Fetched speech models")
 
     await fetch_file_src("PlaneResponse", "text_models.py")
-    event_logger.add_record("DEBUG", "Fetched text models")
+    event_logger.log("DEBUG", "Fetched text models")
 
     //ACAI
     await fetch_file_src("ACAI", "main_control.py")

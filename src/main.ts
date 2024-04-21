@@ -98,13 +98,13 @@ class Window{
         if (path.includes("main")){
             this.checkClose(() => {
                 if (!app_status["redir-to-main"]){
-                    EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got close-app request, saving logs and quitting app..."])
+                    EvLogger.log("DEBUG", "Closing app... Bye Bye")
                     main_app.exit_app()
                 }
             })
         }
 
-        EvLogger.add_record("DEBUG", `Created window object(win_type=${this.win_type},path_load=${this.path_load}, coords=${coords})`)
+        EvLogger.log("DEBUG", `Created window object(win_type=${this.win_type},path_load=${this.path_load}, coords=${coords})`)
     }
 }
 
@@ -209,26 +209,13 @@ class MainApp{
                 switch(arg){
                     case "command":
                         let command_args = content.split(" ")
-                        console.log(command_args)
 
-                        //search plane by callsign
-                        for(let i = 0; i < this.PlaneDatabase.DB.length; i++){
-                            if (command_args[0] == this.PlaneDatabase.DB[i].callsign){
-                                if (command_args[1] == "change-heading"){
-                                    this.PlaneDatabase.DB[i].updated_heading = parseInt(command_args[2])
-                                }
-                                else if (command_args[1] == "change-speed"){
-                                    this.PlaneDatabase.DB[i].updated_speed = parseInt(command_args[2])
-                                }
-                                else if (command_args[1] == "change-level"){
-                                    this.PlaneDatabase.DB[i].updated_level = parseInt(command_args[2])
-                                }
-                            }
-                        }
+                        //TODO: add args to set command
+                        this.PlaneDatabase.set_command(command_args[0], command_args[1], parseInt(command_args[2]))
                         break
                     case "debug":
                         //used for debug logging
-                        EvLogger.log("DEBUG", [content, content])
+                        EvLogger.log("DEBUG", content)
                         break
                 }
             })
@@ -260,7 +247,7 @@ class MainApp{
                     this.app_status["redir-to-main"] = false
 
                     //message call to redirect to main menu
-                    EvLogger.add_record("DEBUG", "redirect-to-menu event")
+                    EvLogger.log("DEBUG", "redirect-to-menu event")
                     
                     if (data[0] == "settings"){
                         settingsWindow.close()
@@ -276,7 +263,7 @@ class MainApp{
                     let win_info = utils.get_window_info(app_settings, this.displays, -1, app_config.main_menu_dict)
                     let coords = win_info.slice(0, 2)
 
-                    EvLogger.add_record("DEBUG", "main-menu show")
+                    EvLogger.log("DEBUG", "main-menu show")
                     mainMenuWindow = new Window(this.app_status, app_config.main_menu_dict, "./res/main.html", coords)
                     mainMenuWindow.show()
 
@@ -284,7 +271,7 @@ class MainApp{
                 }
                 case "save-settings": {
                     //save settings
-                    EvLogger.add_record("DEBUG", "saving settings")
+                    EvLogger.log("DEBUG", "saving settings")
 
                     fs.writeFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), data[1][1])
                     break
@@ -293,7 +280,7 @@ class MainApp{
                     //message call to redirect to settings
                     this.app_status["redir-to-main"] = true
 
-                    EvLogger.add_record("DEBUG", "redirect-to-settings event")
+                    EvLogger.log("DEBUG", "redirect-to-settings event")
 
                     mainMenuWindow.close()
 
@@ -302,7 +289,7 @@ class MainApp{
                     let coords = win_info.slice(0, 2)
                     let display_info = win_info.slice(2, 4)
 
-                    EvLogger.add_record("DEBUG", "settings show")
+                    EvLogger.log("DEBUG", "settings show")
                     settingsWindow = new Window(this.app_status, app_config.settings_dict, "./res/settings.html", coords, "settings", display_info)
                     settingsWindow.show()
                     break
@@ -318,7 +305,7 @@ class MainApp{
                 }
                 case "exit": {
                     //spawning info window
-                    EvLogger.log("DEBUG", ["Closing app... Bye Bye", "got window-all-closed request, saving logs and quitting app..."])
+                    EvLogger.log("DEBUG", "Closing app... Bye Bye")
                     this.exit_app()
                 }
                 case "invoke": {
@@ -399,10 +386,9 @@ class MainApp{
                                 "content": JSON.stringify(commands_config["commands"])
                             })
                         }
-                        EvLogger.log("DEBUG", [`Selected presets: ${[this.map_name, this.command_preset_name, this.aircraft_preset_name]}`, `Selected presets: ${[this.map_name, this.command_preset_name, this.aircraft_preset_name]}`])
                         controllerWindow.send_message("init-info", ["window-info", JSON.stringify(this.workers), this.map_configs_list, 
                                                                     JSON.stringify(app_settings), [this.map_name, this.command_preset_name, this.aircraft_preset_name], this.aircraft_presets_list, 
-                                                                    this.command_presets_list, this.frontend_vars])
+                                                                    this.command_presets_list, this.frontend_vars, this.app_status])
                     }
                     else if (data[0] == "worker"){
                         //send to all workers
@@ -448,6 +434,8 @@ class MainApp{
                     for (let i = 0; i < this.workers.length; i++){
                         this.workers[i].send_message("ask-for-render") //send workers command to fire "render-map" event
                     }
+
+                    EvLogger.log("DEBUG", `Selected presets: ${[this.map_name, this.command_preset_name, this.aircraft_preset_name]}`)
                     break
                 }
                 case "render-map": {
@@ -488,11 +476,11 @@ class MainApp{
                 }
                 case "map-check": {
                     if (this.map_data == undefined){
-                        EvLogger.add_record("WARN", "user did not check any map")
+                        EvLogger.log("WARN", "user did not check any map")
                         controllerWindow.send_message("map-checked", JSON.stringify({"user-check": false}))
                     }
                     else {
-                        EvLogger.add_record("DEBUG", "user checked a map")
+                        EvLogger.log("DEBUG", "user checked a map")
                         controllerWindow.send_message("map-checked", JSON.stringify({"user-check": true}))
                     }
                     break
@@ -589,28 +577,11 @@ class MainApp{
                     break
                 }
                 case "plane-value-change": {
-                    for (let i = 0; i < this.PlaneDatabase.DB.length; i++){
-                        if(this.PlaneDatabase.DB[i].id == data[1][3]){
-                            switch(data[1][1]){
-                                case "item0":
-                                    //heading change
-                                    this.PlaneDatabase.DB[i].updated_heading = data[1][2]
-                                    break
-                                case "item1":
-                                    //level change
-                                    this.PlaneDatabase.DB[i].updated_level = data[1][2]
-                                    break
-                                case "item2":
-                                    //speed change
-                                    this.PlaneDatabase.DB[i].updated_speed = data[1][2]
-                                    break
-
-                                //TODO: do more generally for more variables
-                            }
-                        }
-                    }
-                    
+                    console.log(data)
+                    //TODO: add args to set command
+                    this.PlaneDatabase.set_command(data[1][3], data[1][1], parseInt(data[1][2]))      
                     this.send_to_all(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
+                    controllerWindow.send_message("terminal-add", data[1].slice(1))
                     break
                 }
                 case "plane-delete-record": {
@@ -665,6 +636,15 @@ class MainApp{
                 case "rewrite-frontend-vars": {
                     this.frontend_vars = data[1][1]
                     console.log(this.frontend_vars)
+                }
+                //getting all preset configuration directly from json file
+                case "json-description": {
+                    if (data[1][2] == "command"){
+                        controllerWindow.send_message("description-data", this.command_presets_list[data[1][1]])
+                    }
+                    else if (data[1][2] == "aircraft"){
+                        controllerWindow.send_message("description-data", this.aircraft_presets_list[data[1][1]])
+                    }
                 }
             }
         })
@@ -731,7 +711,7 @@ class MainApp{
             
                     //save to local db using database.ts 
                     this.backup_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict, null, 2)])
-                    EvLogger.log("DEBUG", ["Saving temporary backup...", "Saving temporary backup using database.ts"])
+                    EvLogger.log("DEBUG", "Saving temporary backup...")
                 }
             }
         }, this.backupdb_saving_frequency)
@@ -746,7 +726,7 @@ class MainApp{
         const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
         this.app_settings = JSON.parse(app_settings_raw);
 
-        EvLogger.add_record("DEBUG", "APP-INIT")
+        EvLogger.log("DEBUG", "APP-INIT")
 
         //check internet connectivity
         this.app_status["internet-connection"] = Boolean(await utils.checkInternet(EvLogger))
@@ -758,7 +738,7 @@ class MainApp{
         //workers
         if (this.app_settings["backend_init"]){
             this.backend_worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
-            EvLogger.log("DEBUG", ["Starting BackendWorker because flag backend_init=true", "Starting Backend because flag backend_init is=true"])
+            EvLogger.log("DEBUG", "Starting Backend because flag backend_init is=true")
 
             var backend_settings = {
                 "noise": this.app_settings["noise"]
@@ -767,7 +747,7 @@ class MainApp{
         }
         else{
             this.app_status["turn-on-backend"] = false
-            EvLogger.log("DEBUG", ["Not starting BackendWorker because backend_init is set to false", "Starting Backend because backend_init is set to false"])
+            EvLogger.log("DEBUG", "Starting Backend because backend_init is set to false")
         }
         this.backup_worker = new Worker(path.join(ABS_PATH, "/src/database.js"))
 
@@ -783,11 +763,11 @@ class MainApp{
             this.backupdb_saving_frequency = 5 * 60 * 1000
         }
 
-        EvLogger.add_record("DEBUG", `BackupDB saving frequency is set to ${this.backupdb_saving_frequency / 1000} seconds`)
+        EvLogger.log("DEBUG", `BackupDB saving frequency is set to ${this.backupdb_saving_frequency / 1000} seconds`)
     }
 
     public init_gui(){
-        EvLogger.add_record("DEBUG", "Get display coords info for better window positioning")
+        EvLogger.log("DEBUG", "Get display coords info for better window positioning")
         //get screen info
         var displays_info: any = screen.getAllDisplays()
         var displays_mod = []
@@ -801,7 +781,7 @@ class MainApp{
         let win_info = utils.get_window_info(app_settings, this.displays, -1, app_config.main_menu_dict)
         let coords = win_info.slice(0, 2)
 
-        EvLogger.add_record("DEBUG", "main-menu show")
+        EvLogger.log("DEBUG", "main-menu show")
         mainMenuWindow = new Window(this.app_status, app_config.main_menu_dict, "./res/main.html", coords)
         mainMenuWindow.show()
     }
@@ -826,7 +806,7 @@ class MainApp{
                 continue
             }
             
-            EvLogger.add_record("DEBUG", "worker show")
+            EvLogger.log("DEBUG", "worker show")
             if (backup_db){
                 //backup was created, reload workers
                 workerWindow = new Window(this.app_status, app_config.worker_dict, backup_db["monitor-data"][i]["path_load"], backup_db["monitor-data"][i]["win_coordinates"], backup_db["monitor-data"][i]["win_type"], display_info)
@@ -846,7 +826,7 @@ class MainApp{
         let coords = win_info.slice(0, 2)
         let display_info = win_info.slice(2, 4)
 
-        EvLogger.add_record("DEBUG", "controller show")
+        EvLogger.log("DEBUG", "controller show")
         controllerWindow = new Window(this.app_status, app_config.controller_dict, "./res/controller_set.html", coords, "controller", display_info)
         controllerWindow.checkClose(() => {
             if (this.app_status["app-running"] && this.app_status["redir-to-main"]){
@@ -919,25 +899,25 @@ class MainApp{
 
         if (this.app_status["turn-on-backend"]){
             //disable voice recognition and ACAI backend
-            EvLogger.add_record("DEBUG", "stopping voice-recognition")
+            EvLogger.log("DEBUG", "stopping voice-recognition")
             this.backend_worker.postMessage(["action", "stop-neural"])
 
             await utils.sleep(1000) //TODO: do much better way
 
             //kill voice recognition
-            EvLogger.add_record("DEBUG", "killing core.py")
+            EvLogger.log("DEBUG", "killing core.py")
             this.backend_worker.postMessage(["action", "interrupt"])
 
             await utils.sleep(1000) //TODO: do much better way
 
             //stop backend worker
-            EvLogger.add_record("DEBUG", "terminating backend worker")
+            EvLogger.log("DEBUG", "terminating backend worker")
             this.backend_worker.terminate()
         }
-        EvLogger.add_record("DEBUG", "terminating database worker")
+        EvLogger.log("DEBUG", "terminating database worker")
         this.backup_worker.terminate()
 
-        EvLogger.add_record("DEBUG", "exit")
+        EvLogger.log("DEBUG", "exit")
         app.exit(0)
     }
 }
@@ -957,7 +937,7 @@ app.on("ready", async () => {
     await main_app.init_app() //initializing backend for app
 
     //update audio devices
-    EvLogger.log("DEBUG", ["Updating audio devices...", "Updating audio device list using get_info.py"])
+    EvLogger.log("DEBUG", "Updating audio device list using get_info.py")
     const update_devices = spawn("python3", [PATH_TO_AUDIO_UPDATE])
     //TODO: add fallback logger to update_devices subprocess
     

@@ -637,6 +637,15 @@ class MainApp{
                     this.frontend_vars = data[1][1]
                     console.log(this.frontend_vars)
                 }
+                //getting all preset configuration directly from json file
+                case "json-description": {
+                    if (data[1][2] == "command"){
+                        controllerWindow.send_message("description-data", this.command_presets_list[data[1][1]])
+                    }
+                    else if (data[1][2] == "aircraft"){
+                        controllerWindow.send_message("description-data", this.aircraft_presets_list[data[1][1]])
+                    }
+                }
             }
         })
 

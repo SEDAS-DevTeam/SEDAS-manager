@@ -18,6 +18,7 @@ var INIT_DATA = [] //storing all vital data like airport list, command preset li
 var APP_DATA = undefined
 
 var desc_rendered = false
+var clicked = false
 var curr_desc = -1
 
 //user selection variables
@@ -517,12 +518,18 @@ function generate_aircrafts_from_sources(){
         name_obj.innerHTML = name
         let inspect_obj = document.createElement("td")
         let select_obj = document.createElement("td")
+        let inspect = document.createElement("i")
+        inspect.classList.add("fa")
+        inspect.classList.add("fa-search")
+        inspect.setAttribute("aria-hidden", "true")
+        inspect.id = "aircraft"
 
         let select_button = document.createElement("button")
         select_button.classList.add("tablebutton")
         select_button.innerHTML = "Select"
         select_button.id = aircraft_data[i]["hash"]
         select_obj.append(select_button)
+        inspect_obj.append(inspect)
 
         record.appendChild(name_obj)
         record.appendChild(inspect_obj)
@@ -542,12 +549,19 @@ function generate_commands_from_sources(){
         name_obj.innerHTML = name
         let inspect_obj = document.createElement("td")
         let select_obj = document.createElement("td")
+        let inspect = document.createElement("i")
+        inspect.classList.add("fa")
+        inspect.classList.add("fa-search")
+        inspect.setAttribute("aria-hidden", "true")
+        inspect.id = "command"
 
         let select_button = document.createElement("button")
         select_button.classList.add("tablebutton")
         select_button.innerHTML = "Select"
         select_button.id = command_data[i]["hash"]
         select_obj.append(select_button)
+        
+        inspect_obj.appendChild(inspect)
 
         record.appendChild(name_obj)
         record.appendChild(inspect_obj)
@@ -583,14 +597,15 @@ function generate_airports_from_sources(){
 
         let desc_obj = document.createElement("td")
         let select_obj = document.createElement("td")
-        let logo = document.createElement("i")
+        let inspect = document.createElement("i")
         let popup_box = document.createElement("div")
         let desc = document.createElement("p")
         let select_button = document.createElement("button")
 
-        logo.classList.add("fa");
-        logo.classList.add("fa-search")
-        logo.setAttribute('aria-hidden', 'true');
+        inspect.classList.add("fa");
+        inspect.classList.add("fa-search")
+        inspect.setAttribute('aria-hidden', 'true')
+        inspect.id = "airport"
 
         popup_box.classList.add("popup-box");
         select_button.classList.add("tablebutton")
@@ -602,7 +617,7 @@ function generate_airports_from_sources(){
 
         popup_box.appendChild(desc)
 
-        desc_obj.appendChild(logo)
+        desc_obj.appendChild(inspect)
         desc_obj.appendChild(popup_box)
         select_obj.appendChild(select_button)
 
@@ -637,7 +652,7 @@ function send_monitor_data(){
     window.electronAPI.send_message("controller", ["monitor-change-info", data])
 }
 
-function show_description(idx){
+function show_description_airport(idx){
     let desc_data = document.querySelectorAll("div.popup-box")
     for (let i = 0; i < desc_data.length; i++){
         desc_data[i].style.visibility = "hidden"
@@ -645,7 +660,15 @@ function show_description(idx){
     desc_data[idx].style.visibility = "visible"
 
     desc_rendered = true
+    clicked = true
     curr_desc = idx
+}
+
+function ask_for_content(idx, type){
+    window.electronAPI.send_message("controller", ["json-description", idx, type])
+    desc_rendered = true
+    clicked = true
+    document.getElementsByClassName("desc-content")[0].style.visibility = "visible"
 }
 
 function process_init_data(data, reset = false){
@@ -742,11 +765,27 @@ function process_init_data(data, reset = false){
                 })
             }
     
-            //add event listener for every description button 
-            var desc_elem = document.querySelectorAll("td i")
-            for(let i = 0; i < desc_elem.length; i++){
-                desc_elem[i].addEventListener("click", () => {
-                    show_description(i)
+            //add listener to airport description button
+            var desc_elem_airport = document.querySelectorAll("td i#airport")
+            for(let i = 0; i < desc_elem_airport.length; i++){
+                desc_elem_airport[i].addEventListener("click", () => {
+                    show_description_airport(i)
+                })
+            }
+
+            //add listener to command description button
+            var desc_elem_command = document.querySelectorAll("td i#command")
+            for(let i = 0; i < desc_elem_command.length; i++){
+                desc_elem_command[i].addEventListener("click", () => {
+                    ask_for_content(i, "command")
+                })
+            }
+
+            //add listener to aircraft description button
+            var desc_elem_aircraft = document.querySelectorAll("td i#aircraft")
+            for(let i = 0; i < desc_elem_aircraft.length; i++){
+                desc_elem_aircraft[i].addEventListener("click", () => {
+                    ask_for_content(i, "aircraft")
                 })
             }
 
@@ -885,15 +924,20 @@ window.onload = () => {
             //event listeners
 
             document.addEventListener("click", () => {
+                if (clicked){
+                    clicked = false
+                    return
+                }
+
                 if (desc_rendered){
                     desc_rendered = false
-                }
-                else{
-                    try{
+
+                    let popup_elem = document.querySelectorAll("div.popup-box")[curr_desc]
+
+                    if (popup_elem != undefined){
                         document.querySelectorAll("div.popup-box")[curr_desc].style.visibility = "hidden"
-                    } catch(error){
-                        //do nothing (TODO, remove try catch)
                     }
+
                 }
             })
 
@@ -902,6 +946,11 @@ window.onload = () => {
             })
             document.getElementById("regen-map").addEventListener("click", () => {
                 regen_map()
+            })
+
+            document.getElementById("close-desc").addEventListener("click", () => {
+                desc_rendered = false
+                document.getElementsByClassName("desc-content")[0].style.visibility = "hidden"
             })
 
             break
@@ -1142,5 +1191,9 @@ window.onload = () => {
 
             warn_text.style.display = "none"
         }
+    })
+
+    window.electronAPI.on_message("description-data", (data) => {
+        document.getElementById("inner-content").innerHTML = process_JSON(data)
     })
 }

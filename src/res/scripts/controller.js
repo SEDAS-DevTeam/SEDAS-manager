@@ -983,6 +983,9 @@ window.onload = () => {
         case "controller_sim":
             //running init code
 
+            //set mask to whole page
+            document.getElementById("mask-sim").style.height = `${document.body.scrollHeight}px`
+
             //check if user had already selected map
             window.electronAPI.send_message("controller", ["map-check"])
 

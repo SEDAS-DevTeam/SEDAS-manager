@@ -78,7 +78,7 @@ export const basic_worker_widget_dict = {
     width: 300,
     height: 300,
     title: "SEDAC widget",
-    resizable: false,
+    resizable: true,
     icon: "./res/img/sedac-manager-logo.png",
     frame: false,
     webPreferences: {

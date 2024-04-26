@@ -1,4 +1,8 @@
-document.onload(() => {
+window.electronAPI.on_message("register", (data) => {
+    console.log(data)
+})
+
+window.onload = () => {
     document.getElementById("minimize").addEventListener("click", (event) => {
         //minimize window
         window.electronAPI.send_message("worker-widget", ["min-widget"])
@@ -13,4 +17,4 @@ document.onload(() => {
         //exit window
         window.electronAPI.send_message("worker-widget", ["exit-widget"])
     })
-})
+}

@@ -762,8 +762,13 @@ class MainApp{
             //setup basic widgets for workers
             let workerWidgetWindow = new WidgetWindow(basic_worker_widget_dict, "./res/worker_widget.html", coords, EvLogger)
             
-            let id = utils.generate_id()
-            this.widget_workers.push(workerWidgetWindow)
+            let widget_id = utils.generate_id()
+            let worker_id = utils.generate_id()
+
+            this.widget_workers.push({
+                "id": widget_id,
+                "win": workerWidgetWindow
+            })
             this.workers.push(workerWindow)
         }
 
@@ -788,7 +793,8 @@ class MainApp{
         }
 
         for (let i = 0; i < this.widget_workers.length; i++){
-            this.widget_workers[i].show()
+            this.widget_workers[i]["win"].show()
+            this.widget_workers[i]["win"].send_message("register", ["id", this.widget_workers[i]["id"]]) //TODO not working
         }
 
         controllerWindow.show()

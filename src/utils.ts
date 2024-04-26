@@ -28,6 +28,26 @@ export function generate_hash(){
     return v4()
 }
 
+export function generate_id(){
+    var alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+    var n_pos: number = 5;
+    var res_str: string = ""
+
+    for (let i = 0; i < n_pos; i++){
+        let rand_choice = Math.random() < 0.5;
+        let elem: string;
+        if (rand_choice){ //alphabet
+            elem = alphabet[(Math.floor(Math.random() * alphabet.length))]
+        }
+        else{ //number
+            elem = Math.floor(Math.random() * 11).toString()
+        }
+        res_str += elem
+    }
+    return res_str
+}
+
 //Main functions
 export function checkInternet(EvLogger: EventLogger){
     EvLogger.log("DEBUG", "Performing HTTP GET on google servers for internet check")

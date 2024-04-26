@@ -3,11 +3,11 @@
 */
 
 //glob imports
-import { app, BrowserWindow, ipcMain, screen, Tray, nativeImage, Menu } from "electron";
 import fs from "fs";
 import { Worker } from "worker_threads"
 import { spawn } from "node:child_process"
 import path from "path"
+import { app, ipcMain, screen, Tray, nativeImage, Menu } from "electron";
 
 //relative imports
 import { Plane, PlaneDB } from "./plane_functions"
@@ -15,7 +15,19 @@ import { update_all } from "./fetch"
 import { EventLogger } from "./logger"
 
 import * as utils from "./utils"
-import * as app_config from "./app_config"
+import {
+    //window configs
+    main_menu_dict,
+    settings_dict,
+    exit_dict,
+    controller_dict,
+    worker_dict,
+    basic_worker_widget_dict,
+
+    //window Classes
+    Window,
+    WidgetWindow
+} from "./app_config"
 
 //window variable declarations
 var mainMenuWindow: Window;
@@ -32,86 +44,11 @@ const PATH_TO_MAPS: string = path.join(ABS_PATH, "/src/res/data/sim/maps/")
 const PATH_TO_COMMANDS: string = path.join(ABS_PATH, "/src/res/data/sim/commands/")
 const PATH_TO_AIRCRAFTS: string = path.join(ABS_PATH, "/src/res/data/sim/planes/")
 
-//app defs
-
-class Window{
-    public window: BrowserWindow;
-    public win_type: string = "none";
-    public isClosed: boolean = false;
-    public win_coordinates: number[];
-    private path_load: string;
-    private localConfig: any = {}; //contains local config of window
-
-    public close(){
-        if (!this.isClosed){
-            this.window.close()
-        }
-        this.isClosed = true
-    }
-
-    public show(path: string = ""){
-        if (path.length != 0){
-            //rewrite path_load (used for controller window_manipulation
-            this.path_load = path
-        }
-
-        this.isClosed = false
-        this.window.loadFile(this.path_load);
-    }
-
-    public send_message(channel: string, message: any){
-        this.window.webContents.postMessage(channel, message)
-    }
-
-    public checkClose(callback: any = undefined){
-        this.window.on("closed", () => {
-            this.isClosed = true
-            if (callback != undefined){
-                callback()
-            }
-        })
-    }
-
-    public constructor(app_status: Record<string, boolean>, config: any, path: string, coords: number[], window_type: string = "none", display_res: number[] = []){
-        this.win_coordinates = coords //store to use later
-
-        //retype window_type
-        this.win_type = window_type
-
-        Object.assign(this.localConfig, config)
-        if (display_res.length > 0 && !display_res.includes(undefined)){
-            //set resolution according to display resolution
-            this.localConfig.width = display_res[0]
-            this.localConfig.height = display_res[1]
-        }
-
-        this.localConfig.x = coords[0]
-        this.localConfig.y = coords[1]
-
-        this.window = new BrowserWindow(this.localConfig);
-        this.window.setMenu(null);
-        this.window.webContents.openDevTools()
-
-        this.path_load = path
-        this.window.maximize()
-        
-        if (path.includes("main")){
-            this.checkClose(() => {
-                if (!app_status["redir-to-main"]){
-                    EvLogger.log("DEBUG", "Closing app... Bye Bye")
-                    main_app.exit_app()
-                }
-            })
-        }
-
-        EvLogger.log("DEBUG", `Created window object(win_type=${this.win_type},path_load=${this.path_load}, coords=${coords})`)
-    }
-}
-
 class MainApp{
     public app_settings: any;
     public displays = [];
-    public workers: any = [];
+    public workers: any[] = [];
+    public widget_workers: any[] = []
     public sender_win_name: string;
 
     //all variables related to frontend
@@ -200,7 +137,7 @@ class MainApp{
     //
     public add_listener_backend(){
         //backend-worker events
-        if (app_config["turn-on-backend"]){
+        if (this.app_status["turn-on-backend"]){
             this.backend_worker.on("message", (message: string) => {
                 //processing from backend.js
                 let arg = message.split(":")[0]
@@ -260,11 +197,12 @@ class MainApp{
                     }
 
                     //calculate x, y
-                    let win_info = utils.get_window_info(app_settings, this.displays, -1, app_config.main_menu_dict)
+                    let win_info = utils.get_window_info(app_settings, this.displays, -1, main_menu_dict)
                     let coords = win_info.slice(0, 2)
 
                     EvLogger.log("DEBUG", "main-menu show")
-                    mainMenuWindow = new Window(this.app_status, app_config.main_menu_dict, "./res/main.html", coords)
+                    mainMenuWindow = new Window(this.app_status, main_menu_dict, 
+                        "./res/main.html", coords, EvLogger, main_app)
                     mainMenuWindow.show()
 
                     break
@@ -290,7 +228,7 @@ class MainApp{
                     let display_info = win_info.slice(2, 4)
 
                     EvLogger.log("DEBUG", "settings show")
-                    settingsWindow = new Window(this.app_status, app_config.settings_dict, "./res/settings.html", coords, "settings", display_info)
+                    settingsWindow = new Window(this.app_status, settings_dict, "./res/settings.html", coords, EvLogger, main_app, "settings", display_info)
                     settingsWindow.show()
                     break
                 }
@@ -646,6 +584,10 @@ class MainApp{
                         controllerWindow.send_message("description-data", this.aircraft_presets_list[data[1][1]])
                     }
                 }
+                case "exit-widget": {
+                    //TODO
+                    console.log("TODO")
+                }
             }
         })
 
@@ -778,11 +720,11 @@ class MainApp{
         this.displays = displays_mod
         
         //calculate x, y
-        let win_info = utils.get_window_info(app_settings, this.displays, -1, app_config.main_menu_dict)
+        let win_info = utils.get_window_info(app_settings, this.displays, -1, main_menu_dict)
         let coords = win_info.slice(0, 2)
 
         EvLogger.log("DEBUG", "main-menu show")
-        mainMenuWindow = new Window(this.app_status, app_config.main_menu_dict, "./res/main.html", coords)
+        mainMenuWindow = new Window(this.app_status, main_menu_dict, "./res/main.html", coords, EvLogger, main_app)
         mainMenuWindow.show()
     }
 
@@ -809,15 +751,19 @@ class MainApp{
             EvLogger.log("DEBUG", "worker show")
             if (backup_db){
                 //backup was created, reload workers
-                workerWindow = new Window(this.app_status, app_config.worker_dict, backup_db["monitor-data"][i]["path_load"], backup_db["monitor-data"][i]["win_coordinates"], backup_db["monitor-data"][i]["win_type"], display_info)
+                workerWindow = new Window(this.app_status, worker_dict, backup_db["monitor-data"][i]["path_load"], backup_db["monitor-data"][i]["win_coordinates"], backup_db["monitor-data"][i]["win_type"], display_info)
                 workerWindow.isClosed = backup_db["monitor-planes"][i]["isClosed"]
             }
             else{
                 //backup was not created, create new workers
-                console.log(coords)
-                workerWindow = new Window(this.app_status, app_config.worker_dict, "./res/worker.html", coords, "ACC", display_info)
+                workerWindow = new Window(this.app_status, worker_dict, "./res/worker.html", coords, EvLogger, main_app, "ACC", display_info)
             }
+
+            //setup basic widgets for workers
+            let workerWidgetWindow = new WidgetWindow(basic_worker_widget_dict, "./res/worker_widget.html", coords, EvLogger)
             
+            let id = utils.generate_id()
+            this.widget_workers.push(workerWidgetWindow)
             this.workers.push(workerWindow)
         }
 
@@ -827,7 +773,7 @@ class MainApp{
         let display_info = win_info.slice(2, 4)
 
         EvLogger.log("DEBUG", "controller show")
-        controllerWindow = new Window(this.app_status, app_config.controller_dict, "./res/controller_set.html", coords, "controller", display_info)
+        controllerWindow = new Window(this.app_status, controller_dict, "./res/controller_set.html", coords, EvLogger, main_app, "controller", display_info)
         controllerWindow.checkClose(() => {
             if (this.app_status["app-running"] && this.app_status["redir-to-main"]){
                 //app is running and is redirected to main => close by tray button
@@ -835,10 +781,16 @@ class MainApp{
             }
         })
         
+        //setting up workers
         for (let i = 0; i < this.workers.length; i++){
             this.workers[i].show()
             this.workers[i].checkClose()
         }
+
+        for (let i = 0; i < this.widget_workers.length; i++){
+            this.widget_workers[i].show()
+        }
+
         controllerWindow.show()
 
         if (this.app_status["turn-on-backend"]){
@@ -889,10 +841,10 @@ class MainApp{
 
     public async exit_app(){
         //spawning info window
-        let win_info = utils.get_window_info(this.app_settings, this.displays, -1, app_config.exit_dict)
+        let win_info = utils.get_window_info(this.app_settings, this.displays, -1, exit_dict)
         let coords = win_info.slice(0, 2)
 
-        exitWindow = new Window(this.app_status, app_config.exit_dict, "./res/exit.html", coords)
+        exitWindow = new Window(this.app_status, exit_dict, "./res/exit.html", coords, EvLogger, main_app)
         exitWindow.show()
 
         this.app_status["app-running"] = false; //stopping all Interval events from firing
@@ -924,7 +876,7 @@ class MainApp{
 
 //app predef
 var EvLogger: EventLogger;
-var main_app: MainApp;
+var main_app: MainApp; //cross im
 
 //read JSON
 const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")

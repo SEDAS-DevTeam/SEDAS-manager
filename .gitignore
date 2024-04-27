@@ -15,6 +15,7 @@ package-lock.json
 /src/fetch.js
 /src/utils.js
 /src/app_config.js
+/src/logger.js
 
 /src/*.map
 

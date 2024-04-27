@@ -186,6 +186,67 @@ export class Window{
     }
 }
 
+export class LoaderWindow{
+    public window: BrowserWindow;
+    public win_type: string = "none";
+    public isClosed: boolean = false;
+    public win_coordinates: number[];
+    private path_load: string;
+    private localConfig: any = {}; //contains local config of window
+    private event_logger: EventLogger;
+
+    public close(){
+        if (!this.isClosed){
+            this.window.close()
+        }
+        this.isClosed = true
+    }
+
+    public show(path: string = ""){
+        if (path.length != 0){
+            //rewrite path_load (used for controller window_manipulation
+            this.path_load = path
+        }
+
+        this.isClosed = false
+        this.window.loadFile(this.path_load);
+    }
+
+    public send_message(channel: string, message: any){
+        this.window.webContents.postMessage(channel, message)
+    }
+
+    public wait_for_load(callback: any){
+        this.window.webContents.on("did-finish-load", () => {
+            callback()
+        })
+    }
+
+    public constructor(config: any, path: string, coords: number[],
+        ev_logger: EventLogger, display_res: number[] = []){
+        this.win_coordinates = coords //store to use later
+        this.event_logger = ev_logger
+
+        Object.assign(this.localConfig, config)
+        if (display_res.length > 0 && !display_res.includes(undefined)){
+            //set resolution according to display resolution
+            this.localConfig.width = display_res[0]
+            this.localConfig.height = display_res[1]
+        }
+
+        this.localConfig.x = coords[0]
+        this.localConfig.y = coords[1]
+
+        this.window = new BrowserWindow(this.localConfig);
+        this.window.setMenu(null);
+        this.window.webContents.openDevTools()
+
+        this.path_load = path
+
+        this.event_logger.log("DEBUG", `Created window object(win_type=${this.win_type},path_load=${this.path_load}, coords=${coords})`)
+    }
+}
+
 export class WidgetWindow{
     public window: BrowserWindow;
     public win_coordinates: number[];

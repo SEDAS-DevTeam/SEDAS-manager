@@ -1,0 +1,8 @@
+{
+    "version": "2.0.0",
+    "tasks": [{
+        "label": "compile",
+        "command": "npx", // Could be any other shell command
+        "args": ["tsc", "--project", "./tsconfig.json"]
+    }]
+}

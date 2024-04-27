@@ -31,7 +31,6 @@ import {
 } from "./app_config"
 
 //window variable declarations
-var LoadingWindow: Window;
 var mainMenuWindow: Window;
 var settingsWindow: Window;
 var controllerWindow: Window;
@@ -50,7 +49,6 @@ class MainApp{
     public app_settings: any;
     public displays = [];
     public workers: any[] = [];
-    public loaders: any[] = [];
     public widget_workers: any[] = []
     public sender_win_name: string;
 
@@ -98,6 +96,9 @@ class MainApp{
     public backend_worker: Worker;
     public backup_worker: Worker;
     public PlaneDatabase: PlaneDB;
+
+    //other classes
+    private loader: utils.ProgressiveLoader
 
     public backupdb_saving_frequency: number = 1000; //defaultly set to 1 second
 
@@ -704,24 +705,17 @@ class MainApp{
     public async init_app(){
         this.get_screen_info() //getting screen info for all displays
 
-        //getting window info to spawn load on all monitors && initialize all loaders
-        for(let i = 0; i < this.displays.length; i++){
-            let win_info = utils.get_window_info(this.app_settings, this.displays, i, "load", load_dict)
-            let coords = win_info.slice(0, 2)
-            let display_info = win_info.slice(2, 4)
+        //set progressive loader object on loaders
+        this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
+        this.loader.set_segments(4)
+        this.loader.set_loader_win()
+        await this.loader.show_loader_win()
+        this.loader.send_progresss("Initializing app")
 
-            //creating loading window
-            LoadingWindow = new Window(this.app_status, load_dict, "./res/load.html", coords, EvLogger, main_app, "ACC", display_info)
-            this.loaders.push(LoadingWindow)
-        }
-
-        //showing all loaders, going to progressively send them data
-        for(let i = 0; i < this.loaders.length; i++){
-            this.loaders[i].show()
-            this.loaders[i].wait_for_load(() => {
-                EvLogger.log("DEBUG", `loader${i} loaded`)
-            })
-        }
+        /*
+            Loader segment 1
+        */
+        this.loader.send_progresss("Reading app configuration")
 
         //read JSON
         const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
@@ -729,12 +723,22 @@ class MainApp{
 
         EvLogger.log("DEBUG", "APP-INIT")
 
+        /*
+            Loader segment 2
+        */
+        this.loader.send_progresss("Checking internet connectivity")
+
         //check internet connectivity
         this.app_status["internet-connection"] = Boolean(await utils.checkInternet(EvLogger))
 
         if (this.app_status["internet-connection"] && this.app_settings["fetch_alg"]){
-            await update_all(EvLogger)
+            await update_all(EvLogger, this.loader)
         }
+
+        /*
+            Loader segment 7 (rest of segments are in update_all)
+        */
+        this.loader.send_progresss("Setting all backend processes")
 
         //workers
         if (this.app_settings["backend_init"]){
@@ -751,7 +755,8 @@ class MainApp{
             EvLogger.log("DEBUG", "Starting Backend because backend_init is set to false")
         }
         this.backup_worker = new Worker(path.join(ABS_PATH, "/src/database.js"))
-
+        
+        //backup saving frequency
         if (this.app_settings["saving_frequency"].includes("min")){
             this.backupdb_saving_frequency = parseInt(this.app_settings["saving_frequency"].charAt(0)) * 60 * 1000
         }
@@ -768,6 +773,11 @@ class MainApp{
     }
 
     public init_gui(){
+        /*
+            Loader segment 8
+        */
+        this.loader.send_progresss("Initializing GUI")
+
         EvLogger.log("DEBUG", "Get display coords info for better window positioning")
         
         //calculate x, y
@@ -935,7 +945,7 @@ class MainApp{
 
 //app predef
 var EvLogger: EventLogger;
-var main_app: MainApp; //cross im
+var main_app: MainApp;
 
 //read JSON
 const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
@@ -945,6 +955,7 @@ const app_settings = JSON.parse(app_settings_raw);
 app.on("ready", async () => {
     EvLogger = new EventLogger(app_settings["logging"])
     main_app = new MainApp(app_settings)
+
     await main_app.init_app() //initializing backend for app
 
     //update audio devices

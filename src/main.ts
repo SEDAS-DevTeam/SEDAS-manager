@@ -574,6 +574,7 @@ class MainApp{
                 case "rewrite-frontend-vars": {
                     this.frontend_vars = data[1][1]
                     console.log(this.frontend_vars)
+                    break
                 }
                 //getting all preset configuration directly from json file
                 case "json-description": {
@@ -583,10 +584,33 @@ class MainApp{
                     else if (data[1][2] == "aircraft"){
                         controllerWindow.send_message("description-data", this.aircraft_presets_list[data[1][1]])
                     }
+                    break
+                }
+                /*Worker widget listeners*/
+                case "min-widget": {
+                    for (let i = 0; i < this.widget_workers.length; i++){
+                        if (this.widget_workers[i]["id"] == data[1][1]){
+                            this.widget_workers[i]["win"].minimize()
+                        }
+                    }
+                    break
+                }
+                case "max-widget": {
+                    for (let i = 0; i < this.widget_workers.length; i++){
+                        if (this.widget_workers[i]["id"] == data[1][1]){
+                            this.widget_workers[i]["win"].maximize()
+                        }
+                    }
+                    break
                 }
                 case "exit-widget": {
-                    //TODO
-                    console.log("TODO")
+                    for (let i = 0; i < this.widget_workers.length; i++){
+                        if (this.widget_workers[i]["id"] == data[1][1]){
+                            this.widget_workers[i]["win"].close()
+                            this.widget_workers.splice(i, 1)
+                        }
+                    }
+                    break
                 }
             }
         })
@@ -764,7 +788,7 @@ class MainApp{
             
             let widget_id = utils.generate_id()
             let worker_id = utils.generate_id()
-
+            
             this.widget_workers.push({
                 "id": widget_id,
                 "win": workerWidgetWindow
@@ -794,7 +818,9 @@ class MainApp{
 
         for (let i = 0; i < this.widget_workers.length; i++){
             this.widget_workers[i]["win"].show()
-            this.widget_workers[i]["win"].send_message("register", ["id", this.widget_workers[i]["id"]]) //TODO not working
+            this.widget_workers[i]["win"].wait_for_load(() => {
+                this.widget_workers[i]["win"].send_message("register", ["id", this.widget_workers[i]["id"]])
+            })
         }
 
         controllerWindow.show()

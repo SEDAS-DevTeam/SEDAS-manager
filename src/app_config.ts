@@ -188,7 +188,21 @@ export class WidgetWindow{
     }
 
     public send_message(channel: string, message: any){
-        this.window.webContents.postMessage(channel, message)
+        this.window.webContents.send(channel, message)
+    }
+
+    public wait_for_load(callback: any){
+        this.window.webContents.on("did-finish-load", () => {
+            callback()
+        })
+    }
+
+    public minimize(){
+        this.window.setSize(this.localConfig.width, 35) //default height of the header
+    }
+
+    public maximize(){
+        this.window.setSize(this.localConfig.width, this.localConfig.height)
     }
 
     public constructor(config: any, path: string, coords: number[], 

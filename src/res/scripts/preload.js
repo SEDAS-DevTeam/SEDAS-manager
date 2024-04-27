@@ -1,5 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
+//messages for IPC
 contextBridge.exposeInMainWorld('electronAPI', {
     //worker to controller communication
     send_message_redir: (send_to, message) => {

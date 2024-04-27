@@ -18,3 +18,56 @@
     background-color: green;
     color: black;
 }
+
+/*Worker widget elements*/
+
+body#worker-widget{
+    background-color: #c9c9c9;
+}
+
+button{
+    background-color: #c9c9c9;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    border: solid 2px #5271ff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#widget-topnav {
+    padding: 5px;
+    text-align: right;
+    background-color: #b1b1b1;
+    display: flex;
+}
+
+#draggable-top{
+    flex-grow: 1;
+    float: left;
+    height: 100%;
+    margin-top: 5px;
+    text-align: left;
+    margin-bottom: 0;
+}
+
+#widget-topnav > #draggable-top{
+    -webkit-app-region: drag;
+}
+
+#widget-topnav i{
+    display: inline-block;
+    text-align: center;
+    padding: 5px;
+    text-decoration: none;
+    font-size: 10px;
+    border: solid 2px #5271ff;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#content{
+    padding: 10px;
+}

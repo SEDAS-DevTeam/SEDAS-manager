@@ -7,9 +7,59 @@ import { join } from "path"
 import { v4 } from "uuid"
 import http from "http"
 import { EventLogger } from "./logger"
+import { LoaderWindow } from "./app_config";
 
 export class ProgressiveLoader{
-    
+    private loaders: any[] = [];
+    private app_settings: any;
+    private displays: any[]
+    private load_dict: any;
+    private ev_logger: EventLogger;
+    public num_segments: number = 0;
+    public curr_n_segments: number = 0;
+
+    public set_loader_win(){
+        //getting window info to spawn load on all monitors && initialize all loaders
+        for(let i = 0; i < this.displays.length; i++){
+            let win_info = get_window_info(this.app_settings, this.displays, i, "load", this.load_dict)
+            let coords = win_info.slice(0, 2)
+            let display_info = win_info.slice(2, 4)
+
+            //creating loading window
+            let LoadingWindow = new LoaderWindow(this.load_dict, "./res/load.html", coords, this.ev_logger, display_info)
+            this.loaders.push(LoadingWindow)
+        }
+    }
+
+    public async show_loader_win(){
+        //showing all loaders, going to progressively send them data
+        for(let i = 0; i < this.loaders.length; i++){
+            this.loaders[i].show()
+            await this.loaders[i].wait_for_load(() => {
+                this.ev_logger.log("DEBUG", `loader${i} loaded`)
+            })
+        }
+    }
+
+    public set_segments(n_segments: number){
+        this.num_segments = n_segments
+        for (let i = 0; i < this.loaders.length; i++){
+            this.loaders[i].send_message("n_segments", this.num_segments)
+        }
+    }
+
+    public send_progresss(message: string){
+        for (let i = 0; i < this.loaders.length; i++){
+            this.loaders[i].send_message("progress", [message])
+        }
+    }
+
+    public constructor(app_settings: any, displays: any[], load_dict: any, event_logger: EventLogger){
+        this.app_settings = app_settings
+        this.displays = displays
+        this.load_dict = load_dict
+        this.ev_logger = event_logger
+    }
 }
 
 export function read_file_content(path: string, file_name: string){

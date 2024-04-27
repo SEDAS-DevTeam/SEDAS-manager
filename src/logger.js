@@ -1,13 +1,7 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.EventLogger = void 0;
-const fs_1 = require("fs");
-const path_1 = __importDefault(require("path"));
-const ABS_PATH = path_1.default.resolve("");
-class EventLogger {
+import { readdirSync, unlinkSync, openSync, appendFileSync } from "fs";
+import path from "path";
+const ABS_PATH = path.resolve("");
+export class EventLogger {
     /*
     data will be processed in format:
     data = [{
@@ -21,20 +15,20 @@ class EventLogger {
     LOG_PATH = "";
     constructor(debug) {
         this.debug_mode = debug;
-        this.LOG_PATH = path_1.default.join(ABS_PATH, "/src/logs/app_log.txt");
+        this.LOG_PATH = path.join(ABS_PATH, "/src/logs/app_log.txt");
         if (this.debug_mode) {
             let time = this.get_time();
             console.log(`[${time}]`, "(DEBUG)", "Initialized event logger with DEBUGGING=TRUE");
         }
         //create log file
-        let files = (0, fs_1.readdirSync)(path_1.default.join(ABS_PATH, "/src/logs"));
+        let files = readdirSync(path.join(ABS_PATH, "/src/logs"));
         if (files.includes("app_log.txt")) {
-            (0, fs_1.unlinkSync)(this.LOG_PATH);
+            unlinkSync(this.LOG_PATH);
         }
-        (0, fs_1.openSync)(this.LOG_PATH, "w");
-        (0, fs_1.appendFileSync)(this.LOG_PATH, "#########################################\n");
-        (0, fs_1.appendFileSync)(this.LOG_PATH, "SEDAC manager v1.0.0 Linux 64-bit version\n"); //TODO: different outputs for different OSes!
-        (0, fs_1.appendFileSync)(this.LOG_PATH, "#########################################\n");
+        openSync(this.LOG_PATH, "w");
+        appendFileSync(this.LOG_PATH, "#########################################\n");
+        appendFileSync(this.LOG_PATH, "SEDAC manager v1.0.0 Linux 64-bit version\n"); //TODO: different outputs for different OSes!
+        appendFileSync(this.LOG_PATH, "#########################################\n");
     }
     get_time() {
         let date_obj = new Date();
@@ -66,8 +60,7 @@ class EventLogger {
             console.log(output);
         }
         //log to main log file
-        (0, fs_1.appendFileSync)(this.LOG_PATH, output + "\n");
+        appendFileSync(this.LOG_PATH, output + "\n");
     }
 }
-exports.EventLogger = EventLogger;
 //# sourceMappingURL=logger.js.map

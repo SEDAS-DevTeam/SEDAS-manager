@@ -217,8 +217,11 @@ export class LoaderWindow{
     }
 
     public wait_for_load(callback: any){
-        this.window.webContents.on("did-finish-load", () => {
-            callback()
+        return new Promise<void>((resolve, reject) => {
+            this.window.webContents.on("did-finish-load", async () => {
+                await callback()
+                resolve()
+            })
         })
     }
 

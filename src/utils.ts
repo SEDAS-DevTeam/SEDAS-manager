@@ -54,6 +54,13 @@ export class ProgressiveLoader{
         }
     }
 
+    public destroy_loaders(){
+        for (let i = 0; i < this.loaders.length; i++){
+            this.loaders[i].close()
+        }
+        this.loaders = []
+    }
+
     public constructor(app_settings: any, displays: any[], load_dict: any, event_logger: EventLogger){
         this.app_settings = app_settings
         this.displays = displays

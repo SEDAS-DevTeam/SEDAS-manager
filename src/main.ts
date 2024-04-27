@@ -770,11 +770,21 @@ class MainApp{
         }
 
         EvLogger.log("DEBUG", `BackupDB saving frequency is set to ${this.backupdb_saving_frequency / 1000} seconds`)
+        
+        /*
+            Loader segment 8
+        */
+        this.loader.send_progresss("Updating audio devices")
+
+        //update audio devices
+        EvLogger.log("DEBUG", "Updating audio device list using get_info.py")
+        const update_devices = spawn("python3", [PATH_TO_AUDIO_UPDATE])
+        //TODO: add fallback logger to update_devices subprocess
     }
 
     public init_gui(){
         /*
-            Loader segment 8
+            Loader segment 9
         */
         this.loader.send_progresss("Initializing GUI")
 
@@ -783,6 +793,9 @@ class MainApp{
         //calculate x, y
         let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", main_menu_dict)
         let coords = win_info.slice(0, 2)
+
+        //delete loaders
+        this.loader.destroy_loaders()
 
         EvLogger.log("DEBUG", "main-menu show")
         mainMenuWindow = new Window(this.app_status, main_menu_dict, "./res/main.html", coords, EvLogger, main_app)
@@ -957,11 +970,6 @@ app.on("ready", async () => {
     main_app = new MainApp(app_settings)
 
     await main_app.init_app() //initializing backend for app
-
-    //update audio devices
-    EvLogger.log("DEBUG", "Updating audio device list using get_info.py")
-    const update_devices = spawn("python3", [PATH_TO_AUDIO_UPDATE])
-    //TODO: add fallback logger to update_devices subprocess
     
     main_app.init_gui() //initializing gui for app
 

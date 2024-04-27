@@ -25,6 +25,19 @@ export const main_menu_dict = {
     }
 }
 
+export const load_dict = {
+    width: 800,
+    height: 600,
+    title: "SEDAC manager - loading",
+    resizable: false,
+    icon: "./res/img/sedac-manager-logo.png",
+    frame: false,
+    webPreferences: {
+        preload: path.join(ABS_PATH, "src/res/scripts/preload.js")
+    }
+}
+
+
 export const settings_dict = {
     width: 1920,
     height: 1080,
@@ -67,8 +80,8 @@ export const worker_dict = {
     title: "SEDAC",
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
-    //frame: false,
-    //focusable: false,
+    //frame: false, //TODO turn off when testing
+    //focusable: false, //same here
     webPreferences: {
         preload: path.join(ABS_PATH, "src/res/scripts/preload.js")
     }
@@ -126,6 +139,12 @@ export class Window{
             if (callback != undefined){
                 callback()
             }
+        })
+    }
+
+    public wait_for_load(callback: any){
+        this.window.webContents.on("did-finish-load", () => {
+            callback()
         })
     }
 

@@ -14,6 +14,7 @@
     height: 75%;
     left: 25%;
     visibility: hidden;
+    overflow-y: scroll;
 }
 
 .upper-mask{
@@ -359,4 +360,19 @@ h3{
     margin-top: 5px;
     margin-bottom: 0;
     font-size: 20px;
+}
+
+/*Content css*/
+
+#desc-content-text span{
+    color: white;
+}
+
+.man-header{
+    font-weight: bolder;
+}
+
+.plane-header{
+    font-style: italic;
+    margin-left: 15px;
 }

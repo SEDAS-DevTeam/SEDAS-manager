@@ -26,10 +26,12 @@ import {
 
     //window Classes
     Window,
-    WidgetWindow
+    WidgetWindow,
+    load_dict
 } from "./app_config"
 
 //window variable declarations
+var LoadingWindow: Window;
 var mainMenuWindow: Window;
 var settingsWindow: Window;
 var controllerWindow: Window;
@@ -48,6 +50,7 @@ class MainApp{
     public app_settings: any;
     public displays = [];
     public workers: any[] = [];
+    public loaders: any[] = [];
     public widget_workers: any[] = []
     public sender_win_name: string;
 
@@ -105,6 +108,18 @@ class MainApp{
     //
     //Built-in functions
     //
+
+    private get_screen_info(){
+        //get screen info
+        var displays_info: any = screen.getAllDisplays()
+        var displays_mod = []
+        for(let i: number = 0; i < displays_info.length; i++){
+            displays_mod.push(displays_info[i].bounds)
+        }
+        displays_mod.sort((a, b) => a.x - b.x);
+        this.displays = displays_mod
+    }
+
     private send_to_all(planes: any, plane_monitor_data: any, plane_paths_data: any){
         if (controllerWindow != undefined && this.workers.length != 0){
             //update planes on controller window
@@ -197,7 +212,7 @@ class MainApp{
                     }
 
                     //calculate x, y
-                    let win_info = utils.get_window_info(app_settings, this.displays, -1, main_menu_dict)
+                    let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", main_menu_dict)
                     let coords = win_info.slice(0, 2)
 
                     EvLogger.log("DEBUG", "main-menu show")
@@ -223,7 +238,7 @@ class MainApp{
                     mainMenuWindow.close()
 
                     //calculate x, y
-                    let win_info = utils.get_window_info(app_settings, this.displays, -1)
+                    let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal")
                     let coords = win_info.slice(0, 2)
                     let display_info = win_info.slice(2, 4)
 
@@ -687,6 +702,26 @@ class MainApp{
     //App phase functions (init/main/exit)
     //
     public async init_app(){
+        this.get_screen_info() //getting screen info for all displays
+
+        //getting window info to spawn load on all monitors && initialize all loaders
+        for(let i = 0; i < this.displays.length; i++){
+            let win_info = utils.get_window_info(this.app_settings, this.displays, i, "load", load_dict)
+            let coords = win_info.slice(0, 2)
+            let display_info = win_info.slice(2, 4)
+
+            //creating loading window
+            LoadingWindow = new Window(this.app_status, load_dict, "./res/load.html", coords, EvLogger, main_app, "ACC", display_info)
+            this.loaders.push(LoadingWindow)
+        }
+
+        //showing all loaders, going to progressively send them data
+        for(let i = 0; i < this.loaders.length; i++){
+            this.loaders[i].show()
+            this.loaders[i].wait_for_load(() => {
+                EvLogger.log("DEBUG", `loader${i} loaded`)
+            })
+        }
 
         //read JSON
         const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
@@ -734,17 +769,9 @@ class MainApp{
 
     public init_gui(){
         EvLogger.log("DEBUG", "Get display coords info for better window positioning")
-        //get screen info
-        var displays_info: any = screen.getAllDisplays()
-        var displays_mod = []
-        for(let i: number = 0; i < displays_info.length; i++){
-            displays_mod.push(displays_info[i].bounds)
-        }
-        displays_mod.sort((a, b) => a.x - b.x);
-        this.displays = displays_mod
         
         //calculate x, y
-        let win_info = utils.get_window_info(app_settings, this.displays, -1, main_menu_dict)
+        let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", main_menu_dict)
         let coords = win_info.slice(0, 2)
 
         EvLogger.log("DEBUG", "main-menu show")
@@ -760,7 +787,7 @@ class MainApp{
         //leftmost or rightmost tactic
         //spawning worker windows
         for(let i = 0; i < this.displays.length; i++){
-            let win_info = utils.get_window_info(this.app_settings, this.displays, i)
+            let win_info = utils.get_window_info(this.app_settings, this.displays, i, "normal")
             let coords = win_info.slice(0, 2)
             let display_info = win_info.slice(2, 4)
             
@@ -797,7 +824,7 @@ class MainApp{
         }
 
         //spawning controller window
-        let win_info = utils.get_window_info(this.app_settings, this.displays, -1)
+        let win_info = utils.get_window_info(this.app_settings, this.displays, -1, "normal")
         let coords = win_info.slice(0, 2)
         let display_info = win_info.slice(2, 4)
 
@@ -873,7 +900,7 @@ class MainApp{
 
     public async exit_app(){
         //spawning info window
-        let win_info = utils.get_window_info(this.app_settings, this.displays, -1, exit_dict)
+        let win_info = utils.get_window_info(this.app_settings, this.displays, -1, "normal", exit_dict)
         let coords = win_info.slice(0, 2)
 
         exitWindow = new Window(this.app_status, exit_dict, "./res/exit.html", coords, EvLogger, main_app)

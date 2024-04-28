@@ -44,7 +44,7 @@ export class ProgressiveLoader{
     public set_segments(n_segments: number){
         this.num_segments = n_segments
         for (let i = 0; i < this.loaders.length; i++){
-            this.loaders[i].send_message("n_segments", this.num_segments)
+            this.loaders[i].send_message("n_segments", [this.num_segments])
         }
     }
 

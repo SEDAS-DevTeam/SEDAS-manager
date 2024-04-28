@@ -707,9 +707,9 @@ class MainApp{
 
         //set progressive loader object on loaders
         this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
-        this.loader.set_segments(4)
         this.loader.set_loader_win()
         await this.loader.show_loader_win()
+        this.loader.set_segments(10)
         this.loader.send_progresss("Initializing app")
 
         /*

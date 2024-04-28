@@ -210,6 +210,10 @@ class MainApp{
                         for (let i = 0; i < this.workers.length; i++){
                             this.workers[i].close()
                         }
+
+                        for (let i = 0; i < this.widget_workers.length; i++){
+                            this.widget_workers[i]["win"].close()
+                        }
                     }
 
                     //calculate x, y
@@ -220,7 +224,11 @@ class MainApp{
                     mainMenuWindow = new Window(this.app_status, main_menu_dict, 
                         "./res/main.html", coords, EvLogger, main_app)
                     mainMenuWindow.show()
-
+                    
+                    this.workers = []
+                    this.widget_workers = []
+                    controllerWindow = undefined
+                    this.PlaneDatabase = undefined
                     break
                 }
                 case "save-settings": {
@@ -651,7 +659,7 @@ class MainApp{
     public add_listener_intervals(){
         //update all planes on one second
         setInterval(() => {
-            if (this.PlaneDatabase != undefined && this.map_data != undefined){
+            if (this.PlaneDatabase != undefined && this.map_data != undefined && this.workers.length != 0){
                 if (this.app_status["sim-running"]){
                     this.PlaneDatabase.update_planes(this.scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]),
                                             parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))

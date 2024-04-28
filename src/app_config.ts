@@ -168,7 +168,7 @@ export class Window{
 
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()
@@ -299,7 +299,7 @@ export class WidgetWindow{
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
         this.window.setAlwaysOnTop(true);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
 

@@ -16,6 +16,10 @@ window.onload = () => {
     document.getElementById("save_settings").addEventListener("click", () => {
         save_settings()
     })
+
+    //everything is set up and loaded
+    document.body.id = "loaded-body"
+    document.getElementById("settings-loader-content").style.visibility = "hidden"
 }
 
 //load settings

@@ -379,6 +379,9 @@ class MainApp{
 
                     this.aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft)
                     this.aircraft_preset_name = this.aircraft_preset_data["info"]["name"]
+                    
+                    console.log(this.command_preset_data)
+                    console.log(this.aircraft_preset_data)
 
                     //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
                     if (this.map_data == undefined){

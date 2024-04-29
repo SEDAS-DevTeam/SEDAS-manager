@@ -7,6 +7,16 @@
             "manufacturer": "Airbus",
             "planes": [
                 {
+                    "name": "A300",
+                    "min_alt": "",
+                    "max_alt": "",
+                    "min_kias": "",
+                    "max_kias": "",
+                    "std_climb": "",
+                    "std_descent": "",
+                    "std_accel": ""
+                },
+                {
                     "name": "A319"
                 },
                 {
@@ -273,7 +283,7 @@
             ]
         },
         {
-            "manufacturer": "Suchoj",
+            "manufacturer": "Sukhoi",
             "planes": [
                 {
                     "name": "Superjet 100"

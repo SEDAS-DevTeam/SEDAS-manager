@@ -8,13 +8,23 @@
             "planes": [
                 {
                     "name": "A300",
-                    "min_alt": "",
-                    "max_alt": "",
-                    "min_kias": "",
-                    "max_kias": "",
-                    "std_climb": "",
-                    "std_descent": "",
-                    "std_accel": ""
+                    "max_alt": 370,
+                    "min_kias": 160,
+                    "max_kias": 470,
+                    "roc": {
+                        "std": 800,
+                        "fl50": 3000,
+                        "fl150": 3200,
+                        "fl240": 2500
+                    },
+                    "rod": {
+                        "std": 800,
+                        "fl240": 1000,
+                        "fl100": 2000,
+                        "fl0": 1500
+                    },
+                    "motor_drag": 249,
+                    "mass": 170500
                 },
                 {
                     "name": "A319"

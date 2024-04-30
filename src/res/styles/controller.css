@@ -364,7 +364,7 @@ h3{
 
 /*Content css*/
 
-#desc-content-text span{
+#inner-content span{
     color: white;
 }
 
@@ -375,4 +375,19 @@ h3{
 .plane-header{
     font-style: italic;
     margin-left: 15px;
+}
+
+.plane-content-switch{
+    margin-left: 15px;
+    cursor: pointer;
+}
+
+.plane-content{
+    margin-left: 30px;
+    display: none;
+    margin-top: 5px;
+}
+
+b.nested{
+    margin-left: 45px;
 }

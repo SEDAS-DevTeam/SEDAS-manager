@@ -1,0 +1,72 @@
+{
+    "info": {
+        "name": "Airbus preset"
+    },
+    "all_planes": [
+        {
+            "manufacturer": "Airbus",
+            "planes": [
+                {
+                    "name": "A300",
+                    "max_alt": 370,
+                    "min_kias": 160,
+                    "max_kias": 470,
+                    "roc": {
+                        "std": 800,
+                        "fl50": 3000,
+                        "fl150": 3200,
+                        "fl240": 2500
+                    },
+                    "rod": {
+                        "std": 800,
+                        "fl240": 1000,
+                        "fl100": 2000,
+                        "fl0": 1500
+                    },
+                    "motor_drag": 498,
+                    "mass": 170500
+                },
+                {
+                    "name": "A310",
+                    "max_alt": 400,
+                    "min_kias": 160,
+                    "max_kias": 480,
+                    "roc": {
+                        "std": 1500,
+                        "fl50": 2500,
+                        "fl150": 3000,
+                        "fl240": 2800
+                    },
+                    "rod": {
+                        "std": 1500,
+                        "fl240": 1500,
+                        "fl100": 2000,
+                        "fl0": 1500
+                    },
+                    "motor_drag": 468,
+                    "mass": "todo"
+                },
+                {
+                    "name": "A318",
+                    "max_alt": 370,
+                    "min_kias": 160,
+                    "max_kias": 470,
+                    "roc": {
+                        "std": 800,
+                        "fl50": 3000,
+                        "fl150": 3200,
+                        "fl240": 2500
+                    },
+                    "rod": {
+                        "std": 800,
+                        "fl240": 1000,
+                        "fl100": 2000,
+                        "fl0": 1500
+                    },
+                    "motor_drag": 498,
+                    "mass": 170500
+                }
+            ]
+        }
+    ]
+}

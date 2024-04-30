@@ -318,5 +318,24 @@ function onload_specific(){
 
     window.electronAPI.on_message("description-data", (data) => {
         document.getElementById("inner-content").innerHTML = process_JSON(data)
+
+        //set all event listeners for inner content
+        let plane_content_selectors = document.getElementsByClassName("plane-content-switch")
+        for (let i = 0; i < plane_content_selectors.length; i++){
+            plane_content_selectors[i].addEventListener("click", (event) => {
+                if (plane_content_selectors[i].classList.contains("fa-caret-right")){
+                    //not visible
+                    event.target.parentNode.parentNode.childNodes[2].style.display = "block"
+                    plane_content_selectors[i].classList.remove("fa-caret-right")
+                    plane_content_selectors[i].classList.add("fa-caret-down")
+                }
+                else {
+                    //visible
+                    event.target.parentNode.parentNode.childNodes[2].style.display = "none"
+                    plane_content_selectors[i].classList.remove("fa-caret-down")
+                    plane_content_selectors[i].classList.add("fa-caret-right")
+                }
+            })
+        }
     })
 }

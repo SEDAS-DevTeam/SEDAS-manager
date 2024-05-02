@@ -141,9 +141,9 @@ class MainApp{
                 }
     
                 //send updated data to all workers
-                this.workers[i].send_message("update-plane-db", temp_planes)
+                this.workers[i]["win"].send_message("update-plane-db", temp_planes)
                 //send path data to all workers
-                this.workers[i].send_message("update-paths", plane_paths_data)
+                this.workers[i]["win"].send_message("update-paths", plane_paths_data)
             }
         }
     }
@@ -208,7 +208,7 @@ class MainApp{
                     else if (data[0] == "controller"){
                         controllerWindow.close()
                         for (let i = 0; i < this.workers.length; i++){
-                            this.workers[i].close()
+                            this.workers[i]["win"].close()
                         }
 
                         for (let i = 0; i < this.widget_workers.length; i++){
@@ -355,7 +355,7 @@ class MainApp{
                     else if (data[0] == "worker"){
                         //send to all workers
                         for (let i = 0; i < this.workers.length; i++){
-                            this.workers[i].send_message("init-info", ["window-info", JSON.stringify(app_settings)])
+                            this.workers[i]["win"].send_message("init-info", ["window-info", JSON.stringify(app_settings)])
                         }
                     }
                     break
@@ -406,9 +406,8 @@ class MainApp{
                         Setting up environment
                     */
                     this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
-                    this.loader.setup_loader(2, "Setting up simulation, please wait...")
+                    this.loader.setup_loader(2, "Setting up simulation, please wait...", "Initializing simulation setup")
 
-                    this.loader.send_progresss("Test")
                     await utils.sleep(3000)
                     this.loader.send_progresss("Test2")
                     await utils.sleep(2000)
@@ -417,7 +416,15 @@ class MainApp{
                     
                     //everything is set up, time to load
                     for (let i = 0; i < this.workers.length; i++){
-                        this.workers[i].send_message("ask-for-render") //send workers command to fire "render-map" event
+                        this.workers[i]["win"].send_message("ask-for-render") //send workers command to fire "render-map" event
+                    }
+                    
+                    //rendering widget workers
+                    for (let i = 0; i < this.widget_workers.length; i++){
+                        this.widget_workers[i]["win"].show()
+                        this.widget_workers[i]["win"].wait_for_load(() => {
+                            this.widget_workers[i]["win"].send_message("register", ["id", this.widget_workers[i]["id"]])
+                        })
                     }
 
                     break
@@ -425,12 +432,12 @@ class MainApp{
                 case "render-map": {
                     //rendering map data for user (invoked from worker)
                     for (let i = 0; i < this.workers.length; i++){
-                        this.workers[i].send_message("map-data", [this.map_data, this.workers[i].win_type])
+                        this.workers[i]["win"].send_message("map-data", [this.map_data, this.workers[i]["win"].win_type])
                     }
 
                     for (let i = 0; i < this.workers.length; i++){
-                        if (this.workers[i]["win_type"] == "weather"){
-                            this.workers[i].send_message("geo-data", [this.latitude, this.longitude, this.zoom])
+                        if (this.workers[i]["win"]["win_type"] == "weather"){
+                            this.workers[i]["win"].send_message("geo-data", [this.latitude, this.longitude, this.zoom])
                         }
                     }
                     break
@@ -473,7 +480,7 @@ class MainApp{
                     //whenever controller decides to change monitor type
                     let mon_data = data[1][1]
                     for (let i = 0; i < this.workers.length; i++){
-                        if (this.workers[i].win_type != mon_data[i]["type"]){
+                        if (this.workers[i]["win"].win_type != mon_data[i]["type"]){
                             //rewrite current window type and render to another one
                             let path_to_render = "";
 
@@ -504,8 +511,8 @@ class MainApp{
                                     break
                             }
 
-                            this.workers[i].win_type = mon_data[i]["type"]
-                            this.workers[i].show(path_to_render)
+                            this.workers[i]["win"].win_type = mon_data[i]["type"]
+                            this.workers[i]["win"].show(path_to_render)
 
 
                         }
@@ -516,8 +523,8 @@ class MainApp{
                 }
                 case "send-location-data": {
                     for (let i = 0; i < this.workers.length; i++){
-                        if (this.workers[i]["win_type"] == "weather"){
-                            this.workers[i].send_message("geo-data", [this.latitude, this.longitude, this.zoom])
+                        if (this.workers[i]["win"]["win_type"] == "weather"){
+                            this.workers[i]["win"].send_message("geo-data", [this.latitude, this.longitude, this.zoom])
                         }
                     }
                     break
@@ -576,8 +583,8 @@ class MainApp{
                 case "send-plane-data": {
                     //send plane data (works for all windows)
                     for (let i = 0; i < this.workers.length; i++){
-                        if (this.workers[i].win_type.includes(data[0])){
-                            this.workers[i].send_message("update-plane-db", this.PlaneDatabase.DB)
+                        if (this.workers[i]["win"].win_type.includes(data[0])){
+                            this.workers[i]["win"].send_message("update-plane-db", this.PlaneDatabase.DB)
                         }
                     }
                     break
@@ -587,7 +594,7 @@ class MainApp{
 
                     //send stop event to all workers
                     for (let i = 0; i < this.workers.length; i++){
-                        this.workers[i].send_message("sim-event", "stopsim")
+                        this.workers[i]["win"].send_message("sim-event", "stopsim")
                     }
                     controllerWindow.send_message("sim-event", "stopsim")
                     break
@@ -597,7 +604,7 @@ class MainApp{
 
                     //send stop event to all workers
                     for (let i = 0; i < this.workers.length; i++){
-                        this.workers[i].send_message("sim-event", "startsim")
+                        this.workers[i]["win"].send_message("sim-event", "startsim")
                     }
                     controllerWindow.send_message("sim-event", "startsim")
                     break
@@ -672,7 +679,7 @@ class MainApp{
                 console.log("from controller")
                 
                 let idx = parseInt(data[0].substring(6, 7))
-                this.workers[idx].send_message("message-redirect", data[1][0])
+                this.workers[idx]["win"].send_message("message-redirect", data[1][0])
                 this.sender_win_name = "controller"
             }
         })
@@ -737,8 +744,7 @@ class MainApp{
 
         //set progressive loader object on loaders
         this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
-        this.loader.setup_loader(10, "SEDAS is loading, please wait...")
-        this.loader.send_progresss("Initializing app")
+        this.loader.setup_loader(10, "SEDAS is loading, please wait...", "Initializing app")
 
         /*
             Loader segment 1
@@ -861,10 +867,10 @@ class MainApp{
                 //backup was not created, create new workers
                 workerWindow = new Window(this.app_status, worker_dict, "./res/worker.html", coords, EvLogger, main_app, "ACC", display_info)
             }
+        
 
-            //setup basic widgets for workers
             let workerWidgetWindow = new WidgetWindow(basic_worker_widget_dict, "./res/worker_widget.html", coords, EvLogger)
-            
+                    
             let widget_id = utils.generate_id()
             let worker_id = utils.generate_id()
             
@@ -872,7 +878,10 @@ class MainApp{
                 "id": widget_id,
                 "win": workerWidgetWindow
             })
-            this.workers.push(workerWindow)
+            this.workers.push({
+                "id": worker_id,
+                "win": workerWindow
+            })
         }
 
         //spawning controller window
@@ -891,15 +900,8 @@ class MainApp{
         
         //setting up workers
         for (let i = 0; i < this.workers.length; i++){
-            this.workers[i].show()
-            this.workers[i].checkClose()
-        }
-
-        for (let i = 0; i < this.widget_workers.length; i++){
-            this.widget_workers[i]["win"].show()
-            this.widget_workers[i]["win"].wait_for_load(() => {
-                this.widget_workers[i]["win"].send_message("register", ["id", this.widget_workers[i]["id"]])
-            })
+            this.workers[i]["win"].show()
+            this.workers[i]["win"].checkClose()
         }
 
         controllerWindow.show()

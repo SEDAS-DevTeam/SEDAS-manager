@@ -262,6 +262,11 @@ export class WidgetWindow{
     }
 
     public show(path: string = ""){
+        this.window = new BrowserWindow(this.localConfig);
+        this.window.setMenu(null);
+        this.window.setAlwaysOnTop(true);
+        //this.window.webContents.openDevTools()
+
         if (path.length != 0){
             //rewrite path_load (used for controller window_manipulation
             this.path_load = path
@@ -295,11 +300,6 @@ export class WidgetWindow{
         
         this.localConfig.x = coords[0]
         this.localConfig.y = coords[1]
-
-        this.window = new BrowserWindow(this.localConfig);
-        this.window.setMenu(null);
-        this.window.setAlwaysOnTop(true);
-        //this.window.webContents.openDevTools()
 
         this.path_load = path
 

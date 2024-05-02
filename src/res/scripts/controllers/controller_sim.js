@@ -445,8 +445,8 @@ function process_specific(data, reset = false){
         console.log(monitor_data[i])
 
         let monitor_option = document.createElement("option")
-        monitor_option.value = `monitor${i}${monitor_data[i]["win_type"]}`
-        monitor_option.innerHTML = `monitor ${i} (${monitor_data[i]["win_type"]})`
+        monitor_option.value = `monitor${i}${monitor_data[i]["win"]["win_type"]}`
+        monitor_option.innerHTML = `monitor ${i} (${monitor_data[i]["win"]["win_type"]})`
         document.getElementById("monitor_spawn").appendChild(monitor_option)
     }
 

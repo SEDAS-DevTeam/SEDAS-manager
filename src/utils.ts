@@ -18,10 +18,12 @@ export class ProgressiveLoader{
     public num_segments: number = 0;
     public curr_n_segments: number = 0;
 
-    public async setup_loader(n_segments: number, loader_header: string){
+    public async setup_loader(n_segments: number, loader_header: string,
+        first_message: string
+    ){
         this.set_loader_win()
         await this.show_loader_win()
-        this.initial_set(n_segments, loader_header)
+        this.initial_set(n_segments, loader_header, first_message)
     }
 
     private set_loader_win(){
@@ -47,10 +49,10 @@ export class ProgressiveLoader{
         }
     }
 
-    private initial_set(n_segments: number, loader_header: string){
+    private initial_set(n_segments: number, loader_header: string, first_message: string){
         this.num_segments = n_segments
         for (let i = 0; i < this.loaders.length; i++){
-            this.loaders[i].send_message("setup", [this.num_segments, loader_header])
+            this.loaders[i].send_message("setup", [this.num_segments, loader_header, first_message])
         }
     }
 

@@ -18,4 +18,5 @@ window.electronAPI.on_message("setup", (data) => {
 
     header = data[1]
     document.getElementById("header-text").innerHTML = header
+    document.getElementById("info-text").innerHTML = data[2]
 })

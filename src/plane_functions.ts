@@ -52,7 +52,7 @@ export class PlaneDB{
     public constructor(monitor_data: any){
         for (let i = 0; i < monitor_data.length; i++){
             this.monitor_DB.push({
-                "type": monitor_data[i].win_type,
+                "type": monitor_data["win"][i].win_type,
                 "planes_id": []
             })
         }
@@ -76,9 +76,9 @@ export class PlaneDB{
         this.monitor_DB = []
 
         for (let i = 0; i < monitor_data.length; i++){
-            if (monitor_data[i].win_type == "APP" || monitor_data[i].win_type == "ACC" || monitor_data[i].win_type == "TWR"){
+            if (monitor_data[i]["win"].win_type == "APP" || monitor_data[i]["win"].win_type == "ACC" || monitor_data[i]["win"].win_type == "TWR"){
                 this.monitor_DB.push({
-                    "type": monitor_data[i].win_type,
+                    "type": monitor_data[i]["win"].win_type,
                     "planes_id": []
                 })
             }

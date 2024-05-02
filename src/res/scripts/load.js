@@ -1,6 +1,7 @@
 var n_seg = 0
 var seg_slice = 0
 var curr_n_seg = 0
+var header = ""
 
 //get progress info
 window.electronAPI.on_message("progress", (data) => {
@@ -11,7 +12,10 @@ window.electronAPI.on_message("progress", (data) => {
 })
 
 //get segment slicing
-window.electronAPI.on_message("n_segments", (data) => {
+window.electronAPI.on_message("setup", (data) => {
     n_seg = data[0]
     seg_slice = 100 / n_seg
+
+    header = data[1]
+    document.getElementById("header-text").innerHTML = header
 })

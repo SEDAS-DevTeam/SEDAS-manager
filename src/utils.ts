@@ -18,7 +18,13 @@ export class ProgressiveLoader{
     public num_segments: number = 0;
     public curr_n_segments: number = 0;
 
-    public set_loader_win(){
+    public async setup_loader(n_segments: number, loader_header: string){
+        this.set_loader_win()
+        await this.show_loader_win()
+        this.initial_set(n_segments, loader_header)
+    }
+
+    private set_loader_win(){
         //getting window info to spawn load on all monitors && initialize all loaders
         for(let i = 0; i < this.displays.length; i++){
             let win_info = get_window_info(this.app_settings, this.displays, i, "load", this.load_dict)
@@ -31,7 +37,7 @@ export class ProgressiveLoader{
         }
     }
 
-    public async show_loader_win(){
+    private async show_loader_win(){
         //showing all loaders, going to progressively send them data
         for(let i = 0; i < this.loaders.length; i++){
             this.loaders[i].show()
@@ -41,10 +47,10 @@ export class ProgressiveLoader{
         }
     }
 
-    public set_segments(n_segments: number){
+    private initial_set(n_segments: number, loader_header: string){
         this.num_segments = n_segments
         for (let i = 0; i < this.loaders.length; i++){
-            this.loaders[i].send_message("n_segments", [this.num_segments])
+            this.loaders[i].send_message("setup", [this.num_segments, loader_header])
         }
     }
 

@@ -193,7 +193,7 @@ class MainApp{
 
     public add_listener_IPC(){
         //IPC listeners
-        ipcMain.handle("message", (event, data) => {
+        ipcMain.handle("message", async (event, data) => {
             switch(data[1][0]){
                 //generic message channels
                 case "redirect-to-menu": {
@@ -366,6 +366,10 @@ class MainApp{
                     let filename_command = data[1][2]
                     let filename_aircraft = data[1][3]
 
+                    /*
+                        Reading all info for map setup
+                    */
+
                     //save map data to variable
                     this.map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
                     //read scale
@@ -396,11 +400,26 @@ class MainApp{
                         this.zoom = this.map_data["zoom"]
                     }
 
+                    EvLogger.log("DEBUG", `Selected presets: ${[this.map_name, this.command_preset_name, this.aircraft_preset_name]}`)
+                    
+                    /*
+                        Setting up environment
+                    */
+                    this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
+                    this.loader.setup_loader(2, "Setting up simulation, please wait...")
+
+                    this.loader.send_progresss("Test")
+                    await utils.sleep(3000)
+                    this.loader.send_progresss("Test2")
+                    await utils.sleep(2000)
+                    this.loader.destroy_loaders()
+                    this.loader = undefined
+                    
+                    //everything is set up, time to load
                     for (let i = 0; i < this.workers.length; i++){
                         this.workers[i].send_message("ask-for-render") //send workers command to fire "render-map" event
                     }
 
-                    EvLogger.log("DEBUG", `Selected presets: ${[this.map_name, this.command_preset_name, this.aircraft_preset_name]}`)
                     break
                 }
                 case "render-map": {
@@ -718,9 +737,7 @@ class MainApp{
 
         //set progressive loader object on loaders
         this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
-        this.loader.set_loader_win()
-        await this.loader.show_loader_win()
-        this.loader.set_segments(10)
+        this.loader.setup_loader(10, "SEDAS is loading, please wait...")
         this.loader.send_progresss("Initializing app")
 
         /*
@@ -807,6 +824,7 @@ class MainApp{
 
         //delete loaders
         this.loader.destroy_loaders()
+        this.loader = undefined
 
         EvLogger.log("DEBUG", "main-menu show")
         mainMenuWindow = new Window(this.app_status, main_menu_dict, "./res/main.html", coords, EvLogger, main_app)

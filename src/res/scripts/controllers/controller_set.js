@@ -60,7 +60,7 @@ function selection(button_elem){
 
 }
 
-function render_map(){
+function set_environment(){
     if (selected_map.length == 0){
         alert("You did not select any map")
         return
@@ -303,7 +303,7 @@ function onload_specific(){
     })
 
     document.getElementById("confirm").addEventListener("click", () => {
-        render_map()
+        set_environment()
     })
     document.getElementById("regen-map").addEventListener("click", () => {
         regen_map()

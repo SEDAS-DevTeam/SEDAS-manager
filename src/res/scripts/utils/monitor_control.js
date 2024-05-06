@@ -95,7 +95,7 @@ function rename_monitor(event){
 function delete_monitor_elem(delete_element = undefined){
   if (delete_element != undefined){
     //standard procedure, delete all
-    let content = document.getElementById("monitor-panel").children[0]
+    let content = document.querySelector("monitor-table").children[0]
   
     for (let i_y = 0; i_y < content.children.length; i_y++){
       for (let i_x = 0; i_x < content.children[i_y].children.length; i_x++){
@@ -110,6 +110,7 @@ function delete_monitor_elem(delete_element = undefined){
 }
 
 function element_init(element_data, idx, elemParent){
+
   //align to specified x and y
 
   let worker_type = element_data["win_type"]
@@ -156,7 +157,7 @@ function element_init(element_data, idx, elemParent){
     }
 
     //also append monitor to different part of table if moved
-    let table = document.getElementById("monitor-panel")
+    let table = document.querySelector("monitor-table")
     let table_coords = table.getBoundingClientRect()
     
     let table_start_x = table_coords.left
@@ -200,7 +201,7 @@ function element_init(element_data, idx, elemParent){
       }
 
       delete_monitor_elem(curr_monit_elem)
-      document.getElementById("monitor-panel").children[0].children[row].children[column].appendChild(copy_monit_elem)
+      document.querySelector("monitor-table").children[0].children[row].children[column].appendChild(copy_monit_elem)
 
       copy_monit_elem.getElementsByClassName("monitor-header")[0].addEventListener("mousedown", (event) => {
         elem_mousedown(event, copy_monit_elem)

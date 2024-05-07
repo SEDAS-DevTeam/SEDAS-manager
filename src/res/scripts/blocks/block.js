@@ -51,4 +51,46 @@ class TopHeader extends HTMLElement{
     }
 }
 
+class DefaultTable extends HTMLElement{
+    constructor(){
+        super();
+    }
+
+    connectedCallback(){
+        /*
+        parameter list config
+            dim=nxm -> defines initial table size
+            onload=default -> defines table coloring
+        */
+
+        //variable retrival
+        let dim = this.getAttribute("dim").split("x").map((x) => {
+            return parseInt(x)
+        })
+        let onload_callback = this.getAttribute("onload")
+
+        //table setup
+
+        let main_table = document.createElement("table")
+
+        for (let i1 = 0; i1 < dim[0]; i1++){
+            let tr = document.createElement("tr")
+            for (let i2 = 0; i2 < dim[1]; i2++){
+                tr.appendChild(document.createElement("td"))
+            }
+            main_table.appendChild(tr)
+        }
+        this.appendChild(main_table)
+
+        if (onload_callback != null){
+            this.evaluateFunction(onload_callback)
+        }
+    }
+
+    evaluateFunction(functionStr) {
+        return Function(functionStr).call(this);
+    }
+}
+
+customElements.define("default-table", DefaultTable)
 customElements.define("top-header", TopHeader)

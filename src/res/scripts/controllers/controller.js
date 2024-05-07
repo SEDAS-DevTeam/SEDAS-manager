@@ -41,6 +41,10 @@ function process_init_data(data, reset = false){
     let drop_buttons = document.getElementsByClassName("drop-button")
     let drop_contents = document.getElementsByClassName("dropdown-content")
 
+    if (drop_buttons.length == 0){
+        return
+    }
+
     let i_drop = 0;
     for (const [key, value] of Object.entries(frontend_vars[page_name])) {
         if (key.includes("dropdown")){

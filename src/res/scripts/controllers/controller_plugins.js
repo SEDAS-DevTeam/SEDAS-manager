@@ -7,3 +7,12 @@ function refresh(elem){
 
     //TODO send request message to main
 }
+
+function onload_specific(){
+    //blank
+}
+
+function process_specific(data){
+    //blank
+    console.log(data)
+}

@@ -16,6 +16,7 @@
     z-index: 10;
     background-color: #2196F3;
     color: #fff;
+    user-select: none;
 }
 
 .monitor-functions{
@@ -45,4 +46,9 @@
 
 #monitor-panel table{
     margin-bottom: 25px;
+}
+
+#monit-rename{
+    margin-top: 15px;
+    margin-bottom: 15px;
 }

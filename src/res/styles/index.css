@@ -28,6 +28,10 @@ h1, h2, h3, p, a, span, li{
     color: red;
 }
 
+/*
+    Button style def
+*/
+
 button{
     display: inline-block;
     background-color: white;
@@ -38,6 +42,27 @@ button{
     font-size: 24px;
     padding: 8px 20px;
     font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+}
+
+button#small{
+    padding: 1px 12px;
+    font-size: small;
+
+}
+
+.tablebutton{
+    font-size: medium;
+    color: black;
+    border: solid 2px black;
+}
+
+#main-header-button{
+    display: inline-block;
+}
+
+.drop-button:hover{
+    color: #5271ff;
     cursor: pointer;
 }
 
@@ -104,12 +129,6 @@ tr:nth-child(even) {
     background-color: #dddddd;
 }
 
-.tablebutton{
-    font-size: medium;
-    color: black;
-    border: solid 2px black;
-}
-
 /*
 Generic declarations
 */
@@ -123,10 +142,6 @@ Generic declarations
 }
 
 #main-header{
-    display: inline-block;
-}
-
-#main-header-button{
     display: inline-block;
 }
 
@@ -195,11 +210,6 @@ div.grid-item.selected{
 
 #parent-iframe{
     height: 70%;
-}
-
-.drop-button:hover{
-    color: #5271ff;
-    cursor: pointer;
 }
 
 #bot-content{

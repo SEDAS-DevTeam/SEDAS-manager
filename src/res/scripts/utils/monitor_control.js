@@ -5,7 +5,7 @@ const MONITOR_X_SPACE = 250
 const MONITOR_Y = 200
 
 //other vars
-var MAX_MONITORS_ROW = 4 //maximum monitor rows in monitor table, changeable in settings (TODO)
+var MAX_MONITORS_ROW = 3 //maximum monitor rows in monitor table, changeable in settings (TODO)
 var MAX_MONITORS_COL = 3 //maximum monitor rows in monitor column, also changeable in settings (TODO)
 var focus_out = false
 var curr_text;
@@ -95,7 +95,7 @@ function rename_monitor(event){
 function delete_monitor_elem(delete_element = undefined){
   if (delete_element != undefined){
     //standard procedure, delete all
-    let content = document.querySelector("monitor-table").children[0]
+    let content = document.querySelector("default-table#monitor-panel").children[0]
   
     for (let i_y = 0; i_y < content.children.length; i_y++){
       for (let i_x = 0; i_x < content.children[i_y].children.length; i_x++){
@@ -157,7 +157,7 @@ function element_init(element_data, idx, elemParent){
     }
 
     //also append monitor to different part of table if moved
-    let table = document.querySelector("monitor-table")
+    let table = document.querySelector("default-table#monitor-panel")
     let table_coords = table.getBoundingClientRect()
     
     let table_start_x = table_coords.left
@@ -173,12 +173,21 @@ function element_init(element_data, idx, elemParent){
     let diff_y = Math.abs(mouseY - init_monit_y)
 
     if (mouseX > table_stop_x || mouseX < table_start_x){
+      if (curr_monit_elem != undefined){
+        curr_monit_elem.style.width = "100%"
+      }
       return //do nothing (out of bounds x)
     }
     else if ((mouseY > table_stop_y || mouseY < table_start_y)){
+      if (curr_monit_elem != undefined){
+        curr_monit_elem.style.width = "100%"
+      }
       return //do nothing (out of bounds y) (written on two ifs for better visibility)
     }
     else if (!(diff_x > table_step_x || diff_y > table_step_y)){
+      if (curr_monit_elem != undefined){
+        curr_monit_elem.style.width = "100%"
+      }
       return //do nothing (didnt cross the cell)
     }
     else{
@@ -201,11 +210,12 @@ function element_init(element_data, idx, elemParent){
       }
 
       delete_monitor_elem(curr_monit_elem)
-      document.querySelector("monitor-table").children[0].children[row].children[column].appendChild(copy_monit_elem)
+      document.querySelector("default-table#monitor-panel").children[0].children[row].children[column].appendChild(copy_monit_elem)
 
       copy_monit_elem.getElementsByClassName("monitor-header")[0].addEventListener("mousedown", (event) => {
         elem_mousedown(event, copy_monit_elem)
       })
+      copy_monit_elem.style.width = "100%"
     }
   })
 

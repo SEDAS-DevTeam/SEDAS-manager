@@ -60,7 +60,7 @@ class DefaultTable extends HTMLElement{
         /*
         parameter list config
             dim=nxm -> defines initial table size
-            onload=default -> defines table coloring
+            onload=func() -> defines what function should it run on default
         */
 
         //variable retrival

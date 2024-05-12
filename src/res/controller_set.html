@@ -28,19 +28,7 @@
             <div class="dropdown-content">
                 <h3><button class="inline-but" id="regen-map">Regenerate map</button>randomized regeneration</h3>
                 <h3>or search for any airport in search:</h3>
-                <table id="airports">
-                    <tr>
-                        <th>Airport</th>
-                        <th>Type</th>
-                        <th>Code</th>
-                        <th>Country</th>
-                        <th>City</th>
-                        <th>Description</th>
-                        <th>
-                            <form><input type="text" placeholder="Search.." name="search"></form>
-                        </th>
-                    </tr>
-                </table>
+                <default-table id="airports" dim="1x7" onload="set_env_table(this)"></default-table>
                 <p>Data was gathered from the World Bank International airports dataset</p>
 
                 <h3>Selected map:</h3>
@@ -56,16 +44,7 @@
                 <h3 class="header-inline">Aircraft preset selection</h3>
             </div>
             <div class="dropdown-content">
-                <table id="aircrafts">
-                    <tr>
-                        <th>Aircraft preset name</th>
-                        <th>Inspect</th>
-                        <th>
-                            <form><input type="text" placeholder="Search.." name="search"></form>
-                        </th>
-                    </tr>
-                </table>
-
+                <default-table id="aircrafts" dim="1x3" onload="set_env_table(this)"></default-table>
                 <h3>Selected aircraft preset:</h3>
                 <div class="result">
                     <h2 id="confirmresult-aircraft">None</h2>
@@ -79,15 +58,7 @@
                 <h3 class="header-inline">Commands preset selection</h3>
             </div>
             <div class="dropdown-content">
-                <table id="commands">
-                    <tr>
-                        <th>Command Preset name</th>
-                        <th>Inspect</th>
-                        <th>
-                            <form><input type="text" placeholder="Search.." name="search"></form>
-                        </th>
-                    </tr>
-                </table>
+                <default-table id="commands" dim="1x3" onload="set_env_table(this)"></default-table>
                 <h3>Selected command preset:</h3>
                 <div class="result">
                     <h2 id="confirmresult-command">None</h2>

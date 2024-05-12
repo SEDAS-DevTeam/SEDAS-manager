@@ -11,11 +11,13 @@ class DescPopup extends HTMLElement{
         i.classList.add("fa-solid")
         i.classList.add("fa-xmark")
         i.id = "close-desc"
-        i.append(parent_div)
+        parent_div.appendChild(i)
 
         let div = document.createElement("div")
         div.id = "inner-content"
-        div.append(parent_div)
+        parent_div.appendChild(div)
+
+        this.appendChild(parent_div)
     }
 }
 

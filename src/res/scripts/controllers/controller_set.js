@@ -1,6 +1,9 @@
 //
 //Controller Setup JS
 //
+const head_airports = ["Airport preset name", "Type", "Code", "Country", "City", "Description"]
+const head_aircrafts = ["Aircraft preset name", "Inspect"]
+const head_commands = ["Command preseet name", "Inspect"]
 
 var desc_rendered = false
 var clicked = false
@@ -15,6 +18,35 @@ var selected_name = ""
 var map_name = ""
 var command_preset_name = ""
 var aircraft_preset_name = ""
+
+/*
+table setups
+*/
+function set_env_table(elem){
+    let sel_header;
+    switch(elem.id){
+        case "airports":
+            sel_header = head_airports
+            break
+        case "aircrafts":
+            sel_header = head_aircrafts
+            break
+        case "commands":
+            sel_header = head_commands
+            break
+    }
+
+    for (let i = 0; i < sel_header.length + 1; i++){
+        let spec_elem = elem.children[0].children[0].children[i]
+        if (i == sel_header.length){
+            //append search tab
+            spec_elem.innerHTML = '<th><form><input type="text" placeholder="Search.." name="search"></form></th>'
+            break
+        }
+
+        spec_elem.innerHTML = sel_header[i]
+    }
+}
 
 function selection(button_elem){
     let sel_id = button_elem.id

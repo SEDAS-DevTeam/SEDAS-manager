@@ -146,7 +146,7 @@ function generate_aircrafts_from_sources(){
         record.appendChild(inspect_obj)
         record.appendChild(select_obj)
 
-        document.querySelector("table#aircrafts").appendChild(record)
+        document.querySelector("default-table#aircrafts table").appendChild(record)
     }
 }
 
@@ -178,7 +178,7 @@ function generate_commands_from_sources(){
         record.appendChild(inspect_obj)
         record.appendChild(select_obj)
 
-        document.querySelector("table#commands").appendChild(record)
+        document.querySelector("default-table#commands table").appendChild(record)
     }
 }
 
@@ -235,7 +235,7 @@ function generate_airports_from_sources(){
         record.appendChild(desc_obj)
         record.appendChild(select_obj)
 
-        document.querySelector("table#airports").appendChild(record)
+        document.querySelector("default-table#airports table").appendChild(record)
     }
 }
 
@@ -267,6 +267,7 @@ function ask_for_content(idx, type){
 */
 
 function process_specific(data, reset = false){
+    console.log("did it go there?")
     if (map_name != undefined){
         //loaded from backup, change map name 
         document.getElementById("confirmresult-airport").innerHTML = map_name

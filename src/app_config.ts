@@ -258,7 +258,9 @@ export class WidgetWindow{
     private path_load: string;
 
     public close(){
-        this.window.close()
+        if (this.window != undefined){
+            this.window.close()
+        }
     }
 
     public show(path: string = ""){

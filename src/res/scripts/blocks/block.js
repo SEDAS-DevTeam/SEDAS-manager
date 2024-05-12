@@ -61,6 +61,7 @@ class DefaultTable extends HTMLElement{
         parameter list config
             dim=nxm -> defines initial table size
             onload=func() -> defines what function should it run on default
+            header="true" | "false" -> defines if 
         */
 
         //variable retrival
@@ -68,15 +69,20 @@ class DefaultTable extends HTMLElement{
             return parseInt(x)
         })
         let onload_callback = this.getAttribute("onload")
+        let header = this.getAttribute("header")
+        console.log(Boolean(header))
 
         //table setup
-
         let main_table = document.createElement("table")
 
         for (let i1 = 0; i1 < dim[0]; i1++){
             let tr = document.createElement("tr")
             for (let i2 = 0; i2 < dim[1]; i2++){
-                tr.appendChild(document.createElement("td"))
+                let block_elem = "td"
+                if (Boolean(header) && i1 == 0){
+                    block_elem = "th" //rewrite to header
+                }
+                tr.appendChild(document.createElement(block_elem))
             }
             main_table.appendChild(tr)
         }

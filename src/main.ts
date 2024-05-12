@@ -214,6 +214,7 @@ class MainApp{
                         for (let i = 0; i < this.widget_workers.length; i++){
                             this.widget_workers[i]["win"].close()
                         }
+                        this.widget_workers = []
                     }
 
                     //calculate x, y

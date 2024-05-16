@@ -29,6 +29,9 @@ import {
     WidgetWindow,
     load_dict
 } from "./app_config"
+import {
+    Environment
+} from "./environment"
 
 //window variable declarations
 var mainMenuWindow: Window;
@@ -47,13 +50,14 @@ const PATH_TO_AIRCRAFTS: string = path.join(ABS_PATH, "/src/res/data/sim/planes/
 
 class MainApp{
     public app_settings: any;
-    public displays = [];
-    public workers: any[] = [];
-    public widget_workers: any[] = []
-    public sender_win_name: string;
+    private displays = [];
+    private workers: any[] = [];
+    private widget_workers: any[] = []
+    private sender_win_name: string;
+    private enviro: Environment;
 
     //all variables related to frontend
-    public frontend_vars = {
+    private frontend_vars = {
         "controller_mon": {},
         "controller_set": {},
         "controller_sim": {},
@@ -62,28 +66,28 @@ class MainApp{
     } //used to save variables that are then used on redirect between windows
 
     //all variables related to map
-    public map_configs_list: any = [];
-    public map_data: any;
-    public map_name: string;
+    private map_configs_list: any = [];
+    private map_data: any;
+    private map_name: string;
 
-    public scale: number;
-    public longitude: number = undefined;
-    public latitude: number = undefined;
-    public zoom: number = undefined;
+    private scale: number;
+    private longitude: number = undefined;
+    private latitude: number = undefined;
+    private zoom: number = undefined;
 
     //all variables related to aircrafts
-    public aircraft_presets_list: any = []
-    public aircraft_preset_data: any = undefined;
-    public aircraft_preset_name: string = ""
+    private aircraft_presets_list: any = []
+    private aircraft_preset_data: any = undefined;
+    private aircraft_preset_name: string = ""
 
     //all variables related to commands
-    public command_presets_list: any = []
-    public command_preset_data: any = undefined;
-    public command_preset_name: string = ""
+    private command_presets_list: any = []
+    private command_preset_data: any = undefined;
+    private command_preset_name: string = ""
 
     //app status (consists of switches/booleans for different functions 
     //  => written in dict for better arg passing to funcs + better readibility
-    public app_status: Record<string, boolean> = {
+    private app_status: Record<string, boolean> = {
         "internet-connection": false, //switch for internet connectivity and how to handle it in code
         "turn-on-backend": true,      //
         "backup-db-on": true,         //
@@ -373,8 +377,7 @@ class MainApp{
 
                     //save map data to variable
                     this.map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
-                    //read scale
-                    this.scale = utils.parse_scale(this.map_data["scale"])
+            
                     //save map name for backup usage
                     let map_config_raw = fs.readFileSync(PATH_TO_MAPS + this.map_data["CONFIG"], "utf-8")
                     this.map_name = JSON.parse(map_config_raw)["AIRPORT_NAME"];
@@ -384,9 +387,9 @@ class MainApp{
 
                     this.aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft)
                     this.aircraft_preset_name = this.aircraft_preset_data["info"]["name"]
-                    
-                    console.log(this.command_preset_data)
-                    console.log(this.aircraft_preset_data)
+
+                    //read scale
+                    this.scale = utils.parse_scale(this.map_data["scale"])
 
                     //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
                     if (this.map_data == undefined){
@@ -408,6 +411,8 @@ class MainApp{
                     */
                     this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
                     this.loader.setup_loader(2, "Setting up simulation, please wait...", "Initializing simulation setup")
+
+                    this.enviro = new Environment(EvLogger, this.command_preset_data, this.aircraft_preset_data, this.map_data)
 
                     await utils.sleep(3000)
                     this.loader.send_progresss("Test2")

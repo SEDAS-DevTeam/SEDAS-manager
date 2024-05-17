@@ -6,18 +6,10 @@ package-lock.json
 /src/build/*
 !/src/build/.gitkeep
 
-#typescript files (are automatically generated)
-/src/main.js
-/src/backend.js
-/src/read_map.js
-/src/database.js
-/src/plane_functions.js
-/src/fetch.js
-/src/utils.js
-/src/app_config.js
-/src/logger.js
+#javascript files that are automatically generated
+/src/*.js
 
-/src/*.map
+/src/*.js.map
 
 #pycache files
 /src/res/neural/cache/__pycache__/

@@ -412,7 +412,7 @@ class MainApp{
                     this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
                     this.loader.setup_loader(2, "Setting up simulation, please wait...", "Initializing simulation setup")
 
-                    this.enviro = new Environment(EvLogger, this.command_preset_data, this.aircraft_preset_data, this.map_data)
+                    this.enviro = new Environment(EvLogger, ABS_PATH, this.command_preset_data, this.aircraft_preset_data, this.map_data)
 
                     await utils.sleep(3000)
                     this.loader.send_progresss("Test2")
@@ -874,16 +874,10 @@ class MainApp{
                 workerWindow = new Window(this.app_status, worker_dict, "./res/worker.html", coords, EvLogger, main_app, "ACC", display_info)
             }
         
+            //setting up all layer widgets (overlaying whole map)
+            utils.create_widget_window(basic_worker_widget_dict, "./res/html/widget/date_time.html", EvLogger, coords, this.widget_workers)
 
-            let workerWidgetWindow = new WidgetWindow(basic_worker_widget_dict, "./res/worker_widget.html", coords, EvLogger)
-                    
-            let widget_id = utils.generate_id()
             let worker_id = utils.generate_id()
-            
-            this.widget_workers.push({
-                "id": widget_id,
-                "win": workerWidgetWindow
-            })
             this.workers.push({
                 "id": worker_id,
                 "win": workerWindow
@@ -967,6 +961,9 @@ class MainApp{
         exitWindow.show()
 
         this.app_status["app-running"] = false; //stopping all Interval events from firing
+        
+        EvLogger.log("DEBUG", "terminating environment")
+        this.enviro.kill_enviro()
 
         if (this.app_status["turn-on-backend"]){
             //disable voice recognition and ACAI backend

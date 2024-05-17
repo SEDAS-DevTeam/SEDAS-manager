@@ -1,57 +1,34 @@
 import { EventLogger } from "./logger"
-
-function getRandomInteger(min: number, max: number) {
-    return Math.random() * (max - min) + min;
-}
-
-class SimTime {
-    public date_object = new Date();
-
-    public constructor(logger: EventLogger,
-                        mode: string = "current",
-                        year: number = undefined, 
-                        month: number = undefined, 
-                        date: number = undefined,
-                        hours: number = undefined,
-                        mins: number = undefined,
-                        secs: number = undefined){
-        if (mode == "current"){
-
-        }
-        else {
-            if (mode == "fake"){
-                logger.log("DEBUG", "Time not specified, generating own simulation time")
-    
-                this.date_object.setFullYear(getRandomInteger(1980, 2020), getRandomInteger(0, 11), getRandomInteger(1, 31))
-                
-                this.date_object.setHours(getRandomInteger(0, 23))
-                this.date_object.setMinutes(getRandomInteger(0, 59))
-                this.date_object.setSeconds(getRandomInteger(0, 59))
-            }
-            else if (mode == "custom"){
-                this.date_object.setFullYear(year, month, date)
-                
-                this.date_object.setHours(hours)
-                this.date_object.setMinutes(mins)
-                this.date_object.setSeconds(secs)
-            }
-
-            setTimeout
-        }
-    }
-}
+import { Worker } from 'worker_threads';
+import path from "path"
 
 export class Environment {
     private logger: EventLogger;
-    public sim_time: SimTime;
+    private abs_path: string;
+    private sim_time_worker: Worker;
+    public current_time: Date
 
-    public constructor(logger: EventLogger, command_data: any[], aircraft_data: any[], map_data: any[]){
+    public constructor(logger: EventLogger, abs_path: string,
+                    command_data: any[], aircraft_data: any[], map_data: any[]){
         this.logger = logger
+        this.abs_path = abs_path
 
-        //create fake simulation time
-        this.sim_time = new SimTime(this.logger)
+        //create fake simulation time (TODO: pass time into main)
+        this.sim_time_worker = new Worker(path.join(abs_path, "/src/sim_time.js"))
+        this.sim_time_worker.postMessage(["start-measure", "random"])
 
-        console.log(command_data)
-        console.log(aircraft_data)
+        //simulation time handlers
+        this.sim_time_worker.on("message", (message) => {
+            switch(message[0]){
+                case "time": {
+                    this.current_time = message[1]
+                }
+            }
+        })
+
+    }
+
+    public kill_enviro(){
+        this.sim_time_worker.terminate()
     }
 }

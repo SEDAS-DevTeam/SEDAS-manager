@@ -19,6 +19,8 @@
     "./src/plane_functions.ts",
     "./src/fetch.ts",
     "./src/logger.ts",
-    "./src/app_config.ts"
+    "./src/app_config.ts",
+    "./src/environment.ts",
+    "./src/sim_time.ts"
   ]
 }

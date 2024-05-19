@@ -37,3 +37,7 @@ function onload_specific(){
         })
     }
 }
+
+function process_specific(){
+    //empty
+}

@@ -29,6 +29,9 @@ import {
     WidgetWindow,
     load_dict
 } from "./app_config"
+import {
+    Environment
+} from "./environment"
 
 //window variable declarations
 var mainMenuWindow: Window;
@@ -47,13 +50,14 @@ const PATH_TO_AIRCRAFTS: string = path.join(ABS_PATH, "/src/res/data/sim/planes/
 
 class MainApp{
     public app_settings: any;
-    public displays = [];
-    public workers: any[] = [];
-    public widget_workers: any[] = []
-    public sender_win_name: string;
+    private displays = [];
+    private workers: any[] = [];
+    private widget_workers: any[] = []
+    private sender_win_name: string;
+    private enviro: Environment;
 
     //all variables related to frontend
-    public frontend_vars = {
+    private frontend_vars = {
         "controller_mon": {},
         "controller_set": {},
         "controller_sim": {},
@@ -62,28 +66,28 @@ class MainApp{
     } //used to save variables that are then used on redirect between windows
 
     //all variables related to map
-    public map_configs_list: any = [];
-    public map_data: any;
-    public map_name: string;
+    private map_configs_list: any = [];
+    private map_data: any;
+    private map_name: string;
 
-    public scale: number;
-    public longitude: number = undefined;
-    public latitude: number = undefined;
-    public zoom: number = undefined;
+    private scale: number;
+    private longitude: number = undefined;
+    private latitude: number = undefined;
+    private zoom: number = undefined;
 
     //all variables related to aircrafts
-    public aircraft_presets_list: any = []
-    public aircraft_preset_data: any = undefined;
-    public aircraft_preset_name: string = ""
+    private aircraft_presets_list: any = []
+    private aircraft_preset_data: any = undefined;
+    private aircraft_preset_name: string = ""
 
     //all variables related to commands
-    public command_presets_list: any = []
-    public command_preset_data: any = undefined;
-    public command_preset_name: string = ""
+    private command_presets_list: any = []
+    private command_preset_data: any = undefined;
+    private command_preset_name: string = ""
 
     //app status (consists of switches/booleans for different functions 
     //  => written in dict for better arg passing to funcs + better readibility
-    public app_status: Record<string, boolean> = {
+    private app_status: Record<string, boolean> = {
         "internet-connection": false, //switch for internet connectivity and how to handle it in code
         "turn-on-backend": true,      //
         "backup-db-on": true,         //
@@ -214,6 +218,7 @@ class MainApp{
                         for (let i = 0; i < this.widget_workers.length; i++){
                             this.widget_workers[i]["win"].close()
                         }
+                        this.widget_workers = []
                     }
 
                     //calculate x, y
@@ -372,8 +377,7 @@ class MainApp{
 
                     //save map data to variable
                     this.map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
-                    //read scale
-                    this.scale = utils.parse_scale(this.map_data["scale"])
+            
                     //save map name for backup usage
                     let map_config_raw = fs.readFileSync(PATH_TO_MAPS + this.map_data["CONFIG"], "utf-8")
                     this.map_name = JSON.parse(map_config_raw)["AIRPORT_NAME"];
@@ -383,9 +387,9 @@ class MainApp{
 
                     this.aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft)
                     this.aircraft_preset_name = this.aircraft_preset_data["info"]["name"]
-                    
-                    console.log(this.command_preset_data)
-                    console.log(this.aircraft_preset_data)
+
+                    //read scale
+                    this.scale = utils.parse_scale(this.map_data["scale"])
 
                     //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
                     if (this.map_data == undefined){
@@ -408,6 +412,8 @@ class MainApp{
                     this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
                     this.loader.setup_loader(2, "Setting up simulation, please wait...", "Initializing simulation setup")
 
+                    this.enviro = new Environment(EvLogger, ABS_PATH, this.command_preset_data, this.aircraft_preset_data, this.map_data)
+    
                     await utils.sleep(3000)
                     this.loader.send_progresss("Test2")
                     await utils.sleep(2000)
@@ -701,8 +707,17 @@ class MainApp{
         }, 1000)
 
         setInterval(() => {
+            if (this.enviro != undefined && this.app_status["sim-running"]){
+                //send date & time to frontend
+                for (let i = 0; i < this.workers.length; i++){
+                    this.workers[i]["win"].send_message("time", [this.enviro.current_time])
+                }
+            }
+        }, 1000)
+
+        //send plane data to backend
+        setInterval(() => {
             if (this.app_status["app-running"] && this.app_status["turn-on-backend"]){
-                //sending plane status every 500ms for backend
                 if (this.PlaneDatabase == undefined){
                     this.backend_worker.postMessage(["data", []]) //send empty array so the backend can still function without any problems
                 }
@@ -710,7 +725,7 @@ class MainApp{
                     this.backend_worker.postMessage(["data", this.PlaneDatabase.DB])
                 }
             }
-        }, 1000)
+        }, 500)
 
         //on every n minutes, save to local DB if app crashes
         setInterval(() => {
@@ -868,16 +883,10 @@ class MainApp{
                 workerWindow = new Window(this.app_status, worker_dict, "./res/worker.html", coords, EvLogger, main_app, "ACC", display_info)
             }
         
+            //setting up all layer widgets (overlaying whole map)
+            utils.create_widget_window(basic_worker_widget_dict, "./res/html/widget/worker_widget.html", EvLogger, coords, this.widget_workers)
 
-            let workerWidgetWindow = new WidgetWindow(basic_worker_widget_dict, "./res/worker_widget.html", coords, EvLogger)
-                    
-            let widget_id = utils.generate_id()
             let worker_id = utils.generate_id()
-            
-            this.widget_workers.push({
-                "id": widget_id,
-                "win": workerWidgetWindow
-            })
             this.workers.push({
                 "id": worker_id,
                 "win": workerWindow
@@ -961,6 +970,11 @@ class MainApp{
         exitWindow.show()
 
         this.app_status["app-running"] = false; //stopping all Interval events from firing
+        
+        if (this.enviro != undefined){
+            EvLogger.log("DEBUG", "terminating environment")
+            this.enviro.kill_enviro()
+        }
 
         if (this.app_status["turn-on-backend"]){
             //disable voice recognition and ACAI backend

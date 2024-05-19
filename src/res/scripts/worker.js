@@ -363,6 +363,13 @@ window.electronAPI.on_message("sim-event", (data) => {
         elem.innerHTML = "STOP"
     }
 })
+window.electronAPI.on_message("time", (time_data) => {
+    let date_str = time_data[0].toDateString()
+    let time_str = time_data[0].toLocaleTimeString();
+
+    document.getElementById("date").innerHTML = date_str
+    document.getElementById("time").innerHTML = time_str
+})
 
 window.electronAPI.on_init_info((data) => {
     APP_DATA = JSON.parse(data[1])

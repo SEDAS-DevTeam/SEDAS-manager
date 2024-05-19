@@ -38,7 +38,7 @@ function process_specific(data, reset = false){
         for (let i = 0; i < monitor_data.length; i++){
             let x = i % 4
             let y = Math.round(i / 4)
-            let elemParent = document.getElementById("monitor-panel").children[0].children[y].children[x]
+            let elemParent = document.querySelector("default-table#monitor-panel").children[0].children[y].children[x]
 
             element_init(monitor_data[i], i, elemParent)
         }

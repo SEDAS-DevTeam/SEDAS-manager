@@ -1,6 +1,9 @@
 //
 //Controller Setup JS
 //
+const head_airports = ["Scenario preset name", "Type", "Code", "Country", "City", "Description"]
+const head_aircrafts = ["Aircraft preset name", "Inspect"]
+const head_commands = ["Command preseet name", "Inspect"]
 
 var desc_rendered = false
 var clicked = false
@@ -15,6 +18,35 @@ var selected_name = ""
 var map_name = ""
 var command_preset_name = ""
 var aircraft_preset_name = ""
+
+/*
+table setups
+*/
+function set_env_table(elem){
+    let sel_header;
+    switch(elem.id){
+        case "airports":
+            sel_header = head_airports
+            break
+        case "aircrafts":
+            sel_header = head_aircrafts
+            break
+        case "commands":
+            sel_header = head_commands
+            break
+    }
+
+    for (let i = 0; i < sel_header.length + 1; i++){
+        let spec_elem = elem.children[0].children[0].children[i]
+        if (i == sel_header.length){
+            //append search tab
+            spec_elem.innerHTML = '<th><form><input type="text" placeholder="Search.." name="search"></form></th>'
+            break
+        }
+
+        spec_elem.innerHTML = sel_header[i]
+    }
+}
 
 function selection(button_elem){
     let sel_id = button_elem.id
@@ -79,10 +111,6 @@ function set_environment(){
     window.electronAPI.send_message("controller", ["set-environment", selected_map, selected_command_preset, selected_aircraft_preset])
 }
 
-function regen_map(){
-    window.electronAPI.send_message("controller", ["regenerate-map"])
-}
-
 /*
     Generating preset from sources
 */
@@ -114,7 +142,7 @@ function generate_aircrafts_from_sources(){
         record.appendChild(inspect_obj)
         record.appendChild(select_obj)
 
-        document.querySelector("table#aircrafts").appendChild(record)
+        document.querySelector("default-table#aircrafts table").appendChild(record)
     }
 }
 
@@ -146,7 +174,7 @@ function generate_commands_from_sources(){
         record.appendChild(inspect_obj)
         record.appendChild(select_obj)
 
-        document.querySelector("table#commands").appendChild(record)
+        document.querySelector("default-table#commands table").appendChild(record)
     }
 }
 
@@ -203,7 +231,7 @@ function generate_airports_from_sources(){
         record.appendChild(desc_obj)
         record.appendChild(select_obj)
 
-        document.querySelector("table#airports").appendChild(record)
+        document.querySelector("default-table#airports table").appendChild(record)
     }
 }
 
@@ -235,6 +263,7 @@ function ask_for_content(idx, type){
 */
 
 function process_specific(data, reset = false){
+    console.log("did it go there?")
     if (map_name != undefined){
         //loaded from backup, change map name 
         document.getElementById("confirmresult-airport").innerHTML = map_name
@@ -304,9 +333,6 @@ function onload_specific(){
 
     document.getElementById("confirm").addEventListener("click", () => {
         set_environment()
-    })
-    document.getElementById("regen-map").addEventListener("click", () => {
-        regen_map()
     })
 
     document.getElementById("close-desc").addEventListener("click", () => {

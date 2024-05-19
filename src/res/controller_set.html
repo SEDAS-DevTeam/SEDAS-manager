@@ -5,32 +5,17 @@
         <link rel="stylesheet" href="styles/controller.css">
         <meta charset="utf-8" />
 
+        <script src="scripts/blocks/block.js"></script>
+        <script src="scripts/blocks/block_set.js"></script>
+
         <!--some util imports-->
         <script src="scripts/utils/process_json.js"></script>
         <script src="scripts/controllers/controller_set.js"></script>
         <script src="scripts/controllers/controller.js"></script>
     </head>
     <body id="controller-body">
-        <div id="top-content">
-            <div>
-                <h1 id="main-header">SEDAC manager Controller</h1>
-                <button id="exit-button">Exit</button>
-                <button id="menu-button">Back to menu</button>
-                <button id="save-button">Save</button>
-            </div>
-            <hr>
-            <div class="topnav" id="controller-topnav">
-                <a href="controller_set.html" class="active">Setup</a>
-                <a href="controller_mon.html">Monitors</a>
-                <a href="controller_sim.html">Simulation</a>
-                <a href="plugins.html">Plugins</a>
-                <a href="wiki.html">Wiki</a>
-            </div>
-        </div>
-        <div class="desc-content">
-            <i class="fa-solid fa-xmark" id="close-desc"></i><br><br>
-            <div id="inner-content"></div>
-        </div>
+        <top-header id="set"></top-header>
+        <desc-popup></desc-popup>
         <div class="div-indent">
             <h2>Simulation setup</h2>
             <hr>
@@ -38,31 +23,26 @@
             <!--1. dropdown content-->
             <div>
                 <i class="drop-button fa-solid fa-caret-down"></i>
-                <h3 class="header-inline">Map selection</h3>
+                <h3 class="header-inline">Scenario selection</h3>
             </div>
             <div class="dropdown-content">
-                <h3><button class="inline-but" id="regen-map">Regenerate map</button>randomized regeneration</h3>
-                <h3>or search for any airport in search:</h3>
-                <table id="airports">
-                    <tr>
-                        <th>Airport</th>
-                        <th>Type</th>
-                        <th>Code</th>
-                        <th>Country</th>
-                        <th>City</th>
-                        <th>Description</th>
-                        <th>
-                            <form><input type="text" placeholder="Search.." name="search"></form>
-                        </th>
-                    </tr>
-                </table>
-                <p>Data was gathered from the World Bank International airports dataset</p>
+                <default-table id="airports" dim="1x7" onload="set_env_table(this)" header="true"></default-table>
 
                 <h3>Selected map:</h3>
                 <div class="result">
                     <h2 id="confirmresult-airport">None</h2>
                 </div>
             </div>
+
+            <!--1. dropdown content-->
+            <div>
+                <i class="drop-button fa-solid fa-caret-down"></i>
+                <h3 class="header-inline">Scenario adjustments</h3>
+            </div>
+            <div class="dropdown-content">
+                <h3>Scenarion adjustments text</h3>
+            </div>
+
             <hr>
 
             <!--2. dropdown content-->
@@ -71,16 +51,7 @@
                 <h3 class="header-inline">Aircraft preset selection</h3>
             </div>
             <div class="dropdown-content">
-                <table id="aircrafts">
-                    <tr>
-                        <th>Aircraft preset name</th>
-                        <th>Inspect</th>
-                        <th>
-                            <form><input type="text" placeholder="Search.." name="search"></form>
-                        </th>
-                    </tr>
-                </table>
-
+                <default-table id="aircrafts" dim="1x3" onload="set_env_table(this)" header="true"></default-table>
                 <h3>Selected aircraft preset:</h3>
                 <div class="result">
                     <h2 id="confirmresult-aircraft">None</h2>
@@ -94,15 +65,7 @@
                 <h3 class="header-inline">Commands preset selection</h3>
             </div>
             <div class="dropdown-content">
-                <table id="commands">
-                    <tr>
-                        <th>Command Preset name</th>
-                        <th>Inspect</th>
-                        <th>
-                            <form><input type="text" placeholder="Search.." name="search"></form>
-                        </th>
-                    </tr>
-                </table>
+                <default-table id="commands" dim="1x3" onload="set_env_table(this)" header="true"></default-table>
                 <h3>Selected command preset:</h3>
                 <div class="result">
                     <h2 id="confirmresult-command">None</h2>

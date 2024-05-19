@@ -7,7 +7,7 @@ import { join } from "path"
 import { v4 } from "uuid"
 import http from "http"
 import { EventLogger } from "./logger"
-import { LoaderWindow } from "./app_config";
+import { LoaderWindow, WidgetWindow } from "./app_config";
 
 export class ProgressiveLoader{
     private loaders: any[] = [];
@@ -114,6 +114,10 @@ export function generate_id(){
         res_str += elem
     }
     return res_str
+}
+
+export function generateRandomInteger(min: number, max: number) {
+    return Math.random() * (max - min) + min;
 }
 
 //Main functions
@@ -247,4 +251,15 @@ export function parse_scale(scale){
     }
 
     return val
+}
+
+export function create_widget_window(dict: any, path_load: string, 
+                                    event_logger: EventLogger, 
+                                    coords: number[], widget_workers: any[]){
+    let datetimeWidgetWindow = new WidgetWindow(dict, path_load, coords, event_logger)
+    let datetime_id = generate_id()
+    widget_workers.push({
+        "id": datetime_id,
+        "win": datetimeWidgetWindow
+    })
 }

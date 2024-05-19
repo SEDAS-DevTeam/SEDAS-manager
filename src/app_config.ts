@@ -21,7 +21,7 @@ export const main_menu_dict = {
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/preload.js")
+        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -33,7 +33,7 @@ export const load_dict = {
     icon: "./res/img/sedac-manager-logo.png",
     frame: false,
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/preload.js")
+        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -45,7 +45,7 @@ export const settings_dict = {
     resizable: true,
     icon: "./res/img/sedac-manager-logo.png",
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/preload.js")
+        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -57,7 +57,7 @@ export const exit_dict = {
     icon: "./res/img/sedac-manager-logo.png",
     frame: false,
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/preload.js")
+        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -70,7 +70,7 @@ export const controller_dict = {
     frame: true,
     //focusable: true,
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/preload.js")
+        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -83,7 +83,7 @@ export const worker_dict = {
     //frame: false, //TODO turn off when testing
     //focusable: false, //same here
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/preload.js")
+        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -95,7 +95,7 @@ export const basic_worker_widget_dict = {
     icon: "./res/img/sedac-manager-logo.png",
     frame: false,
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/preload.js")
+        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -258,7 +258,9 @@ export class WidgetWindow{
     private path_load: string;
 
     public close(){
-        this.window.close()
+        if (this.window != undefined){
+            this.window.close()
+        }
     }
 
     public show(path: string = ""){

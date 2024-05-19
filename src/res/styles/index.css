@@ -105,6 +105,11 @@ img{
     float: left;
 }
 
+.centeralign{
+    display: inline-block;
+    margin-left: 25%;
+}
+
 .rightalign{
     float: right;
 }

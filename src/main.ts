@@ -413,7 +413,7 @@ class MainApp{
                     this.loader.setup_loader(2, "Setting up simulation, please wait...", "Initializing simulation setup")
 
                     this.enviro = new Environment(EvLogger, ABS_PATH, this.command_preset_data, this.aircraft_preset_data, this.map_data)
-
+    
                     await utils.sleep(3000)
                     this.loader.send_progresss("Test2")
                     await utils.sleep(2000)
@@ -707,8 +707,17 @@ class MainApp{
         }, 1000)
 
         setInterval(() => {
+            if (this.enviro != undefined && this.app_status["sim-running"]){
+                //send date & time to frontend
+                for (let i = 0; i < this.workers.length; i++){
+                    this.workers[i]["win"].send_message("time", [this.enviro.current_time])
+                }
+            }
+        }, 1000)
+
+        //send plane data to backend
+        setInterval(() => {
             if (this.app_status["app-running"] && this.app_status["turn-on-backend"]){
-                //sending plane status every 500ms for backend
                 if (this.PlaneDatabase == undefined){
                     this.backend_worker.postMessage(["data", []]) //send empty array so the backend can still function without any problems
                 }
@@ -716,7 +725,7 @@ class MainApp{
                     this.backend_worker.postMessage(["data", this.PlaneDatabase.DB])
                 }
             }
-        }, 1000)
+        }, 500)
 
         //on every n minutes, save to local DB if app crashes
         setInterval(() => {
@@ -875,7 +884,7 @@ class MainApp{
             }
         
             //setting up all layer widgets (overlaying whole map)
-            utils.create_widget_window(basic_worker_widget_dict, "./res/html/widget/date_time.html", EvLogger, coords, this.widget_workers)
+            utils.create_widget_window(basic_worker_widget_dict, "./res/html/widget/worker_widget.html", EvLogger, coords, this.widget_workers)
 
             let worker_id = utils.generate_id()
             this.workers.push({

@@ -46,18 +46,6 @@ class SimTime {
     }
 
     public get_time(){
-        /*
-        return [
-            this.date_object.getFullYear(),
-            this.date_object.getMonth(),
-            this.date_object.getDate(),
-            this.date_object.getDate(),
-            this.date_object.getHours(),
-            this.date_object.getMinutes(),
-            this.date_object.getSeconds(),
-            this.date_object.getMilliseconds(),
-        ]
-        */
        return this.date_object
     }
 }

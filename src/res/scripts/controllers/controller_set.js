@@ -1,7 +1,7 @@
 //
 //Controller Setup JS
 //
-const head_airports = ["Airport preset name", "Type", "Code", "Country", "City", "Description"]
+const head_airports = ["Scenario preset name", "Type", "Code", "Country", "City", "Description"]
 const head_aircrafts = ["Aircraft preset name", "Inspect"]
 const head_commands = ["Command preseet name", "Inspect"]
 
@@ -109,10 +109,6 @@ function set_environment(){
     }
     
     window.electronAPI.send_message("controller", ["set-environment", selected_map, selected_command_preset, selected_aircraft_preset])
-}
-
-function regen_map(){
-    window.electronAPI.send_message("controller", ["regenerate-map"])
 }
 
 /*
@@ -337,9 +333,6 @@ function onload_specific(){
 
     document.getElementById("confirm").addEventListener("click", () => {
         set_environment()
-    })
-    document.getElementById("regen-map").addEventListener("click", () => {
-        regen_map()
     })
 
     document.getElementById("close-desc").addEventListener("click", () => {

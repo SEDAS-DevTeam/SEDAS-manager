@@ -971,8 +971,10 @@ class MainApp{
 
         this.app_status["app-running"] = false; //stopping all Interval events from firing
         
-        EvLogger.log("DEBUG", "terminating environment")
-        this.enviro.kill_enviro()
+        if (this.enviro != undefined){
+            EvLogger.log("DEBUG", "terminating environment")
+            this.enviro.kill_enviro()
+        }
 
         if (this.app_status["turn-on-backend"]){
             //disable voice recognition and ACAI backend

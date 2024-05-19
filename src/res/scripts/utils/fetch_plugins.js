@@ -13,6 +13,12 @@ function getPlugins(elem){
             "version": "ver 1.0.0",
             "last-updated": "Last year",
             "installed": false
+        },
+        {
+            "plugin": "Map Randgen",
+            "version": "ver 1.0.0",
+            "last-updated": "Last year",
+            "installed": false
         }
     ]
     for (let i = 0; i < headers.length + 1; i++){

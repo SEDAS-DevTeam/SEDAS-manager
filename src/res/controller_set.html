@@ -26,8 +26,7 @@
                 <h3 class="header-inline">Scenario selection</h3>
             </div>
             <div class="dropdown-content">
-                <default-table id="airports" dim="1x7" onload="set_env_table(this)" header="true"></default-table>
-
+                <default-table id="airports" dim="1x7" header="true" even_color="true"></default-table>
                 <h3>Selected map:</h3>
                 <div class="result">
                     <h2 id="confirmresult-airport">None</h2>
@@ -40,7 +39,7 @@
                 <h3 class="header-inline">Scenario adjustments</h3>
             </div>
             <div class="dropdown-content">
-                <h3>Scenarion adjustments text</h3>
+                <default-table id="scenario-adjustments" dim="2x4" header="false" even_color="false"></default-table>
             </div>
 
             <hr>
@@ -51,7 +50,7 @@
                 <h3 class="header-inline">Aircraft preset selection</h3>
             </div>
             <div class="dropdown-content">
-                <default-table id="aircrafts" dim="1x3" onload="set_env_table(this)" header="true"></default-table>
+                <default-table id="aircrafts" dim="1x3" header="true" even_color="true"></default-table>
                 <h3>Selected aircraft preset:</h3>
                 <div class="result">
                     <h2 id="confirmresult-aircraft">None</h2>
@@ -65,7 +64,7 @@
                 <h3 class="header-inline">Commands preset selection</h3>
             </div>
             <div class="dropdown-content">
-                <default-table id="commands" dim="1x3" onload="set_env_table(this)" header="true"></default-table>
+                <default-table id="commands" dim="1x3" header="true" even_color="true"></default-table>
                 <h3>Selected command preset:</h3>
                 <div class="result">
                     <h2 id="confirmresult-command">None</h2>

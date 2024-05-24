@@ -413,8 +413,9 @@ class MainApp{
                     this.loader.setup_loader(2, "Setting up simulation, please wait...", "Initializing simulation setup")
 
                     this.enviro = new Environment(EvLogger, ABS_PATH, this.command_preset_data, this.aircraft_preset_data, this.map_data)
-                    this.loader.send_progresss("Set up environment")
-                    //await utils.sleep(3000)
+                    await utils.sleep(2000)
+                    this.loader.send_progresss("Setting up environment")
+                    await utils.sleep(3000)
                     this.loader.destroy_loaders()
                     this.loader = undefined
                     
@@ -691,63 +692,69 @@ class MainApp{
 
     public add_listener_intervals(){
         //disable intervals on app exit
-        if (this.app_status["app-running"]){
-            //update all planes on one second
-            setInterval(() => {
-                if (this.PlaneDatabase != undefined && this.map_data != undefined && this.workers.length != 0){
-                    if (this.app_status["sim-running"]){
-                        this.PlaneDatabase.update_planes(this.scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]),
-                                                parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
+        try {
+            if (this.app_status["app-running"]){
+                //update all planes on one second
+                setInterval(() => {
+                    if (this.PlaneDatabase != undefined && this.map_data != undefined && this.workers.length != 0){
+                        if (this.app_status["sim-running"]){
+                            this.PlaneDatabase.update_planes(this.scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]),
+                                                    parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
+                        }
+                        if (this.app_status["app-running"]){
+                            //send updated plane database to all
+                            this.send_to_all(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
+                        }
                     }
-                    if (this.app_status["app-running"]){
-                        //send updated plane database to all
-                        this.send_to_all(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
+                }, 1000)
+    
+                //send updated time to all workers
+                setInterval(() => {
+                    if (this.enviro != undefined && this.app_status["sim-running"]){
+                        //send date & time to frontend
+                        for (let i = 0; i < this.workers.length; i++){
+                            this.workers[i]["win"].send_message("time", [this.enviro.current_time])
+                        }
                     }
-                }
-            }, 1000)
-
-            //send updated time to all workers
-            setInterval(() => {
-                if (this.enviro != undefined && this.app_status["sim-running"]){
-                    //send date & time to frontend
-                    for (let i = 0; i < this.workers.length; i++){
-                        this.workers[i]["win"].send_message("time", [this.enviro.current_time])
+                }, 1000)
+    
+                //send plane data to backend
+                setInterval(() => {
+                    if (this.app_status["turn-on-backend"]){
+                        if (this.PlaneDatabase == undefined){
+                            this.backend_worker.postMessage(["data", []]) //send empty array so the backend can still function without any problems
+                        }
+                        else{
+                            this.backend_worker.postMessage(["data", this.PlaneDatabase.DB])
+                        }
                     }
-                }
-            }, 1000)
-
-            //send plane data to backend
-            setInterval(() => {
-                if (this.app_status["turn-on-backend"]){
-                    if (this.PlaneDatabase == undefined){
-                        this.backend_worker.postMessage(["data", []]) //send empty array so the backend can still function without any problems
+                }, 500)
+    
+                //on every n minutes, save to local DB if app crashes
+                setInterval(() => {
+                    if (this.app_status["backup-db-on"] && (this.PlaneDatabase != undefined) && (this.map_data != undefined) && (this.workers.length != 0)){
+                        let simulation_dict = {
+                            "planes": this.PlaneDatabase.DB,
+                            "monitor-planes": this.PlaneDatabase.monitor_DB,
+                            "monitor-data": this.workers,
+                            "map": this.map_data,
+                            "map-name": this.map_name,
+                            "command-preset": this.command_preset_data,
+                            "command-preset-name": this.command_preset_name,
+                            "aircraft-preset": this.aircraft_preset_data,
+                            "aircraft-preset-name": this.aircraft_preset_name
+                        }
+                
+                        //save to local db using database.ts 
+                        this.backup_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict, null, 2)])
+                        EvLogger.log("DEBUG", "Saving temporary backup...")
                     }
-                    else{
-                        this.backend_worker.postMessage(["data", this.PlaneDatabase.DB])
-                    }
-                }
-            }, 500)
-
-            //on every n minutes, save to local DB if app crashes
-            setInterval(() => {
-                if (this.app_status["backup-db-on"] && (this.PlaneDatabase != undefined) && (this.map_data != undefined) && (this.workers.length != 0)){
-                    let simulation_dict = {
-                        "planes": this.PlaneDatabase.DB,
-                        "monitor-planes": this.PlaneDatabase.monitor_DB,
-                        "monitor-data": this.workers,
-                        "map": this.map_data,
-                        "map-name": this.map_name,
-                        "command-preset": this.command_preset_data,
-                        "command-preset-name": this.command_preset_name,
-                        "aircraft-preset": this.aircraft_preset_data,
-                        "aircraft-preset-name": this.aircraft_preset_name
-                    }
-            
-                    //save to local db using database.ts 
-                    this.backup_worker.postMessage(["save-to-db", JSON.stringify(simulation_dict, null, 2)])
-                    EvLogger.log("DEBUG", "Saving temporary backup...")
-                }
-            }, this.backupdb_saving_frequency)
+                }, this.backupdb_saving_frequency)
+            }
+        }
+        catch(error){
+            EvLogger.log("ERROR", "An error happened, written down below")
+            EvLogger.log("", error)
         }
     }
 

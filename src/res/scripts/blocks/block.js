@@ -8,6 +8,20 @@ const conversion_top_header = {
     "wiki": 4
 }
 
+class ElementBind{
+    constructor(element_query){
+        this.element = document.querySelector(element_query)
+        this.attributes = {}
+
+        for (let i = 0; i < this.element.attributes.length; i++){
+            let attribute_name = this.element.attributes[i].name
+            let attribute_value = this.element.attributes[i].value
+
+            this.attributes[attribute_name] = attribute_value
+        }
+    }
+}
+
 //TODO
 class MainButton extends HTMLElement{
     constructor(){
@@ -61,7 +75,8 @@ class DefaultTable extends HTMLElement{
         parameter list config
             dim=nxm -> defines initial table size
             onload=func() -> defines what function should it run on default
-            header="true" | "false" -> defines if 
+            header="true" | "false" -> defines if
+            even_color="true"
         */
 
         //variable retrival
@@ -69,20 +84,24 @@ class DefaultTable extends HTMLElement{
             return parseInt(x)
         })
         let onload_callback = this.getAttribute("onload")
-        let header = this.getAttribute("header")
-        console.log(Boolean(header))
+        let header = Boolean(this.getAttribute("header"))
+        let even_color = Boolean(this.getAttribute("even_color"))
 
         //table setup
         let main_table = document.createElement("table")
 
         for (let i1 = 0; i1 < dim[0]; i1++){
             let tr = document.createElement("tr")
+
             for (let i2 = 0; i2 < dim[1]; i2++){
                 let block_elem = "td"
-                if (Boolean(header) && i1 == 0){
+                if (header && i1 == 0){
                     block_elem = "th" //rewrite to header
                 }
                 tr.appendChild(document.createElement(block_elem))
+            }
+            if (even_color){
+                tr.id = "color"
             }
             main_table.appendChild(tr)
         }

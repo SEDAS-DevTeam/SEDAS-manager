@@ -19,5 +19,18 @@
     "long": "none",
     "lat": "none",
     "zoom": "none",
-    "scale": "0.005m"
+    "scale": "0.005m",
+    "scenarios": [
+        {
+            "name": "Scenario 1 Basic",
+            "category": ["AI", "HE", "GL", "AE"],
+            "weight_category": ["UL", "L", "M", "H", "S"],
+            "flight_schedules": [
+                {
+                    "type": "",
+                    "time": "5min"
+                }
+            ]
+        }
+    ]
 }

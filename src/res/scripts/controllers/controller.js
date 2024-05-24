@@ -2,7 +2,6 @@
 //file for basic functions that every controller window has
 //
 
-
 var INIT_DATA = [] //storing all vital data like airport list, command preset list, aircraft preset list in current session
 var APP_DATA = undefined
 

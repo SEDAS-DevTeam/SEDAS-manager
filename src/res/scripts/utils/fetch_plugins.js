@@ -74,5 +74,16 @@ function getPlugins(elem){
     //reload all listeners
     let not_installed_buttons = document.querySelectorAll("button#not-installed")
     let manage_buttons = document.querySelectorAll("button#manage")
-    //TODO
+    
+    for (let i = 0; i < not_installed_buttons.length; i++){
+        not_installed_buttons[i].addEventListener("click", (event) => {
+            console.log("install!")
+        })
+    }
+
+    for (let i = 0; i < manage_buttons.length; i++){
+        manage_buttons[i].addEventListener("click", (event) => {
+            
+        })
+    }
 }

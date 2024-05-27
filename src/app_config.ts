@@ -103,14 +103,14 @@ export const basic_worker_widget_dict = {
     Window classes
 */
 
-export class Window{
+class BaseWindow{
     public window: BrowserWindow;
     public win_type: string = "none";
     public isClosed: boolean = false;
     public win_coordinates: number[];
-    private path_load: string;
-    private localConfig: any = {}; //contains local config of window
-    private event_logger: EventLogger;
+    public path_load: string;
+    public localConfig: any = {}; //contains local config of window
+    public event_logger: EventLogger;
 
     public close(){
         if (!this.isClosed){
@@ -133,6 +133,13 @@ export class Window{
         this.window.webContents.postMessage(channel, message)
     }
 
+    public constructor(){
+        //TODO
+    }
+}
+
+export class Window extends BaseWindow{
+
     public checkClose(callback: any = undefined){
         this.window.on("closed", () => {
             this.isClosed = true
@@ -142,14 +149,11 @@ export class Window{
         })
     }
 
-    public wait_for_load(callback: any){
-        this.window.webContents.on("did-finish-load", () => {
-            callback()
-        })
-    }
-
     public constructor(app_status: Record<string, boolean>, config: any, path: string, coords: number[],
         ev_logger: EventLogger, main_app: any, window_type: string = "none", display_res: number[] = []){
+        
+        super();
+
         this.win_coordinates = coords //store to use later
         this.event_logger = ev_logger
 
@@ -186,35 +190,7 @@ export class Window{
     }
 }
 
-export class LoaderWindow{
-    public window: BrowserWindow;
-    public win_type: string = "none";
-    public isClosed: boolean = false;
-    public win_coordinates: number[];
-    private path_load: string;
-    private localConfig: any = {}; //contains local config of window
-    private event_logger: EventLogger;
-
-    public close(){
-        if (!this.isClosed){
-            this.window.close()
-        }
-        this.isClosed = true
-    }
-
-    public show(path: string = ""){
-        if (path.length != 0){
-            //rewrite path_load (used for controller window_manipulation
-            this.path_load = path
-        }
-
-        this.isClosed = false
-        this.window.loadFile(this.path_load);
-    }
-
-    public send_message(channel: string, message: any){
-        this.window.webContents.postMessage(channel, message)
-    }
+export class LoaderWindow extends BaseWindow{
 
     public wait_for_load(callback: any){
         return new Promise<void>((resolve, reject) => {
@@ -227,6 +203,9 @@ export class LoaderWindow{
 
     public constructor(config: any, path: string, coords: number[],
         ev_logger: EventLogger, display_res: number[] = []){
+
+        super()
+
         this.win_coordinates = coords //store to use later
         this.event_logger = ev_logger
 
@@ -242,7 +221,7 @@ export class LoaderWindow{
 
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
 
@@ -250,36 +229,7 @@ export class LoaderWindow{
     }
 }
 
-export class WidgetWindow{
-    public window: BrowserWindow;
-    public win_coordinates: number[];
-    private event_logger: EventLogger;
-    private localConfig: any = {}; //contains local config of window
-    private path_load: string;
-
-    public close(){
-        if (this.window != undefined){
-            this.window.close()
-        }
-    }
-
-    public show(path: string = ""){
-        this.window = new BrowserWindow(this.localConfig);
-        this.window.setMenu(null);
-        this.window.setAlwaysOnTop(true);
-        //this.window.webContents.openDevTools()
-
-        if (path.length != 0){
-            //rewrite path_load (used for controller window_manipulation
-            this.path_load = path
-        }
-
-        this.window.loadFile(this.path_load);
-    }
-
-    public send_message(channel: string, message: any){
-        this.window.webContents.send(channel, message)
-    }
+export class WidgetWindow extends BaseWindow{
 
     public wait_for_load(callback: any){
         this.window.webContents.on("did-finish-load", () => {
@@ -297,6 +247,9 @@ export class WidgetWindow{
 
     public constructor(config: any, path: string, coords: number[], 
                         ev_logger: EventLogger){
+
+        super()
+
         this.event_logger = ev_logger
         Object.assign(this.localConfig, config)
         
@@ -306,5 +259,13 @@ export class WidgetWindow{
         this.path_load = path
 
         this.event_logger.log("DEBUG", `Created worker widget window object(path_load=${this.path_load}, coords=${coords})`)
+    }
+}
+
+export class PopupWindow extends BaseWindow{
+
+    public constructor(){
+        super()
+        //TODO
     }
 }

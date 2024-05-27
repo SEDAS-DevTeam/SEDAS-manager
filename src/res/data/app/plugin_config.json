@@ -1,0 +1,20 @@
+[
+    {
+        "plugin": "SEDAC MapBuilder",
+        "version": "ver 1.0.0",
+        "last-updated": "Last week",
+        "installed": true
+    },
+    {
+        "plugin": "Lorem Ipsum",
+        "version": "ver 1.0.0",
+        "last-updated": "Last year",
+        "installed": false
+    },
+    {
+        "plugin": "Map Randgen",
+        "version": "ver 1.0.0",
+        "last-updated": "Last year",
+        "installed": false
+    }
+]

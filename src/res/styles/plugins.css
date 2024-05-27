@@ -14,7 +14,7 @@ tr:nth-child(even) {
     padding: 5px 15px;
 }
 
-.indicator-but#not-installed{
+.indicator-but{
     background-color: white;
     color: black;
     border-color: black;
@@ -24,6 +24,10 @@ tr:nth-child(even) {
     background-color: rgb(216, 216, 216);
     color: rgb(133, 133, 133);
     border-color: rgb(133, 133, 133);
+}
+
+.manage-but{
+    margin-left: 10px;
 }
 
 .inline-text{

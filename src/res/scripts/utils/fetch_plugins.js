@@ -37,7 +37,42 @@ function getPlugins(elem){
         let args = Object.entries(initial_list[i - 1])
 
         for (let i2 = 0; i2 < spec_elem.children.length; i2++){
+            if (typeof(args[i2][1]) == "boolean"){
+                let button_container = document.createElement("div")
+                let button = document.createElement("button")
+
+                if (args[i2][1]){
+                    //is installed
+                    button.classList.add("indicator-but")
+                    button.id = "installed"
+                    button.innerHTML = "Installed"
+
+                    let manage_button = document.createElement("button")
+                    manage_button.classList.add("indicator-but", "manage-but")
+                    manage_button.id = "manage"
+                    manage_button.innerHTML = "Manage plugin"
+
+                    button_container.appendChild(button)
+                    button_container.appendChild(manage_button)
+                }
+                else{
+                    //isn't installed
+                    button.classList.add("indicator-but")
+                    button.id = "not-installed"
+                    button.innerHTML = "Not installed"
+                    
+                    button_container.appendChild(button)
+                }
+                spec_elem.children[i2].appendChild(button_container)
+                continue
+            }
+
             spec_elem.children[i2].innerHTML = args[i2][1]
         }
     }
+
+    //reload all listeners
+    let not_installed_buttons = document.querySelectorAll("button#not-installed")
+    let manage_buttons = document.querySelectorAll("button#manage")
+    //TODO
 }

@@ -77,13 +77,14 @@ function getPlugins(elem){
     
     for (let i = 0; i < not_installed_buttons.length; i++){
         not_installed_buttons[i].addEventListener("click", (event) => {
-            console.log("install!")
+            console.log(event.target)
+            //window.electronAPI.send("controller", ["install-plugin", ])
         })
     }
 
     for (let i = 0; i < manage_buttons.length; i++){
         manage_buttons[i].addEventListener("click", (event) => {
-            
+            console.log("manage!")
         })
     }
 }

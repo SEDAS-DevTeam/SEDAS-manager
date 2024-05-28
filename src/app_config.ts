@@ -99,6 +99,18 @@ export const basic_worker_widget_dict = {
     }
 }
 
+export const popup_widget_dict = {
+    width: 500,
+    height: 300,
+    title: "SEDAC popup",
+    resizable: false,
+    icon: "./res/img/sedac-manager-logo.png",
+    frame: false,
+    webPreferences: {
+        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
+    }
+}
+
 /*
     Window classes
 */
@@ -264,8 +276,22 @@ export class WidgetWindow extends BaseWindow{
 
 export class PopupWindow extends BaseWindow{
 
-    public constructor(){
+    public constructor(config: any, path: string, coords: number[], 
+                        ev_logger: EventLogger, header: string){
         super()
-        //TODO
+        
+        this.event_logger = ev_logger
+        Object.assign(this.localConfig, config)
+
+        this.localConfig.x = coords[0]
+        this.localConfig.y = coords[1]
+
+        this.path_load = path
+
+        this.event_logger.log("DEBUG", `Created popup window object(path_load=${this.path_load}, coords=${coords})`)
+    }
+
+    public wait_for_confirmation(){
+        
     }
 }

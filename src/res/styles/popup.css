@@ -1,0 +1,25 @@
+.norm-text{
+    color: black;
+    font-size: larger;
+}
+
+div#spec-button button{
+    margin-left: 20px;
+    margin-right: 20px;
+    border-radius: 5px;
+    
+    background-color: #5271ff;
+    color: white;
+}
+
+div#spec-button button#yes:hover{
+    color: green;
+    border-color: green;
+    background-color: white;
+}
+
+div#spec-button button#no:hover{
+    color: red;
+    border-color: red;
+    background-color: white;
+}

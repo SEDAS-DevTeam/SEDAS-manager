@@ -23,11 +23,13 @@ import {
     controller_dict,
     worker_dict,
     basic_worker_widget_dict,
+    popup_widget_dict,
+    load_dict,
 
     //window Classes
     Window,
     WidgetWindow,
-    load_dict
+    PopupWindow
 } from "./app_config"
 import {
     Environment

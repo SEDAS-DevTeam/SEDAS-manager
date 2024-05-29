@@ -11,7 +11,6 @@
 
         <script src="scripts/controllers/controller.js"></script>
         <script src="scripts/controllers/controller_plugins.js"></script>
-        <script src="scripts/utils/fetch_plugins.js"></script>
     </head>
     <body style="margin-left: 20px; margin-right: 20px;" id="scrollable">
         <top-header id="plugin"></top-header>
@@ -22,7 +21,7 @@
             <div style="margin-bottom: 10px;">
                 <p class="inline-text">Refresh plugins tab</p><i class="fa fa-refresh" aria-hidden="true" id="refresh" onclick="refresh(this)"></i>
             </div>
-            <default-table id="plugin-tab" dim="4x4" onload="getPlugins(this)"></default-table>
+            <default-table id="plugin-tab" dim="4x4" onload="getPlugins()"></default-table>
         </div>
     </body>
 </html>

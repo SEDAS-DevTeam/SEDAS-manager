@@ -275,6 +275,7 @@ export class WidgetWindow extends BaseWindow{
 }
 
 export class PopupWindow extends BaseWindow{
+    private header: string;
 
     public constructor(config: any, path: string, coords: number[], 
                         ev_logger: EventLogger, header: string){
@@ -287,11 +288,28 @@ export class PopupWindow extends BaseWindow{
         this.localConfig.y = coords[1]
 
         this.path_load = path
+        this.header = header
+
+        this.window = new BrowserWindow(this.localConfig);
+        this.window.setMenu(null);
+        this.window.setAlwaysOnTop(true);
 
         this.event_logger.log("DEBUG", `Created popup window object(path_load=${this.path_load}, coords=${coords})`)
     }
 
-    public wait_for_confirmation(){
-        
+    public load_popup(){
+        this.show()
+        this.wait_for_load(() => {
+            this.send_message("header", this.header)
+        })
+    }
+
+    private wait_for_load(callback: any){
+        return new Promise<void>((resolve, reject) => {
+            this.window.webContents.on("did-finish-load", async () => {
+                await callback()
+                resolve()
+            })
+        })
     }
 }

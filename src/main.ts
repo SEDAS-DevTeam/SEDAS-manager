@@ -11,7 +11,7 @@ import { app, ipcMain, screen, Tray, nativeImage, Menu } from "electron";
 
 //relative imports
 import { Plane, PlaneDB } from "./plane_functions"
-import { update_all } from "./fetch"
+import { update_models, update_plugins } from "./fetch"
 import { EventLogger } from "./logger"
 
 import * as utils from "./utils"
@@ -51,11 +51,11 @@ const PATH_TO_COMMANDS: string = path.join(ABS_PATH, "/src/res/data/sim/commands
 const PATH_TO_AIRCRAFTS: string = path.join(ABS_PATH, "/src/res/data/sim/planes/")
 
 class MainApp{
+    //all variables that contain "low-level" functionalities of the app
     public app_settings: any;
     private displays = [];
     private workers: any[] = [];
     private widget_workers: any[] = []
-    private sender_win_name: string;
     private enviro: Environment;
 
     //all variables related to frontend
@@ -103,10 +103,15 @@ class MainApp{
     public backup_worker: Worker;
     public PlaneDatabase: PlaneDB;
 
-    //other classes
-    private loader: utils.ProgressiveLoader
+    //temporary variables
+    private selected_plugin_id: string;
+    private sender_win_name: string;
+    private current_popup_window: PopupWindow; //For now, app only permits one popup window at the time (TODO)
 
+    //other variables
+    private loader: utils.ProgressiveLoader
     public backupdb_saving_frequency: number = 1000; //defaultly set to 1 second
+    private local_plugin_list: any[]
 
     public constructor(app_settings: any){
         this.app_settings = app_settings
@@ -416,7 +421,7 @@ class MainApp{
 
                     this.enviro = new Environment(EvLogger, ABS_PATH, this.command_preset_data, this.aircraft_preset_data, this.map_data)
                     await utils.sleep(2000)
-                    this.loader.send_progresss("Setting up environment")
+                    this.loader.send_progress("Setting up environment")
                     await utils.sleep(3000)
                     this.loader.destroy_loaders()
                     this.loader = undefined
@@ -672,6 +677,37 @@ class MainApp{
                     }
                     break
                 }
+                //plugin installation
+                case "install-plugin": {
+                    this.selected_plugin_id = data[1][1]
+                    let plugin_name = data[1][2]
+
+                    //create popup window for user confirmation
+                    let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", popup_widget_dict)
+                    let coords = win_info.slice(0, 2)
+                    let popup_window: PopupWindow = new PopupWindow(popup_widget_dict, "./res/html/other/popup.html", coords, 
+                                                    EvLogger, `Do you want to install plugin: ${plugin_name}?`)
+                    
+                    popup_window.load_popup()
+                    this.current_popup_window = popup_window
+
+                    break
+                }
+                case "get-plugin-list": {
+                    controllerWindow.send_message("plugin-list", this.local_plugin_list)
+                    break
+                }
+                case "confirm-install": {
+                    if (data[1][1]){
+                        EvLogger.log("DEBUG", "Installing plugin")
+                        console.log(this.selected_plugin_id)
+                        //TODO
+                    }
+                    else{
+                        EvLogger.log("DEBUG", "Plugin install aborted by user")
+                    }
+                    this.current_popup_window.close()
+                }
             }
         })
 
@@ -773,7 +809,7 @@ class MainApp{
         /*
             Loader segment 1
         */
-        this.loader.send_progresss("Reading app configuration")
+        this.loader.send_progress("Reading app configuration")
 
         //read JSON
         const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
@@ -784,19 +820,19 @@ class MainApp{
         /*
             Loader segment 2
         */
-        this.loader.send_progresss("Checking internet connectivity")
+        this.loader.send_progress("Checking internet connectivity")
 
         //check internet connectivity
         this.app_status["internet-connection"] = Boolean(await utils.checkInternet(EvLogger))
 
         if (this.app_status["internet-connection"] && this.app_settings["fetch_alg"]){
-            await update_all(EvLogger, this.loader)
+            await update_models(EvLogger, this.loader)
         }
 
         /*
             Loader segment 7 (rest of segments are in update_all)
         */
-        this.loader.send_progresss("Setting all backend processes")
+        this.loader.send_progress("Setting all backend processes")
 
         //workers
         if (this.app_settings["backend_init"]){
@@ -832,19 +868,27 @@ class MainApp{
         /*
             Loader segment 8
         */
-        this.loader.send_progresss("Updating audio devices")
+        this.loader.send_progress("Updating audio devices")
 
         //update audio devices
         EvLogger.log("DEBUG", "Updating audio device list using get_info.py")
         const update_devices = spawn("python3", [PATH_TO_AUDIO_UPDATE])
         //TODO: add fallback logger to update_devices subprocess
+
+        /*
+            Loader segment 9
+        */
+        this.loader.send_progress("Fetching new plugin list")
+
+        EvLogger.log("DEBUG", "Fetching new plugin list")
+        this.local_plugin_list = update_plugins()
     }
 
     public init_gui(){
         /*
             Loader segment 9
         */
-        this.loader.send_progresss("Initializing GUI")
+        this.loader.send_progress("Initializing GUI")
 
         EvLogger.log("DEBUG", "Get display coords info for better window positioning")
         

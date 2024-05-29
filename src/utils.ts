@@ -56,7 +56,7 @@ export class ProgressiveLoader{
         }
     }
 
-    public send_progresss(message: string){
+    public send_progress(message: string){
         for (let i = 0; i < this.loaders.length; i++){
             this.loaders[i].send_message("progress", [message])
         }

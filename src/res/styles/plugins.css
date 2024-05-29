@@ -20,10 +20,11 @@ tr:nth-child(even) {
     border-color: black;
 }
 
-.indicator-but#installed{
+.indicator-but.installed{
     background-color: rgb(216, 216, 216);
     color: rgb(133, 133, 133);
     border-color: rgb(133, 133, 133);
+    cursor: default;
 }
 
 .manage-but{

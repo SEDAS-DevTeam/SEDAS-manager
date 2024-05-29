@@ -43,13 +43,13 @@ async function fetch_file_conf(header: string, filename: string){
     })
 }
 
-export async function update_all(event_logger: EventLogger, loader: ProgressiveLoader){
+export async function update_models(event_logger: EventLogger, loader: ProgressiveLoader){
     /*
     fetching for source files
     */
 
     //PlaneResponse (loader segment 3)
-    loader.send_progresss("Fetched all pilot models")
+    loader.send_progress("Fetched all pilot models")
 
     await fetch_file_src("PlaneResponse", "voice_models.py")
     event_logger.log("DEBUG", "Fetched voice models")
@@ -61,21 +61,63 @@ export async function update_all(event_logger: EventLogger, loader: ProgressiveL
     event_logger.log("DEBUG", "Fetched text models")
 
     //ACAI (loader segment 4)
-    loader.send_progresss("Fetching ACAI models")
+    loader.send_progress("Fetching ACAI models")
     
     await fetch_file_src("ACAI", "main_control.py")
 
     //gen_map (loader segment 5)
-    loader.send_progresss("Fetching terrain generation models")
+    loader.send_progress("Fetching terrain generation models")
 
     await fetch_file_src("gen_map", "main_terrain.py")
 
     /*
     fetching for configs (loader segment 6)
     */
-    loader.send_progresss("Fetching all model configurations")
+    loader.send_progress("Fetching all model configurations")
 
     await fetch_file_conf("PlaneResponse", "speech_config.json")
     await fetch_file_conf("PlaneResponse", "text_config.json")
     await fetch_file_conf("PlaneResponse", "voice_config.json")
+}
+
+export function update_plugins(){
+    //TODO
+
+    let initial_list = [
+        {
+            "header": {
+                "id": "asdasdsdasdasd4561" //TODO
+            },
+            "data": {
+                "plugin": "SEDAC MapBuilder",
+                "version": "ver 1.0.0",
+                "last-updated": "Last week",
+                "installed": true
+            }
+        },
+        {
+            "header": {
+                "id": "abfhagbakgnk"
+            },
+            "data": {
+                "plugin": "Lorem Ipsum",
+                "version": "ver 1.0.0",
+                "last-updated": "Last year",
+                "installed": false
+            }
+        },
+        {
+            "header": {
+                "id": "angjkang"
+            },
+            "data": {
+                "plugin": "Map Randgen",
+                "version": "ver 1.0.0",
+                "last-updated": "Last year",
+                "installed": false
+            }
+        }
+    ]
+
+    return initial_list
 }

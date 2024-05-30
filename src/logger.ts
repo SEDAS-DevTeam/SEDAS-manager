@@ -1,5 +1,6 @@
 import { readdirSync, unlinkSync, openSync, appendFileSync} from "fs"
 import path from "path"
+import os from "os"
 
 const ABS_PATH = path.resolve("")
 
@@ -16,25 +17,25 @@ export class EventLogger{
     private data = []
     private debug_mode: boolean = undefined
     private LOG_PATH: string = ""
-    public constructor(debug: boolean){
+    public log_header: string = ""
+    private app_version: string = ""
+
+    public constructor(debug: boolean, log_header: string, header_type: string, app_ver: string = ""){
         this.debug_mode = debug
-        this.LOG_PATH = path.join(ABS_PATH, "/src/logs/app_log.txt")
+        this.LOG_PATH = path.join(ABS_PATH, `/src/logs/${log_header}.txt`)
+        this.log_header = log_header
+        this.app_version = app_ver
 
         if(this.debug_mode){
             let time: string = this.get_time()
             console.log(`[${time}]`, "(DEBUG)", "Initialized event logger with DEBUGGING=TRUE")
         }
-
+        
         //create log file
-        let files: string[] = readdirSync(path.join(ABS_PATH, "/src/logs"))
-        if (files.includes("app_log.txt")){
-            unlinkSync(this.LOG_PATH)
-        }
         openSync(this.LOG_PATH, "w")
 
-        appendFileSync(this.LOG_PATH, "#########################################\n")
-        appendFileSync(this.LOG_PATH, "SEDAC manager v1.0.0 Linux 64-bit version\n") //TODO: different outputs for different OSes!
-        appendFileSync(this.LOG_PATH, "#########################################\n")
+        //write information header
+        this.create_header(header_type)
     }
     private get_time(){
         let date_obj = new Date()
@@ -75,5 +76,24 @@ export class EventLogger{
 
         //log to main log file
         appendFileSync(this.LOG_PATH, output + "\n")
+    }
+
+    private create_header(header_type: string){
+        appendFileSync(this.LOG_PATH, "#########################################\n")
+
+        switch (header_type){
+            case "system":
+                let os_type: string = os.type()
+                let os_release: string = os.release()
+                let os_platform: string = os.platform()
+
+                appendFileSync(this.LOG_PATH, `SEDAC manager ${this.app_version} ${os_type} ${os_platform} ${os_release}\n`)
+                break
+            case "environment":
+                appendFileSync(this.LOG_PATH, "SEDAC environment\n")
+                break
+        }
+
+        appendFileSync(this.LOG_PATH, "#########################################\n")
     }
 }

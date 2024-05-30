@@ -8,6 +8,11 @@ import { v4 } from "uuid"
 import http from "http"
 import { EventLogger } from "./logger"
 import { LoaderWindow, WidgetWindow } from "./app_config";
+import path from "path"
+
+const ABS_PATH = path.resolve("")
+const PATH_TO_LOGS: string = path.join(ABS_PATH, "/src/logs/")
+
 
 export class ProgressiveLoader{
     private loaders: any[] = [];
@@ -261,5 +266,22 @@ export function create_widget_window(dict: any, path_load: string,
     widget_workers.push({
         "id": datetime_id,
         "win": datetimeWidgetWindow
+    })
+}
+
+export function delete_logs(){
+    fs.readdir(PATH_TO_LOGS, (err, files) => {
+        if (err){
+            console.error(err)
+        }
+
+        files.forEach((file) => {
+            let abs_path = path.join(PATH_TO_LOGS, file)
+            
+            if (file != ".gitkeep"){
+                fs.rmSync(abs_path)
+            }
+
+        })
     })
 }

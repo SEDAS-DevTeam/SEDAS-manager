@@ -67,10 +67,11 @@ class MainApp{
         "glob": {} //variables used across windows
     } //used to save variables that are then used on redirect between windows
 
-    //all variables related to map
+    //all variables related to environment/map
     private map_configs_list: any = [];
     private map_data: any;
     private map_name: string;
+    private enviro_logger: EventLogger;
 
     private scale: number;
     private longitude: number = undefined;
@@ -387,7 +388,7 @@ class MainApp{
             
                     //save map name for backup usage
                     let map_config_raw = fs.readFileSync(PATH_TO_MAPS + this.map_data["CONFIG"], "utf-8")
-                    this.map_name = JSON.parse(map_config_raw)["AIRPORT_NAME"];
+                    this.map_name = JSON.parse(map_config_raw)["AIRPORT_NAME"]
 
                     this.command_preset_data = utils.read_file_content(PATH_TO_COMMANDS, filename_command)
                     this.command_preset_name = this.command_preset_data["info"]["name"]
@@ -418,7 +419,9 @@ class MainApp{
                     */
                     this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
                     this.loader.setup_loader(2, "Setting up simulation, please wait...", "Initializing simulation setup")
+                    
 
+                    this.enviro_logger = new EventLogger(true, "enviro_log", "environment")
                     this.enviro = new Environment(EvLogger, ABS_PATH, this.command_preset_data, this.aircraft_preset_data, this.map_data)
                     await utils.sleep(2000)
                     this.loader.send_progress("Setting up environment")
@@ -685,12 +688,10 @@ class MainApp{
                     //create popup window for user confirmation
                     let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", popup_widget_dict)
                     let coords = win_info.slice(0, 2)
-                    let popup_window: PopupWindow = new PopupWindow(popup_widget_dict, "./res/html/other/popup.html", coords, 
+                    this.current_popup_window = new PopupWindow(popup_widget_dict, "./res/html/other/popup.html", coords, 
                                                     EvLogger, `Do you want to install plugin: ${plugin_name}?`)
                     
-                    popup_window.load_popup()
-                    this.current_popup_window = popup_window
-
+                    this.current_popup_window.load_popup()
                     break
                 }
                 case "get-plugin-list": {
@@ -707,6 +708,7 @@ class MainApp{
                         EvLogger.log("DEBUG", "Plugin install aborted by user")
                     }
                     this.current_popup_window.close()
+                    this.current_popup_window = undefined
                 }
             }
         })
@@ -1064,7 +1066,10 @@ const app_settings = JSON.parse(app_settings_raw);
 
 //app main code
 app.on("ready", async () => {
-    EvLogger = new EventLogger(app_settings["logging"])
+    //setup app event logger
+    utils.delete_logs()
+    EvLogger = new EventLogger(app_settings["logging"], "app_log", "system", "v1.0.0")
+
     main_app = new MainApp(app_settings)
 
     await main_app.init_app() //initializing backend for app

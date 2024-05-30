@@ -72,7 +72,7 @@ class FrontendFunctions{
 }
 
 class TableFunctions extends ElementBind{
-    constructor(element_query, selection_type){
+    constructor(element_query, selection_type = ""){
         super(element_query);
 
         console.log(this.attributes)
@@ -90,6 +90,9 @@ class TableFunctions extends ElementBind{
                 break
             case "commands":
                 sel_header = head_commands
+                break
+            case "scenario":
+                sel_header = head_scenarios
                 break
         }
     
@@ -233,6 +236,55 @@ class TableFunctions extends ElementBind{
     
             record.appendChild(desc_obj)
             record.appendChild(select_obj)
+    
+            this.element.children[0].appendChild(record)
+
+            this.#check_even()
+        }
+    }
+
+    set_adjustments_list(){
+
+    }
+
+    set_scenarios_list(scenarios){
+        //delete children
+        for (let i = 1; i < this.element.children[0].children.length; i++){
+            console.log(this.element.children[0].children[i])
+            this.element.children[0].children[i].remove()
+        }
+
+        for (let i = 0; i < scenarios.length; i++){
+            let scenario_name = scenarios[i]["name"]
+            let scenario_id = scenarios[i]["id"]
+            let scenario_weight_categories = scenarios[i]["weight_category"]
+            let scenario_categories = scenarios[i]["category"]
+
+            let record = document.createElement("tr")
+            
+            let name = document.createElement("td")
+            name.innerHTML = scenario_name
+
+            let category_tags_parent = document.createElement("td")
+            for (let i = 0; i < scenario_categories.length; i++){
+                category_tags_parent.innerHTML += `<span id="tag">${scenario_categories[i]}</span>`
+            }
+
+            let weight_category_tags_parent = document.createElement("td")
+            for (let i = 0; i < scenario_weight_categories.length; i++){
+                weight_category_tags_parent.innerHTML += `<span id="tag">${scenario_weight_categories[i]}</span>`
+            }
+
+            let select_button = document.createElement("button")
+            select_button.classList.add("tablebutton")
+            select_button.innerHTML = "Select"
+            select_button.id = scenario_id
+            
+
+            record.appendChild(name)
+            record.appendChild(category_tags_parent)
+            record.appendChild(weight_category_tags_parent)
+            record.appendChild(select_button)
     
             this.element.children[0].appendChild(record)
 

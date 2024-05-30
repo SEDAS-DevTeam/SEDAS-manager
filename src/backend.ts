@@ -3,14 +3,17 @@ import {spawn} from "node:child_process"
 import net from "net"
 import fs from "fs";
 import path from "path";
+import {
+    ABS_PATH,
+    PATH_TO_SETTINGS
+} from "./app_config"
 
-const ABS_PATH = path.resolve("")
 const PORT = 36000
 
 const QUERY_TIMEOUT: number = 10
 
 //read JSON
-const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
+const app_settings_raw = fs.readFileSync(PATH_TO_SETTINGS, "utf-8")
 const app_settings = JSON.parse(app_settings_raw);
 
 //variables

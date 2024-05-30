@@ -37,7 +37,13 @@ import {
     PATH_TO_CONTROLLER_HTML,
     PATH_TO_EXIT_HTML,
     PATH_TO_WORKER_HTML,
-    PATH_TO_POPUP_HTML
+    PATH_TO_POPUP_HTML,
+
+    ABS_PATH,
+    PATH_TO_AUDIO_UPDATE,
+    PATH_TO_MAPS,
+    PATH_TO_COMMANDS,
+    PATH_TO_AIRCRAFTS
 
 } from "./app_config"
 import {
@@ -50,14 +56,6 @@ var settingsWindow: Window;
 var controllerWindow: Window;
 var workerWindow: Window;
 var exitWindow: Window;
-
-//paths
-const ABS_PATH = path.resolve("")
-
-const PATH_TO_AUDIO_UPDATE: string = path.join(ABS_PATH, "/src/res/neural/get_info.py")
-const PATH_TO_MAPS: string = path.join(ABS_PATH, "/src/res/data/sim/maps/")
-const PATH_TO_COMMANDS: string = path.join(ABS_PATH, "/src/res/data/sim/commands/")
-const PATH_TO_AIRCRAFTS: string = path.join(ABS_PATH, "/src/res/data/sim/planes/")
 
 class MainApp{
     //all variables that contain "low-level" functionalities of the app
@@ -382,6 +380,12 @@ class MainApp{
                     }
                     break
                 }
+                case "send-scenario-list": {
+                    let selected_map_data = utils.read_file_content(PATH_TO_MAPS, data[1][1])
+                    let scenarios = selected_map_data["scenarios"]
+                    controllerWindow.send_message("scenario-list", scenarios)
+                    break
+                }
                 case "set-environment": {
                     //getting map info, command preset info, aircraft preset info from user
                     let filename_map = data[1][1]
@@ -396,8 +400,8 @@ class MainApp{
                     this.map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
             
                     //save map name for backup usage
-                    let map_config_raw = fs.readFileSync(PATH_TO_MAPS + this.map_data["CONFIG"], "utf-8")
-                    this.map_name = JSON.parse(map_config_raw)["AIRPORT_NAME"]
+                    let map_config = utils.read_file_content(PATH_TO_MAPS, this.map_data["CONFIG"])
+                    this.map_name = map_config["AIRPORT_NAME"]
 
                     this.command_preset_data = utils.read_file_content(PATH_TO_COMMANDS, filename_command)
                     this.command_preset_name = this.command_preset_data["info"]["name"]

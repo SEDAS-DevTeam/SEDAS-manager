@@ -4,10 +4,12 @@
 const head_airports = ["Scenario preset name", "Type", "Code", "Country", "City", "Description"]
 const head_aircrafts = ["Aircraft preset name", "Inspect"]
 const head_commands = ["Command preseet name", "Inspect"]
+const head_scenarios = ["Scenario name", "category tags", "weight category tags"]
 
 var desc_rendered = false
 var clicked = false
 var curr_desc = -1
+var all_selected_scenarios = [];
 
 //user selection variables
 var selected_map = ""
@@ -19,11 +21,13 @@ var map_name = ""
 var command_preset_name = ""
 var aircraft_preset_name = ""
 
-//element function binders defined
+//element function binders definitions
 var frontend;
 var table_map;
 var table_aircraft;
 var table_command;
+var table_scenario;
+var table_scenario_adjustments;
 
 /*
 table setups
@@ -68,6 +72,8 @@ function selection(button_elem){
             }
             document.getElementById("confirmresult-airport").innerHTML = selection_name
             selected_map = selection_path
+
+            window.electronAPI.send_message("controller", ["send-scenario-list", selected_map])
             break
     }
 }
@@ -119,15 +125,22 @@ function process_specific(data, reset = false){
 */
 
 function onload_specific(){
-    //create all element classes
+    //create frontend binder
+    frontend = new FrontendFunctions()
+
+    //create all element binders
     table_map = new TableFunctions("default-table#airports", "airports")
     table_aircraft = new TableFunctions("default-table#aircrafts", "aircrafts")
     table_command = new TableFunctions("default-table#commands", "commands")
-    frontend = new FrontendFunctions()
+    table_scenario = new TableFunctions("default-table#scenarios", "scenario")
+    table_scenario_adjustments = new TableFunctions("default-table#scenario-adjustments")
 
     table_map.set_header()
     table_aircraft.set_header()
     table_command.set_header()
+    table_scenario.set_header()
+
+    table_scenario_adjustments.set_adjustments_list()
 
     document.addEventListener("click", () => {
         if (clicked){
@@ -178,5 +191,10 @@ function onload_specific(){
                 }
             })
         }
+    })
+    
+    window.electronAPI.on_message("scenario-list", (data) => {
+        all_selected_scenarios = data
+        table_scenario.set_scenarios_list(all_selected_scenarios)
     })
 }

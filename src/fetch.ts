@@ -4,10 +4,10 @@ import { EventLogger } from "./logger"
 import { ProgressiveLoader } from "./utils"
 
 import { createWriteStream } from 'fs'
-
-const ABS_PATH = path.resolve("")
-const PATH_TO_CACHE: string = path.join(ABS_PATH, "/src/res/neural/alg_cache")
-const PATH_TO_CONFIG: string = path.join(ABS_PATH, "/src/res/data/alg/")
+import {
+    PATH_TO_CACHE,
+    PATH_TO_CONFIG
+} from "./app_config"
 
 const URL: string = "https://raw.githubusercontent.com/SEDAS-DevTeam/SEDAS-networks/main/src/"
 

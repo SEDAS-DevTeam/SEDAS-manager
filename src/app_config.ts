@@ -9,9 +9,9 @@ import { EventLogger } from "./logger"
 
 
 //init vars
-const ABS_PATH = path.resolve("")
+export const ABS_PATH = path.resolve("")
 
-//for main.ts and utils.ts
+//paths for all html files
 export const PATH_TO_MAIN_HTML = path.join(ABS_PATH, "./src/res/html/other/main.html")
 export const PATH_TO_SETTINGS_HTML = path.join(ABS_PATH, "./src/res/html/controller/settings.html")
 export const PATH_TO_CONTROLLER_HTML = path.join(ABS_PATH, "./src/res/html/controller/controller_set.html")
@@ -19,6 +19,21 @@ export const PATH_TO_EXIT_HTML = path.join(ABS_PATH, "./src/res/html/other/exit.
 export const PATH_TO_WORKER_HTML = path.join(ABS_PATH, "./src/res/html/worker/worker.html")
 export const PATH_TO_POPUP_HTML = path.join(ABS_PATH, "./src/res/html/other/popup.html")
 export const PATH_TO_LOADER_HTML = path.join(ABS_PATH, "./src/res/html/other/load.html")
+
+//paths for subprocesses
+export const PATH_TO_AUDIO_UPDATE: string = path.join(ABS_PATH, "/src/res/neural/get_info.py")
+
+//paths for local storage
+export const PATH_TO_LOGS: string = path.join(ABS_PATH, "/src/logs/")
+export const PATH_TO_MAPS: string = path.join(ABS_PATH, "/src/res/data/sim/maps/")
+export const PATH_TO_COMMANDS: string = path.join(ABS_PATH, "/src/res/data/sim/commands/")
+export const PATH_TO_AIRCRAFTS: string = path.join(ABS_PATH, "/src/res/data/sim/planes/")
+export const PATH_TO_CACHE: string = path.join(ABS_PATH, "/src/res/neural/alg_cache")
+export const PATH_TO_CONFIG: string = path.join(ABS_PATH, "/src/res/data/alg/")
+export const PATH_TO_SETTINGS: string = path.join(ABS_PATH, "/src/res/data/app/settings.json")
+
+//paths for backup
+export const PATH_TO_DATABASE: string = path.join(ABS_PATH, "/src/res/data/tmp/backup.json")
 
 /*
     Window configs for electron

@@ -13,13 +13,10 @@ import {
     WidgetWindow,
 
     //paths
-    PATH_TO_LOADER_HTML
+    PATH_TO_LOADER_HTML,
+    PATH_TO_LOGS
  } from "./app_config";
 import path from "path"
-
-const ABS_PATH = path.resolve("")
-const PATH_TO_LOGS: string = path.join(ABS_PATH, "/src/logs/")
-
 
 export class ProgressiveLoader{
     private loaders: any[] = [];

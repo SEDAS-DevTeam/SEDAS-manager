@@ -1,8 +1,9 @@
 import { readdirSync, unlinkSync, openSync, appendFileSync} from "fs"
 import path from "path"
 import os from "os"
-
-const ABS_PATH = path.resolve("")
+import {
+    ABS_PATH
+} from "./app_config"
 
 export class EventLogger{
     /*

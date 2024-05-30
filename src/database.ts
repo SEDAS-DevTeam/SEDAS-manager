@@ -1,9 +1,10 @@
 import {parentPort} from "worker_threads"
 import path from "path"
 import fs from "fs"
-
-const ABS_PATH = path.resolve("")
-const DATABASE_PATH = path.join(ABS_PATH, "/src/res/data/tmp/backup.json")
+import {
+    PATH_TO_DATABASE,
+    ABS_PATH
+} from "./app_config"
 
 //
 // worker part
@@ -13,10 +14,10 @@ parentPort.on("message", async (message) => {
     if (Array.isArray(message)){
         switch(message[0]){
             case "save-to-db":
-                fs.writeFileSync(DATABASE_PATH, message[1])
+                fs.writeFileSync(PATH_TO_DATABASE, message[1])
                 break
             case "read-db":
-                let data = fs.readFileSync(DATABASE_PATH, "utf-8")
+                let data = fs.readFileSync(PATH_TO_DATABASE, "utf-8")
                 parentPort.postMessage(["db-data", data])
                 break
         }

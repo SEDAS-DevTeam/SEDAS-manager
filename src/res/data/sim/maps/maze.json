@@ -22,6 +22,7 @@
     "scale": "0.005m",
     "scenarios": [
         {
+            "id": "adasdassd14255",
             "name": "Scenario 1 Basic",
             "category": ["AI", "HE", "GL", "AE"],
             "weight_category": ["UL", "L", "M", "H", "S"],

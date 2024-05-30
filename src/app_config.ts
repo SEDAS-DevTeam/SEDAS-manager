@@ -8,8 +8,17 @@ import { BrowserWindow, ipcMain, screen, Tray, nativeImage, Menu } from "electro
 import { EventLogger } from "./logger"
 
 
-//init
+//init vars
 const ABS_PATH = path.resolve("")
+
+//for main.ts and utils.ts
+export const PATH_TO_MAIN_HTML = path.join(ABS_PATH, "./src/res/html/other/main.html")
+export const PATH_TO_SETTINGS_HTML = path.join(ABS_PATH, "./src/res/html/controller/settings.html")
+export const PATH_TO_CONTROLLER_HTML = path.join(ABS_PATH, "./src/res/html/controller/controller_set.html")
+export const PATH_TO_EXIT_HTML = path.join(ABS_PATH, "./src/res/html/other/exit.html")
+export const PATH_TO_WORKER_HTML = path.join(ABS_PATH, "./src/res/html/worker/worker.html")
+export const PATH_TO_POPUP_HTML = path.join(ABS_PATH, "./src/res/html/other/popup.html")
+export const PATH_TO_LOADER_HTML = path.join(ABS_PATH, "./src/res/html/other/load.html")
 
 /*
     Window configs for electron

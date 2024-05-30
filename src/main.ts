@@ -29,7 +29,16 @@ import {
     //window Classes
     Window,
     WidgetWindow,
-    PopupWindow
+    PopupWindow,
+
+    //all init vars
+    PATH_TO_MAIN_HTML,
+    PATH_TO_SETTINGS_HTML,
+    PATH_TO_CONTROLLER_HTML,
+    PATH_TO_EXIT_HTML,
+    PATH_TO_WORKER_HTML,
+    PATH_TO_POPUP_HTML
+
 } from "./app_config"
 import {
     Environment
@@ -235,7 +244,7 @@ class MainApp{
 
                     EvLogger.log("DEBUG", "main-menu show")
                     mainMenuWindow = new Window(this.app_status, main_menu_dict, 
-                        "./res/main.html", coords, EvLogger, main_app)
+                        PATH_TO_MAIN_HTML, coords, EvLogger, main_app)
                     mainMenuWindow.show()
                     
                     this.workers = []
@@ -265,7 +274,7 @@ class MainApp{
                     let display_info = win_info.slice(2, 4)
 
                     EvLogger.log("DEBUG", "settings show")
-                    settingsWindow = new Window(this.app_status, settings_dict, "./res/settings.html", coords, EvLogger, main_app, "settings", display_info)
+                    settingsWindow = new Window(this.app_status, settings_dict, PATH_TO_SETTINGS_HTML, coords, EvLogger, main_app, "settings", display_info)
                     settingsWindow.show()
                     break
                 }
@@ -420,7 +429,6 @@ class MainApp{
                     this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
                     this.loader.setup_loader(2, "Setting up simulation, please wait...", "Initializing simulation setup")
                     
-
                     this.enviro_logger = new EventLogger(true, "enviro_log", "environment")
                     this.enviro = new Environment(EvLogger, ABS_PATH, this.command_preset_data, this.aircraft_preset_data, this.map_data)
                     await utils.sleep(2000)
@@ -688,7 +696,7 @@ class MainApp{
                     //create popup window for user confirmation
                     let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", popup_widget_dict)
                     let coords = win_info.slice(0, 2)
-                    this.current_popup_window = new PopupWindow(popup_widget_dict, "./res/html/other/popup.html", coords, 
+                    this.current_popup_window = new PopupWindow(popup_widget_dict, PATH_TO_POPUP_HTML, coords, 
                                                     EvLogger, `Do you want to install plugin: ${plugin_name}?`)
                     
                     this.current_popup_window.load_popup()
@@ -903,7 +911,7 @@ class MainApp{
         this.loader = undefined
 
         EvLogger.log("DEBUG", "main-menu show")
-        mainMenuWindow = new Window(this.app_status, main_menu_dict, "./res/main.html", coords, EvLogger, main_app)
+        mainMenuWindow = new Window(this.app_status, main_menu_dict, PATH_TO_MAIN_HTML, coords, EvLogger, main_app)
         mainMenuWindow.show()
     }
 
@@ -935,11 +943,11 @@ class MainApp{
             }
             else{
                 //backup was not created, create new workers
-                workerWindow = new Window(this.app_status, worker_dict, "./res/worker.html", coords, EvLogger, main_app, "ACC", display_info)
+                workerWindow = new Window(this.app_status, worker_dict, PATH_TO_WORKER_HTML, coords, EvLogger, main_app, "ACC", display_info)
             }
         
             //setting up all layer widgets (overlaying whole map)
-            utils.create_widget_window(basic_worker_widget_dict, "./res/html/widget/worker_widget.html", EvLogger, coords, this.widget_workers)
+            //utils.create_widget_window(basic_worker_widget_dict, "./res/html/widget/worker_widget.html", EvLogger, coords, this.widget_workers)
 
             let worker_id = utils.generate_id()
             this.workers.push({
@@ -954,7 +962,7 @@ class MainApp{
         let display_info = win_info.slice(2, 4)
 
         EvLogger.log("DEBUG", "controller show")
-        controllerWindow = new Window(this.app_status, controller_dict, "./res/controller_set.html", coords, EvLogger, main_app, "controller", display_info)
+        controllerWindow = new Window(this.app_status, controller_dict, PATH_TO_CONTROLLER_HTML, coords, EvLogger, main_app, "controller", display_info)
         controllerWindow.checkClose(() => {
             if (this.app_status["app-running"] && this.app_status["redir-to-main"]){
                 //app is running and is redirected to main => close by tray button
@@ -1021,7 +1029,7 @@ class MainApp{
         let win_info = utils.get_window_info(this.app_settings, this.displays, -1, "normal", exit_dict)
         let coords = win_info.slice(0, 2)
 
-        exitWindow = new Window(this.app_status, exit_dict, "./res/exit.html", coords, EvLogger, main_app)
+        exitWindow = new Window(this.app_status, exit_dict, PATH_TO_EXIT_HTML, coords, EvLogger, main_app)
         exitWindow.show()
 
         this.app_status["app-running"] = false; //stopping all Interval events from firing

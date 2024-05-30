@@ -7,7 +7,14 @@ import { join } from "path"
 import { v4 } from "uuid"
 import http from "http"
 import { EventLogger } from "./logger"
-import { LoaderWindow, WidgetWindow } from "./app_config";
+import { 
+    //Window defs
+    LoaderWindow, 
+    WidgetWindow,
+
+    //paths
+    PATH_TO_LOADER_HTML
+ } from "./app_config";
 import path from "path"
 
 const ABS_PATH = path.resolve("")
@@ -39,7 +46,7 @@ export class ProgressiveLoader{
             let display_info = win_info.slice(2, 4)
 
             //creating loading window
-            let LoadingWindow = new LoaderWindow(this.load_dict, "./res/load.html", coords, this.ev_logger, display_info)
+            let LoadingWindow = new LoaderWindow(this.load_dict, PATH_TO_LOADER_HTML, coords, this.ev_logger, display_info)
             this.loaders.push(LoadingWindow)
         }
     }
@@ -258,6 +265,7 @@ export function parse_scale(scale){
     return val
 }
 
+//currently deprecated
 export function create_widget_window(dict: any, path_load: string, 
                                     event_logger: EventLogger, 
                                     coords: number[], widget_workers: any[]){

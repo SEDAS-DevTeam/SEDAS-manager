@@ -86,19 +86,24 @@ class DefaultTable extends HTMLElement{
         let onload_callback = this.getAttribute("onload")
         let header = Boolean(this.getAttribute("header"))
         let even_color = Boolean(this.getAttribute("even_color"))
+        let padding = parseInt(this.getAttribute("padding"))
 
         //table setup
         let main_table = document.createElement("table")
 
         for (let i1 = 0; i1 < dim[0]; i1++){
             let tr = document.createElement("tr")
+            tr.style.padding = padding
 
             for (let i2 = 0; i2 < dim[1]; i2++){
                 let block_elem = "td"
                 if (header && i1 == 0){
                     block_elem = "th" //rewrite to header
                 }
-                tr.appendChild(document.createElement(block_elem))
+                let elem = document.createElement(block_elem)
+                elem.style.padding = padding
+
+                tr.appendChild(elem)
             }
             if (even_color){
                 tr.id = "color"

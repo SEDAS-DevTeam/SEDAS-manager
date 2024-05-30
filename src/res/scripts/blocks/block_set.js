@@ -243,8 +243,35 @@ class TableFunctions extends ElementBind{
         }
     }
 
-    set_adjustments_list(){
+    set_adjustments_list(type){
+        let sel_category;
+        switch(type){
+            case "category": {
+                sel_category = head_category
+                break
+            }
+            case "weight": {
+                sel_category = head_weight_category
+                break
+            }
+        }
 
+        let row = this.element.children[0].children[0]
+        for (let i = 0; i < sel_category.length; i++){
+            let col = row.children[i]
+            let select = document.createElement("select")
+            select.innerHTML = "<option>True</option><option>False</option>"
+            select.id = sel_category[i]
+            select.classList.add("sel-category")
+
+            let text = document.createElement("p")
+            text.innerHTML = sel_category[i]
+            text.classList.add("sel-text")
+
+            col.appendChild(select)
+            col.appendChild(text)
+
+        }
     }
 
     set_scenarios_list(scenarios){
@@ -253,6 +280,9 @@ class TableFunctions extends ElementBind{
             console.log(this.element.children[0].children[i])
             this.element.children[0].children[i].remove()
         }
+
+        //hide warn text
+        document.getElementById("map-not-selected").style.display = "none"
 
         for (let i = 0; i < scenarios.length; i++){
             let scenario_name = scenarios[i]["name"]

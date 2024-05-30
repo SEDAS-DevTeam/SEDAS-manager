@@ -391,3 +391,18 @@ h3{
 b.nested{
     margin-left: 45px;
 }
+
+.sel-category{
+    width: 50%;
+    height: 100%;
+    background-color: rgb(148, 148, 148);
+    color: white;
+}
+
+
+.sel-text{
+    font-weight: bold;
+    margin-left: 10px;
+    display: inline;
+    color: black;
+}

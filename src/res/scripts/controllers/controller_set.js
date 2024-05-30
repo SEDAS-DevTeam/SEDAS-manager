@@ -6,6 +6,9 @@ const head_aircrafts = ["Aircraft preset name", "Inspect"]
 const head_commands = ["Command preseet name", "Inspect"]
 const head_scenarios = ["Scenario name", "category tags", "weight category tags"]
 
+const head_category = ["AI", "HE", "GL", "AE"]
+const head_weight_category = ["UL", "L", "M", "H", "S"]
+
 var desc_rendered = false
 var clicked = false
 var curr_desc = -1
@@ -27,7 +30,8 @@ var table_map;
 var table_aircraft;
 var table_command;
 var table_scenario;
-var table_scenario_adjustments;
+var table_scenario_adjustments_category;
+var table_scenario_adjustments_weight;
 
 /*
 table setups
@@ -133,14 +137,17 @@ function onload_specific(){
     table_aircraft = new TableFunctions("default-table#aircrafts", "aircrafts")
     table_command = new TableFunctions("default-table#commands", "commands")
     table_scenario = new TableFunctions("default-table#scenarios", "scenario")
-    table_scenario_adjustments = new TableFunctions("default-table#scenario-adjustments")
+    table_scenario_adjustments_category = new TableFunctions("default-table#scenario-adjustments-category")
+    table_scenario_adjustments_weight = new TableFunctions("default-table#scenario-adjustments-weight")
 
     table_map.set_header()
     table_aircraft.set_header()
     table_command.set_header()
     table_scenario.set_header()
 
-    table_scenario_adjustments.set_adjustments_list()
+    table_scenario_adjustments_category.set_adjustments_list("category")
+    table_scenario_adjustments_weight.set_adjustments_list("weight")
+
 
     document.addEventListener("click", () => {
         if (clicked){

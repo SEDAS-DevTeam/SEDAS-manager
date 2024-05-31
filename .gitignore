@@ -6,6 +6,9 @@ package-lock.json
 /src/build/*
 !/src/build/.gitkeep
 
+/src_build/*
+!/src_build/.gitkeep
+
 #javascript files that are automatically generated
 /src/*.js
 

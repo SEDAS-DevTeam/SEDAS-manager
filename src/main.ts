@@ -50,6 +50,11 @@ import {
     Environment
 } from "./environment"
 
+//C++ (N-API) imports
+import { plane_hello, main_hello } from "./bind";
+main_hello() //just for testing
+plane_hello()
+
 //window variable declarations
 var mainMenuWindow: Window;
 var settingsWindow: Window;

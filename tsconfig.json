@@ -21,6 +21,7 @@
     "./src/logger.ts",
     "./src/app_config.ts",
     "./src/environment.ts",
-    "./src/sim_time.ts"
+    "./src/sim_time.ts",
+    "./src/bind.ts"
   ]
 }

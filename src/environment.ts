@@ -28,6 +28,22 @@ export class Environment {
 
     }
 
+    public set_plane_schedules(){
+
+    }
+
+    public set_plane_trajectories(){
+
+    }
+
+    public set_plane_spawner(){
+
+    }
+
+    public validate(){
+        
+    }
+
     public kill_enviro(){
         this.sim_time_worker.terminate()
     }

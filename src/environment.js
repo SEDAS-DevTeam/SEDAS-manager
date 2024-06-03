@@ -26,6 +26,14 @@ class Environment {
             }
         });
     }
+    set_plane_schedules() {
+    }
+    set_plane_trajectories() {
+    }
+    set_plane_spawner() {
+    }
+    validate() {
+    }
     kill_enviro() {
         this.sim_time_worker.terminate();
     }

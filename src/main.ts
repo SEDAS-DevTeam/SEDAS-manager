@@ -436,13 +436,24 @@ class MainApp{
                         Setting up environment
                     */
                     this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
-                    this.loader.setup_loader(2, "Setting up simulation, please wait...", "Initializing simulation setup")
+                    this.loader.setup_loader(5, "Setting up simulation, please wait...", "Initializing simulation setup")
                     
                     this.enviro_logger = new EventLogger(true, "enviro_log", "environment")
-                    this.enviro = new Environment(EvLogger, ABS_PATH, this.command_preset_data, this.aircraft_preset_data, this.map_data)
-                    await utils.sleep(2000)
+
                     this.loader.send_progress("Setting up environment")
-                    await utils.sleep(3000)
+                    this.enviro = new Environment(EvLogger, ABS_PATH, this.command_preset_data, this.aircraft_preset_data, this.map_data)
+                    this.loader.send_progress("Setting plane schedules")
+                    this.enviro.set_plane_schedules()
+                    this.loader.send_progress("Calculating plane trajectories")
+                    this.enviro.set_plane_trajectories()
+                    this.loader.send_progress("Spawning PlaneSpawner process")
+                    this.enviro.set_plane_spawner()
+
+                    //everything done, just validate everything
+                    this.loader.send_progress("Done! Validating output...")
+                    await utils.sleep(1000)
+                    this.enviro.validate()
+
                     this.loader.destroy_loaders()
                     this.loader = undefined
                     

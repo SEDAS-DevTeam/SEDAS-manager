@@ -28,8 +28,22 @@
             "weight_category": ["UL", "L", "M", "H", "S"],
             "flight_schedules": [
                 {
-                    "type": "",
-                    "time": "5min"
+                    "category": "AI",
+                    "weight_category": "L",
+                    "time": "5min",
+                    "special_event": "none"
+                },
+                {
+                    "category": "AI",
+                    "weight_category": "M",
+                    "time": "10min",
+                    "special_event": "none"
+                },
+                {
+                    "category": "HE",
+                    "weight_category": "L",
+                    "time": "12min",
+                    "special_event": "none"
                 }
             ]
         }

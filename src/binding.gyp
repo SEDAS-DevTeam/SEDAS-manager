@@ -5,6 +5,10 @@
       'sources': [ './addons/plane_calculations.cpp' ]
     },
     {
+      'target_name': 'enviro_calculations',
+      'sources': [ './addons/enviro_calculations.cpp' ]
+    },
+    {
       'target_name': 'main',
       'sources': [ './addons/main.cpp' ]
     }

@@ -1,6 +1,11 @@
 import { EventLogger } from "./logger"
 import { Worker } from 'worker_threads';
 import path from "path"
+import { ProgressiveLoader, sleep } from "./utils";
+
+//C++ (N-API) imports
+import { enviro_calculations } from "./bind";
+import { Plane, PlaneDB } from "./plane_functions";
 
 export class Environment {
     private logger: EventLogger;
@@ -8,10 +13,18 @@ export class Environment {
     private sim_time_worker: Worker;
     public current_time: Date
 
-    public constructor(logger: EventLogger, abs_path: string,
+    private command_data: any;
+    private aircraft_data: any;
+    private map_data: any;
+
+    public constructor(logger: EventLogger, abs_path: string, plane_database: PlaneDB,
                     command_data: any[], aircraft_data: any[], map_data: any[]){
         this.logger = logger
         this.abs_path = abs_path
+
+        this.command_data = command_data
+        this.aircraft_data = aircraft_data
+        this.map_data = map_data
 
         //create fake simulation time (TODO: pass time into main)
         this.sim_time_worker = new Worker(path.join(abs_path, "/src/sim_time.js"))
@@ -28,23 +41,43 @@ export class Environment {
 
     }
 
-    public set_plane_schedules(){
+    /*
+        Enviro functions exposed to main
+    */
+    public async setup_enviro(loader: ProgressiveLoader){
+        loader.send_progress("Setting plane schedules")
+        this.set_plane_schedules()
+        loader.send_progress("Calculating plane trajectories")
+        this.set_plane_trajectories()
+        loader.send_progress("Spawning PlaneSpawner process")
+        this.set_plane_spawner()
 
-    }
-
-    public set_plane_trajectories(){
-
-    }
-
-    public set_plane_spawner(){
-
-    }
-
-    public validate(){
-        
+        //everything done, just validate everything
+        loader.send_progress("Done! Validating output...")
+        await sleep(1000)
+        this.validate()
     }
 
     public kill_enviro(){
         this.sim_time_worker.terminate()
+    }
+
+    /*
+        Private enviro functions
+    */
+    private set_plane_schedules(){
+
+    }
+
+    private set_plane_trajectories(){
+
+    }
+
+    private set_plane_spawner(){
+
+    }
+
+    private validate(){
+        
     }
 }

@@ -1,4 +1,5 @@
-
+//C++ (N-API) imports
+import { plane_calculations } from "./bind";
 
 //low level functions
 function deg_to_rad(deg){

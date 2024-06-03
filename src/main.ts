@@ -51,9 +51,7 @@ import {
 } from "./environment"
 
 //C++ (N-API) imports
-import { plane_hello, main_hello } from "./bind";
-main_hello() //just for testing
-plane_hello()
+import { main } from "./bind";
 
 //window variable declarations
 var mainMenuWindow: Window;
@@ -441,18 +439,10 @@ class MainApp{
                     this.enviro_logger = new EventLogger(true, "enviro_log", "environment")
 
                     this.loader.send_progress("Setting up environment")
-                    this.enviro = new Environment(EvLogger, ABS_PATH, this.command_preset_data, this.aircraft_preset_data, this.map_data)
-                    this.loader.send_progress("Setting plane schedules")
-                    this.enviro.set_plane_schedules()
-                    this.loader.send_progress("Calculating plane trajectories")
-                    this.enviro.set_plane_trajectories()
-                    this.loader.send_progress("Spawning PlaneSpawner process")
-                    this.enviro.set_plane_spawner()
+                    this.enviro = new Environment(EvLogger, ABS_PATH, this.PlaneDatabase,
+                        this.command_preset_data, this.aircraft_preset_data, this.map_data)
 
-                    //everything done, just validate everything
-                    this.loader.send_progress("Done! Validating output...")
-                    await utils.sleep(1000)
-                    this.enviro.validate()
+                    this.enviro.setup_enviro(this.loader)
 
                     this.loader.destroy_loaders()
                     this.loader = undefined

@@ -7,7 +7,6 @@ import path from "path"
 import { BrowserWindow, ipcMain, screen, Tray, nativeImage, Menu } from "electron";
 import { EventLogger } from "./logger"
 
-
 //init vars
 export const ABS_PATH = path.resolve("")
 
@@ -208,7 +207,7 @@ export class Window extends BaseWindow{
 
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
-        this.window.webContents.openDevTools()
+        //this.window.webContents.openDevTools()
 
         this.path_load = path
         this.window.maximize()

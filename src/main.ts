@@ -63,6 +63,7 @@ var exitWindow: Window;
 class MainApp{
     //all variables that contain "low-level" functionalities of the app
     public app_settings: any;
+    private dev_panel: boolean;
     private displays = [];
     private workers: any[] = [];
     private widget_workers: any[] = []
@@ -126,6 +127,7 @@ class MainApp{
 
     public constructor(app_settings: any){
         this.app_settings = app_settings
+        this.dev_panel = app_settings["debug-panel"]
     }
 
     //
@@ -244,7 +246,7 @@ class MainApp{
                     let coords = win_info.slice(0, 2)
 
                     EvLogger.log("DEBUG", "main-menu show")
-                    mainMenuWindow = new Window(this.app_status, main_menu_dict, 
+                    mainMenuWindow = new Window(this.app_status, this.dev_panel, main_menu_dict, 
                         PATH_TO_MAIN_HTML, coords, EvLogger, main_app)
                     mainMenuWindow.show()
                     
@@ -275,7 +277,7 @@ class MainApp{
                     let display_info = win_info.slice(2, 4)
 
                     EvLogger.log("DEBUG", "settings show")
-                    settingsWindow = new Window(this.app_status, settings_dict, PATH_TO_SETTINGS_HTML, coords, EvLogger, main_app, "settings", display_info)
+                    settingsWindow = new Window(this.app_status, this.dev_panel, settings_dict, PATH_TO_SETTINGS_HTML, coords, EvLogger, main_app, "settings", display_info)
                     settingsWindow.show()
                     break
                 }
@@ -921,7 +923,7 @@ class MainApp{
         this.loader = undefined
 
         EvLogger.log("DEBUG", "main-menu show")
-        mainMenuWindow = new Window(this.app_status, main_menu_dict, PATH_TO_MAIN_HTML, coords, EvLogger, main_app)
+        mainMenuWindow = new Window(this.app_status, this.dev_panel, main_menu_dict, PATH_TO_MAIN_HTML, coords, EvLogger, main_app)
         mainMenuWindow.show()
     }
 
@@ -948,12 +950,12 @@ class MainApp{
             EvLogger.log("DEBUG", "worker show")
             if (backup_db){
                 //backup was created, reload workers
-                workerWindow = new Window(this.app_status, worker_dict, backup_db["monitor-data"][i]["path_load"], backup_db["monitor-data"][i]["win_coordinates"], backup_db["monitor-data"][i]["win_type"], display_info)
+                workerWindow = new Window(this.app_status, this.dev_panel, worker_dict, backup_db["monitor-data"][i]["path_load"], backup_db["monitor-data"][i]["win_coordinates"], backup_db["monitor-data"][i]["win_type"], display_info)
                 workerWindow.isClosed = backup_db["monitor-planes"][i]["isClosed"]
             }
             else{
                 //backup was not created, create new workers
-                workerWindow = new Window(this.app_status, worker_dict, PATH_TO_WORKER_HTML, coords, EvLogger, main_app, "ACC", display_info)
+                workerWindow = new Window(this.app_status, this.dev_panel, worker_dict, PATH_TO_WORKER_HTML, coords, EvLogger, main_app, "ACC", display_info)
             }
         
             //setting up all layer widgets (overlaying whole map)
@@ -972,7 +974,7 @@ class MainApp{
         let display_info = win_info.slice(2, 4)
 
         EvLogger.log("DEBUG", "controller show")
-        controllerWindow = new Window(this.app_status, controller_dict, PATH_TO_CONTROLLER_HTML, coords, EvLogger, main_app, "controller", display_info)
+        controllerWindow = new Window(this.app_status, this.dev_panel, controller_dict, PATH_TO_CONTROLLER_HTML, coords, EvLogger, main_app, "controller", display_info)
         controllerWindow.checkClose(() => {
             if (this.app_status["app-running"] && this.app_status["redir-to-main"]){
                 //app is running and is redirected to main => close by tray button
@@ -1039,7 +1041,7 @@ class MainApp{
         let win_info = utils.get_window_info(this.app_settings, this.displays, -1, "normal", exit_dict)
         let coords = win_info.slice(0, 2)
 
-        exitWindow = new Window(this.app_status, exit_dict, PATH_TO_EXIT_HTML, coords, EvLogger, main_app)
+        exitWindow = new Window(this.app_status, this.dev_panel, exit_dict, PATH_TO_EXIT_HTML, coords, EvLogger, main_app)
         exitWindow.show()
 
         this.app_status["app-running"] = false; //stopping all Interval events from firing

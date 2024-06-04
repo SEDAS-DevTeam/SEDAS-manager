@@ -167,10 +167,6 @@ class BaseWindow{
     public send_message(channel: string, message: any){
         this.window.webContents.postMessage(channel, message)
     }
-
-    public constructor(){
-        //TODO
-    }
 }
 
 export class Window extends BaseWindow{
@@ -184,7 +180,8 @@ export class Window extends BaseWindow{
         })
     }
 
-    public constructor(app_status: Record<string, boolean>, config: any, path: string, coords: number[],
+    public constructor(app_status: Record<string, boolean>, dev_panel: boolean = false,
+        config: any, path: string, coords: number[],
         ev_logger: EventLogger, main_app: any, window_type: string = "none", display_res: number[] = []){
         
         super();
@@ -207,7 +204,9 @@ export class Window extends BaseWindow{
 
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
-        //this.window.webContents.openDevTools()
+        if (dev_panel){
+            this.window.webContents.openDevTools()
+        }
 
         this.path_load = path
         this.window.maximize()

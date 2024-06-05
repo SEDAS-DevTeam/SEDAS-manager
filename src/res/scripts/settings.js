@@ -1,7 +1,8 @@
 //variables
 var app_data_template = []
+var settings_area;
 
-window.onload = () => {
+function onload_specific(){
     //set wiki block to same height as settings-block
     let height = document.getElementById("settings-block").offsetHeight
     document.getElementById("wiki-block").setAttribute("style", `height: ${height}px`)
@@ -139,4 +140,17 @@ function save_settings(){
     alert("Saved the settings! (Restart app so the changes take effect)")
 }
 
-window.electronAPI.on_message("app-data", load_settings)
+//
+//file for basic functions that every controller window has
+//
+
+var INIT_DATA = [] //storing all vital data like airport list, command preset list, aircraft preset list in current session
+var APP_DATA = undefined
+
+//frontend variables dict
+var frontend_vars = {}
+
+window.onload = () => {
+    onload_specific() //onloads set for specific page
+    window.electronAPI.on_message("app-data", load_settings)
+}

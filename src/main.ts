@@ -43,7 +43,16 @@ import {
     PATH_TO_AUDIO_UPDATE,
     PATH_TO_MAPS,
     PATH_TO_COMMANDS,
-    PATH_TO_AIRCRAFTS
+    PATH_TO_AIRCRAFTS,
+
+    PATH_TO_SPEECH_CONFIG,
+    PATH_TO_TEXT_CONFIG,
+    PATH_TO_VOICE_CONFIG,
+
+    PATH_TO_IN_DEVICES,
+    PATH_TO_OUT_DEVICES,
+
+    PATH_TO_SETTINGS_LAYOUT
 
 } from "./app_config"
 import {
@@ -127,7 +136,7 @@ class MainApp{
 
     public constructor(app_settings: any){
         this.app_settings = app_settings
-        this.dev_panel = app_settings["debug-panel"]
+        this.dev_panel = app_settings["debug_panel"]
     }
 
     //
@@ -310,27 +319,20 @@ class MainApp{
                     
                     if (data[0] == "settings"){
 
-                        //ACAI backend
-
-                        const speech_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/speech_config.json"), "utf-8")
-                        const speech_config = JSON.parse(speech_config_raw);
-
-                        const text_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/text_config.json"), "utf-8")
-                        const text_config = JSON.parse(text_config_raw);
-
-                        const voice_config_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/alg/voice_config.json"), "utf-8")
-                        const voice_config = JSON.parse(voice_config_raw);
+                        //ACAI backend¨
+                        let speech_config = utils.readJSON(PATH_TO_SPEECH_CONFIG)
+                        let text_config = utils.readJSON(PATH_TO_TEXT_CONFIG)
+                        let voice_config = utils.readJSON(PATH_TO_VOICE_CONFIG)
 
                         //audio devices
+                        let in_devices = utils.readJSON(PATH_TO_IN_DEVICES)
+                        let out_devices = utils.readJSON(PATH_TO_OUT_DEVICES)
 
-                        const in_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/in_device_list.json"), "utf-8")
-                        const in_devices = JSON.parse(in_devices_raw)
-
-                        const out_devices_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/out_device_list.json"), "utf-8")
-                        const out_devices = JSON.parse(out_devices_raw)
+                        //reading settings gui layouts
+                        let settings_layout = utils.readJSON(PATH_TO_SETTINGS_LAYOUT)
 
                         //sending app data and alg configs
-                        settingsWindow.send_message("app-data", [app_settings, voice_config, text_config, speech_config, in_devices, out_devices])
+                        settingsWindow.send_message("app-data", [app_settings, voice_config, text_config, speech_config, in_devices, out_devices, settings_layout])
                     }
                     else if (data[0] == "controller"){
                         //sending monitor data

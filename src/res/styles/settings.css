@@ -25,8 +25,8 @@ body{
 
 .set-header hr{
     margin-bottom: 15px;
-    margin-right: 40px;
     color: #5271ff;
+    border-color: #5271ff;
 }
 
 .short-inp{

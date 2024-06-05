@@ -4,7 +4,7 @@ class SettingsArea extends HTMLElement{
     }
 
     connectedCallback(){
-        
+        //TODO
     }
 }
 
@@ -19,5 +19,7 @@ class SettingsFunctions extends ElementBind{
         this.selection_type = selection_type
     }
 
-    
+    load_parsed_layout(layout){
+        this.element.appendChild(layout)
+    }
 }

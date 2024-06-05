@@ -3,9 +3,9 @@ var app_data_template = []
 var settings_area;
 
 function onload_specific(){
-    //set wiki block to same height as settings-block
-    let height = document.getElementById("settings-block").offsetHeight
-    document.getElementById("wiki-block").setAttribute("style", `height: ${height}px`)
+
+    //set settings binder
+    settings_area = new SettingsFunctions("settings-area")
 
     //ask for settings to load
     window.electronAPI.send_message("settings", ["send-info"])
@@ -25,10 +25,14 @@ function onload_specific(){
 
 //load settings
 function load_settings(data){
-
     let app_data = data[0]
     let config_data = data.slice(1, 4)
     let device_data = data.slice(4, 6)
+    let layout_data = data[6]
+
+    //spawn gui for settings area
+    let layout = parse_settings_layout(layout_data)
+    settings_area.load_parsed_layout(layout)
 
     for (const [key, value] of Object.entries(app_data)) {
         app_data_template.push(key)
@@ -67,7 +71,7 @@ function load_settings(data){
     }
 
     //load all algorithms
-    let all_config_elem = document.getElementsByClassName("skip")
+    let all_config_elem = document.querySelectorAll('[id*="skip"]');
 
     //load all devices
     for (let i_device = 0; i_device < device_data.length; i_device++){
@@ -101,6 +105,10 @@ function load_settings(data){
             i += 1
         }
     }
+
+    //set wiki block to same height as settings-block
+    let height = document.getElementById("settings-block").offsetHeight
+    document.getElementById("wiki-block").setAttribute("style", `height: ${height}px`)
 }
 
 //save settings

@@ -3,36 +3,47 @@
     while running the program
 */
 
-import path from "path"
+import { join, resolve } from "path"
 import { BrowserWindow, ipcMain, screen, Tray, nativeImage, Menu } from "electron";
 import { EventLogger } from "./logger"
 
 //init vars
-export const ABS_PATH = path.resolve("")
+export const ABS_PATH = resolve("")
 
 //paths for all html files
-export const PATH_TO_MAIN_HTML = path.join(ABS_PATH, "./src/res/html/other/main.html")
-export const PATH_TO_SETTINGS_HTML = path.join(ABS_PATH, "./src/res/html/controller/settings.html")
-export const PATH_TO_CONTROLLER_HTML = path.join(ABS_PATH, "./src/res/html/controller/controller_set.html")
-export const PATH_TO_EXIT_HTML = path.join(ABS_PATH, "./src/res/html/other/exit.html")
-export const PATH_TO_WORKER_HTML = path.join(ABS_PATH, "./src/res/html/worker/worker.html")
-export const PATH_TO_POPUP_HTML = path.join(ABS_PATH, "./src/res/html/other/popup.html")
-export const PATH_TO_LOADER_HTML = path.join(ABS_PATH, "./src/res/html/other/load.html")
+export const PATH_TO_MAIN_HTML = join(ABS_PATH, "./src/res/html/other/main.html")
+export const PATH_TO_SETTINGS_HTML = join(ABS_PATH, "./src/res/html/controller/settings.html")
+export const PATH_TO_CONTROLLER_HTML = join(ABS_PATH, "./src/res/html/controller/controller_set.html")
+export const PATH_TO_EXIT_HTML = join(ABS_PATH, "./src/res/html/other/exit.html")
+export const PATH_TO_WORKER_HTML = join(ABS_PATH, "./src/res/html/worker/worker.html")
+export const PATH_TO_POPUP_HTML = join(ABS_PATH, "./src/res/html/other/popup.html")
+export const PATH_TO_LOADER_HTML = join(ABS_PATH, "./src/res/html/other/load.html")
 
 //paths for subprocesses
-export const PATH_TO_AUDIO_UPDATE: string = path.join(ABS_PATH, "/src/res/neural/get_info.py")
+export const PATH_TO_AUDIO_UPDATE: string = join(ABS_PATH, "/src/res/neural/get_info.py")
 
 //paths for local storage
-export const PATH_TO_LOGS: string = path.join(ABS_PATH, "/src/logs/")
-export const PATH_TO_MAPS: string = path.join(ABS_PATH, "/src/res/data/sim/maps/")
-export const PATH_TO_COMMANDS: string = path.join(ABS_PATH, "/src/res/data/sim/commands/")
-export const PATH_TO_AIRCRAFTS: string = path.join(ABS_PATH, "/src/res/data/sim/planes/")
-export const PATH_TO_CACHE: string = path.join(ABS_PATH, "/src/res/neural/alg_cache")
-export const PATH_TO_CONFIG: string = path.join(ABS_PATH, "/src/res/data/alg/")
-export const PATH_TO_SETTINGS: string = path.join(ABS_PATH, "/src/res/data/app/settings.json")
+export const PATH_TO_LOGS: string = join(ABS_PATH, "/src/logs/")
+export const PATH_TO_MAPS: string = join(ABS_PATH, "/src/res/data/sim/maps/")
+export const PATH_TO_COMMANDS: string = join(ABS_PATH, "/src/res/data/sim/commands/")
+export const PATH_TO_AIRCRAFTS: string = join(ABS_PATH, "/src/res/data/sim/planes/")
+export const PATH_TO_CACHE: string = join(ABS_PATH, "/src/res/neural/alg_cache")
+export const PATH_TO_CONFIG: string = join(ABS_PATH, "/src/res/data/alg/")
+export const PATH_TO_SETTINGS: string = join(ABS_PATH, "/src/res/data/app/settings.json")
+
+//paths for modifiable local storage (e. g. storage that is updated frequently)
+export const PATH_TO_SPEECH_CONFIG: string = join(ABS_PATH, "/src/res/data/alg/speech_config.json")
+export const PATH_TO_TEXT_CONFIG: string = join(ABS_PATH, "/src/res/data/alg/text_config.json")
+export const PATH_TO_VOICE_CONFIG: string = join(ABS_PATH, "/src/res/data/alg/voice_config.json")
+
+export const PATH_TO_IN_DEVICES: string = join(ABS_PATH, "/src/res/data/app/in_device_list.json")
+export const PATH_TO_OUT_DEVICES: string = join(ABS_PATH, "/src/res/data/app/out_device_list.json")
+
+//paths for gui layouts
+export const PATH_TO_SETTINGS_LAYOUT: string = join(ABS_PATH, "/src/res/data/app/gui/settings_layout.json")
 
 //paths for backup
-export const PATH_TO_DATABASE: string = path.join(ABS_PATH, "/src/res/data/tmp/backup.json")
+export const PATH_TO_DATABASE: string = join(ABS_PATH, "/src/res/data/tmp/backup.json")
 
 /*
     Window configs for electron
@@ -44,7 +55,7 @@ export const main_menu_dict = {
     resizable: false,
     icon: "./res/img/sedac-manager-logo.png",
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -56,7 +67,7 @@ export const load_dict = {
     icon: "./res/img/sedac-manager-logo.png",
     frame: false,
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -68,7 +79,7 @@ export const settings_dict = {
     resizable: true,
     icon: "./res/img/sedac-manager-logo.png",
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -80,7 +91,7 @@ export const exit_dict = {
     icon: "./res/img/sedac-manager-logo.png",
     frame: false,
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -93,7 +104,7 @@ export const controller_dict = {
     frame: true,
     //focusable: true,
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -106,7 +117,7 @@ export const worker_dict = {
     //frame: false, //TODO turn off when testing
     //focusable: false, //same here
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -118,7 +129,7 @@ export const basic_worker_widget_dict = {
     icon: "./res/img/sedac-manager-logo.png",
     frame: false,
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -130,7 +141,7 @@ export const popup_widget_dict = {
     icon: "./res/img/sedac-manager-logo.png",
     frame: false,
     webPreferences: {
-        preload: path.join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 

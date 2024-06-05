@@ -290,3 +290,9 @@ export function delete_logs(){
         })
     })
 }
+
+export function readJSON(path: string){
+    let file_raw = fs.readFileSync(path, "utf-8")
+    let file_content = JSON.parse(file_raw)
+    return file_content
+}

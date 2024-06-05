@@ -1,0 +1,309 @@
+{
+    "headers": {
+        "header1": {
+            "name": "General Settings",
+            "type": "h2",
+            "children": {
+                "controller-win-loc": {
+                    "name": "controller window location",
+                    "type": "select",
+                    "id": "controller_loc",
+                    "options": [
+                        {
+                            "name": "leftmost",
+                            "id": "leftmost"
+                        },
+                        {
+                            "name": "rightmost",
+                            "id": "rightmost"
+                        }
+                    ]
+                },
+                "window-spawn-lim": {
+                    "name": "worker spawn limit",
+                    "type": "input",
+                    "id": "worker_spawn"
+                },
+                "window-align": {
+                    "name": "window alignment",
+                    "type": "select",
+                    "id": "alignment",
+                    "options": [
+                        {
+                            "name": "set",
+                            "id": "set"
+                        },
+                        {
+                            "name": "free",
+                            "id": "free"
+                        }
+                    ]
+                },
+                "backup-saving-freq": {
+                    "name": "backup saving frequency",
+                    "type": "select",
+                    "id": "saving_frequency",
+                    "options": [
+                        {
+                            "name": "1 minute",
+                            "id": "1min"
+                        },
+                        {
+                            "name": "5 minutes",
+                            "id": "5min"
+                        },
+                        {
+                            "name": "10 minutes",
+                            "id": "10min"
+                        },
+                        {
+                            "name": "30 minutes",
+                            "id": "30min"
+                        },
+                        {
+                            "name": "1 hour",
+                            "id": "1hour"
+                        },
+                        {
+                            "name": "never",
+                            "id": "never"
+                        }
+                    ]
+                },
+                "plane-path-limit": {
+                    "name": "maximum plane path particles limit",
+                    "type": "input",
+                    "id": "plane_path_limit"
+                },
+                "logging": {
+                    "name": "debug logging",
+                    "type": "select",
+                    "id": "logging",
+                    "options": [
+                        {
+                            "name": "false",
+                            "id": "false"
+                        },
+                        {
+                            "name": "true",
+                            "id": "true"
+                        }
+                    ]
+                },
+                "debug-panel": {
+                    "name": "debug panel (NOTE: use only for development debugging)",
+                    "type": "select",
+                    "id": "debug_panel",
+                    "options": [
+                        {
+                            "name": "false",
+                            "id": "false"
+                        },
+                        {
+                            "name": "true",
+                            "id": "true"
+                        }
+                    ]
+                },
+                "out-device-skip": {
+                    "name": "output devices",
+                    "type": "select",
+                    "id": "out_device-skip",
+                    "options": []
+                },
+                "in-device-skip": {
+                    "name": "input devices",
+                    "type": "select",
+                    "id": "in_device-skip",
+                    "options": []
+                },
+                "backend-init": {
+                    "name": "Initialize backend",
+                    "type": "select",
+                    "id": "backend_init",
+                    "options": [
+                        {
+                            "name": "false",
+                            "id": "false"
+                        },
+                        {
+                            "name": "true",
+                            "id": "true"
+                        }
+                    ]
+                },
+                "fetch-alg": {
+                    "name": "Fetch algorithms on app startup",
+                    "type": "select",
+                    "id": "fetch_alg",
+                    "options": [
+                        {
+                            "name": "false",
+                            "id": "false"
+                        },
+                        {
+                            "name": "true",
+                            "id": "true"
+                        }
+                    ]
+                }
+            }
+        },
+        "header2": {
+            "name": "Controller Settings",
+            "type": "h2",
+            "children": {
+                "subheader1": {
+                    "name": "Monitors setup",
+                    "type": "h3",
+                    "children": {
+                        "max-monitor-col": {
+                            "name": "Maximum number of monitor columns",
+                            "type": "input",
+                            "id": "max_monitor_col"
+                        },
+                        "max-monitor-row": {
+                            "name": "Maximum number of monitor rows",
+                            "type": "input",
+                            "id": "max_monitor_row"
+                        }
+                    }
+                },
+                "subheader2": {
+                    "name": "Simulation setup",
+                    "type": "h3",
+                    "children": {}
+                },
+                "subheader3": {
+                    "name": "Simulation control",
+                    "type": "h3",
+                    "children": {}
+                },
+                "subheader4": {
+                    "name": "Plugins",
+                    "type": "h3",
+                    "children": {}
+                }
+            }
+        },
+        "header3": {
+            "name": "Simulation Settings",
+            "type": "h2",
+            "children": {
+                "ai-aggression": {
+                    "name": "AI aggression policy",
+                    "type": "select",
+                    "id": "ai_aggression",
+                    "options": [
+                        {
+                            "name": "high",
+                            "id": "high"
+                        },
+                        {
+                            "name": "medium",
+                            "id": "medium"
+                        },
+                        {
+                            "name": "low",
+                            "id": "low"
+                        }
+                    ]
+                },
+                "results": {
+                    "name": "show results on end of simulation",
+                    "type": "checkbox",
+                    "id": "results"
+                },
+                "voice-alg-skip": {
+                    "name": "voice recognition algorithm",
+                    "type": "select",
+                    "id": "voice_alg-skip",
+                    "options": []
+                },
+                "text-alg-skip": {
+                    "name": "language processing algorithm",
+                    "type": "select",
+                    "id": "text_alg-skip",
+                    "options": []
+                },
+                "speech-alg-skip": {
+                    "name": "speech synthesis algorithm",
+                    "type": "select",
+                    "id": "speech_alg-skip",
+                    "options": []
+                },
+                "noise": {
+                    "name": "Add artificial noise to generated audio output (more realistic)",
+                    "type": "checkbox",
+                    "id": "noise"
+                }
+            }
+        },
+        "header4": {
+            "name": "Plane Settings",
+            "type": "h2",
+            "children": {
+                "std-bank-angle": {
+                    "name": "standard bank angle",
+                    "type": "input",
+                    "unit": "degrees",
+                    "id": "std_bank_angle"
+                },
+                "min-speed": {
+                    "name": "aircraft minimum speed",
+                    "type": "input",
+                    "unit": "knots",
+                    "id": "min_speed"
+                },
+                "max-speed": {
+                    "name": "aircraft maximum speed",
+                    "type": "input",
+                    "unit": "knots",
+                    "id": "max_speed"
+                },
+                "min-alt": {
+                    "name": "aircraft minimum altitude",
+                    "type": "input",
+                    "unit": "feet",
+                    "id": "min_alt"
+                },
+                "max-alt": {
+                    "name": "aircraft maximum altitude",
+                    "type": "input",
+                    "unit": "feet",
+                    "id": "max_alt"
+                },
+                "standard-pitch-up": {
+                    "name": "aircraft standard climb angle",
+                    "type": "input",
+                    "unit": "degrees",
+                    "id": "standard_pitch_up"
+                },
+                "standard-pitch-down": {
+                    "name": "aircraft standard descent angle",
+                    "type": "input",
+                    "unit": "degrees",
+                    "id": "standard_pitch_down"
+                },
+                "standard-accel": {
+                    "name": "aircraft standard acceleration",
+                    "type": "input",
+                    "unit": "knots/seconds-squared",
+                    "id": "standard_accel"
+                }
+            }
+        },
+        "header5": {
+            "name": "Environment Settings",
+            "type": "h2",
+            "children": {
+                "transition-altitude": {
+                    "name": "standard transition altitude",
+                    "type": "input",
+                    "unit": "feet",
+                    "id": "transition_altitude"
+                }
+            }
+        }
+    }
+}

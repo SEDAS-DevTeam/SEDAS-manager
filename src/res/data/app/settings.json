@@ -5,7 +5,7 @@
     "saving_frequency": "1min",
     "plane_path_limit": "15",
     "logging": true,
-    "debug-panel": true,
+    "debug_panel": true,
     "out_device-skip": "1",
     "in_device-skip": "",
     "backend_init": false,

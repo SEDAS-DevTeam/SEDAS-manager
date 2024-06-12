@@ -19,6 +19,7 @@ var selected_map = ""
 var selected_aircraft_preset = ""
 var selected_command_preset = ""
 var selected_name = ""
+var selected_scenario = ""
 
 var map_name = ""
 var command_preset_name = ""
@@ -43,7 +44,7 @@ function selection(button_elem){
 
     let selection_path;
     let selection_name;
-
+    console.log(button_elem)
     switch(prefix){
         case "aircraft":
             for (let i = 0; i < INIT_DATA[5].length; i++){
@@ -79,6 +80,11 @@ function selection(button_elem){
 
             window.electronAPI.send_message("controller", ["send-scenario-list", selected_map])
             break
+        case "scenario": {
+            document.getElementById("confirmresult-scenario").innerHTML = selection_name
+            selected_scenario = selection_path
+            break
+        }
     }
 }
 
@@ -202,6 +208,14 @@ function onload_specific(){
     
     window.electronAPI.on_message("scenario-list", (data) => {
         all_selected_scenarios = data
+        table_scenario.delete_scenarios_list()
         table_scenario.set_scenarios_list(all_selected_scenarios)
+
+        let scenario_select_buttons = document.querySelectorAll('[id*="scenario"] .tablebutton');
+        for (let i = 0; i < scenario_select_buttons.length; i++){
+            scenario_select_buttons[i].addEventListener("click", () => {
+                selection(scenario_select_buttons[i])
+            })
+        }
     })
 }

@@ -11,7 +11,8 @@ export class Environment {
     private logger: EventLogger;
     private abs_path: string;
     private sim_time_worker: Worker;
-    public current_time: Date
+    public current_time: Date;
+    public plane_schedules: any;
 
     private command_data: any;
     private aircraft_data: any;
@@ -66,7 +67,12 @@ export class Environment {
         Private enviro functions
     */
     private set_plane_schedules(){
-
+        //TODO
+        this.plane_schedules = this.map_data["scenarios"][0]["flight_schedules"]
+        console.log(this.plane_schedules)
+        for (let i = 0; i < this.plane_schedules.length; i++){
+            console.log(this.plane_schedules[i])
+        }
     }
 
     private set_plane_trajectories(){

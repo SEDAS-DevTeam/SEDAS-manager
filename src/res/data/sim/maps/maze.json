@@ -22,7 +22,6 @@
     "scale": "0.005m",
     "scenarios": [
         {
-            "id": "adasdassd14255",
             "name": "Scenario 1 Basic",
             "category": ["AI", "HE", "GL", "AE"],
             "weight_category": ["UL", "L", "M", "H", "S"],
@@ -43,6 +42,19 @@
                     "category": "HE",
                     "weight_category": "L",
                     "time": "12min",
+                    "special_event": "none"
+                }
+            ]
+        },
+        {
+            "name": "Scenario 1 Advanced",
+            "category": ["AI", "HE", "GL", "AE"],
+            "weight_category": ["UL", "L", "M", "H", "S"],
+            "flight_schedules": [
+                {
+                    "category": "AI",
+                    "weight_category": "L",
+                    "time": "5min",
                     "special_event": "none"
                 }
             ]

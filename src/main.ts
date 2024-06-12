@@ -91,6 +91,8 @@ class MainApp{
     private map_configs_list: any = [];
     private map_data: any;
     private map_name: string;
+    private scenario_presets_list: any[] = []
+
     private enviro_logger: EventLogger;
 
     private scale: number;
@@ -390,7 +392,15 @@ class MainApp{
                 case "send-scenario-list": {
                     let selected_map_data = utils.read_file_content(PATH_TO_MAPS, data[1][1])
                     let scenarios = selected_map_data["scenarios"]
-                    controllerWindow.send_message("scenario-list", scenarios)
+                    for (let i = 0; i < scenarios.length; i++){
+                        this.scenario_presets_list.push({
+                            "hash": "scenario-" + utils.generate_hash(),
+                            "name": scenarios[i]["name"],
+                            "content": scenarios[i],
+                        })
+                    }
+
+                    controllerWindow.send_message("scenario-list", this.scenario_presets_list)
                     break
                 }
                 case "set-environment": {
@@ -526,7 +536,7 @@ class MainApp{
                                 case "ACC":
                                     //rewrite to Area control
                                     path_to_render = "./res/worker.html"
-                                    //TODO: add rendering
+                                    //command_presets_listTODO: add rendering
                                     break
                                 case "APP":
                                     //rewrite to Approach control

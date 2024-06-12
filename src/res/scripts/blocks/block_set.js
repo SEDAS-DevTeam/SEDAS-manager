@@ -119,6 +119,7 @@ class TableFunctions extends ElementBind{
     */
     set_aircrafts_list(){
         let aircraft_data = INIT_DATA[5]
+        console.log(aircraft_data)
         for (let i = 0; i < aircraft_data.length; i++){
             let record = document.createElement("tr")
             let name = aircraft_data[i]["name"]
@@ -286,9 +287,11 @@ class TableFunctions extends ElementBind{
 
         for (let i = 0; i < scenarios.length; i++){
             let scenario_name = scenarios[i]["name"]
-            let scenario_id = scenarios[i]["id"]
-            let scenario_weight_categories = scenarios[i]["weight_category"]
-            let scenario_categories = scenarios[i]["category"]
+            let scenario_id = scenarios[i]["hash"]
+            let scenario_content = scenarios[i]["content"]
+
+            let scenario_weight_categories = scenario_content["weight_category"]
+            let scenario_categories = scenario_content["category"]
 
             let record = document.createElement("tr")
             
@@ -320,5 +323,9 @@ class TableFunctions extends ElementBind{
 
             this.#check_even()
         }
+    }
+
+    delete_scenarios_list(){
+        
     }
 }

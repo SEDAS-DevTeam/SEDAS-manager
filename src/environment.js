@@ -12,6 +12,7 @@ class Environment {
     abs_path;
     sim_time_worker;
     current_time;
+    plane_schedules;
     command_data;
     aircraft_data;
     map_data;
@@ -55,6 +56,12 @@ class Environment {
         Private enviro functions
     */
     set_plane_schedules() {
+        //TODO
+        this.plane_schedules = this.map_data["scenarios"][0]["flight_schedules"];
+        console.log(this.plane_schedules);
+        for (let i = 0; i < this.plane_schedules.length; i++) {
+            console.log(this.plane_schedules[i]);
+        }
     }
     set_plane_trajectories() {
     }

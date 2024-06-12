@@ -66,6 +66,8 @@
 
 .result{
     margin-bottom: 20px;
+    display: inline-block;
+    margin-left: 10px;
 }
 
 td i{

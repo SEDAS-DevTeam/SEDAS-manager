@@ -24,7 +24,11 @@
                         "fl0": 1500
                     },
                     "motor_drag": 498,
-                    "mass": 170500
+                    "mass": 170500,
+
+                    "category": "AI",
+                    "wtc_category": "H",
+                    "apc_category": "C"
                 },
                 {
                     "name": "A310",
@@ -44,7 +48,11 @@
                         "fl0": 1500
                     },
                     "motor_drag": 468,
-                    "mass": "todo"
+                    "mass": "todo",
+
+                    "category": "AI",
+                    "wtc_category": "H",
+                    "apc_category": "C"
                 },
                 {
                     "name": "A318",
@@ -64,7 +72,11 @@
                         "fl0": 1500
                     },
                     "motor_drag": 498,
-                    "mass": 170500
+                    "mass": 170500,
+
+                    "category": "AI",
+                    "wtc_category": "M",
+                    "apc_category": "C"
                 }
             ]
         }

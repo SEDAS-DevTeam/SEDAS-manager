@@ -92,6 +92,7 @@ class MainApp{
     private map_data: any;
     private map_name: string;
     private scenario_presets_list: any[] = []
+    private scenario_data: any = undefined;
 
     private enviro_logger: EventLogger;
 
@@ -412,7 +413,6 @@ class MainApp{
                     
                     //map addons
                     let scenario_hash = data[1][4]
-                    console.log(scenario_hash)
 
                     let filename_command = data[1][2]
                     let filename_aircraft = data[1][3]
@@ -423,7 +423,14 @@ class MainApp{
 
                     //save map data to variable
                     this.map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
-            
+                    
+                    //get scenario data
+                    for (let i = 0; i < this.scenario_presets_list.length; i++){
+                        if (scenario_hash == this.scenario_presets_list[i]["hash"]){
+                            this.scenario_data = this.scenario_presets_list[i]["content"]
+                        }
+                    }
+
                     //save map name for backup usage
                     let map_config = utils.read_file_content(PATH_TO_MAPS, this.map_data["CONFIG"])
                     this.map_name = map_config["AIRPORT_NAME"]
@@ -462,7 +469,7 @@ class MainApp{
 
                     this.loader.send_progress("Setting up environment")
                     this.enviro = new Environment(EvLogger, ABS_PATH, this.PlaneDatabase,
-                        this.command_preset_data, this.aircraft_preset_data, this.map_data)
+                        this.command_preset_data, this.aircraft_preset_data, this.map_data, this.scenario_data)
 
                     this.enviro.setup_enviro(this.loader)
 

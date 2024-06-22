@@ -281,14 +281,15 @@ class TableFunctions extends ElementBind{
 
         //hide warn text
         document.getElementById("map-not-selected").style.display = "none"
-
         for (let i = 0; i < scenarios.length; i++){
             let scenario_name = scenarios[i]["name"]
             let scenario_id = scenarios[i]["hash"]
             let scenario_content = scenarios[i]["content"]
 
-            let scenario_weight_categories = scenario_content["weight_category"]
+            let scenario_weight_categories = scenario_content["wtc_category"]
             let scenario_categories = scenario_content["category"]
+            
+            console.log(scenario_weight_categories, scenario_categories)
 
             let record = document.createElement("tr")
             

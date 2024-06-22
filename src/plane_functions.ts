@@ -369,7 +369,7 @@ export class Plane{
     }
 
     public calc_rate_of_turn(std_bank_angle: number){
-        return ((1.091 * Math.tan(deg_to_rad(std_bank_angle))) / this.speed) * 1000 //TODO: inspect this rounding error
+        return ((1.091 * Math.tan(deg_to_rad(std_bank_angle))) / this.speed) * 1000
     }
 
     public calc_pixel_change(type: string, scale: number, angle: number, change: number){

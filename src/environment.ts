@@ -17,19 +17,24 @@ export class Environment {
     private command_data: any;
     private aircraft_data: any;
     private map_data: any;
+    private scenario_data: any;
+
+    public plane_conditions: any;
 
     public constructor(logger: EventLogger, abs_path: string, plane_database: PlaneDB,
-                    command_data: any[], aircraft_data: any[], map_data: any[]){
+                    command_data: any[], aircraft_data: any[], map_data: any[], scenario_data: any){
         this.logger = logger
         this.abs_path = abs_path
 
         this.command_data = command_data
         this.aircraft_data = aircraft_data
         this.map_data = map_data
+        this.scenario_data = scenario_data
 
         //create fake simulation time (TODO: pass time into main)
         this.sim_time_worker = new Worker(path.join(abs_path, "/src/sim_time.js"))
         this.sim_time_worker.postMessage(["start-measure", "random"])
+
 
         //simulation time handlers
         this.sim_time_worker.on("message", (message) => {
@@ -69,9 +74,8 @@ export class Environment {
     private set_plane_schedules(){
         //TODO
         this.plane_schedules = this.map_data["scenarios"][0]["flight_schedules"]
-        console.log(this.plane_schedules)
         for (let i = 0; i < this.plane_schedules.length; i++){
-            console.log(this.plane_schedules[i])
+            this.get_plane()
         }
     }
 
@@ -85,5 +89,27 @@ export class Environment {
 
     private validate(){
         
+    }
+
+    /*Inner functions*/
+    private get_plane(){
+        this.plane_conditions = this.get_conditions()
+        for (let i = 0; i < this.aircraft_data.length; i++){
+            let plane_parameters: any[] = [];
+            
+        }
+    }
+
+    private get_conditions(){
+        let condition_list = {}
+        
+        //TODO: rework with frontend (+ add APC and WTC)
+        let weight_conditions = this.scenario_data["weight_category"]
+        let cat_conditions = this.scenario_data["category"]
+
+        condition_list["weight_category"] = weight_conditions
+        condition_list["category"] = cat_conditions
+
+        return condition_list
     }
 }

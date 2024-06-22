@@ -16,12 +16,15 @@ class Environment {
     command_data;
     aircraft_data;
     map_data;
-    constructor(logger, abs_path, plane_database, command_data, aircraft_data, map_data) {
+    scenario_data;
+    plane_conditions;
+    constructor(logger, abs_path, plane_database, command_data, aircraft_data, map_data, scenario_data) {
         this.logger = logger;
         this.abs_path = abs_path;
         this.command_data = command_data;
         this.aircraft_data = aircraft_data;
         this.map_data = map_data;
+        this.scenario_data = scenario_data;
         //create fake simulation time (TODO: pass time into main)
         this.sim_time_worker = new worker_threads_1.Worker(path_1.default.join(abs_path, "/src/sim_time.js"));
         this.sim_time_worker.postMessage(["start-measure", "random"]);
@@ -58,9 +61,8 @@ class Environment {
     set_plane_schedules() {
         //TODO
         this.plane_schedules = this.map_data["scenarios"][0]["flight_schedules"];
-        console.log(this.plane_schedules);
         for (let i = 0; i < this.plane_schedules.length; i++) {
-            console.log(this.plane_schedules[i]);
+            this.get_plane();
         }
     }
     set_plane_trajectories() {
@@ -68,6 +70,22 @@ class Environment {
     set_plane_spawner() {
     }
     validate() {
+    }
+    /*Inner functions*/
+    get_plane() {
+        this.plane_conditions = this.get_conditions();
+        for (let i = 0; i < this.aircraft_data.length; i++) {
+            let plane_parameters = [];
+        }
+    }
+    get_conditions() {
+        let condition_list = {};
+        //TODO: rework with frontend (+ add APC and WTC)
+        let weight_conditions = this.scenario_data["weight_category"];
+        let cat_conditions = this.scenario_data["category"];
+        condition_list["weight_category"] = weight_conditions;
+        condition_list["category"] = cat_conditions;
+        return condition_list;
     }
 }
 exports.Environment = Environment;

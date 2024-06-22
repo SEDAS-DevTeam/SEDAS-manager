@@ -1,7 +1,7 @@
 import { EventLogger } from "./logger"
 import { Worker } from 'worker_threads';
 import path from "path"
-import { ProgressiveLoader, sleep } from "./utils";
+import { ProgressiveLoader, sleep, generate_hash, generate_name, get_random_element } from "./utils";
 
 //C++ (N-API) imports
 import { enviro_calculations } from "./bind";
@@ -18,8 +18,9 @@ export class Environment {
     private aircraft_data: any;
     private map_data: any;
     private scenario_data: any;
+    private plane_database: PlaneDB
 
-    public plane_conditions: any;
+    public plane_conditions: object;
 
     public constructor(logger: EventLogger, abs_path: string, plane_database: PlaneDB,
                     command_data: any[], aircraft_data: any[], map_data: any[], scenario_data: any){
@@ -27,9 +28,11 @@ export class Environment {
         this.abs_path = abs_path
 
         this.command_data = command_data
-        this.aircraft_data = aircraft_data
+        this.aircraft_data = aircraft_data["all_planes"] //get only planes resource
         this.map_data = map_data
         this.scenario_data = scenario_data
+
+        this.plane_database = plane_database
 
         //create fake simulation time (TODO: pass time into main)
         this.sim_time_worker = new Worker(path.join(abs_path, "/src/sim_time.js"))
@@ -72,10 +75,19 @@ export class Environment {
         Private enviro functions
     */
     private set_plane_schedules(){
-        //TODO
         this.plane_schedules = this.map_data["scenarios"][0]["flight_schedules"]
+
+        this.plane_conditions = this.get_conditions()
+        let preprocessed_planes: any[] = this.get_processed_plane_list(this.plane_conditions, this.aircraft_data)
+        if (preprocessed_planes.length == 0){
+            console.log("TODO: add cusom error popup")
+            return
+        }
+
         for (let i = 0; i < this.plane_schedules.length; i++){
-            this.get_plane()
+            let selected_plane = this.get_plane(preprocessed_planes, this.plane_schedules[i])
+            //TODO: create Plane instances
+            //preprocessed_planes.push(this.get_plane())
         }
     }
 
@@ -92,24 +104,78 @@ export class Environment {
     }
 
     /*Inner functions*/
-    private get_plane(){
-        this.plane_conditions = this.get_conditions()
-        for (let i = 0; i < this.aircraft_data.length; i++){
-            let plane_parameters: any[] = [];
-            
+    private get_processed_plane_list(conditions: object, aircraft_data: any[]){
+
+        let accepted_planes: any[] = []
+        for (let i = 0; i < aircraft_data.length; i++){
+            for(let i_man = 0; i_man < aircraft_data[i]["planes"].length; i_man++){
+                let spec_plane = aircraft_data[i]["planes"][i_man]
+
+                let plane_args: object = {
+                    "wtc_category": spec_plane["wtc_category"], 
+                    "category": spec_plane["category"]
+                }
+
+                let passing: boolean = true
+                for (let key in conditions) {
+                    if (!conditions[key].includes(plane_args[key])){
+                        passing = false
+                        break
+                    }
+                } 
+                
+                if(passing){
+                    accepted_planes.push({
+                        "manufacturer": aircraft_data[i]["manufacturer"],
+                        "properties": spec_plane
+                    })
+                }
+            }
+            //let plane = new Plane(...plane_parameters)
         }
+        return accepted_planes
     }
 
     private get_conditions(){
         let condition_list = {}
         
-        //TODO: rework with frontend (+ add APC and WTC)
-        let weight_conditions = this.scenario_data["weight_category"]
+        //TODO: rework with frontend (+ add APC)
+        let weight_conditions = this.scenario_data["wtc_category"]
         let cat_conditions = this.scenario_data["category"]
 
-        condition_list["weight_category"] = weight_conditions
+        condition_list["wtc_category"] = weight_conditions
         condition_list["category"] = cat_conditions
 
         return condition_list
+    }
+
+    private get_plane(plane_list: any[], plane_schedule: any){
+        //perform final selection to get right plane type
+        let category = plane_schedule["category"]
+        let wtc_category = plane_schedule["wtc"]
+        let spec_condition_list = {"wtc_category": wtc_category, "category": category}
+
+        let final_plane_list: any[] = []
+        for (let i_plane = 0; i_plane < plane_list.length; i_plane++){
+
+            let passing: boolean = true
+            for (let key in spec_condition_list) {
+                if (plane_list[i_plane]["properties"][key] != spec_condition_list[key]){
+                    passing = false
+                    break
+                }
+            } 
+            
+            if(passing){
+                final_plane_list.push(plane_list[i_plane])
+            }
+        }
+
+        if (final_plane_list.length == 0){
+            //TODO: add alert on that
+        }
+
+        //random choose plane
+        return get_random_element(final_plane_list)
     }
 }

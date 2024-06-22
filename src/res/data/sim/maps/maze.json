@@ -29,19 +29,19 @@
             "flight_schedules": [
                 {
                     "category": "AI",
-                    "weight_category": "L",
+                    "wtc": "L",
                     "time": "5min",
                     "special_event": "none"
                 },
                 {
                     "category": "AI",
-                    "weight_category": "M",
+                    "wtc": "M",
                     "time": "10min",
                     "special_event": "none"
                 },
                 {
                     "category": "HE",
-                    "weight_category": "L",
+                    "wtc": "L",
                     "time": "12min",
                     "special_event": "none"
                 }

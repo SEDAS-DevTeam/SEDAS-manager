@@ -129,6 +129,20 @@ export function generateRandomInteger(min: number, max: number) {
     return Math.random() * (max - min) + min;
 }
 
+export function generate_name(){
+    //TODO
+    return "ACAS1234"
+}
+
+export function get_random_element(array: any[]){
+    if(array.length == 1){
+        return array[0]
+    }
+
+    let random_index: number = Math.floor(Math.random() * array.length)
+    return array[random_index]
+}
+
 //Main functions
 export function checkInternet(EvLogger: EventLogger){
     EvLogger.log("DEBUG", "Performing HTTP GET on google servers for internet check")

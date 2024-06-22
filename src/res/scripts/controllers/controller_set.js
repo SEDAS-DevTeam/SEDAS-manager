@@ -38,13 +38,13 @@ var table_scenario_adjustments_weight;
 table setups
 */
 
-function selection(button_elem){
-    let sel_id = button_elem.id
+function selection(event){
+    let sel_id = event.target.id
     let prefix = sel_id.split("-")[0]
 
     let selection_path;
     let selection_name;
-    console.log(button_elem)
+    let selection_hash;
     switch(prefix){
         case "aircraft":
             for (let i = 0; i < INIT_DATA[5].length; i++){
@@ -81,8 +81,17 @@ function selection(button_elem){
             window.electronAPI.send_message("controller", ["send-scenario-list", selected_map])
             break
         case "scenario": {
+            for (let i = 0; i < all_selected_scenarios.length; i++){
+                if (sel_id == all_selected_scenarios[i]["hash"]){
+                    selection_name = all_selected_scenarios[i]["name"]
+                    selection_hash = all_selected_scenarios[i]["hash"]
+                    break
+                }
+            }
+
             document.getElementById("confirmresult-scenario").innerHTML = selection_name
-            selected_scenario = selection_path
+            selected_scenario = selection_hash
+
             break
         }
     }
@@ -104,7 +113,7 @@ function set_environment(){
         return
     }
     
-    window.electronAPI.send_message("controller", ["set-environment", selected_map, selected_command_preset, selected_aircraft_preset])
+    window.electronAPI.send_message("controller", ["set-environment", selected_map, selected_command_preset, selected_aircraft_preset, selected_scenario])
 }
 
 /*
@@ -208,14 +217,18 @@ function onload_specific(){
     
     window.electronAPI.on_message("scenario-list", (data) => {
         all_selected_scenarios = data
-        table_scenario.delete_scenarios_list()
+        console.log(all_selected_scenarios)
         table_scenario.set_scenarios_list(all_selected_scenarios)
 
+        /*
         let scenario_select_buttons = document.querySelectorAll('[id*="scenario"] .tablebutton');
+        console.log(scenario_select_buttons)
         for (let i = 0; i < scenario_select_buttons.length; i++){
             scenario_select_buttons[i].addEventListener("click", () => {
                 selection(scenario_select_buttons[i])
             })
         }
+        */
+        frontend.listener_on_select()
     })
 }

@@ -390,6 +390,9 @@ class MainApp{
                     break
                 }
                 case "send-scenario-list": {
+                    //rewrite scenario presets lists
+                    this.scenario_presets_list = []
+
                     let selected_map_data = utils.read_file_content(PATH_TO_MAPS, data[1][1])
                     let scenarios = selected_map_data["scenarios"]
                     for (let i = 0; i < scenarios.length; i++){
@@ -406,6 +409,11 @@ class MainApp{
                 case "set-environment": {
                     //getting map info, command preset info, aircraft preset info from user
                     let filename_map = data[1][1]
+                    
+                    //map addons
+                    let scenario_hash = data[1][4]
+                    console.log(scenario_hash)
+
                     let filename_command = data[1][2]
                     let filename_aircraft = data[1][3]
 

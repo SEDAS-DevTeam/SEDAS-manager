@@ -46,9 +46,9 @@ class FrontendFunctions{
     listener_on_select(){
         let select_buttons = document.getElementsByClassName("tablebutton")
         for (let i = 0; i < select_buttons.length; i++){
-            select_buttons[i].addEventListener("click", () => {
-                selection(select_buttons[i])
-            })
+            //remove click listeners (just in case)
+            select_buttons[i].removeEventListener("click", selection)
+            select_buttons[i].addEventListener("click", selection)
         }
     }
 
@@ -277,10 +277,7 @@ class TableFunctions extends ElementBind{
 
     set_scenarios_list(scenarios){
         //delete children
-        for (let i = 1; i < this.element.children[0].children.length; i++){
-            console.log(this.element.children[0].children[i])
-            this.element.children[0].children[i].remove()
-        }
+        this.delete_scenarios_list()
 
         //hide warn text
         document.getElementById("map-not-selected").style.display = "none"
@@ -326,6 +323,8 @@ class TableFunctions extends ElementBind{
     }
 
     delete_scenarios_list(){
-        
+        for (let i = 1; i < this.element.children[0].children.length; i++){
+            this.element.children[0].children[i].remove()
+        }
     }
 }

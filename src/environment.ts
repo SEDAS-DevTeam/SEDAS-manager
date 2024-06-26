@@ -6,6 +6,7 @@ import { ProgressiveLoader, sleep, generate_hash, generate_name, get_random_elem
 //C++ (N-API) imports
 import { enviro_calculations } from "./bind";
 import { Plane, PlaneDB } from "./plane_functions";
+import { PopupWindow } from "./app_config";
 
 export class Environment {
     private logger: EventLogger;
@@ -54,8 +55,7 @@ export class Environment {
         Enviro functions exposed to main
     */
     public async setup_enviro(loader: ProgressiveLoader){
-        loader.send_progress("Setting plane schedules")
-        this.set_plane_schedules()
+
         loader.send_progress("Calculating plane trajectories")
         this.set_plane_trajectories()
         loader.send_progress("Spawning PlaneSpawner process")
@@ -74,32 +74,44 @@ export class Environment {
     /*
         Private enviro functions
     */
-    private set_plane_schedules(){
+    public set_plane_schedules(){
+        let n_unused_schedules = 0
+
         this.plane_schedules = this.map_data["scenarios"][0]["flight_schedules"]
 
         this.plane_conditions = this.get_conditions()
         let preprocessed_planes: any[] = this.get_processed_plane_list(this.plane_conditions, this.aircraft_data)
         if (preprocessed_planes.length == 0){
-            console.log("TODO: add cusom error popup")
-            return
+            return -1 //plane preset is invalid for scenario options
         }
 
         for (let i = 0; i < this.plane_schedules.length; i++){
             let selected_plane = this.get_plane(preprocessed_planes, this.plane_schedules[i])
-            //TODO: create Plane instances
-            //preprocessed_planes.push(this.get_plane())
+            if (selected_plane == 0){
+                //no plane found for this schedule
+                n_unused_schedules += 1
+            }
+            else{
+                selected_plane["name"] = generate_name()
+                selected_plane["hash"] = generate_hash()
+            
+                //let plane = new Plane()
+                //this.plane_database.add_record()
+            }
         }
+
+        return n_unused_schedules
     }
 
-    private set_plane_trajectories(){
+    public set_plane_trajectories(){
 
     }
 
-    private set_plane_spawner(){
+    public set_plane_spawner(){
 
     }
 
-    private validate(){
+    public validate(){
         
     }
 
@@ -172,7 +184,7 @@ export class Environment {
         }
 
         if (final_plane_list.length == 0){
-            //TODO: add alert on that
+            return 0 //no planes avaliable
         }
 
         //random choose plane

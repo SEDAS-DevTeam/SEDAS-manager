@@ -146,6 +146,26 @@ class MainApp{
     //Built-in functions
     //
 
+    private setup_environment(){
+        this.enviro.setup_enviro(this.loader)
+
+        this.loader.destroy_loaders()
+        this.loader = undefined
+        
+        //everything is set up, time to load
+        for (let i = 0; i < this.workers.length; i++){
+            this.workers[i]["win"].send_message("ask-for-render") //send workers command to fire "render-map" event
+        }
+        
+        //rendering widget workers
+        for (let i = 0; i < this.widget_workers.length; i++){
+            this.widget_workers[i]["win"].show()
+            this.widget_workers[i]["win"].wait_for_load(() => {
+                this.widget_workers[i]["win"].send_message("register", ["id", this.widget_workers[i]["id"]])
+            })
+        }
+    }
+
     private get_screen_info(){
         //get screen info
         var displays_info: any = screen.getAllDisplays()
@@ -470,25 +490,25 @@ class MainApp{
                     this.loader.send_progress("Setting up environment")
                     this.enviro = new Environment(EvLogger, ABS_PATH, this.PlaneDatabase,
                         this.command_preset_data, this.aircraft_preset_data, this.map_data, this.scenario_data)
-
-                    this.enviro.setup_enviro(this.loader)
-
-                    this.loader.destroy_loaders()
-                    this.loader = undefined
                     
-                    //everything is set up, time to load
-                    for (let i = 0; i < this.workers.length; i++){
-                        this.workers[i]["win"].send_message("ask-for-render") //send workers command to fire "render-map" event
-                    }
-                    
-                    //rendering widget workers
-                    for (let i = 0; i < this.widget_workers.length; i++){
-                        this.widget_workers[i]["win"].show()
-                        this.widget_workers[i]["win"].wait_for_load(() => {
-                            this.widget_workers[i]["win"].send_message("register", ["id", this.widget_workers[i]["id"]])
-                        })
-                    }
+                    this.loader.send_progress("Setting plane schedules")
+                    let n_unused_schedules = this.enviro.set_plane_schedules()
+                    if (n_unused_schedules > 0){
+                        //some schedules are deleted because no avaliable plane was found matching
 
+                        let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", popup_widget_dict)
+                        let coords = win_info.slice(0, 2)
+                        this.current_popup_window = new PopupWindow(popup_widget_dict,
+                                                                    PATH_TO_POPUP_HTML,
+                                                                    coords,
+                                                                    EvLogger,
+                                                                    "alert",
+                                                                    "confirm-schedules")
+                        this.current_popup_window.load_popup(`WARNING: ${n_unused_schedules} plane schedules are going to be unused`, "because no plane was matching schedule type")
+                    }
+                    else{
+                        this.setup_environment()
+                    }
                     break
                 }
                 case "render-map": {
@@ -735,10 +755,14 @@ class MainApp{
                     //create popup window for user confirmation
                     let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", popup_widget_dict)
                     let coords = win_info.slice(0, 2)
-                    this.current_popup_window = new PopupWindow(popup_widget_dict, PATH_TO_POPUP_HTML, coords, 
-                                                    EvLogger, `Do you want to install plugin: ${plugin_name}?`)
+                    this.current_popup_window = new PopupWindow(popup_widget_dict, 
+                                                                PATH_TO_POPUP_HTML, 
+                                                                coords, 
+                                                                EvLogger,  
+                                                                "confirm",
+                                                                "confirm-install")
                     
-                    this.current_popup_window.load_popup()
+                    this.current_popup_window.load_popup(`Do you want to install plugin: ${plugin_name}?`, "Proceed?")
                     break
                 }
                 case "get-plugin-list": {
@@ -756,6 +780,15 @@ class MainApp{
                     }
                     this.current_popup_window.close()
                     this.current_popup_window = undefined
+                    break
+                }
+                //environment messages
+                case "confirm-schedules": {
+                    this.setup_environment()
+
+                    this.current_popup_window.close()
+                    this.current_popup_window = undefined
+                    break
                 }
             }
         })

@@ -308,10 +308,15 @@ export class WidgetWindow extends BaseWindow{
 }
 
 export class PopupWindow extends BaseWindow{
-    private header: string;
+    public popup_type: string;
+    private comm_channel: string;
 
-    public constructor(config: any, path: string, coords: number[], 
-                        ev_logger: EventLogger, header: string){
+    public constructor(config: any, 
+                        path: string, 
+                        coords: number[], 
+                        ev_logger: EventLogger,
+                        type: string,
+                        channel: string){
         super()
         
         this.event_logger = ev_logger
@@ -321,7 +326,8 @@ export class PopupWindow extends BaseWindow{
         this.localConfig.y = coords[1]
 
         this.path_load = path
-        this.header = header
+        this.popup_type = type
+        this.comm_channel = channel
 
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
@@ -330,10 +336,10 @@ export class PopupWindow extends BaseWindow{
         this.event_logger.log("DEBUG", `Created popup window object(path_load=${this.path_load}, coords=${coords})`)
     }
 
-    public load_popup(){
+    public load_popup(header: string, text: string){
         this.show()
         this.wait_for_load(() => {
-            this.send_message("header", this.header)
+            this.send_message("popup-init-info", [this.popup_type, this.comm_channel, header, text])
         })
     }
 

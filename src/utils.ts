@@ -11,9 +11,14 @@ import {
     //Window defs
     LoaderWindow, 
     WidgetWindow,
+    PopupWindow,
+
+    popup_widget_dict,
+    basic_worker_widget_dict,
 
     //paths
     PATH_TO_LOADER_HTML,
+    PATH_TO_POPUP_HTML,
     PATH_TO_LOGS
  } from "./app_config";
 import path from "path"
@@ -276,16 +281,36 @@ export function parse_scale(scale){
     return val
 }
 
-//currently deprecated
-export function create_widget_window(dict: any, path_load: string, 
+//currently not used (TODO)
+export function create_widget_window(path_load: string, 
                                     event_logger: EventLogger, 
                                     coords: number[], widget_workers: any[]){
-    let datetimeWidgetWindow = new WidgetWindow(dict, path_load, coords, event_logger)
+    let datetimeWidgetWindow = new WidgetWindow(basic_worker_widget_dict, path_load, coords, event_logger)
     let datetime_id = generate_id()
     widget_workers.push({
         "id": datetime_id,
         "win": datetimeWidgetWindow
     })
+}
+
+export function create_popup_window(app_settings: any,
+                                    event_logger: EventLogger,
+                                    displays: any[],
+                                    type: string,
+                                    channel: string,
+                                    header: string,
+                                    text: string){
+
+    let win_info = get_window_info(app_settings, displays, -1, "normal", popup_widget_dict)
+    let coords = win_info.slice(0, 2)
+    let temp_popup_window: PopupWindow = new PopupWindow(popup_widget_dict,
+                                                        PATH_TO_POPUP_HTML,
+                                                        coords,
+                                                        event_logger,
+                                                        type,
+                                                        channel)
+    temp_popup_window.load_popup(header, text)
+    return temp_popup_window
 }
 
 export function delete_logs(){

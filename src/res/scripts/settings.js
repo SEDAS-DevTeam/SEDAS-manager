@@ -144,8 +144,6 @@ function save_settings(){
     console.log(data_str)
 
     window.electronAPI.send_message('settings', ['save-settings', data_str])
-
-    alert("Saved the settings! (Restart app so the changes take effect)")
 }
 
 //

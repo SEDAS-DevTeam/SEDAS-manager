@@ -293,6 +293,12 @@ class MainApp{
                     EvLogger.log("DEBUG", "saving settings")
 
                     fs.writeFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), data[1][1])
+                    
+                    //inform user that settings are loaded only after restart
+                    this.current_popup_window = utils.create_popup_window(app_settings, EvLogger, this.displays,
+                        "alert", "confirm-settings",
+                        "Saved the settings",
+                        "Restart the app for changes to take the effect")
                     break
                 }
                 case "redirect-to-settings": {
@@ -495,16 +501,11 @@ class MainApp{
                     let n_unused_schedules = this.enviro.set_plane_schedules()
                     if (n_unused_schedules > 0){
                         //some schedules are deleted because no avaliable plane was found matching
-
-                        let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", popup_widget_dict)
-                        let coords = win_info.slice(0, 2)
-                        this.current_popup_window = new PopupWindow(popup_widget_dict,
-                                                                    PATH_TO_POPUP_HTML,
-                                                                    coords,
-                                                                    EvLogger,
-                                                                    "alert",
-                                                                    "confirm-schedules")
-                        this.current_popup_window.load_popup(`WARNING: ${n_unused_schedules} plane schedules are going to be unused`, "because no plane was matching schedule type")
+                        
+                        this.current_popup_window = utils.create_popup_window(app_settings, EvLogger, this.displays,
+                                                "alert", "confirm-schedules",
+                                                `WARNING: ${n_unused_schedules} plane schedules are going to be unused`,
+                                                "because no plane was matching schedule type")
                     }
                     else{
                         this.setup_environment()
@@ -780,6 +781,13 @@ class MainApp{
                     }
                     this.current_popup_window.close()
                     this.current_popup_window = undefined
+                    break
+                }
+                case "confirm-settings": {
+                    //TODO
+                    this.current_popup_window.close()
+                    this.current_popup_window = undefined
+
                     break
                 }
                 //environment messages

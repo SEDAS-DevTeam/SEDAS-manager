@@ -15,6 +15,8 @@ import { update_models, update_plugins } from "./fetch"
 import { EventLogger } from "./logger"
 
 import * as utils from "./utils"
+import * as plugins from "./plugins"
+
 import {
     //window configs
     main_menu_dict,

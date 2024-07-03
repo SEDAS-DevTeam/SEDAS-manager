@@ -29,6 +29,10 @@ package-lock.json
 /src/res/data/tmp/*
 !/src/res/data/tmp/.gitkeep
 
+#plugin folders
+/src/res/plugins/*
+!/src/res/plugins/.gitkeep
+
 #app logs
 /src/logs/*
 !/src/logs/.gitkeep

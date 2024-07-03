@@ -505,7 +505,7 @@ class MainApp{
                         this.current_popup_window = utils.create_popup_window(app_settings, EvLogger, this.displays,
                                                 "alert", "confirm-schedules",
                                                 `WARNING: ${n_unused_schedules} plane schedules are going to be unused`,
-                                                "because no plane was matching schedule type")
+                                                "because plane was not matching schedule type")
                     }
                     else{
                         this.setup_environment()

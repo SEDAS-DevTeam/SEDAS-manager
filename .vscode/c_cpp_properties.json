@@ -7,7 +7,7 @@
                 "${HOME}/.nvm/versions/node/v20.12.1/include/node"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/clang",
+            "compilerPath": "/usr/bin/g++",
             "cStandard": "c17",
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-clang-x64"

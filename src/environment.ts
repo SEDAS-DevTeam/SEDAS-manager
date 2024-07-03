@@ -14,6 +14,7 @@ export class Environment {
     private sim_time_worker: Worker;
     public current_time: Date;
     public plane_schedules: any;
+    public plane_objects: object[] = [];
 
     private command_data: any;
     private aircraft_data: any;
@@ -55,7 +56,6 @@ export class Environment {
         Enviro functions exposed to main
     */
     public async setup_enviro(loader: ProgressiveLoader){
-
         loader.send_progress("Calculating plane trajectories")
         this.set_plane_trajectories()
         loader.send_progress("Spawning PlaneSpawner process")
@@ -94,9 +94,9 @@ export class Environment {
             else{
                 selected_plane["name"] = generate_name()
                 selected_plane["hash"] = generate_hash()
-            
-                //let plane = new Plane()
-                //this.plane_database.add_record()
+                selected_plane["schedule"] = this.plane_schedules[i]
+
+                this.plane_objects.push(selected_plane)
             }
         }
 
@@ -104,7 +104,17 @@ export class Environment {
     }
 
     public set_plane_trajectories(){
+        for (let i = 0; i < this.plane_objects.length; i++){
+            console.log(this.plane_objects[i])
+            let dep_point: string = this.plane_objects[i]["departure"]
+            let arr_point: string = this.plane_objects[i]["arrival"]
+            let trans_points: string = this.plane_objects[i]["transport_points"]
 
+
+
+            let out: string = enviro_calculations.compute_heading_up(this.map_data, dep_point, trans_points, arr_point)
+            console.log(out)
+        }
     }
 
     public set_plane_spawner(){

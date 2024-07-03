@@ -37,7 +37,10 @@
                     "category": "AI",
                     "wtc": "M",
                     "time": "10min",
-                    "special_event": "none"
+                    "special_event": "none",
+                    "departure": "VEPOT",
+                    "arrival": "AFIS",
+                    "transport_points": []
                 },
                 {
                     "category": "HE",
@@ -57,7 +60,10 @@
                     "category": "AI",
                     "weight_category": "L",
                     "time": "5min",
-                    "special_event": "none"
+                    "special_event": "none",
+                    "departure": "VEPOT",
+                    "arrival": "AFIS",
+                    "transport_points": []
                 }
             ]
         }

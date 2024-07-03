@@ -11,8 +11,8 @@ export namespace plane_calculations{
 }
 
 export namespace enviro_calculations{
-    export function test(){
-        console.log(plane_import.hello_world())
+    export function compute_heading_up(...args: any): string{
+        return plane_import.compute_heading_up(...args)
     }
 }
 

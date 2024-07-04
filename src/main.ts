@@ -11,11 +11,11 @@ import { app, ipcMain, screen, Tray, nativeImage, Menu } from "electron";
 
 //relative imports
 import { Plane, PlaneDB } from "./plane_functions"
-import { update_models, update_plugins } from "./fetch"
+import { update_models } from "./fetch"
 import { EventLogger } from "./logger"
 
-import * as utils from "./utils"
-import * as plugins from "./plugins"
+import utils, {ProgressiveLoader} from "./utils"
+import {PluginRegister} from "./plugin_register"
 
 import {
     //window configs
@@ -79,6 +79,7 @@ class MainApp{
     private workers: any[] = [];
     private widget_workers: any[] = []
     private enviro: Environment;
+    private plugin_register: PluginRegister;
 
     //all variables related to frontend
     private frontend_vars = {
@@ -135,7 +136,7 @@ class MainApp{
     private current_popup_window: PopupWindow; //For now, app only permits one popup window at the time (TODO)
 
     //other variables
-    private loader: utils.ProgressiveLoader
+    private loader: any;
     public backupdb_saving_frequency: number = 1000; //defaultly set to 1 second
     private local_plugin_list: any[]
 
@@ -490,7 +491,7 @@ class MainApp{
                     /*
                         Setting up environment
                     */
-                    this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
+                    this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
                     this.loader.setup_loader(5, "Setting up simulation, please wait...", "Initializing simulation setup")
                     
                     this.enviro_logger = new EventLogger(true, "enviro_log", "environment")
@@ -895,8 +896,8 @@ class MainApp{
         this.get_screen_info() //getting screen info for all displays
 
         //set progressive loader object on loaders
-        this.loader = new utils.ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
-        this.loader.setup_loader(10, "SEDAS is loading, please wait...", "Initializing app")
+        this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
+        this.loader.setup_loader(11, "SEDAS is loading, please wait...", "Initializing app")
 
         /*
             Loader segment 1
@@ -967,13 +968,24 @@ class MainApp{
         const update_devices = spawn("python3", [PATH_TO_AUDIO_UPDATE])
         //TODO: add fallback logger to update_devices subprocess
 
+        // setup plugin register
+        this.plugin_register = new PluginRegister()
+
         /*
             Loader segment 9
         */
         this.loader.send_progress("Fetching new plugin list")
 
         EvLogger.log("DEBUG", "Fetching new plugin list")
-        this.local_plugin_list = update_plugins()
+        this.plugin_register.fetch_plugin_list()
+
+        /*
+            Loader segment 10
+        */
+        this.loader.send_progress("Loading local plugins")
+
+        EvLogger.log("DEBUG", "Loading local plugins")
+        this.plugin_register.load_local_plugins()
     }
 
     public init_gui(){

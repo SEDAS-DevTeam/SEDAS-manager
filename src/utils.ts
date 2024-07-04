@@ -4,7 +4,7 @@
 
 import fs from "fs";
 import { join } from "path"
-import { v4 } from "uuid"
+import { parse, v4 } from "uuid"
 import http from "http"
 import { EventLogger } from "./logger"
 import { 
@@ -91,12 +91,12 @@ export class ProgressiveLoader{
     }
 }
 
-export function read_file_content(path: string, file_name: string){
+function read_file_content(path: string, file_name: string){
     let map_raw = fs.readFileSync(join(path, file_name), "utf-8")
     return JSON.parse(map_raw);
 }
 
-export function list_files(path: string){
+function list_files(path: string){
     var files = fs.readdirSync(path)
 
     let idx_gitkeep = files.indexOf(".gitkeep")
@@ -106,11 +106,11 @@ export function list_files(path: string){
     return files
 }
 
-export function generate_hash(){
+function generate_hash(){
     return v4()
 }
 
-export function generate_id(){
+function generate_id(){
     var alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
     var n_pos: number = 5;
@@ -130,16 +130,16 @@ export function generate_id(){
     return res_str
 }
 
-export function generateRandomInteger(min: number, max: number) {
+function generateRandomInteger(min: number, max: number) {
     return Math.random() * (max - min) + min;
 }
 
-export function generate_name(){
+function generate_name(){
     //TODO
     return "ACAS1234"
 }
 
-export function get_random_element(array: any[]){
+function get_random_element(array: any[]){
     if(array.length == 1){
         return array[0]
     }
@@ -149,7 +149,7 @@ export function get_random_element(array: any[]){
 }
 
 //Main functions
-export function checkInternet(EvLogger: EventLogger){
+function checkInternet(EvLogger: EventLogger){
     EvLogger.log("DEBUG", "Performing HTTP GET on google servers for internet check")
     return new Promise((resolve, reject) => {
         http.get("http://www.google.com", async (res) => {
@@ -163,7 +163,7 @@ export function checkInternet(EvLogger: EventLogger){
     })
 }
 
-export function get_window_info(app_settings: any, displays: any[], idx: number, mode: string, window_dict: any = undefined){
+function get_window_info(app_settings: any, displays: any[], idx: number, mode: string, window_dict: any = undefined){
     //TODO: rework
     let x: number;
     let y: number;
@@ -267,11 +267,11 @@ export function get_window_info(app_settings: any, displays: any[], idx: number,
     return [x, y, width, height]
 }
 
-export function sleep(ms) {
+function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function parse_scale(scale){
+function parse_scale(scale){
     //parse scale (constant, that describes how many units is one pixel)
     let val: number = 0
     if(scale.includes("m")){
@@ -282,7 +282,7 @@ export function parse_scale(scale){
 }
 
 //currently not used (TODO)
-export function create_widget_window(path_load: string, 
+function create_widget_window(path_load: string, 
                                     event_logger: EventLogger, 
                                     coords: number[], widget_workers: any[]){
     let datetimeWidgetWindow = new WidgetWindow(basic_worker_widget_dict, path_load, coords, event_logger)
@@ -293,7 +293,7 @@ export function create_widget_window(path_load: string,
     })
 }
 
-export function create_popup_window(app_settings: any,
+function create_popup_window(app_settings: any,
                                     event_logger: EventLogger,
                                     displays: any[],
                                     type: string,
@@ -313,7 +313,7 @@ export function create_popup_window(app_settings: any,
     return temp_popup_window
 }
 
-export function delete_logs(){
+function delete_logs(){
     fs.readdir(PATH_TO_LOGS, (err, files) => {
         if (err){
             console.error(err)
@@ -330,8 +330,29 @@ export function delete_logs(){
     })
 }
 
-export function readJSON(path: string){
+function readJSON(path: string){
     let file_raw = fs.readFileSync(path, "utf-8")
     let file_content = JSON.parse(file_raw)
     return file_content
 }
+
+// exports
+const utils = {
+    read_file_content,
+    list_files,
+    generate_hash,
+    generate_id,
+    generateRandomInteger,
+    generate_name,
+    get_random_element,
+    checkInternet,
+    get_window_info,
+    sleep,
+    parse_scale,
+    create_widget_window,
+    create_popup_window,
+    delete_logs,
+    readJSON
+}
+
+export default utils

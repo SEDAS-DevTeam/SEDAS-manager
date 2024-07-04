@@ -23,6 +23,6 @@
     "./src/environment.ts",
     "./src/sim_time.ts",
     "./src/bind.ts",
-    "./src/plugins.ts"
+    "./src/plugin_register.ts"
   ]
 }

@@ -134,9 +134,48 @@ function generateRandomInteger(min: number, max: number) {
     return Math.random() * (max - min) + min;
 }
 
-function generate_name(){
-    //TODO
-    return "ACAS1234"
+function generate_name(type: string): string{
+    /*
+    CALLSIGN GENERATION RULES & RECOMMENDATIONS (TODO: Validate)
+    * must not exceed 7 characters (by FAA)
+    * scheduled aircraft operators may use a letter or two as the final character of identification, otherwise not permited (FAA does not permit two letters)
+    * Must have 3 letters reserved for airline identification
+    * The last 3 to 4 letters are reserved for flight identification
+    * On non-airline/not-scheduled flights/private-owner typically 5 alphabet charaters are used (NATO-alphabet when pronouncing)
+    */
+
+    function get_random_char(char_str: string){
+        return char_str.charAt(Math.floor(Math.random() * char_str.length))
+    }
+    
+    let chars: string = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    let nums: string = "0123456789"
+
+    let out: string = ""
+
+    if (type == "airliner"){
+        //airliner flight
+        
+        //get airliner name
+        out += "ACA" //TODO
+
+        let rand_len: number = Math.floor(Math.random() * 3) + 1
+        for (let i = 0; i < rand_len; i++){
+            out += get_random_char(nums)
+        }
+        for (let i = 0; i < 4 - rand_len; i++){
+            out += get_random_char(chars)
+        }
+
+    }
+    else if (type == "other"){
+        //others
+        for (let i = 0; i < 5; i++){
+            out += get_random_char(chars)
+        }
+    }
+
+    return out
 }
 
 function get_random_element(array: any[]){

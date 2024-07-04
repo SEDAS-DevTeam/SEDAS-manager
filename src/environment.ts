@@ -1,7 +1,7 @@
 import { EventLogger } from "./logger"
 import { Worker } from 'worker_threads';
 import path from "path"
-import { ProgressiveLoader, sleep, generate_hash, generate_name, get_random_element } from "./utils";
+import utils, { ProgressiveLoader } from "./utils";
 
 //C++ (N-API) imports
 import { enviro_calculations } from "./bind";
@@ -63,7 +63,7 @@ export class Environment {
 
         //everything done, just validate everything
         loader.send_progress("Done! Validating output...")
-        await sleep(1000)
+        await utils.sleep(1000)
         this.validate()
     }
 
@@ -92,8 +92,8 @@ export class Environment {
                 n_unused_schedules += 1
             }
             else{
-                selected_plane["name"] = generate_name()
-                selected_plane["hash"] = generate_hash()
+                selected_plane["name"] = utils.generate_name("airliner") //TODO
+                selected_plane["hash"] = utils.generate_hash()
                 selected_plane["schedule"] = this.plane_schedules[i]
 
                 this.plane_objects.push(selected_plane)
@@ -198,6 +198,6 @@ export class Environment {
         }
 
         //random choose plane
-        return get_random_element(final_plane_list)
+        return utils.get_random_element(final_plane_list)
     }
 }

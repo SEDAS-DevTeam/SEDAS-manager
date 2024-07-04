@@ -1,5 +1,5 @@
 import { parentPort, isMainThread } from 'worker_threads';
-import { generateRandomInteger } from './utils';
+import utils from './utils';
 
 //TODO Better time measurement
 
@@ -21,11 +21,11 @@ class SimTime {
             if (mode == "random"){
                 //logger.log("DEBUG", "Time not specified, generating own simulation time")
     
-                this.date_object.setFullYear(generateRandomInteger(1980, 2020), generateRandomInteger(0, 11), generateRandomInteger(1, 31))
+                this.date_object.setFullYear(utils.generateRandomInteger(1980, 2020), utils.generateRandomInteger(0, 11), utils.generateRandomInteger(1, 31))
                 
-                this.date_object.setHours(generateRandomInteger(0, 23))
-                this.date_object.setMinutes(generateRandomInteger(0, 59))
-                this.date_object.setSeconds(generateRandomInteger(0, 59))
+                this.date_object.setHours(utils.generateRandomInteger(0, 23))
+                this.date_object.setMinutes(utils.generateRandomInteger(0, 59))
+                this.date_object.setSeconds(utils.generateRandomInteger(0, 59))
             }
             else if (mode == "custom"){
                 this.date_object.setFullYear(year, month, date)

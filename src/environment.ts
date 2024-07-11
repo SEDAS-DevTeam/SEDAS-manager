@@ -20,25 +20,32 @@ export class Environment {
     private aircraft_data: any;
     private map_data: any;
     private scenario_data: any;
+    private airlines_data: any;
+
     private plane_database: PlaneDB
 
     public plane_conditions: object;
 
     public constructor(logger: EventLogger, abs_path: string, plane_database: PlaneDB,
-                    command_data: any[], aircraft_data: any[], map_data: any[], scenario_data: any){
+                        command_data: object, 
+                        aircraft_data: object, 
+                        airlines_data: object,
+                        map_data: object, 
+                        scenario_data: object){
         this.logger = logger
         this.abs_path = abs_path
 
         this.command_data = command_data
         this.aircraft_data = aircraft_data["all_planes"] //get only planes resource
+        this.airlines_data = airlines_data["airlines"]
         this.map_data = map_data
         this.scenario_data = scenario_data
 
         this.plane_database = plane_database
 
         //create fake simulation time (TODO: pass time into main)
-        this.sim_time_worker = new Worker(path.join(abs_path, "/src/sim_time.js"))
-        this.sim_time_worker.postMessage(["start-measure", "random"])
+        this.sim_time_worker = new Worker(path.join(abs_path, "/src/workers/sim_time.js"))
+        this.sim_time_worker.postMessage(["start-measure", "random"]) //TODO: change to specific user setup
 
 
         //simulation time handlers
@@ -46,6 +53,7 @@ export class Environment {
             switch(message[0]){
                 case "time": {
                     this.current_time = message[1]
+                    this.plane_spawner_check() //check for any scheduled plane to spawn
                 }
             }
         })
@@ -55,16 +63,21 @@ export class Environment {
     /*
         Enviro functions exposed to main
     */
-    public async setup_enviro(loader: ProgressiveLoader){
+    public async setup_enviro(loader: ProgressiveLoader, logger: EventLogger){
         loader.send_progress("Calculating plane trajectories")
+        logger.log("INFO", "Calculating plane trajectories")
         this.set_plane_trajectories()
         loader.send_progress("Spawning PlaneSpawner process")
+        logger.log("INFO", "Setting up PlaneSpawner process")
         this.set_plane_spawner()
 
         //everything done, just validate everything
         loader.send_progress("Done! Validating output...")
-        await utils.sleep(1000)
+        logger.log("INFO", "Validating output")
+        await utils.sleep(1000) //TODO: HUH?
         this.validate()
+
+        logger.log("INFO", "Output succesfully validated")
     }
 
     public kill_enviro(){
@@ -86,16 +99,15 @@ export class Environment {
         }
 
         for (let i = 0; i < this.plane_schedules.length; i++){
-            let selected_plane = this.get_plane(preprocessed_planes, this.plane_schedules[i])
+            let selected_plane: any = this.get_plane(preprocessed_planes, this.plane_schedules[i])
             if (selected_plane == 0){
                 //no plane found for this schedule
                 n_unused_schedules += 1
             }
             else{
-                selected_plane["name"] = utils.generate_name("airliner") //TODO
+                selected_plane["name"] = utils.generate_name(this.airlines_data, "airliner") //TODO
                 selected_plane["hash"] = utils.generate_hash()
                 selected_plane["schedule"] = this.plane_schedules[i]
-
                 this.plane_objects.push(selected_plane)
             }
         }
@@ -110,10 +122,15 @@ export class Environment {
             let arr_point: string = this.plane_objects[i]["arrival"]
             let trans_points: string = this.plane_objects[i]["transport_points"]
 
+            console.log(this.plane_objects[i])
+            
+            /* UNCOMMENT AFTER C++ FIX
+            let plane_trajectories: string = enviro_calculations.compute_heading_up(this.map_data, dep_point, trans_points, arr_point)
+            console.log(plane_trajectories)
 
+            this.plane_objects[i]["trajectories"] = plane_trajectories
 
-            let out: string = enviro_calculations.compute_heading_up(this.map_data, dep_point, trans_points, arr_point)
-            console.log(out)
+            */
         }
     }
 
@@ -199,5 +216,9 @@ export class Environment {
 
         //random choose plane
         return utils.get_random_element(final_plane_list)
+    }
+
+    private plane_spawner_check(){
+
     }
 }

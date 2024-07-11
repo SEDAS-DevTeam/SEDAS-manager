@@ -1,20 +1,30 @@
 #!/bin/sh
 
+# variables
 PURPLE='\033[0;35m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-cd ..
-DIR="./src"
-for FILE in "$DIR"/*
-do
-    BASENAME=$(basename "$FILE")
-    if [ -f "$FILE" ]; then
-        if [[ "$BASENAME" == *.js ]] && [[ "$BASENAME" == *.js.map ]]; then
-            # Add your file processing commands here
-            echo "Processing file: $FILE"
+# functions
+check_files() {
+    for FILE in "$1"/*
+    do
+        EXTENSION="${FILE##*.}"
+        if [ -f "$FILE" ]; then
+            if [ "$EXTENSION" = "map" ] || [ "$EXTENSION" = "js" ]; then
+                # Add your file processing commands here
+                rm $FILE
+            fi
         fi
-    fi
-done
+    done
+}
+
+cd ..
+
+# running in /src dir
+check_files "./src"
+
+# running in /src/workers dir
+check_files "./src/workers"
 
 echo "[${PURPLE}Build info${NC}] ${BLUE}Cleaned working /src directory${NC}"

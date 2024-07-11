@@ -11,8 +11,9 @@ package-lock.json
 
 #javascript files that are automatically generated
 /src/*.js
-
 /src/*.js.map
+/src/workers/*.js
+/src/workers/*.js.map
 
 #pycache files
 /src/res/neural/cache/__pycache__/

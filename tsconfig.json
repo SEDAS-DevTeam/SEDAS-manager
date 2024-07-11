@@ -12,17 +12,18 @@
   },
   "exclude": [ "node_modules" ],
   "files": [
-    "./src/backend.ts",
     "./src/main.ts",
     "./src/utils.ts",
-    "./src/database.ts",
     "./src/plane_functions.ts",
     "./src/fetch.ts",
     "./src/logger.ts",
     "./src/app_config.ts",
     "./src/environment.ts",
-    "./src/sim_time.ts",
     "./src/bind.ts",
-    "./src/plugin_register.ts"
+    "./src/plugin_register.ts",
+    //Workers
+    "./src/workers/sim_time.ts",
+    "./src/workers/backend.ts",
+    "./src/workers/database.ts",
   ]
 }

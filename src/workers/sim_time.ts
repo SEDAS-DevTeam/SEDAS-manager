@@ -1,5 +1,5 @@
 import { parentPort, isMainThread } from 'worker_threads';
-import utils from './utils';
+import utils from '../utils';
 
 //TODO Better time measurement
 

@@ -134,7 +134,7 @@ function generateRandomInteger(min: number, max: number) {
     return Math.random() * (max - min) + min;
 }
 
-function generate_name(type: string): string{
+function generate_name(airline_names: object[], type: string): string{
     /*
     CALLSIGN GENERATION RULES & RECOMMENDATIONS (TODO: Validate)
     * must not exceed 7 characters (by FAA)
@@ -144,7 +144,7 @@ function generate_name(type: string): string{
     * On non-airline/not-scheduled flights/private-owner typically 5 alphabet charaters are used (NATO-alphabet when pronouncing)
     */
 
-    function get_random_char(char_str: string){
+    function get_random_char(char_str: string): string{
         return char_str.charAt(Math.floor(Math.random() * char_str.length))
     }
     
@@ -157,7 +157,11 @@ function generate_name(type: string): string{
         //airliner flight
         
         //get airliner name
-        out += "ACA" //TODO
+        let airline_abbrs: string[] = []
+        for (let i = 0; i < airline_names.length; i++){
+            airline_abbrs.push(airline_names[0]["abbr"])
+        }
+        out += get_random_element(airline_abbrs)
 
         let rand_len: number = Math.floor(Math.random() * 3) + 1
         for (let i = 0; i < rand_len; i++){
@@ -178,7 +182,7 @@ function generate_name(type: string): string{
     return out
 }
 
-function get_random_element(array: any[]){
+function get_random_element(array: string[] | number[] | object[]){
     if(array.length == 1){
         return array[0]
     }
@@ -202,7 +206,7 @@ function checkInternet(EvLogger: EventLogger){
     })
 }
 
-function get_window_info(app_settings: any, displays: any[], idx: number, mode: string, window_dict: any = undefined){
+function get_window_info(app_settings: object, displays: any[], idx: number, mode: string, window_dict: any = undefined){
     //TODO: rework
     let x: number;
     let y: number;

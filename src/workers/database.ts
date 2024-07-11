@@ -4,7 +4,7 @@ import fs from "fs"
 import {
     PATH_TO_DATABASE,
     ABS_PATH
-} from "./app_config"
+} from "../app_config"
 
 //
 // worker part

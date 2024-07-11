@@ -4,9 +4,15 @@
     },
     "airlines": [
         {
-            "name": "Aer Lingus",
+            "name": "Test 1 ",
+            "abbr": "ACA",
             "fleet": ["B737", "B757"],
             "type": "airline"
+        },
+        {
+            "name": "EasyJet",
+            "abbr": "EJU",
+            "fleet": ["A320", "A300"]
         },
         {
             "name": "private",

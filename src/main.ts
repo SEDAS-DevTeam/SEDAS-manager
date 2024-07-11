@@ -46,6 +46,7 @@ import {
     PATH_TO_MAPS,
     PATH_TO_COMMANDS,
     PATH_TO_AIRCRAFTS,
+    PATH_TO_AIRLINES,
 
     PATH_TO_SPEECH_CONFIG,
     PATH_TO_TEXT_CONFIG,
@@ -73,11 +74,11 @@ var exitWindow: Window;
 
 class MainApp{
     //all variables that contain "low-level" functionalities of the app
-    public app_settings: any;
+    public app_settings: object;
     private dev_panel: boolean;
     private displays = [];
-    private workers: any[] = [];
-    private widget_workers: any[] = []
+    private workers: object[] = [];
+    private widget_workers: object[] = []
     private enviro: Environment;
     private plugin_register: PluginRegister;
 
@@ -91,11 +92,11 @@ class MainApp{
     } //used to save variables that are then used on redirect between windows
 
     //all variables related to environment/map
-    private map_configs_list: any = [];
-    private map_data: any;
+    private map_configs_list: object[] = [];
+    private map_data: object;
     private map_name: string;
-    private scenario_presets_list: any[] = []
-    private scenario_data: any = undefined;
+    private scenario_presets_list: object[] = []
+    private scenario_data: object = undefined;
 
     private enviro_logger: EventLogger;
 
@@ -105,13 +106,17 @@ class MainApp{
     private zoom: number = undefined;
 
     //all variables related to aircrafts
-    private aircraft_presets_list: any = []
-    private aircraft_preset_data: any = undefined;
+    private aircraft_presets_list: object[] = []
+    private aircraft_preset_data: object = undefined;
     private aircraft_preset_name: string = ""
 
+    //all variables related to airlines
+    private airline_preset_data: object = undefined
+    private airline_preset_name: string = ""
+
     //all variables related to commands
-    private command_presets_list: any = []
-    private command_preset_data: any = undefined;
+    private command_presets_list: object[] = []
+    private command_preset_data: object = undefined;
     private command_preset_name: string = ""
 
     //app status (consists of switches/booleans for different functions 
@@ -136,11 +141,11 @@ class MainApp{
     private current_popup_window: PopupWindow; //For now, app only permits one popup window at the time (TODO)
 
     //other variables
-    private loader: any;
+    private loader: ProgressiveLoader;
     public backupdb_saving_frequency: number = 1000; //defaultly set to 1 second
-    private local_plugin_list: any[]
+    private local_plugin_list: object[]
 
-    public constructor(app_settings: any){
+    public constructor(app_settings: object){
         this.app_settings = app_settings
         this.dev_panel = app_settings["debug_panel"]
     }
@@ -150,7 +155,7 @@ class MainApp{
     //
 
     private setup_environment(){
-        this.enviro.setup_enviro(this.loader)
+        this.enviro.setup_enviro(this.loader, this.enviro_logger)
 
         this.loader.destroy_loaders()
         this.loader = undefined
@@ -171,7 +176,8 @@ class MainApp{
 
     private get_screen_info(){
         //get screen info
-        var displays_info: any = screen.getAllDisplays()
+        var displays_info: any[] = screen.getAllDisplays()
+        console.log(typeof displays_info)
         var displays_mod = []
         for(let i: number = 0; i < displays_info.length; i++){
             displays_mod.push(displays_info[i].bounds)
@@ -180,7 +186,7 @@ class MainApp{
         this.displays = displays_mod
     }
 
-    private send_to_all(planes: any, plane_monitor_data: any, plane_paths_data: any){
+    private send_to_all(planes: object[], plane_monitor_data: object[], plane_paths_data: object[]){
         if (controllerWindow != undefined && this.workers.length != 0){
             //update planes on controller window
             controllerWindow.send_message("update-plane-db", planes)
@@ -452,7 +458,7 @@ class MainApp{
 
                     //save map data to variable
                     this.map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
-                    
+
                     //get scenario data
                     for (let i = 0; i < this.scenario_presets_list.length; i++){
                         if (scenario_hash == this.scenario_presets_list[i]["hash"]){
@@ -469,6 +475,10 @@ class MainApp{
 
                     this.aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft)
                     this.aircraft_preset_name = this.aircraft_preset_data["info"]["name"]
+
+                    //set now to default (TODO: change later?)
+                    this.airline_preset_data = utils.read_file_content(PATH_TO_AIRLINES, "airline_data.json")
+                    this.airline_preset_name = this.aircraft_preset_data["info"]["name"]
 
                     //read scale
                     this.scale = utils.parse_scale(this.map_data["scale"])
@@ -495,12 +505,19 @@ class MainApp{
                     this.loader.setup_loader(5, "Setting up simulation, please wait...", "Initializing simulation setup")
                     
                     this.enviro_logger = new EventLogger(true, "enviro_log", "environment")
+                    this.enviro_logger.log("INFO", "EventLogger instance on Environment is set up")
 
                     this.loader.send_progress("Setting up environment")
                     this.enviro = new Environment(EvLogger, ABS_PATH, this.PlaneDatabase,
-                        this.command_preset_data, this.aircraft_preset_data, this.map_data, this.scenario_data)
+                        this.command_preset_data,
+                        this.aircraft_preset_data,
+                        this.airline_preset_data,
+                        this.map_data, 
+                        this.scenario_data)
                     
+
                     this.loader.send_progress("Setting plane schedules")
+                    this.enviro_logger.log("INFO", "Setting plane shedules")
                     let n_unused_schedules = this.enviro.set_plane_schedules()
                     if (n_unused_schedules > 0){
                         //some schedules are deleted because no avaliable plane was found matching
@@ -529,7 +546,7 @@ class MainApp{
                     break
                 }
                 case "get-points": {
-                    let spec_data: any;
+                    let spec_data: object;
                     if (data[1][1].includes("ACC")){
                         //selected monitor is in ACC mode
                         spec_data = this.map_data["ACC"]
@@ -929,7 +946,7 @@ class MainApp{
 
         //workers
         if (this.app_settings["backend_init"]){
-            this.backend_worker = new Worker(path.join(ABS_PATH, "/src/backend.js"))
+            this.backend_worker = new Worker(path.join(ABS_PATH, "/src/workers/backend.js"))
             EvLogger.log("DEBUG", "Starting Backend because flag backend_init is=true")
 
             var backend_settings = {
@@ -941,7 +958,7 @@ class MainApp{
             this.app_status["turn-on-backend"] = false
             EvLogger.log("DEBUG", "Starting Backend because backend_init is set to false")
         }
-        this.backup_worker = new Worker(path.join(ABS_PATH, "/src/database.js"))
+        this.backup_worker = new Worker(path.join(ABS_PATH, "/src/workers/database.js"))
         
         //backup saving frequency
         if (this.app_settings["saving_frequency"].includes("min")){
@@ -1009,7 +1026,7 @@ class MainApp{
         mainMenuWindow.show()
     }
 
-    public async main_app(backup_db: any = undefined){
+    public async main_app(backup_db: object = undefined){
         mainMenuWindow.close()
         this.workers = []
 

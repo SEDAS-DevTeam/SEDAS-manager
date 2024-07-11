@@ -6,7 +6,7 @@ import path from "path";
 import {
     ABS_PATH,
     PATH_TO_SETTINGS
-} from "./app_config"
+} from "../app_config"
 
 const PORT = 36000
 

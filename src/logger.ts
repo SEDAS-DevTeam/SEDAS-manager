@@ -62,6 +62,7 @@ export class EventLogger{
     public log(cat_name: string, message: string){
         //messages is an array where first element is standard logging message followed by non-standard
         //debug mode message
+
         let time: string = this.get_time()
         
         this.data.push({

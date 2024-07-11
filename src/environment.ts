@@ -12,7 +12,11 @@ export class Environment {
     private logger: EventLogger;
     private abs_path: string;
     private sim_time_worker: Worker;
+
+    // time variables
     public current_time: Date;
+    public start_time: Date;
+
     public plane_schedules: any;
     public plane_objects: object[] = [];
 
@@ -22,7 +26,8 @@ export class Environment {
     private scenario_data: any;
     private airlines_data: any;
 
-    private plane_database: PlaneDB
+    private plane_database: PlaneDB;
+    private plane_spawner_config: object[] = [];
 
     public plane_conditions: object;
 
@@ -51,9 +56,16 @@ export class Environment {
         //simulation time handlers
         this.sim_time_worker.on("message", (message) => {
             switch(message[0]){
-                case "time": {
+                case "time": { //updating time for whole environment
                     this.current_time = message[1]
                     this.plane_spawner_check() //check for any scheduled plane to spawn
+
+                    break
+                }
+                case "start-time": { //getting starting time so the plane spawner can check from initial time
+                    this.start_time = message[1]
+
+                    break
                 }
             }
         })
@@ -121,21 +133,30 @@ export class Environment {
             let dep_point: string = this.plane_objects[i]["departure"]
             let arr_point: string = this.plane_objects[i]["arrival"]
             let trans_points: string = this.plane_objects[i]["transport_points"]
-
-            console.log(this.plane_objects[i])
             
             /* UNCOMMENT AFTER C++ FIX
             let plane_trajectories: string = enviro_calculations.compute_heading_up(this.map_data, dep_point, trans_points, arr_point)
             console.log(plane_trajectories)
 
             this.plane_objects[i]["trajectories"] = plane_trajectories
-
             */
         }
     }
 
     public set_plane_spawner(){
+        for (let i = 0; i < this.plane_objects.length; i++){
+            let des_time: string = this.plane_objects[i]["schedule"]["time"]
+            let conv_h: number = parseInt(des_time.split(":")[0]) * 3600000
+            let conv_m: number = parseInt(des_time.split(":")[1]) * 60000
+            let conv_s: number = parseInt(des_time.split(":")[2])
+            
+            let updated_time: Date = new Date(this.start_time.getTime() + (conv_h + conv_m + conv_s))
 
+            this.plane_spawner_config.push({
+                "id": this.plane_objects[i]["hash"],
+                "time": updated_time
+            })
+        }
     }
 
     public validate(){
@@ -219,6 +240,21 @@ export class Environment {
     }
 
     private plane_spawner_check(){
+        function convert_time(time_obj: Date){
+            return `${time_obj.getHours()}:${time_obj.getMinutes()}`
+        }
 
+        for (let i = this.plane_spawner_config.length - 1; i >= 0; i--){
+            let spawn_time: Date = this.plane_spawner_config[i]["time"]
+            if (convert_time(spawn_time) == convert_time(this.current_time)){
+                console.log("Time to spawn!")
+                
+                //Spawn plane
+
+                //delete from plane spawner (already moved to PlaneDB)
+                this.plane_spawner_config.splice(i, 1)
+
+            }
+        }
     }
 }

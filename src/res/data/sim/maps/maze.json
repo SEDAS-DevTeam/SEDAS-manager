@@ -30,13 +30,13 @@
                 {
                     "category": "AI",
                     "wtc": "L",
-                    "time": "5min",
+                    "time": "00:05:00",
                     "special_event": "none"
                 },
                 {
                     "category": "AI",
                     "wtc": "M",
-                    "time": "10min",
+                    "time": "00:01:00",
                     "special_event": "none",
                     "departure": "VEPOT",
                     "arrival": "AFIS",
@@ -45,7 +45,7 @@
                 {
                     "category": "HE",
                     "wtc": "L",
-                    "time": "12min",
+                    "time": "00:12:00",
                     "special_event": "none"
                 }
             ]

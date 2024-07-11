@@ -39,14 +39,10 @@ class SimTime {
                 //for updating the time (every millis)
                 this.date_object.setMilliseconds(this.date_object.getMilliseconds() + 1)
                 if (this.measure){
-                    parentPort.postMessage(["time", this.get_time()])
+                    parentPort.postMessage(["time", this.date_object])
                 }
             }, 1)
         }
-    }
-
-    public get_time(){
-       return this.date_object
     }
 }
 
@@ -58,11 +54,12 @@ if (!isMainThread){
             case "start-measure": {
                 simulation_time = new SimTime(message[1])
                 simulation_time.measure = true
+                
+                parentPort.postMessage(["start-time", simulation_time.date_object])
                 break
             }
             case "get-time": {
-                let curr_time = simulation_time.get_time()
-                parentPort.postMessage(["time", curr_time])
+                parentPort.postMessage(["time", simulation_time.date_object])
             }
         }
     })

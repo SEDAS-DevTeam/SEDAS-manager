@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="stylesheet" href="../../styles/embed.css">
         <meta charset="utf-8" />
+
+        <script src="../../scripts/blocks/block.js"></script>
+
+        <!--some util imports-->
+        <script src="../../scripts/embed.js"></script>
     </head>
     <body>
-        <iframe>
-            <!--TODO-->
-        </iframe>
+        <div id="embed-top-panel">
+            <form id="url-form"><input type="text" placeholder="Place embed URL" name="url" class="choice-text"></form>
+            <button id="confirm-button">Confirm</button>
+        </div>
+        <iframe id="embed-iframe" frameborder="0" allowfullscreen></iframe>
     </body>
 </html>

@@ -230,5 +230,6 @@ function onload_specific(){
         }
         */
         frontend.listener_on_select()
+        frontend.listener_on_select_dropdown()
     })
 }

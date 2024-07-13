@@ -419,3 +419,20 @@ b.nested{
     margin-left: 10px;
     width: 95%;
 }
+
+span#tag{
+    margin-left: 10px;
+    background-color: #5271ff;
+    color: white;
+    border-radius: 5px;
+    padding: 2px 3px;
+}
+
+.time-select select, .time-select form{
+    display: block;
+    width: 100%;
+}
+
+.time-form{
+    display: none;
+}

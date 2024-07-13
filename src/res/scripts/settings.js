@@ -18,6 +18,18 @@ function onload_specific(){
         save_settings()
     })
 
+    if (window.navigator.onLine){
+        document.getElementById("wiki-block-iframe").src = "https://sedas-docs.readthedocs.io/en/latest/"
+    }
+    else{
+        document.getElementById("wiki-block-iframe").remove()
+    
+        let warn_text = document.createElement("h1")
+        warn_text.style.marginLeft = "15px"
+        warn_text.innerHTML = "Not connected to internet, cannot show documentation in Iframe"
+        document.getElementById("wiki-block").appendChild(warn_text)
+    }
+
     //everything is set up and loaded
     document.body.id = "loaded-body"
     document.getElementById("settings-loader-content").style.visibility = "hidden"

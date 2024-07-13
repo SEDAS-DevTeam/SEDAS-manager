@@ -4,7 +4,7 @@ function update_time(){
     let time_elem = document.getElementById("top-time-header")
     let date = new Date()
 
-    let innerhtml = "Time: " + new Date(date)
+    let innerhtml = "Time: " + date
 
     time_elem.innerHTML = innerhtml
 

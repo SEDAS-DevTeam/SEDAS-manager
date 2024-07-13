@@ -17,7 +17,13 @@ function onload_specific(){
         iframe_buttons[0].classList.add("selected")
     }
     else{
-        document.getElementById("wiki-content").src = "./internet.html"
+        document.getElementById("wiki-content").remove()
+    
+        let warn_text = document.createElement("h1")
+        warn_text.style.marginLeft = "15px"
+        warn_text.innerHTML = "Not connected to internet, cannot show documentation in Iframe"
+        document.getElementById("parent-iframe").appendChild(warn_text)
+
         return //do not allow to set listeners for iframe buttons
     }
 

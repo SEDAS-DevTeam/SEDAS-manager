@@ -15,9 +15,14 @@ export const PATH_TO_MAIN_HTML = join(ABS_PATH, "./src/res/html/other/main.html"
 export const PATH_TO_SETTINGS_HTML = join(ABS_PATH, "./src/res/html/controller/settings.html")
 export const PATH_TO_CONTROLLER_HTML = join(ABS_PATH, "./src/res/html/controller/controller_set.html")
 export const PATH_TO_EXIT_HTML = join(ABS_PATH, "./src/res/html/other/exit.html")
-export const PATH_TO_WORKER_HTML = join(ABS_PATH, "./src/res/html/worker/worker.html")
 export const PATH_TO_POPUP_HTML = join(ABS_PATH, "./src/res/html/other/popup.html")
 export const PATH_TO_LOADER_HTML = join(ABS_PATH, "./src/res/html/other/load.html")
+
+//paths to worker html files
+export const PATH_TO_WORKER_HTML = join(ABS_PATH, "./src/res/html/worker/worker.html")
+export const PATH_TO_DEP_ARR_HTML = join(ABS_PATH, "./src/res/html/worker/dep_arr.html")
+export const PATH_TO_EMBED_HTML = join(ABS_PATH, "./src/res/html/worker/embed.html")
+export const PATH_TO_WEATHER_HTML = join(ABS_PATH, "./src/res/html/worker/dep_arr.html")
 
 //paths for subprocesses
 export const PATH_TO_AUDIO_UPDATE: string = join(ABS_PATH, "/src/res/neural/get_info.py")

@@ -1,6 +1,6 @@
 //ELEMENT INIT DEFS
 const MONITOR_INIT_STRING = '<div class="monitor-header">Monitor </div><select id="functions" class="monitor-functions" name="functions"><option value="TWR">TWR control</option><option value="APP">APP control</option><option value="ACC">ACC control</option><option value="weather">weather forecast</option><option value="dep_arr">departure/arrival list</option></select>'
-const MODES = ["TWR", "APP", "ACC", "weather", "dep_arr"]
+const MODES = ["TWR", "APP", "ACC", "weather", "dep_arr", "embed"]
 const MONITOR_X_SPACE = 250
 const MONITOR_Y = 200
 

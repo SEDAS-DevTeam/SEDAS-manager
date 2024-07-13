@@ -52,6 +52,11 @@ class FrontendFunctions{
         }
     }
 
+    listener_on_select_dropdown(){
+        let select1 = document.getElementById("time-mode")
+        //TODO
+    }
+
     listener_on_description(){
         let desc_elem_airport = document.querySelectorAll("td i#airport")
         for(let i = 0; i < desc_elem_airport.length; i++){

@@ -24,6 +24,12 @@ h1, h2, h3, h4, p, a, span, li{
     font-weight: 400;
 }
 
+b{
+    color: #5271ff;
+    font-family: 'Montserrat', sans-serif;
+    margin-top: 20px;
+}
+
 h4{
     margin-top: 20px;
     margin-bottom: 0;

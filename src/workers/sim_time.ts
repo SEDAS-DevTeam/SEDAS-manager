@@ -15,7 +15,12 @@ class SimTime {
                         mins: number = undefined,
                         secs: number = undefined){
         if (mode == "current"){
-            //TODO
+            setInterval(() => {
+                this.date_object = new Date()
+                if (this.measure){
+                    parentPort.postMessage(["time", this.date_object])
+                }
+            }, 1)
         }
         else {
             if (mode == "random"){
@@ -25,7 +30,7 @@ class SimTime {
                 
                 this.date_object.setHours(utils.generateRandomInteger(0, 23))
                 this.date_object.setMinutes(utils.generateRandomInteger(0, 59))
-                this.date_object.setSeconds(utils.generateRandomInteger(0, 59))
+                this.date_object.setSeconds(0)
             }
             else if (mode == "custom"){
                 this.date_object.setFullYear(year, month, date)

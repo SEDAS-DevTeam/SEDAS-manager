@@ -1,0 +1,12 @@
+body{
+    margin: 0;
+}
+
+#embed-top-panel{
+    width: 100%;
+    background-color: gray;
+}
+
+#embed-top-panel form, #embed-top-panel button{
+    display: inline-block;
+}

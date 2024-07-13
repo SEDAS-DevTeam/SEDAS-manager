@@ -38,8 +38,12 @@ import {
     PATH_TO_SETTINGS_HTML,
     PATH_TO_CONTROLLER_HTML,
     PATH_TO_EXIT_HTML,
-    PATH_TO_WORKER_HTML,
     PATH_TO_POPUP_HTML,
+
+    PATH_TO_WORKER_HTML,
+    PATH_TO_DEP_ARR_HTML,
+    PATH_TO_EMBED_HTML,
+    PATH_TO_WEATHER_HTML,
 
     ABS_PATH,
     PATH_TO_AUDIO_UPDATE,
@@ -591,26 +595,29 @@ class MainApp{
                             switch(mon_data[i]["type"]){
                                 case "ACC":
                                     //rewrite to Area control
-                                    path_to_render = "./res/worker.html"
+                                    path_to_render = PATH_TO_WORKER_HTML
                                     //command_presets_listTODO: add rendering
                                     break
                                 case "APP":
                                     //rewrite to Approach control
-                                    path_to_render = "./res/worker.html"
+                                    path_to_render = PATH_TO_WORKER_HTML
                                     //TODO: add rendering
                                     break
                                 case "TWR":
                                     //rewrite to tower
-                                    path_to_render = "./res/worker.html"
+                                    path_to_render = PATH_TO_WORKER_HTML
                                     //TODO: add rendering
                                     break
                                 case "weather":
                                     //rewrite to weather forecast
-                                    path_to_render = "./res/weather.html"
+                                    path_to_render = PATH_TO_WEATHER_HTML
                                     break
                                 case "dep_arr":
                                     //rewrite to departure/arrival list
-                                    path_to_render = "./res/dep_arr.html"
+                                    path_to_render = PATH_TO_DEP_ARR_HTML
+                                    break
+                                case "embed":
+                                    path_to_render = PATH_TO_EMBED_HTML
                                     break
                             }
 

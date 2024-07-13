@@ -825,6 +825,15 @@ class MainApp{
                     this.current_popup_window = undefined
                     break
                 }
+                case "ping": {
+                    let status: boolean = await utils.ping(data[1][1])
+                    for (let i = 0; i < this.workers.length; i++){
+                        console.log(this.workers[i]["win"]["win_type"])
+                        if (this.workers[i]["win"]["win_type"] == "embed"){
+                            this.workers[i]["win"].send_message("ping-status", status)
+                        }
+                    }
+                }
             }
         })
 

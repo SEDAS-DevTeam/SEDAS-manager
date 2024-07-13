@@ -7,6 +7,8 @@ import { join } from "path"
 import { parse, v4 } from "uuid"
 import http from "http"
 import { EventLogger } from "./logger"
+import path from "path"
+import dns from "dns"
 import { 
     //Window defs
     LoaderWindow, 
@@ -21,7 +23,6 @@ import {
     PATH_TO_POPUP_HTML,
     PATH_TO_LOGS
  } from "./app_config";
-import path from "path"
 
 export class ProgressiveLoader{
     private loaders: any[] = [];
@@ -379,6 +380,24 @@ function readJSON(path: string){
     return file_content
 }
 
+async function ping(address: string): Promise<boolean>{
+    return new Promise((resolve, reject) => {
+        let url: URL;
+        try{
+            url = new URL(address)
+        }
+        catch(e){ //invalid URL
+            resolve(false)
+        }
+        let parsed_address: string = url.hostname + url.pathname
+
+        dns.lookup(parsed_address, (error, address, family) => {
+            if (error) resolve(false)
+            else resolve(true)
+        })
+    })
+}
+
 // exports
 const utils = {
     read_file_content,
@@ -395,7 +414,8 @@ const utils = {
     create_widget_window,
     create_popup_window,
     delete_logs,
-    readJSON
+    readJSON,
+    ping
 }
 
 export default utils

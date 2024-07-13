@@ -22,7 +22,7 @@ export const PATH_TO_LOADER_HTML = join(ABS_PATH, "./src/res/html/other/load.htm
 export const PATH_TO_WORKER_HTML = join(ABS_PATH, "./src/res/html/worker/worker.html")
 export const PATH_TO_DEP_ARR_HTML = join(ABS_PATH, "./src/res/html/worker/dep_arr.html")
 export const PATH_TO_EMBED_HTML = join(ABS_PATH, "./src/res/html/worker/embed.html")
-export const PATH_TO_WEATHER_HTML = join(ABS_PATH, "./src/res/html/worker/dep_arr.html")
+export const PATH_TO_WEATHER_HTML = join(ABS_PATH, "./src/res/html/worker/weather.html")
 
 //paths for subprocesses
 export const PATH_TO_AUDIO_UPDATE: string = join(ABS_PATH, "/src/res/neural/get_info.py")

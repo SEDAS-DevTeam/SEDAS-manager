@@ -3,49 +3,39 @@
 #include <string>
 #include <vector>
 
+#include "utils.h"
+
 napi_value Compute_heading_up(napi_env env, napi_callback_info info) {
-    napi_value napi_result;
-    napi_status status;
-
     // Parse the arguments
-    size_t argc = 3;
-    napi_value args[3];
+    napi_value args[4];
+    get_args(env, info, 4, args);
 
-    status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
-    if (status != napi_ok) return nullptr;
+    // checking types of all variables passed as arguments
+    var_typecheck(env, args[0], napi_object);
+    var_typecheck(env, args[1], napi_string);
+    var_is_array(env, args[2]);
+    var_typecheck(env, args[3], napi_string);
 
-    //argument retrival
-    char* dep_point_buf;
-    char* arr_point_buf;
+    // Process the object (dictionary) if needed
+    // Example: get a property from the dictionary
+    //napi_value dict_value;
+    //status = napi_get_named_property(env, args[0], "example_key", &dict_value);
+    //if (status != napi_ok) return nullptr;
 
-    // Get the length of the first string
-    size_t str_len0;
-    status = napi_get_value_string_utf8(env, args[0], nullptr, 0, &str_len0);
-    if (status != napi_ok) return nullptr;
+    std::string dep_point = get_string(env, args[1]);
+    std::vector<std::string> trans_points = get_string_array(env, args[2]);
+    std::string arr_point = get_string(env, args[3]);
 
-    // Get the length of the second string
-    size_t str_len1;
-    status = napi_get_value_string_utf8(env, args[1], nullptr, 0, &str_len1);
-    if (status != napi_ok) return nullptr;
+    // Process data and create result
+    std::vector<std::pair<int, int>> int_pairs = {
+        {1, 2}, {3, 4}, {5, 6}
+    };
 
-    // Copy the first string to the result
-    status = napi_get_value_string_utf8(env, args[0], dep_point_buf, str_len0 + 1, &str_len0);
-    if (status != napi_ok) return nullptr;
+    // Create and return the result array
+    napi_value result_array = create_trajectory_array(env, int_pairs);
+    if (result_array == nullptr) return nullptr;
 
-    // Copy the second string to the result
-    status = napi_get_value_string_utf8(env, args[1], arr_point_buf, str_len1 + 1, &str_len1);
-    if (status != napi_ok) return nullptr;
-
-    //convert char to std::string
-    std::string dep_point(dep_point_buf);
-    std::string arr_point(arr_point_buf);
-    
-    //Test
-    std::string result = dep_point += arr_point;
-
-    status = napi_create_string_utf8(env, result.data(), NAPI_AUTO_LENGTH, &napi_result);
-    if (status != napi_ok) return nullptr;
-    return napi_result;
+    return result_array;
 }
 
 napi_value init(napi_env env, napi_value exports) {
@@ -57,6 +47,7 @@ napi_value init(napi_env env, napi_value exports) {
 
     status = napi_set_named_property(env, exports, "compute_heading_up", fn_com_he_up);
     if (status != napi_ok) return nullptr;
+
     return exports;
 }
 

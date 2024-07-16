@@ -130,16 +130,16 @@ export class Environment {
     public set_plane_trajectories(){
         for (let i = 0; i < this.plane_objects.length; i++){
             console.log(this.plane_objects[i])
-            let dep_point: string = this.plane_objects[i]["departure"]
-            let arr_point: string = this.plane_objects[i]["arrival"]
-            let trans_points: string = this.plane_objects[i]["transport_points"]
+            let dep_point: string = this.plane_objects[i]["schedule"]["departure"]
+            let arr_point: string = this.plane_objects[i]["schedule"]["arrival"]
+            let trans_points: string = this.plane_objects[i]["schedule"]["transport_points"]
+            console.log(this.map_data)
             
-            /* UNCOMMENT AFTER C++ FIX
-            let plane_trajectories: string = enviro_calculations.compute_heading_up(this.map_data, dep_point, trans_points, arr_point)
+            let plane_trajectories: any[] = enviro_calculations.compute_heading_up(this.map_data, dep_point, trans_points, arr_point)
+            //let plane_trajectories: string = enviro_calculations.compute_heading_up(dep_point, arr_point)
             console.log(plane_trajectories)
-
-            this.plane_objects[i]["trajectories"] = plane_trajectories
-            */
+            
+            //this.plane_objects[i]["trajectories"] = plane_trajectories
         }
     }
 

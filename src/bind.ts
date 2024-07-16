@@ -2,6 +2,7 @@
     File that imports all C++ libraries and passes them to main app code
 */
 const plane_import = require("./build/Release/plane_calculations.node")
+const enviro_import = require("./build/Release/enviro_calculations.node")
 const main_import = require("./build/Release/main.node")
 
 export namespace plane_calculations{
@@ -11,8 +12,8 @@ export namespace plane_calculations{
 }
 
 export namespace enviro_calculations{
-    export function compute_heading_up(...args: any): string{
-        return plane_import.compute_heading_up(...args)
+    export function compute_heading_up(...args: any): any[]{
+        return enviro_import.compute_heading_up(...args)
     }
 }
 

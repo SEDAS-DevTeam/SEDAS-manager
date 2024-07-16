@@ -7,11 +7,10 @@
     Glob utils
 */
 
-void get_args(napi_env env, napi_callback_info info, uint8_t arg_size, napi_value* args){
+void get_args(napi_env env, napi_callback_info info, size_t arg_size, napi_value* args){
     napi_status status;
-    size_t argc = 4;
 
-    status = napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);
+    status = napi_get_cb_info(env, info, &arg_size, args, nullptr, nullptr);
     if (status != napi_ok) throw;
 }
 
@@ -66,6 +65,16 @@ std::vector<std::string> get_string_array(napi_env env, napi_value napi_array) {
     }
 
     return string_array;
+}
+
+napi_value get_dict_property(napi_env env, napi_value napi_dict, char* key) {
+    napi_value dict_value;
+    napi_status status;
+
+    status = napi_get_named_property(env, napi_dict, key, &dict_value);
+    if (status != napi_ok) throw;
+
+    return dict_value;
 }
 
 bool var_typecheck(napi_env env, napi_value napi_var, napi_valuetype type) {

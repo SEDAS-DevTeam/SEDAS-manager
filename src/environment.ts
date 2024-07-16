@@ -28,6 +28,7 @@ export class Environment {
 
     private plane_database: PlaneDB;
     private plane_spawner_config: object[] = [];
+    private plane_commander_config: object[] = []
 
     public plane_conditions: object;
 
@@ -58,7 +59,10 @@ export class Environment {
             switch(message[0]){
                 case "time": { //updating time for whole environment
                     this.current_time = message[1]
-                    this.plane_spawner_check() //check for any scheduled plane to spawn
+                    this.plane_modifier_check()
+                    //this function checks for following:
+                    //1. plane spawns
+                    //2. Plane heading change
 
                     break
                 }
@@ -81,7 +85,7 @@ export class Environment {
         this.set_plane_trajectories()
         loader.send_progress("Spawning PlaneSpawner process")
         logger.log("INFO", "Setting up PlaneSpawner process")
-        this.set_plane_spawner()
+        this.set_plane_modifiers()
 
         //everything done, just validate everything
         loader.send_progress("Done! Validating output...")
@@ -129,33 +133,14 @@ export class Environment {
 
     public set_plane_trajectories(){
         for (let i = 0; i < this.plane_objects.length; i++){
-            console.log(this.plane_objects[i])
             let dep_point: string = this.plane_objects[i]["schedule"]["departure"]
             let arr_point: string = this.plane_objects[i]["schedule"]["arrival"]
             let trans_points: string = this.plane_objects[i]["schedule"]["transport_points"]
-            console.log(this.map_data)
             
-            let plane_trajectories: any[] = enviro_calculations.compute_heading_up(this.map_data, dep_point, trans_points, arr_point)
-            //let plane_trajectories: string = enviro_calculations.compute_heading_up(dep_point, arr_point)
-            console.log(plane_trajectories)
+            let plane_trajectory: any[] = enviro_calculations.compute_heading_up(this.map_data, this.plane_objects[i],
+                                                                                    dep_point, trans_points, arr_point)
             
-            //this.plane_objects[i]["trajectories"] = plane_trajectories
-        }
-    }
-
-    public set_plane_spawner(){
-        for (let i = 0; i < this.plane_objects.length; i++){
-            let des_time: string = this.plane_objects[i]["schedule"]["time"]
-            let conv_h: number = parseInt(des_time.split(":")[0]) * 3600000
-            let conv_m: number = parseInt(des_time.split(":")[1]) * 60000
-            let conv_s: number = parseInt(des_time.split(":")[2])
-            
-            let updated_time: Date = new Date(this.start_time.getTime() + (conv_h + conv_m + conv_s))
-
-            this.plane_spawner_config.push({
-                "id": this.plane_objects[i]["hash"],
-                "time": updated_time
-            })
+            this.plane_objects[i]["trajectory"] = plane_trajectory
         }
     }
 
@@ -239,12 +224,53 @@ export class Environment {
         return utils.get_random_element(final_plane_list)
     }
 
-    private plane_spawner_check(){
+    /*
+        Sim time sets
+    */
+
+    private set_plane_modifiers(){
+        for (let i = 0; i < this.plane_objects.length; i++){
+            console.log(this.plane_objects[i])
+
+            //Plane spawner set
+            let sch_time: string = this.plane_objects[i]["schedule"]["time"]
+            let conv_h: number = parseInt(sch_time.split(":")[0]) * 3600000
+            let conv_m: number = parseInt(sch_time.split(":")[1]) * 60000
+            let conv_s: number = parseInt(sch_time.split(":")[2])
+
+            this.plane_spawner_config.push({
+                "id": this.plane_objects[i]["hash"],
+                "time": new Date(this.start_time.getTime() + (conv_h + conv_m + conv_s))
+            })
+
+            //Plane commander set
+            let plane_trajectory_mod: any[] = []
+            for (let i_tr = 0; i_tr < this.plane_objects[i]["trajectory"].length; i_tr++){
+                let des_head: number = this.plane_objects[i]["trajectory"][i_tr][0]
+                let des_time: Date = new Date(this.start_time.getTime() + this.plane_objects[i]["trajectory"])
+
+                plane_trajectory_mod.push([des_head, des_time])
+            }
+
+            this.plane_commander_config.push({
+                "id": this.plane_objects[i]["hash"],
+                "content": plane_trajectory_mod
+            })
+        }
+    }
+
+    /*
+        Sim time checks
+    */
+
+    private plane_modifier_check(){
         function convert_time(time_obj: Date){
             return `${time_obj.getHours()}:${time_obj.getMinutes()}`
         }
 
         for (let i = this.plane_spawner_config.length - 1; i >= 0; i--){
+
+            //Plane spawner check
             let spawn_time: Date = this.plane_spawner_config[i]["time"]
             if (convert_time(spawn_time) == convert_time(this.current_time)){
                 console.log("Time to spawn!")
@@ -255,6 +281,10 @@ export class Environment {
                 this.plane_spawner_config.splice(i, 1)
 
             }
+
+            //Plane commander check
+            //TODO: Going to revisit this soon, because in ATC some excercises prefer vectoring
+            //TODO: Finish plane commander
         }
     }
 }

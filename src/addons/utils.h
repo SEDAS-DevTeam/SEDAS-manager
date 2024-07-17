@@ -14,6 +14,25 @@ void get_args(napi_env env, napi_callback_info info, size_t arg_size, napi_value
     if (status != napi_ok) throw;
 }
 
+napi_value register_functions(napi_env env, napi_value exports, std::vector<std::string>& strings, std::vector<napi_callback>& callbacks) {
+    napi_status status;
+
+    size_t len = strings.size();
+    for (uint8_t i = 0; i < len; i++){
+        // register function to N-API
+        const char* fn_name = strings[i].c_str();
+        napi_callback callback = callbacks[i];
+        napi_value fn;
+
+        status = napi_create_function(env, nullptr, 0, callback, nullptr, &fn);
+        if (status != napi_ok) throw;
+
+        status = napi_set_named_property(env, exports, fn_name, fn);
+        if (status != napi_ok) throw;
+    }
+    return exports;
+}
+
 std::string get_string(napi_env env, napi_value napi_string) {
     napi_status status;
     size_t str_len;

@@ -1,8 +1,3 @@
-#include <node_api.h>
-#include <iostream>
-#include <string>
-#include <vector>
-
 #include "utils.h"
 
 napi_value Compute_heading_up(napi_env env, napi_callback_info info) {
@@ -36,16 +31,10 @@ napi_value Compute_heading_up(napi_env env, napi_callback_info info) {
 }
 
 napi_value init(napi_env env, napi_value exports) {
-    napi_status status;
-    napi_value fn_com_he_up;
+    std::vector<std::string> str_vector{ "compute_heading_up" };
+    std::vector<napi_callback> func_vector{ Compute_heading_up };
 
-    status = napi_create_function(env, nullptr, 0, Compute_heading_up, nullptr, &fn_com_he_up);
-    if (status != napi_ok) return nullptr;
-
-    status = napi_set_named_property(env, exports, "compute_heading_up", fn_com_he_up);
-    if (status != napi_ok) return nullptr;
-
-    return exports;
+    return register_functions(env, exports, str_vector, func_vector);
 }
 
 NAPI_MODULE(NODE_GYP_MODULE_NAME, init)

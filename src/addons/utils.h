@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cmath>
 
 /*
     Glob utils
@@ -119,6 +120,18 @@ bool var_is_array(napi_env env, napi_value napi_var) {
     return is_array;
 }
 
+float deg_to_rad(float deg){
+    return deg * (M_PI / 180);
+}
+
+float rad_to_deg(float rad){
+    return round(rad * (180 / M_PI));
+}
+
+float calc_rate_of_turn(uint32_t std_bank_angle){
+    return 1.091 * tan(deg_to_rad((float) std_bank_angle));
+}
+
 /*
     Utils for enviro calculations
 */
@@ -149,6 +162,14 @@ napi_value create_trajectory_array(napi_env env, const std::vector<std::pair<int
     }
 
     return result_array;
+}
+
+uint8_t calc_angle_between_two_points(std::vector<uint32_t> point_A_coords, std::vector<uint32_t> point_B_coords){
+    
+}
+
+uint32_t calc_turn_time(float angle_start, float angle_final){
+    uint32_t iter_time = 0;
 }
 
 /*

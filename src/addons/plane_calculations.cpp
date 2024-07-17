@@ -1,12 +1,6 @@
 #include "utils.h"
 
 napi_value Calc_rate_of_turn(napi_env env, napi_callback_info args) {
-  napi_value greeting;
-  napi_status status;
-
-  status = napi_create_string_utf8(env, "world", NAPI_AUTO_LENGTH, &greeting);
-  if (status != napi_ok) return nullptr;
-  return greeting;
 }
 
 napi_value init(napi_env env, napi_value exports) {

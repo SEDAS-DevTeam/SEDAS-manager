@@ -1,15 +1,6 @@
 //C++ (N-API) imports
 import { plane_calculations } from "./bind";
 
-//low level functions
-function deg_to_rad(deg){
-    return deg * (Math.PI / 180)
-}
-
-function rad_to_deg(rad){
-    return Math.round(rad * (180 / Math.PI))
-}
-
 export class PlaneDB{
     /*Just an array with methods - for storing planes*/
     public DB: any = [] //storing planes
@@ -171,7 +162,7 @@ export class PlaneDB{
             //heading change
             if (this.DB[i].updated_heading != this.DB[i].heading){
                 //make turn
-                let r_of_t = this.DB[i].calc_rate_of_turn(std_bank_angle)
+                let r_of_t = plane_calculations.calc_rate_of_turn(std_bank_angle, this.DB[i].speed)
                 
                 let continue_change: boolean = true
                 //scan plane turn database
@@ -198,46 +189,43 @@ export class PlaneDB{
         //level change
         for (let i = 0; i < this.DB.length; i++){
             if (parseInt(this.DB[i].updated_level) != parseInt(this.DB[i].level)){
-
+                //compute screen 2d speed
                 if (parseInt(this.DB[i].updated_level) > parseInt(this.DB[i].level)){
-                    //compute screen 2d speed, because of trigonometry
-                    let screen_speed = Math.cos(deg_to_rad(std_climb_angle)) * parseInt(this.DB[i].speed)
+                    let screen_speed: number = plane_calculations.calc_screen_speed(std_climb_angle, this.DB[i].speed)
                     this.DB[i].screen_speed = screen_speed
 
-                    //climb
-                    let change = (parseInt(this.DB[i].speed) / 3600) * Math.sin(deg_to_rad(std_climb_angle)) / scale
-                    let fallback_diff = parseInt(this.DB[i].level) + change - parseInt(this.DB[i].updated_level)
-
-                    //check if completed
-                    if (fallback_diff > 0 && fallback_diff < 500){
+                    const [change, fallback_diff] = plane_calculations.calc_climb(this.DB[i].speed, this.DB[i].level, std_climb_angle, scale, this.DB[i].updated_level)
+                    
+                    if (fallback_diff > 0 && fallback_diff < 500){ //TODO: resolution size not always correct
+                        //Not done
                         this.DB[i].level = this.DB[i].updated_level
-
+                        
                         //set screen speed back to normal
                         this.DB[i].screen_speed = this.DB[i].speed
                         
-                        continue
                     }
-                    this.DB[i].level = Math.round(parseInt(this.DB[i].level) + change) //round
-
+                    else{
+                        //Done
+                        this.DB[i].level = Math.round(parseInt(this.DB[i].level) + change) //round
+                    }
                 }
                 else if (parseInt(this.DB[i].updated_level) < parseInt(this.DB[i].level)){
-                    //compute screen 2d speed, because of trigonometry
-                    let screen_speed = Math.cos(deg_to_rad(std_descent_angle)) * parseInt(this.DB[i].speed)
+                    let screen_speed: number = plane_calculations.calc_screen_speed(std_descent_angle, this.DB[i].speed)
                     this.DB[i].screen_speed = screen_speed
 
-                    //descent
-                    let change = parseInt(this.DB[i].speed) / 3600 * Math.sin(std_descent_angle)
-                    let fallback_diff = parseInt(this.DB[i].updated_level) - parseInt(this.DB[i].level) - change
+                    const [change, fallback_diff] = plane_calculations.calc_descent(this.DB[i].speed, this.DB[i].level, std_descent_angle, scale, this.DB[i].updated_level)
                     
                     if (fallback_diff > 0 && fallback_diff < 500){
+                        //Not done
                         this.DB[i].level = this.DB[i].updated_level
 
                         //set screen speed back to normal
                         this.DB[i].screen_speed = this.DB[i].speed
-
-                        continue
                     }
-                    this.DB[i].level = (parseInt(this.DB[i].level) - change).toFixed(1)
+                    else{
+                        //Done
+                        this.DB[i].level = (parseInt(this.DB[i].level) - change).toFixed(1)
+                    }
                 }
             }
         }
@@ -368,85 +356,18 @@ export class Plane{
             this.y = y;
     }
 
-    public calc_rate_of_turn(std_bank_angle: number){
-        return ((1.091 * Math.tan(deg_to_rad(std_bank_angle))) / this.speed) * 1000
-    }
-
-    public calc_pixel_change(type: string, scale: number, angle: number, change: number){
-        let angle_head = Math.floor(angle / 90)
-        let rel_angle = angle % 90
-        if(angle % 90 == 0 && angle != 0){
-            rel_angle = angle - (angle_head - 1) * angle
-        }
-
-        let dy_n_scale = Math.sin(deg_to_rad(rel_angle)) * change
-        let dx_n_scale = Math.cos(deg_to_rad(rel_angle)) * change
-        
-        let dy = 0
-        let dx = 0
-        if (type == "movement"){
-            dy = dy_n_scale / scale
-            dx = dx_n_scale / scale
-        }
-        else if (type == "rotation"){
-            dy = dy_n_scale
-            dx = dx_n_scale
-        }
-
-        //if pixel-change is too small, set automatically to one
-        dy = Math.ceil(dy)
-        dx = Math.ceil(dx)
-
-        let x1: number = 0
-        let y1: number = 0
-
-        switch(angle_head){
-            case 0:
-            x1 = this.x + dy
-            y1 = this.y - dx
-            break
-            case 1:
-            x1 = this.x + dx
-            y1 = this.y + dy
-            break
-            case 2:
-            x1 = this.x - dy
-            y1 = this.y + dx
-            break
-            case 3:
-            x1 = this.x - dx
-            y1 = this.y - dy
-            break
-        }
-
-        if(angle == 90){
-            x1 = this.x + dy
-            y1 = this.y
-        }
-        else if(angle == 180){
-            x1 = this.x
-            y1 = this.y + dx
-        }
-        else if(angle == 270){
-            x1 = this.x - dy
-            y1 = this.y
-        }
-
-        return [x1, y1]
-    }
-
     public forward(scale: number){
         //make one forward pass
 
         let vals = undefined
         if (this.speed != this.screen_speed){
             //calculate pixel distance
-            vals = this.calc_pixel_change("movement", scale, this.heading, this.screen_speed / 3600)
+            vals = plane_calculations.calc_pixel_change(this.x, this.y, "movement", scale, this.heading, this.screen_speed / 3600)
         }
         else{
 
             //calculate pixel distance
-            vals = this.calc_pixel_change("movement", scale, this.heading, this.speed / 3600)
+            vals = plane_calculations.calc_pixel_change(this.x, this.y, "movement", scale, this.heading, this.speed / 3600)
         }
 
         //rewrite variables

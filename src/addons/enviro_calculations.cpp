@@ -12,12 +12,12 @@ napi_value Compute_heading_up(napi_env env, napi_callback_info info) {
     var_is_array(env, args[3]);
     var_typecheck(env, args[4], napi_string);
 
-    // Process the object (dictionary) if needed
+    // Process the dictionary
     napi_value acc_config = get_dict_property(env, args[0], "ACC");
 
-    std::string dep_point = get_string(env, args[2]);
+    std::string dep_point = get_variable<std::string>(env, args[2]);
     std::vector<std::string> trans_points = get_string_array(env, args[3]);
-    std::string arr_point = get_string(env, args[4]);
+    std::string arr_point = get_variable<std::string>(env, args[4]);
 
     // Process data and create result
     std::vector<std::pair<int, int>> int_pairs = {
@@ -25,7 +25,7 @@ napi_value Compute_heading_up(napi_env env, napi_callback_info info) {
     };
 
     // Create and return the result array
-    napi_value result_array = create_trajectory_array(env, int_pairs);
+    napi_value result_array = create_pair_array(env, int_pairs);
 
     return result_array;
 }

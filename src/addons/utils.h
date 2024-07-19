@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <type_traits>
 
 /*
     Glob utils
@@ -32,29 +33,6 @@ napi_value register_functions(napi_env env, napi_value exports, std::vector<std:
         if (status != napi_ok) throw;
     }
     return exports;
-}
-
-std::string get_string(napi_env env, napi_value napi_string) {
-    napi_status status;
-    size_t str_len;
-
-    //get string length
-    status = napi_get_value_string_utf8(env, napi_string, nullptr, 0, &str_len);
-    if (status != napi_ok) throw;
-
-    //omit string into char*
-    char* str_buf = new char[str_len + 1];
-    status = napi_get_value_string_utf8(env, napi_string, str_buf, str_len + 1, &str_len);
-    if (status != napi_ok) {
-        delete[] str_buf;
-        throw;
-    }
-
-    
-    std::string str(str_buf);
-    delete[] str_buf;
-
-    return str;
 }
 
 std::vector<std::string> get_string_array(napi_env env, napi_value napi_array) {
@@ -132,37 +110,140 @@ float calc_rate_of_turn(uint32_t std_bank_angle){
     return 1.091 * tan(deg_to_rad((float) std_bank_angle));
 }
 
-/*
-    Utils for enviro calculations
-*/
+//Definitions for get_variable (compatible with templates)
 
-napi_value create_trajectory_array(napi_env env, const std::vector<std::pair<int, int>>& pairs) {
+template <typename T>
+T get_variable(napi_env env, napi_value napi_elem){
+    static_assert(sizeof(T) == -1, "get_variable is not implemented for this type.");
+}
+
+template<>
+std::string get_variable<std::string>(napi_env env, napi_value napi_elem){
+    napi_status status;
+    size_t str_len;
+
+    //get string length
+    status = napi_get_value_string_utf8(env, napi_elem, nullptr, 0, &str_len);
+    if (status != napi_ok) throw;
+
+    //omit string into char*
+    char* str_buf = new char[str_len + 1];
+    status = napi_get_value_string_utf8(env, napi_elem, str_buf, str_len + 1, &str_len);
+    if (status != napi_ok){
+        delete[] str_buf;
+        throw;
+    }
+
+    std::string str(str_buf);
+    delete[] str_buf;
+
+    return str;
+}
+
+template<>
+float get_variable<float>(napi_env env, napi_value napi_elem){
+    napi_status status;
+    double result;
+
+    status = napi_get_value_double(env, napi_elem, &result);
+    if (status != napi_ok) throw;
+
+    return result;
+}
+
+template<>
+int get_variable<int>(napi_env env, napi_value napi_elem){
+    napi_status status;
+    int result;
+
+    status = napi_get_value_int32(env, napi_elem, &result);
+    if (status != napi_ok) throw;
+
+    return result;
+}
+
+//Definitions for create_variable (compatible with templates)
+
+template <typename T>
+napi_value create_variable(napi_env env, T value);
+
+template <>
+napi_value create_variable<int>(napi_env env, int value) {
+    napi_status status;
+    napi_value elem;
+
+    status = napi_create_int32(env, value, &elem);
+    if (status != napi_ok) throw;
+
+    return elem;
+}
+
+template <>
+napi_value create_variable<std::string>(napi_env env, std::string value) {
+    napi_status status;
+    napi_value elem;
+
+    status = napi_create_string_utf8(env, value.c_str(), value.length(), &elem);
+    if (status != napi_ok) throw;
+
+    return elem;
+}
+
+template <>
+napi_value create_variable<float>(napi_env env, float value) {
+    napi_status status;
+    napi_value elem;
+
+    status = napi_create_double(env, value, &elem);
+    if (status != napi_ok) throw;
+
+    return elem;
+}
+
+template <typename T>
+napi_value create_pair_array(napi_env env, const std::vector<std::pair<T, T>>& pairs) {
     napi_value result_array;
     napi_status status = napi_create_array_with_length(env, pairs.size(), &result_array);
-    if (status != napi_ok) return nullptr;
+    if (status != napi_ok) throw;
 
-    for (size_t i = 0; i < pairs.size(); ++i) {
-        napi_value int_pair;
-        status = napi_create_array_with_length(env, 2, &int_pair);
-        if (status != napi_ok) return nullptr;
+    for (size_t i = 0; i < pairs.size(); i++) {
+        napi_value pair;
+        status = napi_create_array_with_length(env, 2, &pair);
+        if (status != napi_ok) throw;
 
-        napi_value first, second;
-        status = napi_create_int32(env, pairs[i].first, &first);
-        if (status != napi_ok) return nullptr;
-        status = napi_create_int32(env, pairs[i].second, &second);
-        if (status != napi_ok) return nullptr;
+        napi_value first = create_variable(env, pairs[i].first);
+        napi_value second = create_variable(env, pairs[i].second);
 
-        status = napi_set_element(env, int_pair, 0, first);
-        if (status != napi_ok) return nullptr;
-        status = napi_set_element(env, int_pair, 1, second);
-        if (status != napi_ok) return nullptr;
+        status = napi_set_element(env, pair, 0, first);
+        if (status != napi_ok) throw;
+        status = napi_set_element(env, pair, 1, second);
+        if (status != napi_ok) throw;
 
-        status = napi_set_element(env, result_array, i, int_pair);
-        if (status != napi_ok) return nullptr;
+        status = napi_set_element(env, result_array, i, pair);
+        if (status != napi_ok) throw;
     }
 
     return result_array;
 }
+
+template <typename T>
+napi_value create_array(napi_env env, const std::vector<T> vector){
+    napi_value result_array;
+    napi_status status = napi_create_array_with_length(env, vector.size(), &result_array);
+
+    for (size_t i = 0; i < vector.size(); i++){
+        napi_value elem = create_variable(env, vector[i]);
+        
+        status = napi_set_element(env, result_array, i, elem);
+        if (status != napi_ok) throw;
+    }
+
+    return result_array;
+}
+
+/*
+    Utils for enviro calculations
+*/
 
 uint8_t calc_angle_between_two_points(std::vector<uint32_t> point_A_coords, std::vector<uint32_t> point_B_coords){
     

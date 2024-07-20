@@ -3,7 +3,7 @@
 napi_value Compute_heading_up(napi_env env, napi_callback_info info) {
     // Parse the arguments
     napi_value args[5];
-    get_args(env, info, 5, args);
+    get_args(env, info, args);
 
     // checking types of all variables passed as arguments
     var_typecheck(env, args[0], napi_object);
@@ -32,8 +32,13 @@ napi_value Compute_heading_up(napi_env env, napi_callback_info info) {
 }
 
 napi_value init(napi_env env, napi_value exports) {
-    std::vector<std::string> str_vector{ "compute_heading_up" };
-    std::vector<napi_callback> func_vector{ Compute_heading_up };
+    std::vector<std::string> str_vector{ 
+        "compute_heading_up"
+    };
+
+    std::vector<napi_callback> func_vector{
+        Compute_heading_up
+    };
 
     return register_functions(env, exports, str_vector, func_vector);
 }

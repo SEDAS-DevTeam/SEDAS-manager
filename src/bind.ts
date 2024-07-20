@@ -31,7 +31,7 @@ export namespace plane_calculations{
                 updated_level)
         }
         catch(err){
-            console.error(err.message)
+            handle_exception_js(err)
         }
     }
     /*
@@ -46,7 +46,7 @@ export namespace plane_calculations{
                 updated_level)
         }
         catch(err){
-            console.error(err.message)
+            handle_exception_js(err)
         }
     }
     /*
@@ -57,7 +57,7 @@ export namespace plane_calculations{
             return plane_import.calc_screen_speed(angle, speed)
         }
         catch(err){
-            console.error(err.message)
+            handle_exception_js(err)
         }
     }
     /*
@@ -68,7 +68,7 @@ export namespace plane_calculations{
             return plane_import.calc_rate_of_turn(std_bank_angle, speed)
         }
         catch(err){
-            console.error(err.message)
+            handle_exception_js(err)
         }
     }
     /*
@@ -84,7 +84,18 @@ export namespace plane_calculations{
                 change)
         }
         catch(err){
-            console.error(err.message)
+            handle_exception_js(err)
+        }
+    }
+
+    export function calc_turn_fallback_diff(heading: number, rate_of_turn: number, updated_heading: number){
+        try{
+            return plane_import.calc_turn_fallback_diff(heading,
+                                                        rate_of_turn,
+                                                        updated_heading)
+        }
+        catch(err){
+            handle_exception_js(err)
         }
     }
 }
@@ -98,7 +109,7 @@ export namespace enviro_calculations{
             return enviro_import.compute_heading_up(...args)
         }
         catch(err){
-            console.error(err.message)
+            handle_exception_js(err)
         }
     }
 }
@@ -112,7 +123,7 @@ export namespace main{
             console.log(main_import.hello_world())
         }
         catch(err){
-            console.error(err.message)
+            handle_exception_js(err)
         }
     }
 }

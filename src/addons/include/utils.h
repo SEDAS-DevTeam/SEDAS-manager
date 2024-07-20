@@ -6,11 +6,13 @@
 #include <cmath>
 #include <type_traits>
 
-#include "logger.h"
-
 /*
     Glob utils
 */
+
+int get_array_len(auto array[]){
+    return sizeof(array) / sizeof(array[0]);
+}
 
 void handle_napi_exception(napi_status status, napi_env env, std::string message){
     if (status != napi_ok){
@@ -35,8 +37,9 @@ void handle_exception(napi_env env, std::exception error){
     napi_throw(env, napi_error);
 }
 
-void get_args(napi_env env, napi_callback_info info, size_t arg_size, napi_value* args){
+void get_args(napi_env env, napi_callback_info info, napi_value* args){
     napi_status status;
+    size_t arg_size = get_array_len(args);
 
     status = napi_get_cb_info(env, info, &arg_size, args, nullptr, nullptr);
     handle_napi_exception(status, env, "Failed to get args");

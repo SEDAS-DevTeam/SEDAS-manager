@@ -267,8 +267,8 @@ export class PlaneDB{
                     continue
                 }
                 if (this.plane_turn_DB[i]["id"] == this.DB[i_plane].id){
-
-                    var fallback_diff = Math.abs(this.DB[i_plane].heading + this.plane_turn_DB[i]["rate_of_turn"] - this.DB[i_plane].updated_heading)
+                    var fallback_diff: number = plane_calculations.calc_turn_fallback_diff(this.DB[i].heading, this.plane_turn_DB[i]["rate_of_turn"], this.DB[i_plane].updated_heading)
+                    
                     //check if completed
                     if (fallback_diff > 0 && fallback_diff < 10){
                         //automatically set to updated heading

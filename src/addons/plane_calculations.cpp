@@ -2,7 +2,7 @@
 
 napi_value Calc_rate_of_turn(napi_env env, napi_callback_info info) {
   napi_value args[2];
-  get_args(env, info, 2, args);
+  get_args(env, info, args);
 
   var_typecheck(env, args[0], napi_string);
   var_typecheck(env, args[1], napi_number);
@@ -15,7 +15,13 @@ napi_value Calc_rate_of_turn(napi_env env, napi_callback_info info) {
 napi_value Calc_climb(napi_env env, napi_callback_info info){
   // Parse the arguments
   napi_value args[5];
-  get_args(env, info, 5, args);
+  get_args(env, info, args);
+
+  var_typecheck(env, args[0], napi_number);
+  var_typecheck(env, args[1], napi_number);
+  var_typecheck(env, args[2], napi_string);
+  var_typecheck(env, args[3], napi_string);
+  var_typecheck(env, args[4], napi_number);
 
   int plane_speed = get_variable<int>(env, args[0]);
   int level = get_variable<int>(env, args[1]);
@@ -32,7 +38,13 @@ napi_value Calc_climb(napi_env env, napi_callback_info info){
 
 napi_value Calc_descent(napi_env env, napi_callback_info info){
   napi_value args[5];
-  get_args(env, info, 5, args);
+  get_args(env, info, args);
+
+  var_typecheck(env, args[0], napi_number);
+  var_typecheck(env, args[1], napi_number);
+  var_typecheck(env, args[2], napi_string);
+  var_typecheck(env, args[3], napi_string);
+  var_typecheck(env, args[4], napi_number);
 
   int plane_speed = get_variable<int>(env, args[0]);
   int level = get_variable<int>(env, args[1]);
@@ -50,7 +62,14 @@ napi_value Calc_descent(napi_env env, napi_callback_info info){
 napi_value Calc_pixel_change(napi_env env, napi_callback_info info){
   try{
     napi_value args[6];
-    get_args(env, info, 6, args);
+    get_args(env, info, args);
+
+    var_typecheck(env, args[0], napi_number);
+    var_typecheck(env, args[1], napi_number);
+    var_typecheck(env, args[2], napi_string);
+    var_typecheck(env, args[3], napi_number);
+    var_typecheck(env, args[4], napi_number);
+    var_typecheck(env, args[5], napi_number);
 
     int plane_x = get_variable<int>(env, args[0]);
     int plane_y = get_variable<int>(env, args[1]);
@@ -132,7 +151,7 @@ napi_value Calc_pixel_change(napi_env env, napi_callback_info info){
 napi_value Calc_screen_speed(napi_env env, napi_callback_info info){
   // Parse the arguments
   napi_value args[2];
-  get_args(env, info, 2, args);
+  get_args(env, info, args);
 
   // checking types of all variables passed as arguments
   var_typecheck(env, args[0], napi_string);
@@ -143,19 +162,42 @@ napi_value Calc_screen_speed(napi_env env, napi_callback_info info){
 
   return create_variable<float>(env, cos(deg_to_rad(angle)) * plane_speed);
 }
-/*
-napi_value Calc_speed_change(napi_env env, napi_callback_info info){
 
+napi_value Calc_turn_fallback_diff(napi_env env, napi_callback_info info){
+  napi_value args[3];
+  get_args(env, info, args);
+
+  var_typecheck(env, args[0], napi_number);
+  var_typecheck(env, args[1], napi_number);
+  var_typecheck(env, args[2], napi_number);
+
+  int heading = get_variable<int>(env, args[0]);
+  float rate_of_turn = get_variable<float>(env, args[1]);
+  int updated_heading = get_variable<int>(env, args[2]);
+
+  float fallback_diff = abs(heading + rate_of_turn - updated_heading);
+
+  return create_variable<float>(env, fallback_diff);
 }
-
-napi_value Calc_turn_change(napi_env env, napi_callback_info info){
-
-}
-*/
 
 napi_value init(napi_env env, napi_value exports) {
-  std::vector<std::string> str_vector{ "calc_rate_of_turn", "calc_pixel_change", "calc_descent", "calc_climb", "calc_screen_speed" };
-  std::vector<napi_callback> func_vector{ Calc_rate_of_turn, Calc_pixel_change, Calc_descent, Calc_climb, Calc_screen_speed };
+  std::vector<std::string> str_vector{ 
+    "calc_rate_of_turn", 
+    "calc_pixel_change", 
+    "calc_descent", 
+    "calc_climb", 
+    "calc_screen_speed",
+    "calc_turn_fallback_diff"
+  };
+  
+  std::vector<napi_callback> func_vector{ 
+    Calc_rate_of_turn, 
+    Calc_pixel_change, 
+    Calc_descent, 
+    Calc_climb, 
+    Calc_screen_speed,
+    Calc_turn_fallback_diff
+  };
 
   return register_functions(env, exports, str_vector, func_vector);
 }

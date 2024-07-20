@@ -12,8 +12,9 @@ napi_value Compute_heading_up(napi_env env, napi_callback_info info) {
     var_is_array(env, args[3]);
     var_typecheck(env, args[4], napi_string);
 
-    // Process the dictionary
-    napi_value acc_config = get_dict_property(env, args[0], "ACC");
+    // Process the dictionary (TODO)
+    //char* key = "ACC";
+    //napi_value acc_config = get_dict_property(env, args[0], key);
 
     std::string dep_point = get_variable<std::string>(env, args[2]);
     std::vector<std::string> trans_points = get_string_array(env, args[3]);

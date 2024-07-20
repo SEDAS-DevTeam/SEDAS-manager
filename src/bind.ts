@@ -12,11 +12,17 @@ catch (err){
     process.exit(0)
 }
 
+function handle_exception_js(error: Error){
+    /* Function for handling error on javascript side
+    */
+    console.log(error.message)
+}
+
 export namespace plane_calculations{
     /*
         Function that calculates rate of descent, also calculates difference from desired level
     */
-    export function calc_descent(descent_angle: number, level: number, plane_speed: number, scale: number, updated_level: number){
+    export function calc_descent(descent_angle: number, level: number, plane_speed: string, scale: number, updated_level: number){
         try{
             return plane_import.calc_descent(descent_angle,
                 level,
@@ -31,7 +37,7 @@ export namespace plane_calculations{
     /*
         Function that calculates rate of climb, also calculates difference from desired level
     */
-    export function calc_climb(climb_angle: number, level: number, plane_speed: number, scale: number, updated_level: number){
+    export function calc_climb(climb_angle: number, level: number, plane_speed: string, scale: number, updated_level: number){
         try{
             return plane_import.calc_climb(climb_angle,
                 level,
@@ -46,10 +52,9 @@ export namespace plane_calculations{
     /*
         Function that calculates true screen speed (because of climb or descent, the speed is slower on the monitors)
     */
-    export function calc_screen_speed(angle: number, speed: number){
+    export function calc_screen_speed(angle: string, speed: number){
         try{
-            return plane_import.calc_screen_speed(angle, 
-                speed)
+            return plane_import.calc_screen_speed(angle, speed)
         }
         catch(err){
             console.error(err.message)
@@ -58,10 +63,9 @@ export namespace plane_calculations{
     /*
         Function that calculates rate of turn regarding the standard bank angle used for airliners and aircraft TAS
     */
-    export function calc_rate_of_turn(std_bank_angle: number, speed: number){
+    export function calc_rate_of_turn(std_bank_angle: string, speed: number){
         try{
-            return plane_import.calc_rate_of_turn(std_bank_angle,
-                speed)
+            return plane_import.calc_rate_of_turn(std_bank_angle, speed)
         }
         catch(err){
             console.error(err.message)

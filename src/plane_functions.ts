@@ -50,12 +50,13 @@ export class PlaneDB{
         }
     }
 
-    public set_command(callsign: string, command: string, value: number, args: string[] = []){
+    public set_command(callsign: string, command: string, value: any, args: string[] = []){
         for(let i = 0; i < this.DB.length; i++){
             if (callsign == this.DB[i].callsign){
                 //find specific command context
                 this.command_config.commands.forEach(command_elem => {
                     if (command == command_elem["comm"]){
+                        console.log(command, command_elem)
                         command_elem["exec"](this.DB[i], command, args, value)
                     }
                 })
@@ -64,7 +65,6 @@ export class PlaneDB{
     }
 
     public update_worker_data(monitor_data: any){
-        console.log(monitor_data)
         this.monitor_DB = []
 
         for (let i = 0; i < monitor_data.length; i++){
@@ -142,13 +142,15 @@ export class PlaneDB{
         this.monitor_DB = []
     }
 
-    public update_planes(scale: number, std_bank_angle: number, std_climb_angle: number, std_descent_angle: number,
+    public update_planes(scale: number, std_bank_angle: string, std_climb_angle: string, std_descent_angle: string,
                          std_accel: number, path_limit: number){
         //scale that represents how many nautical miles are on one pixel
-
         /*
         MOVEMENT CHANGES
         */
+
+        //typecheck for all planes, no need to do that every turn (remove later TODO)
+        //also, there is no need for 5 fckin loops, so remove that later too
 
         //update all planes
         for (let i = 0; i < this.DB.length; i++){
@@ -162,8 +164,10 @@ export class PlaneDB{
             //heading change
             if (this.DB[i].updated_heading != this.DB[i].heading){
                 //make turn
+                console.log(std_bank_angle)
                 let r_of_t = plane_calculations.calc_rate_of_turn(std_bank_angle, this.DB[i].speed)
-                
+                console.log("rate", r_of_t)
+
                 let continue_change: boolean = true
                 //scan plane turn database
                 for (let i_db = 0; i_db < this.plane_turn_DB.length; i_db++){
@@ -188,14 +192,16 @@ export class PlaneDB{
 
         //level change
         for (let i = 0; i < this.DB.length; i++){
-            if (parseInt(this.DB[i].updated_level) != parseInt(this.DB[i].level)){
+            if (this.DB[i].updated_level != this.DB[i].level){
                 //compute screen 2d speed
-                if (parseInt(this.DB[i].updated_level) > parseInt(this.DB[i].level)){
+                if (this.DB[i].updated_level > this.DB[i].level){
                     let screen_speed: number = plane_calculations.calc_screen_speed(std_climb_angle, this.DB[i].speed)
+                    console.log("screen", screen_speed)
                     this.DB[i].screen_speed = screen_speed
 
                     const [change, fallback_diff] = plane_calculations.calc_climb(this.DB[i].speed, this.DB[i].level, std_climb_angle, scale, this.DB[i].updated_level)
-                    
+                    console.log("tf is that", change, fallback_diff)
+
                     if (fallback_diff > 0 && fallback_diff < 500){ //TODO: resolution size not always correct
                         //Not done
                         this.DB[i].level = this.DB[i].updated_level
@@ -206,15 +212,17 @@ export class PlaneDB{
                     }
                     else{
                         //Done
-                        this.DB[i].level = Math.round(parseInt(this.DB[i].level) + change) //round
+                        this.DB[i].level = Math.round(this.DB[i].level + change)
                     }
                 }
-                else if (parseInt(this.DB[i].updated_level) < parseInt(this.DB[i].level)){
+                else if (this.DB[i].updated_level < this.DB[i].level){
                     let screen_speed: number = plane_calculations.calc_screen_speed(std_descent_angle, this.DB[i].speed)
+                    console.log(screen_speed)
                     this.DB[i].screen_speed = screen_speed
 
                     const [change, fallback_diff] = plane_calculations.calc_descent(this.DB[i].speed, this.DB[i].level, std_descent_angle, scale, this.DB[i].updated_level)
-                    
+                    console.log(change, fallback_diff)
+
                     if (fallback_diff > 0 && fallback_diff < 500){
                         //Not done
                         this.DB[i].level = this.DB[i].updated_level
@@ -224,7 +232,7 @@ export class PlaneDB{
                     }
                     else{
                         //Done
-                        this.DB[i].level = (parseInt(this.DB[i].level) - change).toFixed(1)
+                        this.DB[i].level = parseFloat((this.DB[i].level - change).toFixed(1))
                     }
                 }
             }
@@ -233,21 +241,21 @@ export class PlaneDB{
         //speed change
         for (let i = 0; i < this.DB.length; i++){
             if (this.DB[i].updated_speed != this.DB[i].speed){
-                var fallback_diff = parseInt(this.DB[i].speed) + std_accel - parseInt(this.DB[i].updated_speed)
+                var fallback_diff = this.DB[i].speed + std_accel - this.DB[i].updated_speed
                 if (fallback_diff > 0 && fallback_diff < std_accel){
                     //check if finished
-                    this.DB[i].speed = parseInt(this.DB[i].updated_speed)
+                    this.DB[i].speed = this.DB[i].updated_speed
                 }
 
-                if (parseInt(this.DB[i].updated_speed) > parseInt(this.DB[i].speed)){
+                if (this.DB[i].updated_speed > this.DB[i].speed){
                     //increase velocity
-                    this.DB[i].speed = parseInt(this.DB[i].speed) + std_accel
-                    this.DB[i].screen_speed = parseInt(this.DB[i].screen_speed) + std_accel
+                    this.DB[i].speed = this.DB[i].speed + std_accel
+                    this.DB[i].screen_speed = this.DB[i].screen_speed + std_accel
                 }
-                else if (parseInt(this.DB[i].updated_speed) < parseInt(this.DB[i].speed)){
+                else if (this.DB[i].updated_speed < this.DB[i].speed){
                     //decrease velocity
-                    this.DB[i].speed = parseInt(this.DB[i].speed) - std_accel
-                    this.DB[i].screen_speed = parseInt(this.DB[i].screen_speed) - std_accel
+                    this.DB[i].speed = this.DB[i].speed - std_accel
+                    this.DB[i].screen_speed = this.DB[i].screen_speed - std_accel
                 }
             }
         }
@@ -260,11 +268,11 @@ export class PlaneDB{
                 }
                 if (this.plane_turn_DB[i]["id"] == this.DB[i_plane].id){
 
-                    var fallback_diff = Math.abs(parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"] - parseInt(this.DB[i_plane].updated_heading))
+                    var fallback_diff = Math.abs(this.DB[i_plane].heading + this.plane_turn_DB[i]["rate_of_turn"] - this.DB[i_plane].updated_heading)
                     //check if completed
                     if (fallback_diff > 0 && fallback_diff < 10){
                         //automatically set to updated heading
-                        this.DB[i_plane].heading = parseInt(this.DB[i_plane].updated_heading)
+                        this.DB[i_plane].heading = this.DB[i_plane].updated_heading
 
                         //heading == updated_heading => remove
                         this.plane_turn_DB.splice(i, 1)
@@ -272,13 +280,13 @@ export class PlaneDB{
                     }
 
                     var divider = ((this.DB[i_plane].heading < 180) ? this.DB[i_plane].heading + 180 : this.DB[i_plane].heading - 180)
-                    if (parseInt(this.DB[i_plane].updated_heading) > divider || parseInt(this.DB[i_plane].updated_heading) < this.DB[i_plane].heading){
+                    if (this.DB[i_plane].updated_heading > divider || this.DB[i_plane].updated_heading < this.DB[i_plane].heading){
                         //turn left
-                        this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) - this.plane_turn_DB[i]["rate_of_turn"]
+                        this.DB[i_plane].heading = this.DB[i_plane].heading - this.plane_turn_DB[i]["rate_of_turn"]
                     }
                     else{
                         //turn right
-                        this.DB[i_plane].heading = parseInt(this.DB[i_plane].heading) + this.plane_turn_DB[i]["rate_of_turn"]
+                        this.DB[i_plane].heading = this.DB[i_plane].heading + this.plane_turn_DB[i]["rate_of_turn"]
                     }
 
                     //check if over 360
@@ -365,7 +373,6 @@ export class Plane{
             vals = plane_calculations.calc_pixel_change(this.x, this.y, "movement", scale, this.heading, this.screen_speed / 3600)
         }
         else{
-
             //calculate pixel distance
             vals = plane_calculations.calc_pixel_change(this.x, this.y, "movement", scale, this.heading, this.speed / 3600)
         }
@@ -378,24 +385,15 @@ export class Plane{
     /*
         Functions for changing plane variables
     */
-    public change_heading(command: string, args: string[], value: number){
-        if (args.length == 0) this.updated_heading = value
-        else{
-
-        }
+    public change_heading(command: string, args: string[], value: any){
+        if (args.length == 0) this.updated_heading = parseInt(value)
     }
 
     public change_speed(command: string, args: string[], value: any){
-        if (args.length == 0) this.updated_speed = value
-        else{
-
-        }
+        if (args.length == 0) this.updated_speed = parseInt(value)
     }
 
     public change_level(command: string, args: string[], value: any){
-        if (args.length == 0) this.updated_level = value
-        else{
-
-        }
+        if (args.length == 0) this.updated_level = parseInt(value)
     }
 }

@@ -218,9 +218,9 @@ function process_plane_data(){
 
     window.electronAPI.send_message("controller", ["spawn-plane", {
         "name": name,
-        "heading": heading,
-        "level": level,
-        "speed": speed,
+        "heading": parseInt(heading),
+        "level": parseInt(level),
+        "speed": parseInt(speed),
         "monitor": spawn_on,
         "departure": dep_point,
         "arrival": arr_point,

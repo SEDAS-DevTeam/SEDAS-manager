@@ -5,7 +5,7 @@ napi_value Method(napi_env env, napi_callback_info args) {
   napi_status status;
 
   status = napi_create_string_utf8(env, "hello", NAPI_AUTO_LENGTH, &greeting);
-  handle_exception(status, env, "Test");
+  handle_napi_exception(status, env, "Test");
   return greeting;
 }
 

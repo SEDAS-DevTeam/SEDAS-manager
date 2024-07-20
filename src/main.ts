@@ -233,7 +233,7 @@ class MainApp{
                         let command_args = content.split(" ")
 
                         //TODO: add args to set command
-                        this.PlaneDatabase.set_command(command_args[0], command_args[1], parseInt(command_args[2]))
+                        this.PlaneDatabase.set_command(command_args[0], command_args[1], command_args[2])
                         break
                     case "debug":
                         //used for debug logging
@@ -678,9 +678,8 @@ class MainApp{
                     break
                 }
                 case "plane-value-change": {
-                    console.log(data)
                     //TODO: add args to set command
-                    this.PlaneDatabase.set_command(data[1][3], data[1][1], parseInt(data[1][2]))      
+                    this.PlaneDatabase.set_command(data[1][3], data[1][1], data[1][2])      
                     this.send_to_all(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
                     controllerWindow.send_message("terminal-add", data[1].slice(1))
                     break
@@ -862,7 +861,7 @@ class MainApp{
                 setInterval(() => {
                     if (this.PlaneDatabase != undefined && this.map_data != undefined && this.workers.length != 0){
                         if (this.app_status["sim-running"]){
-                            this.PlaneDatabase.update_planes(this.scale, app_settings["std_bank_angle"], parseInt(app_settings["standard_pitch_up"]), parseInt(app_settings["standard_pitch_down"]),
+                            this.PlaneDatabase.update_planes(this.scale, app_settings["std_bank_angle"], app_settings["standard_pitch_up"], app_settings["standard_pitch_down"],
                                                     parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
                         }
                         if (this.app_status["app-running"]){

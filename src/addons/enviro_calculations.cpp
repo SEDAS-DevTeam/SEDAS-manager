@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "include/utils.h"
 
 napi_value Compute_heading_up(napi_env env, napi_callback_info info) {
     // Parse the arguments

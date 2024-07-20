@@ -1201,6 +1201,9 @@ const app_settings = JSON.parse(app_settings_raw);
 
 //app main code
 app.on("ready", async () => {
+    //test
+    main.main_hello()
+
     //setup app event logger
     utils.delete_logs()
     EvLogger = new EventLogger(app_settings["logging"], "app_log", "system", "v1.0.0")

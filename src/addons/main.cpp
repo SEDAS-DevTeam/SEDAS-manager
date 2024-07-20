@@ -1,11 +1,11 @@
-#include "utils.h"
+#include "include/utils.h"
 
 napi_value Method(napi_env env, napi_callback_info args) {
   napi_value greeting;
   napi_status status;
 
   status = napi_create_string_utf8(env, "hello", NAPI_AUTO_LENGTH, &greeting);
-  if (status != napi_ok) return nullptr;
+  handle_exception(status, env, "Test");
   return greeting;
 }
 

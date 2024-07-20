@@ -14,7 +14,7 @@ import { Plane, PlaneDB } from "./plane_functions"
 import { update_models } from "./fetch"
 import { EventLogger } from "./logger"
 
-import utils, {ProgressiveLoader} from "./utils"
+import utils, {ProgressiveLoader, IPCwrapper} from "./utils"
 import {PluginRegister} from "./plugin_register"
 
 import {
@@ -146,6 +146,7 @@ class MainApp{
 
     //other variables
     private loader: ProgressiveLoader;
+    private wrapper: IPCwrapper;
     public backupdb_saving_frequency: number = 1000; //defaultly set to 1 second
     private local_plugin_list: object[]
 
@@ -927,6 +928,9 @@ class MainApp{
     public async init_app(){
         this.get_screen_info() //getting screen info for all displays
 
+        //setup IPC wrapper
+        this.wrapper = new IPCwrapper()
+
         //set progressive loader object on loaders
         this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
         this.loader.setup_loader(11, "SEDAS is loading, please wait...", "Initializing app")
@@ -1038,6 +1042,7 @@ class MainApp{
 
         EvLogger.log("DEBUG", "main-menu show")
         mainMenuWindow = new Window(this.app_status, this.dev_panel, main_menu_dict, PATH_TO_MAIN_HTML, coords, EvLogger, main_app)
+        this.wrapper.register_window(mainMenuWindow, "bidirectional")
         mainMenuWindow.show()
     }
 

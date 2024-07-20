@@ -6,6 +6,7 @@
 import { join, resolve } from "path"
 import { BrowserWindow, ipcMain, screen, Tray, nativeImage, Menu } from "electron";
 import { EventLogger } from "./logger"
+import utils from "./utils"
 
 //init vars
 export const ABS_PATH = resolve("")
@@ -162,6 +163,7 @@ class BaseWindow{
     public win_coordinates: number[];
     public path_load: string;
     public localConfig: any = {}; //contains local config of window
+    public window_id: string;
     public event_logger: EventLogger;
 
     public close(){
@@ -187,7 +189,6 @@ class BaseWindow{
 }
 
 export class Window extends BaseWindow{
-
     public checkClose(callback: any = undefined){
         this.window.on("closed", () => {
             this.isClosed = true
@@ -202,6 +203,9 @@ export class Window extends BaseWindow{
         ev_logger: EventLogger, main_app: any, window_type: string = "none", display_res: number[] = []){
         
         super();
+
+        //generate id for window
+        this.window_id = utils.generate_win_id()
 
         this.win_coordinates = coords //store to use later
         this.event_logger = ev_logger
@@ -242,7 +246,6 @@ export class Window extends BaseWindow{
 }
 
 export class LoaderWindow extends BaseWindow{
-
     public wait_for_load(callback: any){
         return new Promise<void>((resolve, reject) => {
             this.window.webContents.on("did-finish-load", async () => {
@@ -300,6 +303,9 @@ export class WidgetWindow extends BaseWindow{
                         ev_logger: EventLogger){
 
         super()
+
+        //generate id for window
+        this.window_id = utils.generate_win_id()
 
         this.event_logger = ev_logger
         Object.assign(this.localConfig, config)

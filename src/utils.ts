@@ -14,6 +14,7 @@ import {
     LoaderWindow, 
     WidgetWindow,
     PopupWindow,
+    Window,
 
     popup_widget_dict,
     basic_worker_widget_dict,
@@ -24,7 +25,41 @@ import {
     PATH_TO_LOGS
  } from "./app_config";
 
+// variables
+const alphabet: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+export class IPCwrapper{
+    /*
+        Class that handles the IPC communication
+    */
+    public window_communication_configuration: object[] = [];
+
+
+    public register_window(window: Window, comm_type: string){
+        this.window_communication_configuration.push({
+            "id": window.window_id,
+            "communication-type": comm_type //supports keys: bidirectional and unidirectional
+        })
+    }
+
+    public unregister_window(window_id: string){
+        for (let i = 0; i < this.window_communication_configuration.length; i++){
+            if (this.window_communication_configuration[i]["id"] == window_id){
+                this.window_communication_configuration.splice(i, 1)
+                break
+            }
+        }
+    }
+
+    public constructor(){
+
+    }
+}
+
 export class ProgressiveLoader{
+    /*
+        Loader class used for loading any stuff in GUI (involves spawning windows too)
+    */
     private loaders: any[] = [];
     private app_settings: any;
     private displays: any[]
@@ -111,9 +146,18 @@ function generate_hash(){
     return v4()
 }
 
-function generate_id(){
-    var alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+function generate_win_id(){
+    var res_str: string = "win-"
+    var n_pos: number = 4;
 
+
+    for (let i = 0; i < n_pos; i++){
+        res_str += Math.floor(Math.random() * 9).toString()
+    }
+    return res_str
+}
+
+function generate_id(){
     var n_pos: number = 5;
     var res_str: string = ""
 
@@ -404,6 +448,7 @@ const utils = {
     list_files,
     generate_hash,
     generate_id,
+    generate_win_id,
     generateRandomInteger,
     generate_name,
     get_random_element,

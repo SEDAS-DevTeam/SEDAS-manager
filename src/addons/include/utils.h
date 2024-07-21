@@ -10,8 +10,20 @@
     Glob utils
 */
 
-int get_array_len(auto array[]){
-    return sizeof(array) / sizeof(array[0]);
+template <typename T>
+int get_array_len(napi_env env, T array);
+
+template <>
+int get_array_len<napi_callback_info>(napi_env env, napi_callback_info array){
+    size_t arg_size;
+    napi_get_cb_info(env, array, &arg_size, nullptr, nullptr, nullptr);
+
+    return arg_size;
+}
+
+template <typename T>
+int get_array_len(napi_env env, T array){
+    return sizeof(array) / sizeof(array[0]); 
 }
 
 void handle_napi_exception(napi_status status, napi_env env, std::string message){
@@ -39,7 +51,7 @@ void handle_exception(napi_env env, std::exception error){
 
 void get_args(napi_env env, napi_callback_info info, napi_value* args){
     napi_status status;
-    size_t arg_size = get_array_len(args);
+    size_t arg_size = get_array_len(env, info);
 
     status = napi_get_cb_info(env, info, &arg_size, args, nullptr, nullptr);
     handle_napi_exception(status, env, "Failed to get args");
@@ -141,7 +153,7 @@ float calc_rate_of_turn(uint32_t std_bank_angle){
 template <typename T>
 T get_variable(napi_env env, napi_value napi_elem);
 
-template<>
+template <>
 std::string get_variable<std::string>(napi_env env, napi_value napi_elem){
     napi_status status;
     size_t str_len;
@@ -161,7 +173,7 @@ std::string get_variable<std::string>(napi_env env, napi_value napi_elem){
     return str;
 }
 
-template<>
+template <>
 float get_variable<float>(napi_env env, napi_value napi_elem){
     napi_status status;
     double result;
@@ -172,7 +184,7 @@ float get_variable<float>(napi_env env, napi_value napi_elem){
     return result;
 }
 
-template<>
+template <>
 int get_variable<int>(napi_env env, napi_value napi_elem){
     napi_status status;
     int result;
@@ -185,11 +197,7 @@ int get_variable<int>(napi_env env, napi_value napi_elem){
 
 //Definitions for create_variable (compatible with templates)
 
-template <typename T>
-napi_value create_variable(napi_env env, T value);
-
-template <>
-napi_value create_variable<int>(napi_env env, int value) {
+napi_value create_variable(napi_env env, int value) {
     napi_status status;
     napi_value elem;
 
@@ -199,8 +207,7 @@ napi_value create_variable<int>(napi_env env, int value) {
     return elem;
 }
 
-template <>
-napi_value create_variable<std::string>(napi_env env, std::string value) {
+napi_value create_variable(napi_env env, std::string value) {
     napi_status status;
     napi_value elem;
 
@@ -210,8 +217,7 @@ napi_value create_variable<std::string>(napi_env env, std::string value) {
     return elem;
 }
 
-template <>
-napi_value create_variable<float>(napi_env env, float value) {
+napi_value create_variable(napi_env env, float value) {
     napi_status status;
     napi_value elem;
 

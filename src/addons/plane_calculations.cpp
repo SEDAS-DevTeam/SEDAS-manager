@@ -9,7 +9,9 @@ napi_value Calc_rate_of_turn(napi_env env, napi_callback_info info) {
 
   float std_bank_angle = std::stof(get_variable<std::string>(env, args[0]));
   int plane_speed = get_variable<int>(env, args[1]);
-  return create_variable<float>(env, ((1.091 * tan(deg_to_rad(std_bank_angle))) / plane_speed) * 1000);
+
+  float result = ((1.091 * tan(deg_to_rad(std_bank_angle))) / plane_speed) * 1000;
+  return create_variable(env, result);
 }
 
 napi_value Calc_climb(napi_env env, napi_callback_info info){
@@ -160,7 +162,8 @@ napi_value Calc_screen_speed(napi_env env, napi_callback_info info){
   float angle = std::stof(get_variable<std::string>(env, args[0]));
   float plane_speed = get_variable<float>(env, args[1]);
 
-  return create_variable<float>(env, cos(deg_to_rad(angle)) * plane_speed);
+  float result = cos(deg_to_rad(angle)) * plane_speed;
+  return create_variable(env, result);
 }
 
 napi_value Calc_turn_fallback_diff(napi_env env, napi_callback_info info){
@@ -177,7 +180,7 @@ napi_value Calc_turn_fallback_diff(napi_env env, napi_callback_info info){
 
   float fallback_diff = abs(heading + rate_of_turn - updated_heading);
 
-  return create_variable<float>(env, fallback_diff);
+  return create_variable(env, fallback_diff);
 }
 
 napi_value init(napi_env env, napi_value exports) {

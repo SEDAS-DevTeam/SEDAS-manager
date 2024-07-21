@@ -24,6 +24,7 @@ import {
     PATH_TO_POPUP_HTML,
     PATH_TO_LOGS
  } from "./app_config";
+import { ipcMain } from "electron";
 
 // variables
 const alphabet: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -33,12 +34,16 @@ export class IPCwrapper{
         Class that handles the IPC communication
     */
     public window_communication_configuration: object[] = [];
+    private channel_communication_configuration: object[] = [];
+    private open: boolean = true;
 
-
-    public register_window(window: Window, comm_type: string){
+    // window registering
+    public register_window(window: Window, window_name: string){
+        console.log(window)
         this.window_communication_configuration.push({
             "id": window.window_id,
-            "communication-type": comm_type //supports keys: bidirectional and unidirectional
+            "win_name": window_name,
+            "win": window
         })
     }
 
@@ -51,7 +56,34 @@ export class IPCwrapper{
         }
     }
 
-    public constructor(){
+    // channel registering
+    public register_channel(channel_name: string, callback: Function){
+        this.channel_communication_configuration.push({
+            "channel": channel_name,
+            "callback": callback
+        })
+    }
+
+    public set_all_listeners(){
+        ipcMain.handle("message", async (event, data: any[]) => {
+            if (!this.open){
+                return
+            }
+
+            let destination: string = data[0]
+            let channel: string = data[1][0]
+            let message_data: any = 
+
+            for(let i = 0; i < this.channel_communication_configuration.length; i++){
+                
+            }
+        })
+    }
+
+    public open_channels(){this.open = true}
+    public close_channels(){this.open = false}
+
+    public send_message(destination: string, channel: string, data: any){
 
     }
 }

@@ -263,6 +263,10 @@ class MainApp{
 
     public add_listener_IPC(){
         //IPC listeners
+        this.wrapper.register_channel("redirect-to-menu", () => {
+            
+        })
+
         ipcMain.handle("message", async (event, data) => {
             switch(data[1][0]){
                 //generic message channels
@@ -274,15 +278,20 @@ class MainApp{
                     
                     if (data[0] == "settings"){
                         settingsWindow.close()
+                        this.wrapper.unregister_window(settingsWindow.window_id)
                     }
                     else if (data[0] == "controller"){
                         controllerWindow.close()
+                        this.wrapper.unregister_window(controllerWindow.window_id)
+
                         for (let i = 0; i < this.workers.length; i++){
                             this.workers[i]["win"].close()
+                            this.wrapper.unregister_window(this.workers[i]["win"].window_id)
                         }
 
                         for (let i = 0; i < this.widget_workers.length; i++){
                             this.widget_workers[i]["win"].close()
+                            this.wrapper.unregister_window(this.widget_workers[i]["win"].window_id)
                         }
                         this.widget_workers = []
                     }
@@ -294,6 +303,8 @@ class MainApp{
                     EvLogger.log("DEBUG", "main-menu show")
                     mainMenuWindow = new Window(this.app_status, this.dev_panel, main_menu_dict, 
                         PATH_TO_MAIN_HTML, coords, EvLogger, main_app)
+                    this.wrapper.register_window(mainMenuWindow, "main-menu")
+
                     mainMenuWindow.show()
                     
                     this.workers = []
@@ -322,6 +333,7 @@ class MainApp{
                     EvLogger.log("DEBUG", "redirect-to-settings event")
 
                     mainMenuWindow.close()
+                    this.wrapper.unregister_window(mainMenuWindow.window_id)
 
                     //calculate x, y
                     let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal")
@@ -330,6 +342,8 @@ class MainApp{
 
                     EvLogger.log("DEBUG", "settings show")
                     settingsWindow = new Window(this.app_status, this.dev_panel, settings_dict, PATH_TO_SETTINGS_HTML, coords, EvLogger, main_app, "settings", display_info)
+                    this.wrapper.register_window(settingsWindow, "settings")
+                    
                     settingsWindow.show()
                     break
                 }
@@ -770,6 +784,8 @@ class MainApp{
                     for (let i = 0; i < this.widget_workers.length; i++){
                         if (this.widget_workers[i]["id"] == data[1][1]){
                             this.widget_workers[i]["win"].close()
+                            this.wrapper.unregister_window(this.widget_workers[i]["win"].window_id)
+
                             this.widget_workers.splice(i, 1)
                         }
                     }
@@ -1042,12 +1058,14 @@ class MainApp{
 
         EvLogger.log("DEBUG", "main-menu show")
         mainMenuWindow = new Window(this.app_status, this.dev_panel, main_menu_dict, PATH_TO_MAIN_HTML, coords, EvLogger, main_app)
-        this.wrapper.register_window(mainMenuWindow, "bidirectional")
+        this.wrapper.register_window(mainMenuWindow, "main-menu")
         mainMenuWindow.show()
     }
 
     public async main_app(backup_db: object = undefined){
         mainMenuWindow.close()
+        this.wrapper.unregister_window(mainMenuWindow.window_id)
+
         this.workers = []
 
         //calculate x, y
@@ -1074,10 +1092,12 @@ class MainApp{
             }
             else{
                 //backup was not created, create new workers
-                workerWindow = new Window(this.app_status, this.dev_panel, worker_dict, PATH_TO_WORKER_HTML, coords, EvLogger, main_app, "ACC", display_info)
+                let win_type: string = "ACC" //default option when spawing windows
+                workerWindow = new Window(this.app_status, this.dev_panel, worker_dict, PATH_TO_WORKER_HTML, coords, EvLogger, main_app, win_type, display_info)
+                this.wrapper.register_window(workerWindow, "worker-" + win_type)
             }
         
-            //setting up all layer widgets (overlaying whole map)
+            //setting up all layer widgets (overlaying whole map) TODO
             //utils.create_widget_window(basic_worker_widget_dict, "./res/html/widget/worker_widget.html", EvLogger, coords, this.widget_workers)
 
             let worker_id = utils.generate_id()
@@ -1094,6 +1114,8 @@ class MainApp{
 
         EvLogger.log("DEBUG", "controller show")
         controllerWindow = new Window(this.app_status, this.dev_panel, controller_dict, PATH_TO_CONTROLLER_HTML, coords, EvLogger, main_app, "controller", display_info)
+        this.wrapper.register_window(controllerWindow, "controller")
+
         controllerWindow.checkClose(() => {
             if (this.app_status["app-running"] && this.app_status["redir-to-main"]){
                 //app is running and is redirected to main => close by tray button

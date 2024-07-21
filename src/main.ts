@@ -62,6 +62,11 @@ import {
     PATH_TO_SETTINGS_LAYOUT
 
 } from "./app_config"
+
+import { 
+    redirect_to_menu 
+} from "./backend_functions"
+
 import {
     Environment
 } from "./environment"
@@ -263,8 +268,11 @@ class MainApp{
 
     public add_listener_IPC(){
         //IPC listeners
-        this.wrapper.register_channel("redirect-to-menu", () => {
-            
+        this.wrapper.register_channel("redirect-to-menu", "controller", (data) => {
+            redirect_to_menu("controller")
+        })
+        this.wrapper.register_channel("redirect-to-menu", "settings", (data) => {
+            redirect_to_menu("settings")
         })
 
         ipcMain.handle("message", async (event, data) => {

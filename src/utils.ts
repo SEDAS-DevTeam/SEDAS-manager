@@ -4,7 +4,8 @@
 
 import fs from "fs";
 import { join } from "path"
-import { parse, v4 } from "uuid"
+import { v4 } from "uuid"
+import md5 from "md5"
 import http from "http"
 import { EventLogger } from "./logger"
 import path from "path"
@@ -24,7 +25,7 @@ import {
     PATH_TO_POPUP_HTML,
     PATH_TO_LOGS
  } from "./app_config";
-import { ipcMain } from "electron";
+import { desktopCapturer, ipcMain } from "electron";
 
 // variables
 const alphabet: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -36,6 +37,10 @@ export class IPCwrapper{
     public window_communication_configuration: object[] = [];
     private channel_communication_configuration: object[] = [];
     private open: boolean = true;
+    
+    private hash_message(message: any[]){
+        return md5(JSON.stringify(message))
+    }
 
     // window registering
     public register_window(window: Window, window_name: string){
@@ -57,9 +62,10 @@ export class IPCwrapper{
     }
 
     // channel registering
-    public register_channel(channel_name: string, callback: Function){
+    public register_channel(channel_name: string, sender: string, callback: Function){
         this.channel_communication_configuration.push({
             "channel": channel_name,
+            "sender": sender,
             "callback": callback
         })
     }
@@ -70,12 +76,29 @@ export class IPCwrapper{
                 return
             }
 
-            let destination: string = data[0]
-            let channel: string = data[1][0]
-            let message_data: any = 
+            //incoming data from windows
+            var sender: string = data[0]
+            var channel: string = data[1][0]
+            var message_data: any = data[1].slice(1, data[1].length - 2)
+            var hash: string = data[1][data[1].length - 1]
 
             for(let i = 0; i < this.channel_communication_configuration.length; i++){
-                
+                //data in configuration
+                let desired_sender: string = this.channel_communication_configuration[i]["sender"]
+                let desired_channel: string = this.channel_communication_configuration[i]["channel"]
+                let desired_hash: string = this.hash_message(message_data)
+                let callback: Function = this.channel_communication_configuration[i]["callback"]
+
+                if(sender == desired_sender && channel == desired_channel){
+                    //credentials are correct
+                    if (hash == desired_hash){
+                        //message is correct
+                        callback(message_data)
+                    }
+                    else{
+                        //message not correct -> writing into log
+                    }
+                }
             }
         })
     }

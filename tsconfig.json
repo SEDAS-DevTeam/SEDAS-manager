@@ -21,9 +21,10 @@
     "./src/environment.ts",
     "./src/bind.ts",
     "./src/plugin_register.ts",
+    "./src/backend_functions.ts",
     //Workers
     "./src/workers/sim_time.ts",
     "./src/workers/backend.ts",
-    "./src/workers/database.ts",
+    "./src/workers/database.ts"
   ]
 }

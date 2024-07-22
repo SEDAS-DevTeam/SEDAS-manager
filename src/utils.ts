@@ -306,8 +306,11 @@ function checkInternet(EvLogger: EventLogger){
     })
 }
 
-function get_window_info(app_settings: object, displays: any[], idx: number, mode: string, window_dict: any = undefined){
-    //TODO: rework
+function calculate_window_info(app_settings: object, 
+                               displays: any[], 
+                               idx: number, 
+                               mode: string, 
+                               window_dict: any = undefined){
     let x: number;
     let y: number;
     let width: number;
@@ -410,6 +413,21 @@ function get_window_info(app_settings: object, displays: any[], idx: number, mod
     return [x, y, width, height]
 }
 
+function get_window_info(app_settings: object, 
+                         displays: any[], 
+                         idx: number, 
+                         mode: string, 
+                         window_dict: any = undefined){
+    let win_info = calculate_window_info(app_settings,
+                                         displays,
+                                         idx,
+                                         mode,
+                                         window_dict)
+    let coords = win_info.slice(0, 2)
+    let display_info = win_info.slice(2, 4)
+    return [coords, display_info]
+}
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -444,8 +462,7 @@ function create_popup_window(app_settings: any,
                                     header: string,
                                     text: string){
 
-    let win_info = get_window_info(app_settings, displays, -1, "normal", popup_widget_dict)
-    let coords = win_info.slice(0, 2)
+    const [coords, display_info] = get_window_info(app_settings, displays, -1, "normal", popup_widget_dict)
     let temp_popup_window: PopupWindow = new PopupWindow(popup_widget_dict,
                                                         PATH_TO_POPUP_HTML,
                                                         coords,
@@ -508,6 +525,7 @@ const utils = {
     generate_name,
     get_random_element,
     checkInternet,
+    calculate_window_info,
     get_window_info,
     sleep,
     parse_scale,

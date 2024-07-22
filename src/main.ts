@@ -269,10 +269,10 @@ class MainApp{
     public add_listener_IPC(){
         //IPC listeners
         this.wrapper.register_channel("redirect-to-menu", "controller", (data) => {
-            redirect_to_menu("controller")
+            redirect_to_menu(this, EvLogger, "controller", controllerWindow)
         })
         this.wrapper.register_channel("redirect-to-menu", "settings", (data) => {
-            redirect_to_menu("settings")
+            redirect_to_menu(this, EvLogger, "settings", settingsWindow)
         })
 
         ipcMain.handle("message", async (event, data) => {
@@ -305,8 +305,7 @@ class MainApp{
                     }
 
                     //calculate x, y
-                    let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", main_menu_dict)
-                    let coords = win_info.slice(0, 2)
+                    let coords = utils.get_window_info(app_settings, this.displays, -1, "normal", main_menu_dict)[0]
 
                     EvLogger.log("DEBUG", "main-menu show")
                     mainMenuWindow = new Window(this.app_status, this.dev_panel, main_menu_dict, 
@@ -344,9 +343,7 @@ class MainApp{
                     this.wrapper.unregister_window(mainMenuWindow.window_id)
 
                     //calculate x, y
-                    let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal")
-                    let coords = win_info.slice(0, 2)
-                    let display_info = win_info.slice(2, 4)
+                    const [coords, display_info] = utils.get_window_info(app_settings, this.displays, -1, "normal")
 
                     EvLogger.log("DEBUG", "settings show")
                     settingsWindow = new Window(this.app_status, this.dev_panel, settings_dict, PATH_TO_SETTINGS_HTML, coords, EvLogger, main_app, "settings", display_info)
@@ -805,8 +802,7 @@ class MainApp{
                     let plugin_name = data[1][2]
 
                     //create popup window for user confirmation
-                    let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", popup_widget_dict)
-                    let coords = win_info.slice(0, 2)
+                    let coords = utils.get_window_info(app_settings, this.displays, -1, "normal", popup_widget_dict)[0]
                     this.current_popup_window = new PopupWindow(popup_widget_dict, 
                                                                 PATH_TO_POPUP_HTML, 
                                                                 coords, 
@@ -1057,8 +1053,7 @@ class MainApp{
         EvLogger.log("DEBUG", "Get display coords info for better window positioning")
         
         //calculate x, y
-        let win_info = utils.get_window_info(app_settings, this.displays, -1, "normal", main_menu_dict)
-        let coords = win_info.slice(0, 2)
+        let coords = utils.get_window_info(app_settings, this.displays, -1, "normal", main_menu_dict)[0]
 
         //delete loaders
         this.loader.destroy_loaders()
@@ -1080,9 +1075,7 @@ class MainApp{
         //leftmost or rightmost tactic
         //spawning worker windows
         for(let i = 0; i < this.displays.length; i++){
-            let win_info = utils.get_window_info(this.app_settings, this.displays, i, "normal")
-            let coords = win_info.slice(0, 2)
-            let display_info = win_info.slice(2, 4)
+            const [coords, display_info] = utils.get_window_info(this.app_settings, this.displays, i, "normal")
             
             //stop sequence (display limit reached)
             if (coords[0] == -2){
@@ -1116,9 +1109,7 @@ class MainApp{
         }
 
         //spawning controller window
-        let win_info = utils.get_window_info(this.app_settings, this.displays, -1, "normal")
-        let coords = win_info.slice(0, 2)
-        let display_info = win_info.slice(2, 4)
+        const [coords, display_info] = utils.get_window_info(this.app_settings, this.displays, -1, "normal")
 
         EvLogger.log("DEBUG", "controller show")
         controllerWindow = new Window(this.app_status, this.dev_panel, controller_dict, PATH_TO_CONTROLLER_HTML, coords, EvLogger, main_app, "controller", display_info)
@@ -1187,8 +1178,7 @@ class MainApp{
 
     public async exit_app(){
         //spawning info window
-        let win_info = utils.get_window_info(this.app_settings, this.displays, -1, "normal", exit_dict)
-        let coords = win_info.slice(0, 2)
+        let coords = utils.get_window_info(this.app_settings, this.displays, -1, "normal", exit_dict)[0]
 
         exitWindow = new Window(this.app_status, this.dev_panel, exit_dict, PATH_TO_EXIT_HTML, coords, EvLogger, main_app)
         exitWindow.show()

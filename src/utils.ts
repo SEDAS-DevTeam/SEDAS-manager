@@ -134,9 +134,7 @@ export class ProgressiveLoader{
     private set_loader_win(){
         //getting window info to spawn load on all monitors && initialize all loaders
         for(let i = 0; i < this.displays.length; i++){
-            let win_info = get_window_info(this.app_settings, this.displays, i, "load", this.load_dict)
-            let coords = win_info.slice(0, 2)
-            let display_info = win_info.slice(2, 4)
+            const [coords, display_info] = get_window_info(this.app_settings, this.displays, i, "load", this.load_dict)
 
             //creating loading window
             let LoadingWindow = new LoaderWindow(this.load_dict, PATH_TO_LOADER_HTML, coords, this.ev_logger, display_info)

@@ -64,7 +64,7 @@ import {
 } from "./app_config"
 
 import { 
-    redirect_to_menu 
+    BackendFunctions
 } from "./backend_functions"
 
 import {
@@ -74,14 +74,16 @@ import {
 //C++ (N-API) imports
 import { main } from "./bind";
 
-//window variable declarations
-var mainMenuWindow: Window;
-var settingsWindow: Window;
-var controllerWindow: Window;
+//declaration for local workerWindow before assignment
 var workerWindow: Window;
-var exitWindow: Window;
 
 class MainApp{
+    //window variable declarations
+    public mainMenuWindow: Window;
+    public settingsWindow: Window;
+    public controllerWindow: Window;
+    public exitWindow: Window;
+
     //all variables that contain "low-level" functionalities of the app
     public app_settings: object;
     private dev_panel: boolean;
@@ -90,6 +92,8 @@ class MainApp{
     private widget_workers: object[] = []
     private enviro: Environment;
     private plugin_register: PluginRegister;
+    private wrapper: IPCwrapper;
+    private backend_functions: BackendFunctions;
 
     //all variables related to frontend
     private frontend_vars = {
@@ -151,7 +155,6 @@ class MainApp{
 
     //other variables
     private loader: ProgressiveLoader;
-    private wrapper: IPCwrapper;
     public backupdb_saving_frequency: number = 1000; //defaultly set to 1 second
     private local_plugin_list: object[]
 
@@ -187,7 +190,6 @@ class MainApp{
     private get_screen_info(){
         //get screen info
         var displays_info: any[] = screen.getAllDisplays()
-        console.log(typeof displays_info)
         var displays_mod = []
         for(let i: number = 0; i < displays_info.length; i++){
             displays_mod.push(displays_info[i].bounds)
@@ -197,9 +199,9 @@ class MainApp{
     }
 
     private send_to_all(planes: object[], plane_monitor_data: object[], plane_paths_data: object[]){
-        if (controllerWindow != undefined && this.workers.length != 0){
+        if (this.controllerWindow != undefined && this.workers.length != 0){
             //update planes on controller window
-            controllerWindow.send_message("update-plane-db", planes)
+            this.controllerWindow.send_message("update-plane-db", planes)
     
             for (let i = 0; i < plane_monitor_data.length; i++){
                 let temp_planes = []
@@ -268,58 +270,26 @@ class MainApp{
 
     public add_listener_IPC(){
         //IPC listeners
-        this.wrapper.register_channel("redirect-to-menu", "controller", (data) => {
-            redirect_to_menu(this, EvLogger, "controller", controllerWindow)
+        this.wrapper.register_channel("redirect-to-menu", "controller", "unidirectional", () => {
+            this.backend_functions.redirect_to_menu("controller")
         })
-        this.wrapper.register_channel("redirect-to-menu", "settings", (data) => {
-            redirect_to_menu(this, EvLogger, "settings", settingsWindow)
+        this.wrapper.register_channel("redirect-to-menu", "settings", "unidirectional", () => {
+            this.backend_functions.redirect_to_menu("settings")
+        })
+        this.wrapper.register_channel("redirect-to-settings", "menu", "unidirectional", () => {
+            this.backend_functions.redirect_to_settings()
+        })
+        this.wrapper.register_channel("redirect-to-main", "menu", "unidirectional", () => {
+            this.backend_functions.redirect_to_main()
         })
 
+        //setting all listeners to be active
+        this.wrapper.set_all_listeners()
+
+        /*
         ipcMain.handle("message", async (event, data) => {
             switch(data[1][0]){
                 //generic message channels
-                case "redirect-to-menu": {
-                    this.app_status["redir-to-main"] = false
-
-                    //message call to redirect to main menu
-                    EvLogger.log("DEBUG", "redirect-to-menu event")
-                    
-                    if (data[0] == "settings"){
-                        settingsWindow.close()
-                        this.wrapper.unregister_window(settingsWindow.window_id)
-                    }
-                    else if (data[0] == "controller"){
-                        controllerWindow.close()
-                        this.wrapper.unregister_window(controllerWindow.window_id)
-
-                        for (let i = 0; i < this.workers.length; i++){
-                            this.workers[i]["win"].close()
-                            this.wrapper.unregister_window(this.workers[i]["win"].window_id)
-                        }
-
-                        for (let i = 0; i < this.widget_workers.length; i++){
-                            this.widget_workers[i]["win"].close()
-                            this.wrapper.unregister_window(this.widget_workers[i]["win"].window_id)
-                        }
-                        this.widget_workers = []
-                    }
-
-                    //calculate x, y
-                    let coords = utils.get_window_info(app_settings, this.displays, -1, "normal", main_menu_dict)[0]
-
-                    EvLogger.log("DEBUG", "main-menu show")
-                    mainMenuWindow = new Window(this.app_status, this.dev_panel, main_menu_dict, 
-                        PATH_TO_MAIN_HTML, coords, EvLogger, main_app)
-                    this.wrapper.register_window(mainMenuWindow, "main-menu")
-
-                    mainMenuWindow.show()
-                    
-                    this.workers = []
-                    this.widget_workers = []
-                    controllerWindow = undefined
-                    this.PlaneDatabase = undefined
-                    break
-                }
                 case "save-settings": {
                     //save settings
                     EvLogger.log("DEBUG", "saving settings")
@@ -331,34 +301,6 @@ class MainApp{
                         "alert", "confirm-settings",
                         "Saved the settings",
                         "Restart the app for changes to take the effect")
-                    break
-                }
-                case "redirect-to-settings": {
-                    //message call to redirect to settings
-                    this.app_status["redir-to-main"] = true
-
-                    EvLogger.log("DEBUG", "redirect-to-settings event")
-
-                    mainMenuWindow.close()
-                    this.wrapper.unregister_window(mainMenuWindow.window_id)
-
-                    //calculate x, y
-                    const [coords, display_info] = utils.get_window_info(app_settings, this.displays, -1, "normal")
-
-                    EvLogger.log("DEBUG", "settings show")
-                    settingsWindow = new Window(this.app_status, this.dev_panel, settings_dict, PATH_TO_SETTINGS_HTML, coords, EvLogger, main_app, "settings", display_info)
-                    this.wrapper.register_window(settingsWindow, "settings")
-                    
-                    settingsWindow.show()
-                    break
-                }
-                case "redirect-to-main": {
-                    //message call to redirect to main program (start)
-                    this.app_status["redir-to-main"] = true
-                    if (this.app_status["turn-on-backend"]){
-                        this.backend_worker.postMessage(["action", "start-neural"])
-                    }
-                    this.main_app()
                     break
                 }
                 case "exit": {
@@ -476,10 +418,6 @@ class MainApp{
                     let filename_command = data[1][2]
                     let filename_aircraft = data[1][3]
 
-                    /*
-                        Reading all info for map setup
-                    */
-
                     //save map data to variable
                     this.map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
 
@@ -522,9 +460,7 @@ class MainApp{
 
                     EvLogger.log("DEBUG", `Selected presets: ${[this.map_name, this.command_preset_name, this.aircraft_preset_name]}`)
                     
-                    /*
-                        Setting up environment
-                    */
+
                     this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
                     this.loader.setup_loader(5, "Setting up simulation, please wait...", "Initializing simulation setup")
                     
@@ -768,7 +704,6 @@ class MainApp{
                     }
                     break
                 }
-                /*Worker widget listeners*/
                 case "min-widget": {
                     for (let i = 0; i < this.widget_workers.length; i++){
                         if (this.widget_workers[i]["id"] == data[1][1]){
@@ -856,12 +791,13 @@ class MainApp{
                 }
             }
         })
+        */
 
         //TODO: check if code is actually usable in scenario => for now, its unused
         ipcMain.on("message-redirect", (event, data) => {
             if (data[0] == "controller"){
                 console.log("from worker")
-                controllerWindow.send_message("message-redirect", data[1][0])
+                this.controllerWindow.send_message("message-redirect", data[1][0])
                 this.sender_win_name = "worker"
             }
             else if (data[0].includes("worker")){
@@ -947,6 +883,9 @@ class MainApp{
     //
     public async init_app(){
         this.get_screen_info() //getting screen info for all displays
+
+        //setup backend functions used in the app
+        this.backend_functions = new BackendFunctions(EvLogger, this)
 
         //setup IPC wrapper
         this.wrapper = new IPCwrapper()
@@ -1060,14 +999,14 @@ class MainApp{
         this.loader = undefined
 
         EvLogger.log("DEBUG", "main-menu show")
-        mainMenuWindow = new Window(this.app_status, this.dev_panel, main_menu_dict, PATH_TO_MAIN_HTML, coords, EvLogger, main_app)
-        this.wrapper.register_window(mainMenuWindow, "main-menu")
-        mainMenuWindow.show()
+        this.mainMenuWindow = new Window(this.app_status, this.dev_panel, main_menu_dict, PATH_TO_MAIN_HTML, coords, EvLogger, main_app)
+        this.wrapper.register_window(this.mainMenuWindow, "main-menu")
+        this.mainMenuWindow.show()
     }
 
     public async main_app(backup_db: object = undefined){
-        mainMenuWindow.close()
-        this.wrapper.unregister_window(mainMenuWindow.window_id)
+        this.mainMenuWindow.close()
+        this.wrapper.unregister_window(this.mainMenuWindow.window_id)
 
         this.workers = []
 
@@ -1112,10 +1051,10 @@ class MainApp{
         const [coords, display_info] = utils.get_window_info(this.app_settings, this.displays, -1, "normal")
 
         EvLogger.log("DEBUG", "controller show")
-        controllerWindow = new Window(this.app_status, this.dev_panel, controller_dict, PATH_TO_CONTROLLER_HTML, coords, EvLogger, main_app, "controller", display_info)
-        this.wrapper.register_window(controllerWindow, "controller")
+        this.controllerWindow = new Window(this.app_status, this.dev_panel, controller_dict, PATH_TO_CONTROLLER_HTML, coords, EvLogger, main_app, "controller", display_info)
+        this.wrapper.register_window(this.controllerWindow, "controller")
 
-        controllerWindow.checkClose(() => {
+        this.controllerWindow.checkClose(() => {
             if (this.app_status["app-running"] && this.app_status["redir-to-main"]){
                 //app is running and is redirected to main => close by tray button
                 this.exit_app()
@@ -1128,7 +1067,7 @@ class MainApp{
             this.workers[i]["win"].checkClose()
         }
 
-        controllerWindow.show()
+        this.controllerWindow.show()
 
         if (this.app_status["turn-on-backend"]){
             //setup voice recognition and ACAI backend
@@ -1180,8 +1119,8 @@ class MainApp{
         //spawning info window
         let coords = utils.get_window_info(this.app_settings, this.displays, -1, "normal", exit_dict)[0]
 
-        exitWindow = new Window(this.app_status, this.dev_panel, exit_dict, PATH_TO_EXIT_HTML, coords, EvLogger, main_app)
-        exitWindow.show()
+        this.exitWindow = new Window(this.app_status, this.dev_panel, exit_dict, PATH_TO_EXIT_HTML, coords, EvLogger, main_app)
+        this.exitWindow.show()
 
         this.app_status["app-running"] = false; //stopping all Interval events from firing
         

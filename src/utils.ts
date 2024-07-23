@@ -42,9 +42,16 @@ export class IPCwrapper{
         return md5(JSON.stringify(message))
     }
 
+    private send_message_to_window(destination: string, channel: string, data: any){
+        for (let i = 0; i < this.window_communication_configuration.length; i++){
+            if (destination == this.window_communication_configuration[i]["win_name"]){
+                this.window_communication_configuration[i]["win"].send_message(channel, data)
+            }
+        }
+    }
+
     // window registering
     public register_window(window: Window, window_name: string){
-        console.log(window)
         this.window_communication_configuration.push({
             "id": window.window_id,
             "win_name": window_name,
@@ -62,10 +69,11 @@ export class IPCwrapper{
     }
 
     // channel registering
-    public register_channel(channel_name: string, sender: string, callback: Function){
+    public register_channel(channel_name: string, sender: string, type: string, callback: Function){
         this.channel_communication_configuration.push({
             "channel": channel_name,
             "sender": sender,
+            "type": type, //accepts unidirectional or bidirectional
             "callback": callback
         })
     }
@@ -86,17 +94,26 @@ export class IPCwrapper{
                 //data in configuration
                 let desired_sender: string = this.channel_communication_configuration[i]["sender"]
                 let desired_channel: string = this.channel_communication_configuration[i]["channel"]
-                let desired_hash: string = this.hash_message(message_data)
-                let callback: Function = this.channel_communication_configuration[i]["callback"]
+
+                let desired_hash: string = "";
+                if (message_data.length == 0){
+                    desired_hash = this.hash_message([desired_channel])
+                }
+                else{desired_hash = this.hash_message(message_data)}
 
                 if(sender == desired_sender && channel == desired_channel){
                     //credentials are correct
                     if (hash == desired_hash){
+                        let callback: Function = this.channel_communication_configuration[i]["callback"]
                         //message is correct
+                        
+                        //send back acknowledge and call callback
+                        this.send_ack(sender, channel)
                         callback(message_data)
                     }
                     else{
-                        //message not correct -> writing into log
+                        //message not correct -> writing into log & resend
+                        this.send_nack(sender, channel)
                     }
                 }
             }
@@ -107,7 +124,15 @@ export class IPCwrapper{
     public close_channels(){this.open = false}
 
     public send_message(destination: string, channel: string, data: any){
+        this.send_message_to_window(destination, channel, data)
+    }
 
+    public send_ack(destination: string, channel: string){
+        this.send_message_to_window(destination, channel, ["ACK"])
+    }
+
+    public send_nack(destination: string, channel: string){
+        this.send_message_to_window(destination, channel, ["NACK"])
     }
 }
 
@@ -319,7 +344,6 @@ function calculate_window_info(app_settings: object,
     //for loader just center
     if (mode == "load"){
         let display = displays[idx]
-        console.log(display)
 
         x = display.x + (display.width / 2) - (window_dict.width / 2)
         y = display.y + (display.height / 2) - (window_dict.height / 2)

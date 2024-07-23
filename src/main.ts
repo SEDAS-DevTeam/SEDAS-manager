@@ -146,7 +146,6 @@ class MainApp{
 
     //temporary variables
     private selected_plugin_id: string;
-    private sender_win_name: string;
     private current_popup_window: PopupWindow; //For now, app only permits one popup window at the time (TODO)
 
     //other variables
@@ -266,523 +265,64 @@ class MainApp{
 
     public add_listener_IPC(){
         //IPC listeners
+
         this.wrapper.register_channel("redirect-to-menu", ["controller"], "unidirectional", () => this.backend_functions.redirect_to_menu("controller"))
         this.wrapper.register_channel("redirect-to-menu", ["settings"], "unidirectional", () => this.backend_functions.redirect_to_menu("settings"))
         this.wrapper.register_channel("redirect-to-settings", ["menu"], "unidirectional", () => this.backend_functions.redirect_to_settings())
-
-
         this.wrapper.register_channel("redirect-to-main", ["menu"], "unidirectional", () => this.backend_functions.redirect_to_main())
-        this.wrapper.register_channel("save-settings", ["menu"], "unidirectional", (data: any[]) => this.backend_functions.save_settings(data))
 
+        this.wrapper.register_channel("save-settings", ["menu"], "unidirectional", (data: any[]) => this.backend_functions.save_settings(data))
+        this.wrapper.register_channel("monitor-change-info", ["controller"], "unidirectional", (data: any[]) => this.monitor_change_info(data))
         this.wrapper.register_channel("exit", ["worker", "controller"], "unidirectional", () => this.exit())
+        
+        this.wrapper.register_channel("invoke", ["worker"], "unidirectional", (data: any[]) => this.invoke(data))
+        this.wrapper.register_channel("ping", ["controller", "settings"], "bidirectional", (data: any[]) => this.ping(data))
+        
+        //send app configuration to controller
+        this.wrapper.register_channel("send-info", ["controller"], "bidirectional", () => this.backend_functions.send_info("controller"))
+        this.wrapper.register_channel("send-info", ["worker"], "bidirectional", () => this.backend_functions.send_info("worker"))
+        this.wrapper.register_channel("send-info", ["settings"], "bidirectional", () => this.backend_functions.send_info("settings"))
+
+        //environment invokes
+        this.wrapper.register_channel("start-sim", ["controller", "worker"], "unidirectional", () => this.start_sim())
+        this.wrapper.register_channel("stop-sim", ["controller", "worker"], "unidirectional", () => this.stop_sim())
+        this.wrapper.register_channel("restore-sim", ["controller"], "unidirectional", () => this.restore_sim())
+        this.wrapper.register_channel("regenerate-map", ["controller"], "unidirectional", () => this.regenerate_map())
+
+        this.wrapper.register_channel("set-environment", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.set_environment(data))
+        this.wrapper.register_channel("json-description", ["controller"], "bidirectional", (data: any[]) => this.json_description(data))
+
+        this.wrapper.register_channel("render-map", ["controller"], "unidirectional", () => this.backend_functions.render_map())
+        this.wrapper.register_channel("get-points", ["controller"], "bidirectional", (data: any[]) => this.backend_functions.get_points(data))
+        this.wrapper.register_channel("map-check", ["controller"], "bidirectional", () => this.backend_functions.map_check())
+        this.wrapper.register_channel("send-location-data", ["controller"], "unidirectional", () => this.backend_functions.send_location_data())
+
+        //plane invokes
+        this.wrapper.register_channel("spawn-plane", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.spawn_plane(data))
+        this.wrapper.register_channel("plane-value-change", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.plane_value_change(data))
+        this.wrapper.register_channel("plane-delete-record", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.plane_delete_record(data))
+        this.wrapper.register_channel("send-plane-data", ["worker"], "unidirectional", () => this.backend_functions.send_plane_data())
+        
+        //widget invokes
+        this.wrapper.register_channel("min-widget", ["widget"], "unidirectional", (data: any[]) => this.min_widget(data))
+        this.wrapper.register_channel("max-widget", ["widget"], "unidirectional", (data: any[]) => this.max_widget(data))
+        this.wrapper.register_channel("exit-widget", ["widget"], "unidirectional", (data: any[]) => this.exit_widget(data))
+
+        //plugin invokes
+        this.wrapper.register_channel("install-plugin", ["controller"], "unidirectional", (data: any[]) => this.install_plugin(data))
+        this.wrapper.register_channel("get-plugin-list", ["controller"], "bidirectional", (data: any[]) => this.get_plugin_list())
+
+        //confirm invokes
+        this.wrapper.register_channel("confirm-install", ["popup"], "unidirectional", (data: any[]) => this.confirm_install(data))
+        this.wrapper.register_channel("confirm-settings", ["popup"], "unidirectional", () => this.confirm_settings())
+        this.wrapper.register_channel("confirm-schedules", ["popup"], "unidirectional", () => this.confirm_schedules())
+
+        //other invokes
+        this.wrapper.register_channel("send-info", ["controller"], "bidirectional", (data: any[]) => this.backend_functions.send_scenario_list(data))
+        this.wrapper.register_channel("rewrite-frontend-vars", ["controller"], "unidirectional", (data: any[]) => this.rewrite_frontend_vars(data))
 
         //setting all listeners to be active
         this.wrapper.set_all_listeners()
-
-        /*
-        ipcMain.handle("message", async (event, data) => {
-            switch(data[1][0]){
-                //generic message channels
-                case "invoke": {
-                    //TODO: find out why I have this written here
-                    if (this.app_status["turn-on-backend"]){
-                        this.backend_worker.postMessage(data[1][1])
-                    }
-                    break
-                }
-                //info retrival to Controller
-                case "send-info": {
-                    //this part of function is utilised both for controller window and settings window
-                    //|settings window| uses this to acquire saved .json settings
-                    //|controller window| uses this to acquire current worker/window data
-                    
-                    if (data[0] == "settings"){
-
-                        //ACAI backend¨
-                        let speech_config = utils.readJSON(PATH_TO_SPEECH_CONFIG)
-                        let text_config = utils.readJSON(PATH_TO_TEXT_CONFIG)
-                        let voice_config = utils.readJSON(PATH_TO_VOICE_CONFIG)
-
-                        //audio devices
-                        let in_devices = utils.readJSON(PATH_TO_IN_DEVICES)
-                        let out_devices = utils.readJSON(PATH_TO_OUT_DEVICES)
-
-                        //reading settings gui layouts
-                        let settings_layout = utils.readJSON(PATH_TO_SETTINGS_LAYOUT)
-
-                        //sending app data and alg configs
-                        settingsWindow.send_message("app-data", [app_settings, voice_config, text_config, speech_config, in_devices, out_devices, settings_layout])
-                    }
-                    else if (data[0] == "controller"){
-                        //sending monitor data
-
-                        //acquiring airport map data
-                        this.map_configs_list = []
-                        var map_files = utils.list_files(PATH_TO_MAPS)
-                        for (let i = 0; i < map_files.length; i++){
-                            let map = utils.read_file_content(PATH_TO_MAPS, map_files[i])
-                            if (map_files[i].includes("config")){
-                                this.map_configs_list.push({
-                                    "hash": "airport-" + utils.generate_hash(),
-                                    "content": map
-                                })
-                            }
-                        }
-
-                        //acquiring list of aircraft presets
-                        this.aircraft_presets_list = []
-                        let aircraft_files = utils.list_files(PATH_TO_AIRCRAFTS)
-                        for (let i = 0; i < aircraft_files.length; i++){
-                            let aircraft_config = utils.read_file_content(PATH_TO_AIRCRAFTS, aircraft_files[i])
-                            this.aircraft_presets_list.push({
-                                "path": aircraft_files[i],
-                                "hash": "aircraft-" + utils.generate_hash(),
-                                "name": aircraft_config["info"]["name"],
-                                "content": JSON.stringify(aircraft_config["all_planes"])
-                            })
-                        }
-
-                        //acquiring list of command presets
-                        this.command_presets_list = []
-                        let command_files = utils.list_files(PATH_TO_COMMANDS)
-                        for (let i = 0; i < command_files.length; i++){
-                            let commands_config = utils.read_file_content(PATH_TO_COMMANDS, command_files[i])
-                            this.command_presets_list.push({
-                                "path": command_files[i],
-                                "hash": "command-" + utils.generate_hash(),
-                                "name": commands_config["info"]["name"],
-                                "content": JSON.stringify(commands_config["commands"])
-                            })
-                        }
-                        controllerWindow.send_message("init-info", ["window-info", JSON.stringify(this.workers), this.map_configs_list, 
-                                                                    JSON.stringify(app_settings), [this.map_name, this.command_preset_name, this.aircraft_preset_name], this.aircraft_presets_list, 
-                                                                    this.command_presets_list, this.frontend_vars, this.app_status])
-                    }
-                    else if (data[0] == "worker"){
-                        //send to all workers
-                        for (let i = 0; i < this.workers.length; i++){
-                            this.workers[i]["win"].send_message("init-info", ["window-info", JSON.stringify(app_settings)])
-                        }
-                    }
-                    break
-                }
-                case "send-scenario-list": {
-                    //rewrite scenario presets lists
-                    this.scenario_presets_list = []
-
-                    let selected_map_data = utils.read_file_content(PATH_TO_MAPS, data[1][1])
-                    let scenarios = selected_map_data["scenarios"]
-                    for (let i = 0; i < scenarios.length; i++){
-                        this.scenario_presets_list.push({
-                            "hash": "scenario-" + utils.generate_hash(),
-                            "name": scenarios[i]["name"],
-                            "content": scenarios[i],
-                        })
-                    }
-
-                    controllerWindow.send_message("scenario-list", this.scenario_presets_list)
-                    break
-                }
-                case "set-environment": {
-                    //getting map info, command preset info, aircraft preset info from user
-                    let filename_map = data[1][1]
-                    
-                    //map addons
-                    let scenario_hash = data[1][4]
-
-                    let filename_command = data[1][2]
-                    let filename_aircraft = data[1][3]
-
-                    //save map data to variable
-                    this.map_data = utils.read_file_content(PATH_TO_MAPS, filename_map)
-
-                    //get scenario data
-                    for (let i = 0; i < this.scenario_presets_list.length; i++){
-                        if (scenario_hash == this.scenario_presets_list[i]["hash"]){
-                            this.scenario_data = this.scenario_presets_list[i]["content"]
-                        }
-                    }
-
-                    //save map name for backup usage
-                    let map_config = utils.read_file_content(PATH_TO_MAPS, this.map_data["CONFIG"])
-                    this.map_name = map_config["AIRPORT_NAME"]
-
-                    this.command_preset_data = utils.read_file_content(PATH_TO_COMMANDS, filename_command)
-                    this.command_preset_name = this.command_preset_data["info"]["name"]
-
-                    this.aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft)
-                    this.aircraft_preset_name = this.aircraft_preset_data["info"]["name"]
-
-                    //set now to default (TODO: change later?)
-                    this.airline_preset_data = utils.read_file_content(PATH_TO_AIRLINES, "airline_data.json")
-                    this.airline_preset_name = this.aircraft_preset_data["info"]["name"]
-
-                    //read scale
-                    this.scale = utils.parse_scale(this.map_data["scale"])
-
-                    //for weather to align latitude, longtitude and zoom (https://www.maptiler.com/google-maps-coordinates-tile-bounds-projection/#1/131.42/4.37)
-                    if (this.map_data == undefined){
-                        //map wasn't selected
-                        this.longitude = undefined
-                        this.latitude = undefined
-                        this.zoom = undefined
-                    }
-                    else{
-                        this.longitude = this.map_data["long"]
-                        this.latitude = this.map_data["lat"]
-                        this.zoom = this.map_data["zoom"]
-                    }
-
-                    EvLogger.log("DEBUG", `Selected presets: ${[this.map_name, this.command_preset_name, this.aircraft_preset_name]}`)
-                    
-
-                    this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
-                    this.loader.setup_loader(5, "Setting up simulation, please wait...", "Initializing simulation setup")
-                    
-                    this.enviro_logger = new EventLogger(true, "enviro_log", "environment")
-                    this.enviro_logger.log("INFO", "EventLogger instance on Environment is set up")
-
-                    this.loader.send_progress("Setting up environment")
-                    this.enviro = new Environment(EvLogger, ABS_PATH, this.PlaneDatabase,
-                        this.command_preset_data,
-                        this.aircraft_preset_data,
-                        this.airline_preset_data,
-                        this.map_data, 
-                        this.scenario_data)
-                    
-
-                    this.loader.send_progress("Setting plane schedules")
-                    this.enviro_logger.log("INFO", "Setting plane shedules")
-                    let n_unused_schedules = this.enviro.set_plane_schedules()
-                    if (n_unused_schedules > 0){
-                        //some schedules are deleted because no avaliable plane was found matching
-                        
-                        this.current_popup_window = utils.create_popup_window(app_settings, EvLogger, this.displays,
-                                                "alert", "confirm-schedules",
-                                                `WARNING: ${n_unused_schedules} plane schedules are going to be unused`,
-                                                "because plane was not matching schedule type")
-                    }
-                    else{
-                        this.setup_environment()
-                    }
-                    break
-                }
-                case "render-map": {
-                    //rendering map data for user (invoked from worker)
-                    for (let i = 0; i < this.workers.length; i++){
-                        this.workers[i]["win"].send_message("map-data", [this.map_data, this.workers[i]["win"].win_type])
-                    }
-
-                    for (let i = 0; i < this.workers.length; i++){
-                        if (this.workers[i]["win"]["win_type"] == "weather"){
-                            this.workers[i]["win"].send_message("geo-data", [this.latitude, this.longitude, this.zoom])
-                        }
-                    }
-                    break
-                }
-                case "get-points": {
-                    let spec_data: object;
-                    if (data[1][1].includes("ACC")){
-                        //selected monitor is in ACC mode
-                        spec_data = this.map_data["ACC"]
-                    }
-                    else if (data[1][1].includes("APP")){
-                        //selected monitor is in APP mode
-                        spec_data = this.map_data["APP"]
-                    }
-                    else if (data[1][1].includes("TWR")){
-                        //selected monitor is in TWR mode
-                        spec_data = this.map_data["TWR"]
-                    }
-                    let out_data = {}
-                    for (const [key, value] of Object.entries(spec_data)) {
-                        if (key == "POINTS" || key == "ARP" || key == "SID" || key == "STAR" || key == "RUNWAY"){
-                            out_data[key] = value
-                        }
-                    }
-                    controllerWindow.send_message("map-points", JSON.stringify(out_data))
-                    break
-                }
-                case "map-check": {
-                    if (this.map_data == undefined){
-                        EvLogger.log("WARN", "user did not check any map")
-                        controllerWindow.send_message("map-checked", JSON.stringify({"user-check": false}))
-                    }
-                    else {
-                        EvLogger.log("DEBUG", "user checked a map")
-                        controllerWindow.send_message("map-checked", JSON.stringify({"user-check": true}))
-                    }
-                    break
-                }
-                case "monitor-change-info": {
-                    //whenever controller decides to change monitor type
-                    let mon_data = data[1][1]
-                    for (let i = 0; i < this.workers.length; i++){
-                        if (this.workers[i]["win"].win_type != mon_data[i]["type"]){
-                            //rewrite current window type and render to another one
-                            let path_to_render = "";
-
-
-                            switch(mon_data[i]["type"]){
-                                case "ACC":
-                                    //rewrite to Area control
-                                    path_to_render = PATH_TO_WORKER_HTML
-                                    //command_presets_listTODO: add rendering
-                                    break
-                                case "APP":
-                                    //rewrite to Approach control
-                                    path_to_render = PATH_TO_WORKER_HTML
-                                    //TODO: add rendering
-                                    break
-                                case "TWR":
-                                    //rewrite to tower
-                                    path_to_render = PATH_TO_WORKER_HTML
-                                    //TODO: add rendering
-                                    break
-                                case "weather":
-                                    //rewrite to weather forecast
-                                    path_to_render = PATH_TO_WEATHER_HTML
-                                    break
-                                case "dep_arr":
-                                    //rewrite to departure/arrival list
-                                    path_to_render = PATH_TO_DEP_ARR_HTML
-                                    break
-                                case "embed":
-                                    path_to_render = PATH_TO_EMBED_HTML
-                                    break
-                            }
-
-                            this.workers[i]["win"].win_type = mon_data[i]["type"]
-                            this.workers[i]["win"].show(path_to_render)
-
-
-                        }
-                        //change worker data in monitor_data DB
-                        this.PlaneDatabase.update_worker_data(this.workers)
-                    }
-                    break
-                }
-                case "send-location-data": {
-                    for (let i = 0; i < this.workers.length; i++){
-                        if (this.workers[i]["win"]["win_type"] == "weather"){
-                            this.workers[i]["win"].send_message("geo-data", [this.latitude, this.longitude, this.zoom])
-                        }
-                    }
-                    break
-                }
-                //plane control
-                case "spawn-plane": {
-                    let plane_data = data[1][1]
-
-                    //get current x, y coordinates according to selected points
-                    let x = 0
-                    let y = 0
-                    //get according map data
-                    let point_data = this.map_data[plane_data["monitor"].substring(plane_data["monitor"].length - 3, plane_data["monitor"].length)]
-                    
-                    //get departure point (ARP/POINTS/SID/STAR)
-                    let corresponding_points = plane_data["departure"].split("_")
-                    let point_name = corresponding_points[0]
-                    let point_group = corresponding_points[1]
-
-
-
-                    for (let i = 0; i < point_data[point_group].length; i++){
-                        if (point_name == point_data[point_group][i].name){
-                            //found corresponding point - set initial point
-                            x = point_data[point_group][i].x
-                            y = point_data[point_group][i].y
-                        }
-                    }
-                    
-                    let curr_plane_id = utils.generate_hash()
-                    let plane = new Plane(curr_plane_id, plane_data["name"], 
-                                    plane_data["heading"], plane_data["heading"],
-                                    plane_data["level"], plane_data["level"],
-                                    plane_data["speed"], plane_data["speed"],
-                                    plane_data["departure"], plane_data["arrival"], 
-                                    plane_data["arrival_time"],
-                                    x, y)
-                    this.PlaneDatabase.add_record(plane, plane_data["monitor"])
-
-                    this.send_to_all(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
-                    break
-                }
-                case "plane-value-change": {
-                    //TODO: add args to set command
-                    this.PlaneDatabase.set_command(data[1][3], data[1][1], data[1][2])      
-                    this.send_to_all(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
-                    controllerWindow.send_message("terminal-add", data[1].slice(1))
-                    break
-                }
-                case "plane-delete-record": {
-                    this.PlaneDatabase.delete_record(data[1][1])
-                    this.send_to_all(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
-                    break
-                }
-                case "send-plane-data": {
-                    //send plane data (works for all windows)
-                    for (let i = 0; i < this.workers.length; i++){
-                        if (this.workers[i]["win"].win_type.includes(data[0])){
-                            this.workers[i]["win"].send_message("update-plane-db", this.PlaneDatabase.DB)
-                        }
-                    }
-                    break
-                }
-                case "stop-sim": {
-                    this.app_status["sim-running"] = false
-
-                    //send stop event to all workers
-                    for (let i = 0; i < this.workers.length; i++){
-                        this.workers[i]["win"].send_message("sim-event", "stopsim")
-                    }
-                    controllerWindow.send_message("sim-event", "stopsim")
-                    break
-                }
-                case "start-sim": {
-                    this.app_status["sim-running"] = true
-
-                    //send stop event to all workers
-                    for (let i = 0; i < this.workers.length; i++){
-                        this.workers[i]["win"].send_message("sim-event", "startsim")
-                    }
-                    controllerWindow.send_message("sim-event", "startsim")
-                    break
-                }
-                case "regenerate-map": {
-                    if (this.app_status["turn-on-backend"]){
-                        this.backend_worker.postMessage(["action", "terrain"])
-                    }
-                    break
-                }
-                case "restore-sim": {
-                    this.backup_worker.postMessage(["read-db"])
-                    break
-                }
-                //messages from wiki tab
-                case "get-path": {
-                    console.log(ABS_PATH)
-                    break
-                }
-                case "rewrite-frontend-vars": {
-                    this.frontend_vars = data[1][1]
-                    console.log(this.frontend_vars)
-                    break
-                }
-                //getting all preset configuration directly from json file
-                case "json-description": {
-                    if (data[1][2] == "command"){
-                        controllerWindow.send_message("description-data", this.command_presets_list[data[1][1]])
-                    }
-                    else if (data[1][2] == "aircraft"){
-                        controllerWindow.send_message("description-data", this.aircraft_presets_list[data[1][1]])
-                    }
-                    break
-                }
-                case "min-widget": {
-                    for (let i = 0; i < this.widget_workers.length; i++){
-                        if (this.widget_workers[i]["id"] == data[1][1]){
-                            this.widget_workers[i]["win"].minimize()
-                        }
-                    }
-                    break
-                }
-                case "max-widget": {
-                    for (let i = 0; i < this.widget_workers.length; i++){
-                        if (this.widget_workers[i]["id"] == data[1][1]){
-                            this.widget_workers[i]["win"].maximize()
-                        }
-                    }
-                    break
-                }
-                case "exit-widget": {
-                    for (let i = 0; i < this.widget_workers.length; i++){
-                        if (this.widget_workers[i]["id"] == data[1][1]){
-                            this.widget_workers[i]["win"].close()
-                            this.wrapper.unregister_window(this.widget_workers[i]["win"].window_id)
-
-                            this.widget_workers.splice(i, 1)
-                        }
-                    }
-                    break
-                }
-                //plugin installation
-                case "install-plugin": {
-                    this.selected_plugin_id = data[1][1]
-                    let plugin_name = data[1][2]
-
-                    //create popup window for user confirmation
-                    let coords = utils.get_window_info(app_settings, this.displays, -1, "normal", popup_widget_dict)[0]
-                    this.current_popup_window = new PopupWindow(popup_widget_dict, 
-                                                                PATH_TO_POPUP_HTML, 
-                                                                coords, 
-                                                                EvLogger,  
-                                                                "confirm",
-                                                                "confirm-install")
-                    
-                    this.current_popup_window.load_popup(`Do you want to install plugin: ${plugin_name}?`, "Proceed?")
-                    break
-                }
-                case "get-plugin-list": {
-                    controllerWindow.send_message("plugin-list", this.local_plugin_list)
-                    break
-                }
-                case "confirm-install": {
-                    if (data[1][1]){
-                        EvLogger.log("DEBUG", "Installing plugin")
-                        console.log(this.selected_plugin_id)
-                        //TODO
-                    }
-                    else{
-                        EvLogger.log("DEBUG", "Plugin install aborted by user")
-                    }
-                    this.current_popup_window.close()
-                    this.current_popup_window = undefined
-                    break
-                }
-                case "confirm-settings": {
-                    //TODO
-                    this.current_popup_window.close()
-                    this.current_popup_window = undefined
-
-                    break
-                }
-                //environment messages
-                case "confirm-schedules": {
-                    this.setup_environment()
-
-                    this.current_popup_window.close()
-                    this.current_popup_window = undefined
-                    break
-                }
-                case "ping": {
-                    let status: boolean = await utils.ping(data[1][1])
-                    for (let i = 0; i < this.workers.length; i++){
-                        console.log(this.workers[i]["win"]["win_type"])
-                        if (this.workers[i]["win"]["win_type"] == "embed"){
-                            this.workers[i]["win"].send_message("ping-status", status)
-                        }
-                    }
-                }
-            }
-        })
-        */
-
-        //TODO: check if code is actually usable in scenario => for now, its unused
-        ipcMain.on("message-redirect", (event, data) => {
-            if (data[0] == "controller"){
-                console.log("from worker")
-                this.controllerWindow.send_message("message-redirect", data[1][0])
-                this.sender_win_name = "worker"
-            }
-            else if (data[0].includes("worker")){
-                console.log("from controller")
-                
-                let idx = parseInt(data[0].substring(6, 7))
-                this.workers[idx]["win"].send_message("message-redirect", data[1][0])
-                this.sender_win_name = "controller"
-            }
-        })
     }
 
     public add_listener_intervals(){
@@ -861,6 +401,183 @@ class MainApp{
         //spawning info window
         EvLogger.log("DEBUG", "Closing app... Bye Bye")
         this.exit_app()
+    }
+
+    private invoke(data: any){
+        this.backend_worker.postMessage(data)
+    }
+
+    private monitor_change_info(data: any[]){
+        let mon_data = data[0]
+        for (let i = 0; i < this.workers.length; i++){
+            if (this.workers[i]["win"].win_type != mon_data[i]["type"]){
+                //rewrite current window type and render to another one
+                let path_to_render = "";
+
+
+                switch(mon_data[i]["type"]){
+                    case "ACC":
+                        //rewrite to Area control
+                        path_to_render = PATH_TO_WORKER_HTML
+                        //command_presets_listTODO: add rendering
+                        break
+                    case "APP":
+                        //rewrite to Approach control
+                        path_to_render = PATH_TO_WORKER_HTML
+                        //TODO: add rendering
+                        break
+                    case "TWR":
+                        //rewrite to tower
+                        path_to_render = PATH_TO_WORKER_HTML
+                        //TODO: add rendering
+                        break
+                    case "weather":
+                        //rewrite to weather forecast
+                        path_to_render = PATH_TO_WEATHER_HTML
+                        break
+                    case "dep_arr":
+                        //rewrite to departure/arrival list
+                        path_to_render = PATH_TO_DEP_ARR_HTML
+                        break
+                    case "embed":
+                        path_to_render = PATH_TO_EMBED_HTML
+                        break
+                }
+
+                this.workers[i]["win"].win_type = mon_data[i]["type"]
+                this.workers[i]["win"].show(path_to_render)
+
+
+            }
+            //change worker data in monitor_data DB
+            this.PlaneDatabase.update_worker_data(this.workers)
+        }
+    }
+
+    private start_sim(){
+        this.app_status["sim-running"] = true
+
+        //send stop event to all workers
+        for (let i = 0; i < this.workers.length; i++){
+            this.workers[i]["win"].send_message("sim-event", "startsim")
+        }
+        this.controllerWindow.send_message("sim-event", "startsim")
+    }
+
+    private stop_sim(){
+        this.app_status["sim-running"] = false
+
+        //send stop event to all workers
+        for (let i = 0; i < this.workers.length; i++){
+            this.workers[i]["win"].send_message("sim-event", "stopsim")
+        }
+        this.controllerWindow.send_message("sim-event", "stopsim")
+    }
+
+    private restore_sim(){
+        this.backup_worker.postMessage(["read-db"])
+    }
+
+    private regenerate_map(){
+        if (this.app_status["turn-on-backend"]){
+            this.backend_worker.postMessage(["action", "terrain"])
+        }
+    }
+
+    private rewrite_frontend_vars(data: any[]){
+        this.frontend_vars = data[0]
+        console.log(this.frontend_vars)
+    }
+
+    private min_widget(data: any[]){
+        for (let i = 0; i < this.widget_workers.length; i++){
+            if (this.widget_workers[i]["id"] == data[0]){
+                this.widget_workers[i]["win"].minimize()
+            }
+        }
+    }
+
+    private max_widget(data: any[]){
+        for (let i = 0; i < this.widget_workers.length; i++){
+            if (this.widget_workers[i]["id"] == data[0]){
+                this.widget_workers[i]["win"].maximize()
+            }
+        }
+    }
+
+    private exit_widget(data: any[]){
+        for (let i = 0; i < this.widget_workers.length; i++){
+            if (this.widget_workers[i]["id"] == data[0]){
+                this.widget_workers[i]["win"].close()
+                this.wrapper.unregister_window(this.widget_workers[i]["win"].window_id)
+
+                this.widget_workers.splice(i, 1)
+            }
+        }
+    }
+
+    private install_plugin(data: any[]){
+        this.selected_plugin_id = data[0]
+        let plugin_name = data[1]
+
+        //create popup window for user confirmation
+        let coords = utils.get_window_info(app_settings, this.displays, -1, "normal", popup_widget_dict)[0]
+        this.current_popup_window = new PopupWindow(popup_widget_dict, 
+                                                    PATH_TO_POPUP_HTML, 
+                                                    coords, 
+                                                    EvLogger,  
+                                                    "confirm",
+                                                    "confirm-install")
+        
+        this.current_popup_window.load_popup(`Do you want to install plugin: ${plugin_name}?`, "Proceed?")
+    }
+
+    private get_plugin_list(){
+        this.controllerWindow.send_message("plugin-list", this.local_plugin_list)
+    }
+
+    private confirm_install(data: any[]){
+        if (data[0]){
+            EvLogger.log("DEBUG", "Installing plugin")
+            console.log(this.selected_plugin_id)
+            //TODO
+        }
+        else{
+            EvLogger.log("DEBUG", "Plugin install aborted by user")
+        }
+        this.current_popup_window.close()
+        this.current_popup_window = undefined
+    }
+
+    private confirm_settings(){
+        this.current_popup_window.close()
+        this.current_popup_window = undefined
+    }
+
+    private confirm_schedules(){
+        this.setup_environment()
+
+        this.current_popup_window.close()
+        this.current_popup_window = undefined
+    }
+
+    private async ping(data: any[]){
+        let status: boolean = await utils.ping(data[0])
+        for (let i = 0; i < this.workers.length; i++){
+            console.log(this.workers[i]["win"]["win_type"])
+            if (this.workers[i]["win"]["win_type"] == "embed"){
+                this.workers[i]["win"].send_message("ping-status", status)
+            }
+        }
+    }
+
+    private json_description(data: any[]){
+        if (data[1] == "command"){
+            this.controllerWindow.send_message("description-data", this.command_presets_list[data[1][1]])
+        }
+        else if (data[1] == "aircraft"){
+            this.controllerWindow.send_message("description-data", this.aircraft_presets_list[data[1][1]])
+        }
     }
 
     //

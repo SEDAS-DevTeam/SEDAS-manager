@@ -50,6 +50,9 @@ import {
 
 } from "./app_config"
 
+import fs from "fs";
+import path from "path"
+
 export class BackendFunctions{
     private ev_logger: EventLogger;
     private app: any;
@@ -59,6 +62,11 @@ export class BackendFunctions{
         this.app = app
     }
 
+    /*
+        App redirects
+    */
+
+    // redirect to menu
     public redirect_to_menu(window_type: string){
         this.app.app_status["redir-to-main"] = false
 
@@ -101,6 +109,7 @@ export class BackendFunctions{
         this.app.PlaneDatabase = undefined
     }
 
+    // redirect to settings
     public redirect_to_settings(){
         //message call to redirect to settings
         this.app.app_status["redir-to-main"] = true
@@ -120,6 +129,7 @@ export class BackendFunctions{
         this.app.settingsWindow.show()
     }
 
+    //redirect to main app (starting workers and controller)
     public redirect_to_main(){
         //message call to redirect to main program (start)
         this.app.app_status["redir-to-main"] = true
@@ -127,5 +137,23 @@ export class BackendFunctions{
             this.app.backend_worker.postMessage(["action", "start-neural"])
         }
         this.app.main_app()
+    }
+
+    /*
+        Settings functions
+    */
+
+    // Save settings
+    public save_settings(data: any[]){
+        //save settings
+        this.ev_logger.log("DEBUG", "saving settings")
+
+        fs.writeFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), data[0])
+        
+        //inform user that settings are loaded only after restart
+        this.app.current_popup_window = utils.create_popup_window(this.app.app_settings, this.ev_logger, this.app.displays,
+            "alert", "confirm-settings",
+            "Saved the settings",
+            "Restart the app for changes to take the effect")
     }
 }

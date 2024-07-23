@@ -63,13 +63,9 @@ import {
 
 } from "./app_config"
 
-import { 
-    BackendFunctions
-} from "./backend_functions"
+import { BackendFunctions } from "./backend_functions"
 
-import {
-    Environment
-} from "./environment"
+import { Environment } from "./environment"
 
 //C++ (N-API) imports
 import { main } from "./bind";
@@ -270,18 +266,15 @@ class MainApp{
 
     public add_listener_IPC(){
         //IPC listeners
-        this.wrapper.register_channel("redirect-to-menu", "controller", "unidirectional", () => {
-            this.backend_functions.redirect_to_menu("controller")
-        })
-        this.wrapper.register_channel("redirect-to-menu", "settings", "unidirectional", () => {
-            this.backend_functions.redirect_to_menu("settings")
-        })
-        this.wrapper.register_channel("redirect-to-settings", "menu", "unidirectional", () => {
-            this.backend_functions.redirect_to_settings()
-        })
-        this.wrapper.register_channel("redirect-to-main", "menu", "unidirectional", () => {
-            this.backend_functions.redirect_to_main()
-        })
+        this.wrapper.register_channel("redirect-to-menu", ["controller"], "unidirectional", () => this.backend_functions.redirect_to_menu("controller"))
+        this.wrapper.register_channel("redirect-to-menu", ["settings"], "unidirectional", () => this.backend_functions.redirect_to_menu("settings"))
+        this.wrapper.register_channel("redirect-to-settings", ["menu"], "unidirectional", () => this.backend_functions.redirect_to_settings())
+
+
+        this.wrapper.register_channel("redirect-to-main", ["menu"], "unidirectional", () => this.backend_functions.redirect_to_main())
+        this.wrapper.register_channel("save-settings", ["menu"], "unidirectional", (data: any[]) => this.backend_functions.save_settings(data))
+
+        this.wrapper.register_channel("exit", ["worker", "controller"], "unidirectional", () => this.exit())
 
         //setting all listeners to be active
         this.wrapper.set_all_listeners()
@@ -290,24 +283,6 @@ class MainApp{
         ipcMain.handle("message", async (event, data) => {
             switch(data[1][0]){
                 //generic message channels
-                case "save-settings": {
-                    //save settings
-                    EvLogger.log("DEBUG", "saving settings")
-
-                    fs.writeFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), data[1][1])
-                    
-                    //inform user that settings are loaded only after restart
-                    this.current_popup_window = utils.create_popup_window(app_settings, EvLogger, this.displays,
-                        "alert", "confirm-settings",
-                        "Saved the settings",
-                        "Restart the app for changes to take the effect")
-                    break
-                }
-                case "exit": {
-                    //spawning info window
-                    EvLogger.log("DEBUG", "Closing app... Bye Bye")
-                    this.exit_app()
-                }
                 case "invoke": {
                     //TODO: find out why I have this written here
                     if (this.app_status["turn-on-backend"]){
@@ -876,6 +851,16 @@ class MainApp{
             EvLogger.log("ERROR", "An error happened, written down below")
             EvLogger.log("", error)
         }
+    }
+
+    /*
+        App general utils (used when registering IPC)
+    */
+
+    private exit(){
+        //spawning info window
+        EvLogger.log("DEBUG", "Closing app... Bye Bye")
+        this.exit_app()
     }
 
     //

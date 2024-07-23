@@ -69,7 +69,7 @@ export class IPCwrapper{
     }
 
     // channel registering
-    public register_channel(channel_name: string, sender: string, type: string, callback: Function){
+    public register_channel(channel_name: string, sender: string[], type: string, callback: Function){
         this.channel_communication_configuration.push({
             "channel": channel_name,
             "sender": sender,
@@ -100,20 +100,21 @@ export class IPCwrapper{
                     desired_hash = this.hash_message([desired_channel])
                 }
                 else{desired_hash = this.hash_message(message_data)}
-
-                if(sender == desired_sender && channel == desired_channel){
-                    //credentials are correct
-                    if (hash == desired_hash){
-                        let callback: Function = this.channel_communication_configuration[i]["callback"]
-                        //message is correct
-                        
-                        //send back acknowledge and call callback
-                        this.send_ack(sender, channel)
-                        callback(message_data)
-                    }
-                    else{
-                        //message not correct -> writing into log & resend
-                        this.send_nack(sender, channel)
+                for(let i_sender = 0; i_sender < desired_sender.length; i_sender++){
+                    if(desired_sender[i_sender].includes(sender) && channel == desired_channel){
+                        //credentials are correct
+                        if (hash == desired_hash){
+                            let callback: Function = this.channel_communication_configuration[i]["callback"]
+                            //message is correct
+                            
+                            //send back acknowledge and call callback
+                            this.send_ack(sender, channel)
+                            callback(message_data)
+                        }
+                        else{
+                            //message not correct -> writing into log & resend
+                            this.send_nack(sender, channel)
+                        }
                     }
                 }
             }

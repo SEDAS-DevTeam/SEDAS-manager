@@ -8,10 +8,10 @@ function onload_specific(){
     settings_area = new SettingsFunctions("settings-area")
 
     //ask for settings to load
-    window.electronAPI.send_message("settings", ["send-info"])
+    send_message("settings", "send-info")
 
     document.getElementById("redir_to_menu").addEventListener("click", () => {
-        window.electronAPI.send_message('settings', ['redirect-to-menu'])
+        send_message("settings", "redirect-to-menu")
     })
     
     document.getElementById("save_settings").addEventListener("click", () => {
@@ -155,7 +155,7 @@ function save_settings(){
     let data_str = JSON.stringify(data, null, 4)
     console.log(data_str)
 
-    window.electronAPI.send_message('settings', ['save-settings', data_str])
+    send_message("settings", "save-settings", [data_str])
 }
 
 //

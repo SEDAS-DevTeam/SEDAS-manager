@@ -72,7 +72,7 @@ window.onload = () => {
     var page_name = path.split("/").pop().replace(".html", "");
 
     //window is loaded, send command to send all info from backend
-    window.electronAPI.send_message("controller", ["send-info"])
+    send_message("controller", "send-info")
 
     //set for all elements globally
     
@@ -102,7 +102,7 @@ window.onload = () => {
                 frontend_vars[page_name][`dropdown${i}`] = "on"
             }
 
-            window.electronAPI.send_message("controller", ["rewrite-frontend-vars", frontend_vars])
+            send_message("controller", "rewrite-frontend-vars", [frontend_vars])
         })
     }
 
@@ -110,7 +110,7 @@ window.onload = () => {
 
     //set for all pages
     document.getElementById("exit-button").addEventListener("click", () => {
-        window.electronAPI.send_message("controller", ["exit"])
+        send_message("controller", "exit")
     })
 
     document.getElementById("menu-button").addEventListener("click", () => {
@@ -138,11 +138,10 @@ window.onload = () => {
         map_checked = data_temp["user-check"]
 
         //send message to get new data
-        window.electronAPI.send_message("controller", ["send-info"])
+        send_message("controller", "send-info")
     })
 
     //specific messages
-    window.electronAPI.on_message_redir()
     window.electronAPI.on_init_info((data) => {
         process_init_data(data)
         process_specific(data)

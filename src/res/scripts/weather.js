@@ -196,7 +196,7 @@ function play_loop(){
 Electron functions to communicate through IPC
 */
 function ask_for_loc(){
-    window.electronAPI.send_message("weather", ["send-location-data"])
+    send_message("weather", "send-location-data")
 }
 
 function create_warn_header(message){

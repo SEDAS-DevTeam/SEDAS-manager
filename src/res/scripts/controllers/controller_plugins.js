@@ -19,7 +19,7 @@ function process_specific(data){
 }
 
 function getPlugins(){
-    window.electronAPI.send_message("controller", ["get-plugin-list"])
+    send_message("controller", "get-plugin-list")
 }
 
 window.electronAPI.on_message("plugin-list", (data) => {
@@ -87,7 +87,7 @@ window.electronAPI.on_message("plugin-list", (data) => {
     
     for (let i = 0; i < not_installed_buttons.length; i++){
         not_installed_buttons[i].addEventListener("click", (event) => {
-            window.electronAPI.send_message("controller", ["install-plugin", event.target.id, initial_plugin_list[i]["data"]["plugin"]])
+            send_message("controller", "install-plugin", [event.target.id, initial_plugin_list[i]["data"]["plugin"]])
         })
     }
 

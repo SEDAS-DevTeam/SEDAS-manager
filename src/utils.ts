@@ -38,7 +38,7 @@ export class IPCwrapper{
     private channel_communication_configuration: object[] = [];
     private open: boolean = true;
     
-    private hash_message(message: any[]){
+    private hash_message(message: any[] | string){
         return md5(JSON.stringify(message))
     }
 
@@ -87,7 +87,7 @@ export class IPCwrapper{
             //incoming data from windows
             var sender: string = data[0]
             var channel: string = data[1][0]
-            var message_data: any = data[1].slice(1, data[1].length - 2)
+            var message_data: any = data[1].slice(1, data[1].length - 1)
             var hash: string = data[1][data[1].length - 1]
 
             for(let i = 0; i < this.channel_communication_configuration.length; i++){
@@ -97,9 +97,10 @@ export class IPCwrapper{
 
                 let desired_hash: string = "";
                 if (message_data.length == 0){
-                    desired_hash = this.hash_message([desired_channel])
+                    desired_hash = this.hash_message(desired_channel)
                 }
                 else{desired_hash = this.hash_message(message_data)}
+
                 for(let i_sender = 0; i_sender < desired_sender.length; i_sender++){
                     if(desired_sender[i_sender].includes(sender) && channel == desired_channel){
                         //credentials are correct
@@ -108,12 +109,13 @@ export class IPCwrapper{
                             //message is correct
                             
                             //send back acknowledge and call callback
-                            this.send_ack(sender, channel)
+                            //this.send_ack(sender, channel)
                             callback(message_data)
                         }
                         else{
                             //message not correct -> writing into log & resend
-                            this.send_nack(sender, channel)
+                            //this.send_nack(sender, channel)
+                            console.log("not acknowledged")
                         }
                     }
                 }

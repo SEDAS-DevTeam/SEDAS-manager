@@ -13,11 +13,10 @@ function setup_confirm(content){
 
     yes_button.onclick = () => {
         console.log(comm_channel)
-        window.electronAPI.send_message("popup-widget", [comm_channel, true])
+        send_message("popup", comm_channel, [true])
     }
-
     no_button.onclick = () => {
-        window.electronAPI.send_message("popup-widget", [comm_channel, false])
+        send_message("popup", comm_channel, [false])
     }
 
     content.appendChild(yes_button)
@@ -30,7 +29,7 @@ function setup_alert(content){
     ok_button.innerHTML = "Ok"
 
     ok_button.onclick = () => {
-        window.electronAPI.send_message("popup-widget", [comm_channel])
+        send_message("popup", comm_channel)
     }
 
     content.appendChild(ok_button)

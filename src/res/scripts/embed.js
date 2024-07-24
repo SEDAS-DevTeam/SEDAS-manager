@@ -3,7 +3,7 @@ window.onload = () => {
         let url_value = document.getElementById("url-form").value //TODO
         
         //check if hostname with this address exists
-        window.electronAPI.send_message('embed', ['ping', url_value])
+        send_message('embed', 'ping', [url_value])
 
         document.getElementById("embed-iframe").src = url_value
     }

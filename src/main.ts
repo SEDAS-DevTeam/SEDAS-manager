@@ -276,7 +276,7 @@ class MainApp{
         this.wrapper.register_channel("exit", ["worker", "controller"], "unidirectional", () => this.exit())
         
         this.wrapper.register_channel("invoke", ["worker"], "unidirectional", (data: any[]) => this.invoke(data))
-        this.wrapper.register_channel("ping", ["controller", "settings"], "bidirectional", (data: any[]) => this.ping(data))
+        this.wrapper.register_channel("ping", ["controller", "settings", "embed"], "bidirectional", (data: any[]) => this.ping(data))
         
         //send app configuration to controller
         this.wrapper.register_channel("send-info", ["controller"], "bidirectional", () => this.backend_functions.send_info("controller"))
@@ -292,16 +292,16 @@ class MainApp{
         this.wrapper.register_channel("set-environment", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.set_environment(data))
         this.wrapper.register_channel("json-description", ["controller"], "bidirectional", (data: any[]) => this.json_description(data))
 
-        this.wrapper.register_channel("render-map", ["controller"], "unidirectional", () => this.backend_functions.render_map())
+        this.wrapper.register_channel("render-map", ["controller", "worker"], "unidirectional", () => this.backend_functions.render_map())
         this.wrapper.register_channel("get-points", ["controller"], "bidirectional", (data: any[]) => this.backend_functions.get_points(data))
         this.wrapper.register_channel("map-check", ["controller"], "bidirectional", () => this.backend_functions.map_check())
-        this.wrapper.register_channel("send-location-data", ["controller"], "unidirectional", () => this.backend_functions.send_location_data())
+        this.wrapper.register_channel("send-location-data", ["weather"], "unidirectional", () => this.backend_functions.send_location_data())
 
         //plane invokes
         this.wrapper.register_channel("spawn-plane", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.spawn_plane(data))
         this.wrapper.register_channel("plane-value-change", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.plane_value_change(data))
         this.wrapper.register_channel("plane-delete-record", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.plane_delete_record(data))
-        this.wrapper.register_channel("send-plane-data", ["worker"], "unidirectional", () => this.backend_functions.send_plane_data())
+        this.wrapper.register_channel("send-plane-data", ["dep_arra"], "unidirectional", () => this.backend_functions.send_plane_data())
         
         //widget invokes
         this.wrapper.register_channel("min-widget", ["widget"], "unidirectional", (data: any[]) => this.min_widget(data))
@@ -318,7 +318,7 @@ class MainApp{
         this.wrapper.register_channel("confirm-schedules", ["popup"], "unidirectional", () => this.confirm_schedules())
 
         //other invokes
-        this.wrapper.register_channel("send-info", ["controller"], "bidirectional", (data: any[]) => this.backend_functions.send_scenario_list(data))
+        this.wrapper.register_channel("send-scenario-list", ["controller"], "bidirectional", (data: any[]) => this.backend_functions.send_scenario_list(data))
         this.wrapper.register_channel("rewrite-frontend-vars", ["controller"], "unidirectional", (data: any[]) => this.rewrite_frontend_vars(data))
 
         //setting all listeners to be active

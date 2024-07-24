@@ -6,7 +6,6 @@ import utils, { ProgressiveLoader } from "./utils";
 //C++ (N-API) imports
 import { enviro_calculations } from "./bind";
 import { Plane, PlaneDB } from "./plane_functions";
-import { PopupWindow } from "./app_config";
 
 export class Environment {
     private logger: EventLogger;

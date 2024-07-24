@@ -78,7 +78,7 @@ function selection(event){
             document.getElementById("confirmresult-airport").innerHTML = selection_name
             selected_map = selection_path
 
-            window.electronAPI.send_message("controller", ["send-scenario-list", selected_map])
+            send_message("controller", "send-scenario-list", [selected_map])
             break
         case "scenario": {
             for (let i = 0; i < all_selected_scenarios.length; i++){
@@ -113,7 +113,7 @@ function set_environment(){
         return
     }
     
-    window.electronAPI.send_message("controller", ["set-environment", selected_map, selected_command_preset, selected_aircraft_preset, selected_scenario])
+    send_message("controller", "set-environment", [selected_map, selected_command_preset, selected_aircraft_preset, selected_scenario])
 }
 
 /*

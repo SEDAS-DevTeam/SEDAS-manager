@@ -239,13 +239,13 @@ function update_labels(curr_x, curr_y){
 
 window.onload = () => {
     //ask for map data
-    window.electronAPI.send_message("worker", ["render-map"])
+    send_message("worker", "render-map")
 
     //ask for app data
-    window.electronAPI.send_message("worker", ["send-info"])
+    send_message("worker", "send-info")
 
     //ask for plane data
-    window.electronAPI.send_message("worker", ["send-plane-data"])
+    send_message("worker", "send-plane-data")
 
     //render all essential things
     renderCanvas(1)
@@ -254,22 +254,18 @@ window.onload = () => {
 
     //render empty map placeholder on init
     renderText(50, 100, "Empty map placeholder", "white", "48px", "canvas3")
-
-    document.querySelector("a#plankmsg").addEventListener("click", () => {
-        window.electronAPI.send_message_redir("controller", ["test msg2"])
-    })
     
     document.querySelector("a#exit").addEventListener("click", () => {
-        window.electronAPI.send_message("worker", ["exit"])
+        send_message("worker", "exit")
     })
 
     document.querySelector("a#stopbutton").addEventListener("click", () => {
         let elem = document.querySelector("a#stopbutton")
         if (elem.className == "stopsim"){
-            window.electronAPI.send_message("worker", ["stop-sim"]) //stop simulation
+            send_message("worker", "stop-sim") //stop simulation
         }
         else if (elem.className == "startsim"){
-            window.electronAPI.send_message("worker", ["start-sim"]) //start simulation
+            send_message("worker", "start-sim") //start simulation
         }
     })
 }
@@ -317,13 +313,12 @@ document.onmousemove = (event) => {
     }
 }
 
-window.electronAPI.on_message_redir() //for handling all message redirects
 window.electronAPI.on_map_data((data) => {
     map_data = data //set map data to global on session
     process_map_data()
 })
 window.electronAPI.on_message("ask-for-render", () => {
-    window.electronAPI.send_message("worker", ["render-map"])
+    send_message("worker", "render-map")
 })
 window.electronAPI.on_message("update-plane-db", (data) => { //for updating plane list
     plane_data = data

@@ -21,13 +21,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
             callback(data)
         })
     },
-    //when receiving incoming messages from other processes
-    on_message_redir: () => {
-        ipcRenderer.on("message-redirect", (event, data) => {
-            console.log("received message!")
-            console.log(data)
-        })
-    },
     //getting initial info (number of monitors, etc.) from backend
     on_init_info: (callback) => {
         ipcRenderer.on('init-info', (event, data) => {

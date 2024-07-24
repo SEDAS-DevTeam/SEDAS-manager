@@ -218,6 +218,7 @@ export class BackendFunctions{
                     "content": JSON.stringify(commands_config["commands"])
                 })
             }
+
             this.app.controllerWindow.send_message("init-info", ["window-info", JSON.stringify(this.app.workers), this.app.map_configs_list, 
                                                         JSON.stringify(this.app.app_settings), [this.app.map_name, this.app.command_preset_name, this.app.aircraft_preset_name], this.app.aircraft_presets_list, 
                                                         this.app.command_presets_list, this.app.frontend_vars, this.app.app_status])
@@ -233,6 +234,7 @@ export class BackendFunctions{
     public send_scenario_list(data: any[]){
         //rewrite scenario presets lists
         this.app.scenario_presets_list = []
+        console.log(data)
 
         let selected_map_data = utils.read_file_content(PATH_TO_MAPS, data[0])
         let scenarios = selected_map_data["scenarios"]

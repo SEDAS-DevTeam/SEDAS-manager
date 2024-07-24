@@ -115,7 +115,7 @@ function plane_value_change(elem){
         }
     }
 
-    window.electronAPI.send_message("controller", ["plane-value-change", elem.classList[1], elem.innerHTML, plane_callsign])
+    send_message("controller", "plane-value-change", [elem.classList[1], elem.innerHTML, plane_callsign])
 }
 
 function delete_plane(elem){
@@ -132,7 +132,7 @@ function delete_plane(elem){
             plane_id = plane_data[i].id
         }
     }
-    window.electronAPI.send_message("controller", ["plane-delete-record", plane_id])
+    send_message("controller", "plane-delete-record", [plane_id])
 }
 
 function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival, plane_heading, plane_level, plane_speed){
@@ -216,7 +216,7 @@ function process_plane_data(){
     let mins = document.getElementById("minutes").innerHTML
 
 
-    window.electronAPI.send_message("controller", ["spawn-plane", {
+    send_message("controller", "spawn-plane", [{
         "name": name,
         "heading": parseInt(heading),
         "level": parseInt(level),
@@ -367,7 +367,7 @@ function random_generate_names(){
 function change_according_points(){
     var monit_sel = document.getElementById("monitor_spawn");
     var selectedValue = monit_sel.options[monit_sel.selectedIndex].value;
-    window.electronAPI.send_message("controller", ["get-points", selectedValue])
+    send_message("controller", "get-points", [selectedValue])
 }
 
 /*
@@ -376,7 +376,7 @@ function change_according_points(){
 
 function switch_change_ai(elem){
     if (elem.checked){
-        window.electronAPI.send_message("controller", "ai-control-start")
+        send_message("controller", "ai-control-start")
 
         //disable visibility on whole content
         document.querySelectorAll("#main-content").forEach(elem => {
@@ -384,7 +384,7 @@ function switch_change_ai(elem){
         })
     }
     else{
-        window.electronAPI.send_message("controller", "ai-control-stop")
+        send_message("controller", "ai-control-stop")
 
         //enable visibility on whole content
         document.querySelectorAll("#main-content").forEach(elem => {
@@ -395,7 +395,7 @@ function switch_change_ai(elem){
 
 function switch_change_wind(elem){
     if (elem.checked){
-        window.electronAPI.send_message("controller", "wind-control-start")
+        send_message("controller", "wind-control-start")
 
         //disable visibility on whole content
         document.querySelectorAll("#wind-control").forEach(elem => {
@@ -403,7 +403,7 @@ function switch_change_wind(elem){
         })
     }
     else{
-        window.electronAPI.send_message("controller", "wind-control-stop")
+        send_message("controller", "wind-control-stop")
 
         //enable visibility on whole content
         document.querySelectorAll("#wind-control").forEach(elem => {
@@ -509,7 +509,7 @@ function onload_specific(){
     document.getElementById("mask-sim").style.height = `${document.body.scrollHeight}px`
 
     //check if user had already selected map
-    window.electronAPI.send_message("controller", ["map-check"])
+    send_message("controller", "map-check")
 
     random_generate_names()
 
@@ -533,10 +533,10 @@ function onload_specific(){
     document.getElementById("sim_button").addEventListener("click", (event) => {
         
         if (event.target.className == "stopsim"){
-            window.electronAPI.send_message("controller", ["stop-sim"]) //stop simulation
+            send_message("controller", "stop-sim") //stop simulation
         }
         else if (event.target.className == "startsim"){
-            window.electronAPI.send_message("controller", ["start-sim"]) //start simulation
+            send_message("controller", "start-sim") //start simulation
         }
     })
 

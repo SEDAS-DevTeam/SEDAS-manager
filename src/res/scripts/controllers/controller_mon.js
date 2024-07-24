@@ -23,7 +23,7 @@ function send_monitor_data(){
     }
 
     console.log(data)
-    window.electronAPI.send_message("controller", ["monitor-change-info", data])
+    send_message("controller", "monitor-change-info", [data])
 }
 
 /*
@@ -71,5 +71,5 @@ function onload_specific(){
     })
 
     //send data monitor data retrival request
-    window.electronAPI.send_message("controller", ["send-monitor-data"])
+    send_message("controller", "send-monitor-data")
 }

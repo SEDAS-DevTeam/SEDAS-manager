@@ -164,9 +164,8 @@ export class PlaneDB{
             //heading change
             if (this.DB[i].updated_heading != this.DB[i].heading){
                 //make turn
-                console.log(std_bank_angle)
+                
                 let r_of_t = plane_calculations.calc_rate_of_turn(std_bank_angle, this.DB[i].speed)
-                console.log("rate", r_of_t)
 
                 let continue_change: boolean = true
                 //scan plane turn database

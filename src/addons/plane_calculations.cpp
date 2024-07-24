@@ -31,7 +31,7 @@ napi_value Calc_climb(napi_env env, napi_callback_info info){
   float scale = get_variable<float>(env, args[3]);
   int updated_level = get_variable<int>(env, args[4]);
 
-  float change = (plane_speed / 3600) * sin(deg_to_rad(climb_angle)) / scale;
+  float change = ((plane_speed / 3600) * sin(deg_to_rad(climb_angle)));
   float fallback_diff = level + change - updated_level;
 
   std::vector<float> result = {change, fallback_diff};

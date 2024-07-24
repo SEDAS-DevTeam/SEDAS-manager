@@ -238,6 +238,11 @@ export class BackendFunctions{
 
         let selected_map_data = utils.read_file_content(PATH_TO_MAPS, data[0])
         let scenarios = selected_map_data["scenarios"]
+        if (scenarios == undefined){
+            this.app.controllerWindow.send_message("scenario-list", [])
+            return
+        }
+
         for (let i = 0; i < scenarios.length; i++){
             this.app.scenario_presets_list.push({
                 "hash": "scenario-" + utils.generate_hash(),

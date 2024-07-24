@@ -282,7 +282,7 @@ class TableFunctions extends ElementBind{
 
     set_scenarios_list(scenarios){
         //delete children
-        this.delete_scenarios_list()
+        this.delete_list()
 
         //hide warn text
         document.getElementById("map-not-selected").style.display = "none"
@@ -328,7 +328,7 @@ class TableFunctions extends ElementBind{
         }
     }
 
-    delete_scenarios_list(){
+    delete_list(){
         for (let i = 1; i < this.element.children[0].children.length; i++){
             this.element.children[0].children[i].remove()
         }

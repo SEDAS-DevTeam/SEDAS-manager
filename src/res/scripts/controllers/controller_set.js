@@ -217,7 +217,7 @@ function onload_specific(){
     
     window.electronAPI.on_message("scenario-list", (data) => {
         all_selected_scenarios = data
-        console.log(all_selected_scenarios)
+        table_scenario.delete_list()
         table_scenario.set_scenarios_list(all_selected_scenarios)
 
         /*

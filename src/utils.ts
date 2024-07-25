@@ -109,12 +109,12 @@ export class IPCwrapper{
                             //message is correct
                             
                             //send back acknowledge and call callback
-                            //this.send_ack(sender, channel)
+                            this.send_ack(sender, channel)
                             callback(message_data)
                         }
                         else{
                             //message not correct -> writing into log & resend
-                            //this.send_nack(sender, channel)
+                            this.send_nack(sender, channel)
                             console.log("not acknowledged")
                         }
                     }
@@ -130,12 +130,29 @@ export class IPCwrapper{
         this.send_message_to_window(destination, channel, data)
     }
 
-    public send_ack(destination: string, channel: string){
-        this.send_message_to_window(destination, channel, ["ACK"])
+    public broadcast(type: string, channel: string, data: any){
+        //broadcast to all windows
+        if (type == "all"){
+            for (let i = 0; i < this.window_communication_configuration.length; i++){
+                this.window_communication_configuration[i]["win"].send_message(channel, data)
+            }
+        }
+        else if (type == "workers"){
+            for (let i = 0; i < this.window_communication_configuration.length; i++){
+                let win_name: string = this.window_communication_configuration[i]["win_name"]
+                if (win_name.includes("worker")){
+                    this.window_communication_configuration[i]["win"].send_message(channel, data)
+                }
+            }
+        }
     }
 
-    public send_nack(destination: string, channel: string){
-        this.send_message_to_window(destination, channel, ["NACK"])
+    private send_ack(destination: string, channel: string){
+        this.send_message_to_window(destination, channel + "-ack", ["ACK"])
+    }
+
+    private send_nack(destination: string, channel: string){
+        this.send_message_to_window(destination, channel + "-ack", ["NACK"])
     }
 }
 

@@ -169,9 +169,7 @@ class MainApp{
         this.loader = undefined
         
         //everything is set up, time to load
-        for (let i = 0; i < this.workers.length; i++){
-            this.workers[i]["win"].send_message("ask-for-render") //send workers command to fire "render-map" event
-        }
+        this.wrapper.broadcast("workers", "ask-for-render", []) //send workers command to fire "render-map" event
         
         //rendering widget workers
         for (let i = 0; i < this.widget_workers.length; i++){
@@ -193,10 +191,10 @@ class MainApp{
         this.displays = displays_mod
     }
 
-    private send_to_all(planes: object[], plane_monitor_data: object[], plane_paths_data: object[]){
+    private broadcast_planes(planes: object[], plane_monitor_data: object[], plane_paths_data: object[]){
         if (this.controllerWindow != undefined && this.workers.length != 0){
             //update planes on controller window
-            this.controllerWindow.send_message("update-plane-db", planes)
+            this.wrapper.send_message("controller", "update-plane-db", planes)
     
             for (let i = 0; i < plane_monitor_data.length; i++){
                 let temp_planes = []
@@ -213,9 +211,9 @@ class MainApp{
                 }
     
                 //send updated data to all workers
-                this.workers[i]["win"].send_message("update-plane-db", temp_planes)
+                this.wrapper.send_message(this.workers[i]["win-name"], "update-plane-db", temp_planes)
                 //send path data to all workers
-                this.workers[i]["win"].send_message("update-paths", plane_paths_data)
+                this.wrapper.send_message(this.workers[i]["win-name"], "update-paths", plane_paths_data)
             }
         }
     }
@@ -338,7 +336,7 @@ class MainApp{
                         }
                         if (this.app_status["app-running"]){
                             //send updated plane database to all
-                            this.send_to_all(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
+                            this.broadcast_planes(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
                         }
                     }
                 }, 1000)
@@ -347,9 +345,7 @@ class MainApp{
                 setInterval(() => {
                     if (this.enviro != undefined && this.app_status["sim-running"]){
                         //send date & time to frontend
-                        for (let i = 0; i < this.workers.length; i++){
-                            this.workers[i]["win"].send_message("time", [this.enviro.current_time])
-                        }
+                        this.wrapper.broadcast("workers", "time", [this.enviro.current_time])
                     }
                 }, 1000)
     
@@ -458,20 +454,16 @@ class MainApp{
         this.app_status["sim-running"] = true
 
         //send stop event to all workers
-        for (let i = 0; i < this.workers.length; i++){
-            this.workers[i]["win"].send_message("sim-event", "startsim")
-        }
-        this.controllerWindow.send_message("sim-event", "startsim")
+        this.wrapper.broadcast("workers", "sim-event", "startsim")
+        this.wrapper.send_message("controller", "sim-event", "startsim")
     }
 
     private stop_sim(){
         this.app_status["sim-running"] = false
 
         //send stop event to all workers
-        for (let i = 0; i < this.workers.length; i++){
-            this.workers[i]["win"].send_message("sim-event", "stopsim")
-        }
-        this.controllerWindow.send_message("sim-event", "stopsim")
+        this.wrapper.broadcast("workers", "sim-event", "stopsim")
+        this.wrapper.send_message("controller", "sim-event", "stopsim")
     }
 
     private restore_sim(){
@@ -533,7 +525,7 @@ class MainApp{
     }
 
     private get_plugin_list(){
-        this.controllerWindow.send_message("plugin-list", this.local_plugin_list)
+        this.wrapper.send_message("controller", "plugin-list", this.local_plugin_list)
     }
 
     private confirm_install(data: any[]){
@@ -566,17 +558,17 @@ class MainApp{
         for (let i = 0; i < this.workers.length; i++){
             console.log(this.workers[i]["win"]["win_type"])
             if (this.workers[i]["win"]["win_type"] == "embed"){
-                this.workers[i]["win"].send_message("ping-status", status)
+                this.wrapper.send_message(this.workers[i]["win-name"], "ping-status", status)
             }
         }
     }
 
     private json_description(data: any[]){
-        if (data[1] == "command"){
-            this.controllerWindow.send_message("description-data", this.command_presets_list[data[1][1]])
+        if (data[0] == "command"){
+            this.wrapper.send_message("controller", "description-data", this.command_presets_list[data[1][1]])
         }
-        else if (data[1] == "aircraft"){
-            this.controllerWindow.send_message("description-data", this.aircraft_presets_list[data[1][1]])
+        else if (data[0] == "aircraft"){
+            this.wrapper.send_message("controller", "description-data", this.aircraft_presets_list[data[1][1]])
         }
     }
 
@@ -812,7 +804,7 @@ class MainApp{
             }
 
             //send reloaded plane database to all windows
-            this.send_to_all(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
+            this.broadcast_planes(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
             //controllerWindow.send_message("init-info", ["window-info", map_name, JSON.stringify(workers), map_config, JSON.stringify(app_settings)])
         }
     }

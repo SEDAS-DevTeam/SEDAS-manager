@@ -7,6 +7,8 @@ function md5_hash(value){
     return MD5(JSON.stringify(value))
 }
 
+var n_ack_channels = []
+
 function send_message(sender, channel, data = []){
     let message_content = []
     if (data.length == 0){
@@ -22,4 +24,24 @@ function send_message(sender, channel, data = []){
     }
 
     window.electronAPI.send_message(sender, message_content)
+    
+    //wait for ack
+    //ack channel already registered
+    for (let i = 0; i < n_ack_channels.length; i++){
+        if (n_ack_channels[i] == channel + "-ack"){
+            return;
+        }
+    }
+    //ack channel not registered
+    window.electronAPI.on_message(channel + "-ack", (data) => {
+        if(data[0] == "ACK"){
+            console.log("acknowledged")
+        }
+        else{
+            //Not acknowledged
+            console.log("not acknowledged")
+        }
+
+        n_ack_channels.push(channel + "-ack")
+    })
 }

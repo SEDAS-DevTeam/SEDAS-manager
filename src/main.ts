@@ -20,11 +20,9 @@ import {PluginRegister} from "./plugin_register"
 import {
     //window configs
     main_menu_dict,
-    settings_dict,
     exit_dict,
     controller_dict,
     worker_dict,
-    basic_worker_widget_dict,
     popup_widget_dict,
     load_dict,
 
@@ -35,7 +33,6 @@ import {
 
     //all init vars
     PATH_TO_MAIN_HTML,
-    PATH_TO_SETTINGS_HTML,
     PATH_TO_CONTROLLER_HTML,
     PATH_TO_EXIT_HTML,
     PATH_TO_POPUP_HTML,
@@ -47,20 +44,6 @@ import {
 
     ABS_PATH,
     PATH_TO_AUDIO_UPDATE,
-    PATH_TO_MAPS,
-    PATH_TO_COMMANDS,
-    PATH_TO_AIRCRAFTS,
-    PATH_TO_AIRLINES,
-
-    PATH_TO_SPEECH_CONFIG,
-    PATH_TO_TEXT_CONFIG,
-    PATH_TO_VOICE_CONFIG,
-
-    PATH_TO_IN_DEVICES,
-    PATH_TO_OUT_DEVICES,
-
-    PATH_TO_SETTINGS_LAYOUT
-
 } from "./app_config"
 
 import { BackendFunctions } from "./backend_functions"
@@ -211,9 +194,9 @@ class MainApp{
                 }
     
                 //send updated data to all workers
-                this.wrapper.send_message(this.workers[i]["win-name"], "update-plane-db", temp_planes)
+                this.workers[i]["win"].send_message("update-plane-db", temp_planes)
                 //send path data to all workers
-                this.wrapper.send_message(this.workers[i]["win-name"], "update-paths", plane_paths_data)
+                this.workers[i]["win"].send_message("update-paths", plane_paths_data)
             }
         }
     }

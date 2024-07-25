@@ -9,32 +9,16 @@ import {
     //window configs
     main_menu_dict,
     settings_dict,
-    exit_dict,
-    controller_dict,
-    worker_dict,
-    basic_worker_widget_dict,
-    popup_widget_dict,
     load_dict,
 
     //window Classes
     Window,
-    WidgetWindow,
-    PopupWindow,
 
     //all init vars
     PATH_TO_MAIN_HTML,
     PATH_TO_SETTINGS_HTML,
-    PATH_TO_CONTROLLER_HTML,
-    PATH_TO_EXIT_HTML,
-    PATH_TO_POPUP_HTML,
-
-    PATH_TO_WORKER_HTML,
-    PATH_TO_DEP_ARR_HTML,
-    PATH_TO_EMBED_HTML,
-    PATH_TO_WEATHER_HTML,
 
     ABS_PATH,
-    PATH_TO_AUDIO_UPDATE,
     PATH_TO_MAPS,
     PATH_TO_COMMANDS,
     PATH_TO_AIRCRAFTS,
@@ -175,7 +159,7 @@ export class BackendFunctions{
             let settings_layout = utils.readJSON(PATH_TO_SETTINGS_LAYOUT)
 
             //sending app data and alg configs
-            this.app.settingsWindow.send_message("app-data", [this.app.app_settings, voice_config, text_config, speech_config, in_devices, out_devices, settings_layout])
+            this.app.wrapper.send_message("controller", "app-data", [this.app.app_settings, voice_config, text_config, speech_config, in_devices, out_devices, settings_layout])
         }
         else if (window_type == "controller"){
             //sending monitor data
@@ -218,16 +202,13 @@ export class BackendFunctions{
                     "content": JSON.stringify(commands_config["commands"])
                 })
             }
-
-            this.app.controllerWindow.send_message("init-info", ["window-info", JSON.stringify(this.app.workers), this.app.map_configs_list, 
-                                                        JSON.stringify(this.app.app_settings), [this.app.map_name, this.app.command_preset_name, this.app.aircraft_preset_name], this.app.aircraft_presets_list, 
-                                                        this.app.command_presets_list, this.app.frontend_vars, this.app.app_status])
+            this.app.wrapper.send_message("controller", "init-info", ["window-info", JSON.stringify(this.app.workers), this.app.map_configs_list, 
+                            JSON.stringify(this.app.app_settings), [this.app.map_name, this.app.command_preset_name, this.app.aircraft_preset_name], this.app.aircraft_presets_list, 
+                            this.app.command_presets_list, this.app.frontend_vars, this.app.app_status])
         }
         else if (window_type == "worker"){
             //send to all workers
-            for (let i = 0; i < this.app.workers.length; i++){
-                this.app.workers[i]["win"].send_message("init-info", ["window-info", JSON.stringify(this.app.app_settings)])
-            }
+            this.app.wrapper.broadcast("workers", "init-info", ["window-info", JSON.stringify(this.app.app_settings)])
         }
     }
 
@@ -239,7 +220,7 @@ export class BackendFunctions{
         let selected_map_data = utils.read_file_content(PATH_TO_MAPS, data[0])
         let scenarios = selected_map_data["scenarios"]
         if (scenarios == undefined){
-            this.app.controllerWindow.send_message("scenario-list", [])
+            this.app.wrapper("controller", "scenario-list", [])
             return
         }
 
@@ -251,7 +232,7 @@ export class BackendFunctions{
             })
         }
 
-        this.app.controllerWindow.send_message("scenario-list", this.app.scenario_presets_list)
+        this.app.wrapper.send_message("controller", "scenario-list", this.app.scenario_presets_list)
     }
 
     public set_environment(data: any[]){
@@ -344,11 +325,7 @@ export class BackendFunctions{
             this.app.workers[i]["win"].send_message("map-data", [this.app.map_data, this.app.workers[i]["win"].win_type])
         }
 
-        for (let i = 0; i < this.app.workers.length; i++){
-            if (this.app.workers[i]["win"]["win_type"] == "weather"){
-                this.app.workers[i]["win"].send_message("geo-data", [this.app.latitude, this.app.longitude, this.app.zoom])
-            }
-        }
+        this.send_location_data()
     }
 
     public get_points(data: any[]){
@@ -371,23 +348,23 @@ export class BackendFunctions{
                 out_data[key] = value
             }
         }
-        this.app.controllerWindow.send_message("map-points", JSON.stringify(out_data))
+        this.app.wrapper.send_message("controller", "map-points", JSON.stringify(out_data))
     }
 
     public map_check(){
         if (this.app.map_data == undefined){
             this.ev_logger.log("WARN", "user did not check any map")
-            this.app.controllerWindow.send_message("map-checked", JSON.stringify({"user-check": false}))
+            this.app.wrapper.send_message("controller", "map-checked", JSON.stringify({"user-check": false}))
         }
         else {
             this.ev_logger.log("DEBUG", "user checked a map")
-            this.app.controllerWindow.send_message("map-checked", JSON.stringify({"user-check": true}))
+            this.app.wrapper.send_message("controller", "map-checked", JSON.stringify({"user-check": true}))
         }
     }
 
     public send_location_data(){
         for (let i = 0; i < this.app.workers.length; i++){
-            if (this.app.workers[i]["win"]["win_type"] == "weather"){
+            if (this.app.workers[i]["win"]["win_type"] == "weather"){ //this layer is unchanged because IPC wrapper has no ways of handling different worker types (TODO)
                 this.app.workers[i]["win"].send_message("geo-data", [this.app.latitude, this.app.longitude, this.app.zoom])
             }
         }
@@ -430,24 +407,22 @@ export class BackendFunctions{
                         x, y)
         this.app.PlaneDatabase.add_record(plane, plane_data["monitor"])
 
-        this.app.send_to_all(this.app.PlaneDatabase.DB, this.app.PlaneDatabase.monitor_DB, this.app.PlaneDatabase.plane_paths_DB)
+        this.app.broadcast_planes(this.app.PlaneDatabase.DB, this.app.PlaneDatabase.monitor_DB, this.app.PlaneDatabase.plane_paths_DB)
     }
 
     public plane_value_change(data: any[]){
         //TODO: add args to set command
         this.app.PlaneDatabase.set_command(data[2], data[0], data[1])      
-        this.app.send_to_all(this.app.PlaneDatabase.DB, this.app.PlaneDatabase.monitor_DB, this.app.PlaneDatabase.plane_paths_DB)
-        this.app.controllerWindow.send_message("terminal-add", data[1].slice(1))
+        this.app.broadcast_planes(this.app.PlaneDatabase.DB, this.app.PlaneDatabase.monitor_DB, this.app.PlaneDatabase.plane_paths_DB)
+        this.app.wrapper.send_message("controller", "terminal-add", data[1].slice(1))
     }
 
     public plane_delete_record(data: any[]){
-        this.app.PlaneDatabase.delete_record(data[1][1])
-        this.app.send_to_all(this.app.PlaneDatabase.DB, this.app.PlaneDatabase.monitor_DB, this.app.PlaneDatabase.plane_paths_DB)
+        this.app.PlaneDatabase.delete_record(data[0])
+        this.app.broadcast_planes(this.app.PlaneDatabase.DB, this.app.PlaneDatabase.monitor_DB, this.app.PlaneDatabase.plane_paths_DB)
     }
 
     public send_plane_data(){
-        for (let i = 0; i < this.app.workers.length; i++){
-            this.app.workers[i]["win"].send_message("update-plane-db", this.app.PlaneDatabase.DB)
-        }
+        this.app.wrapper.broadcast("workers", "update-plane-db", this.app.PlaneDatabase.DB)
     }
 }

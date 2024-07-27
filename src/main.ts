@@ -314,8 +314,12 @@ class MainApp{
                 setInterval(() => {
                     if (this.PlaneDatabase != undefined && this.map_data != undefined && this.workers.length != 0){
                         if (this.app_status["sim-running"]){
-                            this.PlaneDatabase.update_planes(this.scale, app_settings["std_bank_angle"], app_settings["standard_pitch_up"], app_settings["standard_pitch_down"],
-                                                    parseInt(app_settings["standard_accel"]), parseInt(app_settings["plane_path_limit"]))
+                            this.PlaneDatabase.update_planes(this.scale, 
+                                            parseFloat(app_settings["std_bank_angle"]), 
+                                            parseFloat(app_settings["standard_pitch_up"]), 
+                                            parseFloat(app_settings["standard_pitch_down"]),
+                                            parseFloat(app_settings["standard_accel"]), 
+                                            parseInt(app_settings["plane_path_limit"]))
                         }
                         if (this.app_status["app-running"]){
                             //send updated plane database to all

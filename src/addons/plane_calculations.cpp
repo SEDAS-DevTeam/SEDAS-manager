@@ -1,3 +1,12 @@
+#include <node_api.h>
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <vector>
+#include <cmath>
+#include <type_traits>
+
+#include "include/napi_utils.h"
 #include "include/utils.h"
 
 napi_value Calc_rate_of_turn(napi_env env, napi_callback_info info) {
@@ -7,7 +16,7 @@ napi_value Calc_rate_of_turn(napi_env env, napi_callback_info info) {
   var_typecheck(env, args[0], napi_string);
   var_typecheck(env, args[1], napi_number);
 
-  float std_bank_angle = std::stof(get_variable<std::string>(env, args[0]));
+  float std_bank_angle = get_variable<float>(env, args[0]);
   int plane_speed = get_variable<int>(env, args[1]);
 
   float result = ((1.091 * tan(deg_to_rad(std_bank_angle))) / plane_speed) * 1000;
@@ -61,86 +70,30 @@ napi_value Calc_descent(napi_env env, napi_callback_info info){
   return create_array(env, result);
 }
 
-napi_value Calc_pixel_change(napi_env env, napi_callback_info info){
+napi_value Calc_plane_forward(napi_env env, napi_callback_info info){
   try{
-    napi_value args[6];
+    napi_value args[1];
     get_args(env, info, args);
+    napi_value arg_dict = args[0];
 
-    var_typecheck(env, args[0], napi_number);
-    var_typecheck(env, args[1], napi_number);
-    var_typecheck(env, args[2], napi_string);
-    var_typecheck(env, args[3], napi_number);
-    var_typecheck(env, args[4], napi_number);
-    var_typecheck(env, args[5], napi_number);
+    var_typecheck(env, arg_dict, napi_object);
 
-    int plane_x = get_variable<int>(env, args[0]);
-    int plane_y = get_variable<int>(env, args[1]);
+    int x = get_variable<int>(env, get_dict_property(env, arg_dict, "x"));
+    int y = get_variable<int>(env, get_dict_property(env, arg_dict, "y"));
+    float scale = get_variable<float>(env, get_dict_property(env, arg_dict, "scale"));
+    int heading = get_variable<int>(env, get_dict_property(env, arg_dict, "heading"));
+    int speed = get_variable<int>(env, get_dict_property(env, arg_dict, "speed"));
+    int screen_speed = get_variable<int>(env, get_dict_property(env, arg_dict, "screen_speed"));
+    float refresh_rate = get_variable<float>(env, get_dict_property(env, arg_dict, "refresh_rate"));
 
-    std::string type = get_variable<std::string>(env, args[2]);
-    float scale = get_variable<float>(env, args[3]);
-    int heading = get_variable<int>(env, args[4]);
-    float change = get_variable<float>(env, args[5]);
+    //normalize and convert vars
+    float norm_speed = ((float) speed / 3600) * refresh_rate;
+    float norm_screen_speed = ((float) screen_speed / 3600) * refresh_rate;
 
-    uint8_t angle_head = floor(heading / 90);
-    float rel_angle = heading % 90;
-    if (rel_angle == 0 && heading != 0){
-      rel_angle = heading - (angle_head - 1) * heading;
-    }
+    std::vector<int> result;
+    if (norm_speed != norm_screen_speed) result = calc_pixel_change(x, y, norm_screen_speed, scale, heading);
+    else result = calc_pixel_change(x, y, norm_speed, scale, heading);
 
-    float dy_n_scale = sin(deg_to_rad(rel_angle)) * change;
-    float dx_n_scale = cos(deg_to_rad(rel_angle)) * change;
-
-    float dy = 0;
-    float dx = 0;
-    if (type == "movement"){
-      dy = dy_n_scale / scale;
-      dx = dx_n_scale / scale;
-    }
-    else if (type == "rotation"){
-      dy = dy_n_scale;
-      dx = dx_n_scale;
-    }
-
-    // automatically aproximmate scale
-    dy = ceil(dy);
-    dx = ceil(dx);
-
-    int x_fin = 0;
-    int y_fin = 0;
-
-    switch(angle_head){
-      case 0:
-        x_fin = plane_x + dy;
-        y_fin = plane_y - dx;
-        break;
-      case 1:
-        x_fin = plane_x + dy;
-        y_fin = plane_y + dx;
-        break;
-      case 2:
-        x_fin = plane_x - dy;
-        y_fin = plane_y + dx;
-        break;
-      case 3:
-        x_fin = plane_x - dy;
-        y_fin = plane_y - dx;
-        break;
-    }
-
-    if (heading == 90){
-      x_fin = plane_x + dy;
-      y_fin = plane_y;
-    }
-    else if (heading == 180){
-      x_fin = plane_x;
-      y_fin = plane_y + dx;
-    }
-    else if (heading == 270){
-      x_fin = plane_x - dy;
-      y_fin = plane_y;
-    }
-
-    std::vector<int> result = {x_fin, y_fin};
     return create_array(env, result);
   }
   catch(const std::exception& e){
@@ -150,20 +103,41 @@ napi_value Calc_pixel_change(napi_env env, napi_callback_info info){
   }
 }
 
-napi_value Calc_screen_speed(napi_env env, napi_callback_info info){
+napi_value Calc_plane_level(napi_env env, napi_callback_info info){
   // Parse the arguments
-  napi_value args[2];
+  napi_value args[1];
   get_args(env, info, args);
+  napi_value arg_dict = args[0];
 
   // checking types of all variables passed as arguments
-  var_typecheck(env, args[0], napi_string);
-  var_typecheck(env, args[1], napi_number);
+  var_typecheck(env, arg_dict, napi_object);
 
-  float angle = std::stof(get_variable<std::string>(env, args[0]));
-  float plane_speed = get_variable<float>(env, args[1]);
+  float climb_angle = get_variable<float>(env, get_dict_property(env, arg_dict, "climb_angle"));
+  float descent_angle = get_variable<float>(env, get_dict_property(env, arg_dict, "descent_angle"));
+  float scale = get_variable<float>(env, get_dict_property(env, arg_dict, "scale"));
+  int level = get_variable<int>(env, get_dict_property(env, arg_dict, "level"));
+  int updated_level = get_variable<int>(env, get_dict_property(env, arg_dict, "updated_level"));
+  int speed = get_variable<int>(env, get_dict_property(env, arg_dict, "speed"));
+  float refresh_rate = get_variable<float>(env, get_dict_property(env, arg_dict, "refresh_rate"));
 
-  float result = cos(deg_to_rad(angle)) * plane_speed;
-  return create_variable(env, result);
+  if (updated_level != level){
+    float k = (updated_level - level) / abs(updated_level - level);
+    std::cout << k << std::endl;
+  }
+
+  // calculating screen speed
+  //float screen_speed = cos(deg_to_rad(angle)) * speed;
+
+  //Test
+  napi_value result = create_empty_array(env, 3);
+  napi_value param1 = create_variable(env, (float) 0.5);
+  set_array_element(env, result, param1, 0);
+  napi_value param2 = create_variable(env, true);
+  set_array_element(env, result, param2, 1);
+  napi_value param3 = create_variable(env, (float) 0.7);
+  set_array_element(env, result, param3, 2);
+
+  return result;
 }
 
 napi_value Calc_turn_fallback_diff(napi_env env, napi_callback_info info){
@@ -185,20 +159,20 @@ napi_value Calc_turn_fallback_diff(napi_env env, napi_callback_info info){
 
 napi_value init(napi_env env, napi_value exports) {
   std::vector<std::string> str_vector{ 
-    "calc_rate_of_turn", 
-    "calc_pixel_change", 
-    "calc_descent", 
-    "calc_climb", 
-    "calc_screen_speed",
+    "calc_rate_of_turn",
+    "calc_descent",
+    "calc_climb",
+    "calc_plane_forward",
+    "calc_plane_level",
     "calc_turn_fallback_diff"
   };
   
   std::vector<napi_callback> func_vector{ 
-    Calc_rate_of_turn, 
-    Calc_pixel_change, 
+    Calc_rate_of_turn,
     Calc_descent, 
-    Calc_climb, 
-    Calc_screen_speed,
+    Calc_climb,
+    Calc_plane_forward,
+    Calc_plane_level,
     Calc_turn_fallback_diff
   };
 

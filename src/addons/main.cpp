@@ -1,3 +1,12 @@
+#include <node_api.h>
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <vector>
+#include <cmath>
+#include <type_traits>
+
+#include "include/napi_utils.h"
 #include "include/utils.h"
 
 napi_value Method(napi_env env, napi_callback_info args) {

@@ -8,6 +8,7 @@ try {
 }
 catch (err){
     console.log("Problem registering functions")
+    console.log(err.message)
     console.log("Quitting program...")
     process.exit(0)
 }
@@ -49,12 +50,23 @@ export namespace plane_calculations{
             handle_exception_js(err)
         }
     }
-    /*
-        Function that calculates true screen speed (because of climb or descent, the speed is slower on the monitors)
+    /**
+     * Function that calculates plane level change
+     * 
+     * **Parameters**:
+     * @param x -> current x coord
+     * @param y -> current y coord
+     * @param scale -> scale (map scale) at which the calculations are made
+     * @param heading -> current heading of the plane
+     * @param speed -> current speed of the plane
+     * @param screen_speed -> the speed that the plane is moving on screen (smaller on plane climb/descent)
+     * @param refresh_rate -> refresh rate of the screen (ATC zones have different SSR refresh rate)
+     * 
+     * @returns [level_change (number), continue (boolean), screen_speed (number)]
     */
-    export function calc_screen_speed(angle: string, speed: number){
+    export function calc_plane_level(arg: object){
         try{
-            return plane_import.calc_screen_speed(angle, speed)
+            return plane_import.calc_plane_level(arg)
         }
         catch(err){
             handle_exception_js(err)
@@ -63,7 +75,7 @@ export namespace plane_calculations{
     /*
         Function that calculates rate of turn regarding the standard bank angle used for airliners and aircraft TAS
     */
-    export function calc_rate_of_turn(std_bank_angle: string, speed: number){
+    export function calc_rate_of_turn(std_bank_angle: number, speed: number){
         try{
             return plane_import.calc_rate_of_turn(std_bank_angle, speed)
         }
@@ -71,17 +83,24 @@ export namespace plane_calculations{
             handle_exception_js(err)
         }
     }
-    /*
-        Function that calculates number of pixels a plane has to move after doing following caluclations
+
+    /**
+     * Function that calculates plane forward step
+     * 
+     * **Parameters**:
+     * @param climb_angle -> plane climb angle
+     * @param descent_angle -> plane descent angle
+     * @param scale -> scale (map scale) at which the calculations are made
+     * @param level -> current level of the plane
+     * @param updated_level -> target level for plane
+     * @param speed -> plane speed
+     * @param refresh_rate -> refresh rate of the screen (ATC zones have different SSR refresh rate)
+     * 
+     * @returns updated [x, y] coordinates of the plane
     */
-    export function calc_pixel_change(plane_x: number, plane_y: number, type: string, scale: number, heading: number, change: number){
+    export function calc_plane_forward(arg: object){
         try{
-            return plane_import.calc_pixel_change(plane_x,
-                plane_y,
-                type,
-                scale,
-                heading,
-                change)
+            return plane_import.calc_plane_forward(arg)
         }
         catch(err){
             handle_exception_js(err)

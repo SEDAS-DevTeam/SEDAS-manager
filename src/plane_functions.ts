@@ -198,7 +198,7 @@ export class PlaneDB{
         }
     }
 
-    public update_planes(scale: number, std_bank_angle: string, std_climb_angle: string, std_descent_angle: string,
+    public update_planes(scale: number, std_bank_angle: number, std_climb_angle: number, std_descent_angle: number,
                          std_accel: number, path_limit: number){
         //scale that represents how many nautical miles are on one pixel
         /*
@@ -284,25 +284,25 @@ export class Plane{
     public forward(scale: number){
         //make one forward pass
 
-        let vals = undefined
-        if (this.speed != this.screen_speed){
-            //calculate pixel distance
-            vals = plane_calculations.calc_pixel_change(this.x, this.y, "movement", scale, this.heading, this.screen_speed / 3600)
+        let napi_arguments = {
+            "x": this.x,
+            "y": this.y,
+            "scale": scale,
+            "heading": this.heading,
+            "speed": this.speed,
+            "screen_speed": this.screen_speed, // to get (nm/s)
+            "refresh_rate": 1 // TODO: add to settings
         }
-        else{
-            //calculate pixel distance
-            vals = plane_calculations.calc_pixel_change(this.x, this.y, "movement", scale, this.heading, this.speed / 3600)
-        }
+        let vals = plane_calculations.calc_plane_forward(napi_arguments)
 
         //rewrite variables
         this.x = vals[0]
         this.y = vals[1]
     }
 
-    public check_heading(std_bank_angle: string, plane_turn_DB: object[]){ //TODO: rewrite
+    public check_heading(std_bank_angle: number, plane_turn_DB: object[]){ //TODO: rewrite
         if (this.updated_heading != this.heading){
             //make turn
-            
             let r_of_t = plane_calculations.calc_rate_of_turn(std_bank_angle, this.speed)
 
             let continue_change: boolean = true
@@ -325,7 +325,35 @@ export class Plane{
         }
     }
 
-    public check_level(std_climb_angle: string, std_descent_angle: string, scale: number){
+    public check_level(std_climb_angle: number, std_descent_angle: number, scale: number){
+        // check and update level on plane
+
+        let napi_arguments = {
+            "climb_angle": std_climb_angle,
+            "descent_angle": std_descent_angle,
+            "scale": scale,
+            "level": this.level,
+            "updated_level": this.updated_level,
+            "speed": this.speed,
+            "refresh_rate": 1
+        }
+        
+        const [change, continue_change, screen_speed] = plane_calculations.calc_plane_level(napi_arguments)
+        console.log(change, continue_change, screen_speed)
+        /*
+        if (continue_change){
+            //Level change is not done
+            this.level = Math.round(this.level + change)
+            this.screen_speed = screen_speed
+        }
+        else{
+            //Level change is done
+            this.level = this.updated_level
+            this.screen_speed = this.speed
+        }
+        */
+
+        /*
         if (this.updated_level != this.level){
             //compute screen 2d speed
             if (this.updated_level > this.level){
@@ -336,7 +364,7 @@ export class Plane{
                 console.log("tf is that", change, fallback_diff)
 
                 if (fallback_diff > 0 && fallback_diff < 500){ //TODO: resolution size not always correct
-                    //Not done
+                    //Done
                     this.level = this.updated_level
                     
                     //set screen speed back to normal
@@ -344,7 +372,7 @@ export class Plane{
                     
                 }
                 else{
-                    //Done
+                    //Not done
                     this.level = Math.round(this.level + change)
                 }
             }
@@ -369,6 +397,7 @@ export class Plane{
                 }
             }
         }
+        */
     }
 
     public check_speed(std_accel: number){

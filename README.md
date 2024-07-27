@@ -1,11 +1,3 @@
-# SEDAS
-**S**calable and **E**asily **D**eployable **ATC** **S**imulator
-
-documentation is divided into two parts (**SEDAS main** and **SEDAS documentation**), main is located on `README.md` and contatins basic info about this project, while documentation is located in separate markdown files
-
-<!--header of the doc file-->
-<hr>
-
 ## Table of contents
 
 1. [SEDAS main](/README.md)
@@ -28,11 +20,12 @@ documentation is divided into two parts (**SEDAS main** and **SEDAS documentatio
 
 <hr>
 
-<!--main content of doc file-->
-<h2 id="about">About</h2>
-This project is new concept of ATC simulator both for beginners and advanced users. It utilises of neural networks to imitate real pilots on the other communication end and also function as a personal trainer. Goal of this desktop application is to make ATC learning easier for hobbyists and begineer ATC students. Project is still in early developement.
+## About
 
-<h2 id="technical">Technical</h2>
-Application is made in `electron`, with the help of `sqlite3`, app also uses `python` to implement the **AI** part. It is also packaged using `electron-packager`. Frontend is fully made in `VanillaJS`.
+This project is a new concept of an **ATC simulator** for both beginners and advanced users. It utilizes neural networks to imitate real pilots and also functions as a personal trainer. The goal of this desktop application is to make ATC learning easier for hobbyists and beginner ATC students. The project is still in early development.
 
-<h2 id="funcs">Functionalities</h2>
+## Technical
+
+The application is made in `electron`, with the help of `sqlite3`. The app also uses `python` to implement the **AI** part. It is packaged using `electron-packager`. The frontend is fully made in `VanillaJS`.
+
+## Functionalities

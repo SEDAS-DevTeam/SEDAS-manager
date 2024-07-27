@@ -8,7 +8,7 @@ export class PlaneDB{
     public plane_paths_DB: any = []
 
     //temporary databases for plane movement
-    public plane_turn_DB: any = []
+    public plane_turn_DB: object[] = []
 
     /*
         Plane command config (used for gui but also for backend)
@@ -142,123 +142,7 @@ export class PlaneDB{
         this.monitor_DB = []
     }
 
-    public update_planes(scale: number, std_bank_angle: string, std_climb_angle: string, std_descent_angle: string,
-                         std_accel: number, path_limit: number){
-        //scale that represents how many nautical miles are on one pixel
-        /*
-        MOVEMENT CHANGES
-        */
-
-        //typecheck for all planes, no need to do that every turn (remove later TODO)
-        //also, there is no need for 5 fckin loops, so remove that later too
-
-        //update all planes
-        for (let i = 0; i < this.DB.length; i++){
-            //save current location to plane path history
-            this.add_path_record(this.DB[i].id, [this.DB[i].x, this.DB[i].y])
-
-            this.DB[i].forward(scale)
-        }
-
-        for (let i = 0; i < this.DB.length; i++){
-            //heading change
-            if (this.DB[i].updated_heading != this.DB[i].heading){
-                //make turn
-                
-                let r_of_t = plane_calculations.calc_rate_of_turn(std_bank_angle, this.DB[i].speed)
-
-                let continue_change: boolean = true
-                //scan plane turn database
-                for (let i_db = 0; i_db < this.plane_turn_DB.length; i_db++){
-                    if (this.plane_turn_DB[i_db]["id"] == this.DB[i].id){
-                        //no need to update
-                        continue_change = false
-                        break
-                    }
-                }
-
-                if (!continue_change){
-                    continue
-                }
-
-                //add to turn DB for processing
-                this.plane_turn_DB.push({
-                    "id": this.DB[i].id,
-                    "rate_of_turn": r_of_t
-                })
-            }
-        }
-
-        //level change
-        for (let i = 0; i < this.DB.length; i++){
-            if (this.DB[i].updated_level != this.DB[i].level){
-                //compute screen 2d speed
-                if (this.DB[i].updated_level > this.DB[i].level){
-                    let screen_speed: number = plane_calculations.calc_screen_speed(std_climb_angle, this.DB[i].speed)
-                    console.log("screen", screen_speed)
-                    this.DB[i].screen_speed = screen_speed
-
-                    const [change, fallback_diff] = plane_calculations.calc_climb(this.DB[i].speed, this.DB[i].level, std_climb_angle, scale, this.DB[i].updated_level)
-                    console.log("tf is that", change, fallback_diff)
-
-                    if (fallback_diff > 0 && fallback_diff < 500){ //TODO: resolution size not always correct
-                        //Not done
-                        this.DB[i].level = this.DB[i].updated_level
-                        
-                        //set screen speed back to normal
-                        this.DB[i].screen_speed = this.DB[i].speed
-                        
-                    }
-                    else{
-                        //Done
-                        this.DB[i].level = Math.round(this.DB[i].level + change)
-                    }
-                }
-                else if (this.DB[i].updated_level < this.DB[i].level){
-                    let screen_speed: number = plane_calculations.calc_screen_speed(std_descent_angle, this.DB[i].speed)
-                    console.log(screen_speed)
-                    this.DB[i].screen_speed = screen_speed
-
-                    const [change, fallback_diff] = plane_calculations.calc_descent(this.DB[i].speed, this.DB[i].level, std_descent_angle, scale, this.DB[i].updated_level)
-                    console.log(change, fallback_diff)
-
-                    if (fallback_diff > 0 && fallback_diff < 500){
-                        //Not done
-                        this.DB[i].level = this.DB[i].updated_level
-
-                        //set screen speed back to normal
-                        this.DB[i].screen_speed = this.DB[i].speed
-                    }
-                    else{
-                        //Done
-                        this.DB[i].level = parseFloat((this.DB[i].level - change).toFixed(1))
-                    }
-                }
-            }
-        }
-
-        //speed change
-        for (let i = 0; i < this.DB.length; i++){
-            if (this.DB[i].updated_speed != this.DB[i].speed){
-                var fallback_diff = this.DB[i].speed + std_accel - this.DB[i].updated_speed
-                if (fallback_diff > 0 && fallback_diff < std_accel){
-                    //check if finished
-                    this.DB[i].speed = this.DB[i].updated_speed
-                }
-
-                if (this.DB[i].updated_speed > this.DB[i].speed){
-                    //increase velocity
-                    this.DB[i].speed = this.DB[i].speed + std_accel
-                    this.DB[i].screen_speed = this.DB[i].screen_speed + std_accel
-                }
-                else if (this.DB[i].updated_speed < this.DB[i].speed){
-                    //decrease velocity
-                    this.DB[i].speed = this.DB[i].speed - std_accel
-                    this.DB[i].screen_speed = this.DB[i].screen_speed - std_accel
-                }
-            }
-        }
-
+    private update_plane_turns(){
         //update plane turns
         for (let i = 0; i < this.plane_turn_DB.length; i++){
             for (let i_plane = 0; i_plane < this.DB.length; i_plane++){
@@ -300,8 +184,10 @@ export class PlaneDB{
                 }
             }
         }
+    }
 
-        //plane path changes
+    private update_path_particles(path_limit: number){
+        // plane path particle regulation
         for (let i = 0; i < this.plane_paths_DB.length; i++){
             if (!isNaN(path_limit)){
                 if (this.plane_paths_DB[i]["coords"].length > path_limit){
@@ -310,6 +196,38 @@ export class PlaneDB{
                 }
             }
         }
+    }
+
+    public update_planes(scale: number, std_bank_angle: string, std_climb_angle: string, std_descent_angle: string,
+                         std_accel: number, path_limit: number){
+        //scale that represents how many nautical miles are on one pixel
+        /*
+        MOVEMENT CHANGES
+        */
+
+        //typecheck for all planes, no need to do that every turn (remove later TODO)
+        //also, there is no need for 5 fckin loops, so remove that later too
+
+        //update all planes
+        for (let i = 0; i < this.DB.length; i++){
+            //save current location to plane path history
+            this.add_path_record(this.DB[i].id, [this.DB[i].x, this.DB[i].y])
+
+            //move plane forward
+            this.DB[i].forward(scale)
+
+            //level change
+            this.DB[i].check_level(std_climb_angle, std_descent_angle, scale)
+
+            //speed change
+            this.DB[i].check_speed(std_accel)
+
+            //heading change
+            this.DB[i].check_heading(std_bank_angle, this.plane_turn_DB)
+        }
+
+        this.update_plane_turns()
+        this.update_path_particles(path_limit)
     }
 }
 
@@ -379,6 +297,99 @@ export class Plane{
         //rewrite variables
         this.x = vals[0]
         this.y = vals[1]
+    }
+
+    public check_heading(std_bank_angle: string, plane_turn_DB: object[]){ //TODO: rewrite
+        if (this.updated_heading != this.heading){
+            //make turn
+            
+            let r_of_t = plane_calculations.calc_rate_of_turn(std_bank_angle, this.speed)
+
+            let continue_change: boolean = true
+            //scan plane turn database
+            for (let i_db = 0; i_db < plane_turn_DB.length; i_db++){
+                if (plane_turn_DB[i_db]["id"] == this.id){
+                    //no need to update
+                    continue_change = false
+                    break
+                }
+            }
+
+            if (continue_change){
+                //add to turn DB for processing
+                plane_turn_DB.push({
+                    "id": this.id,
+                    "rate_of_turn": r_of_t
+                })
+            }
+        }
+    }
+
+    public check_level(std_climb_angle: string, std_descent_angle: string, scale: number){
+        if (this.updated_level != this.level){
+            //compute screen 2d speed
+            if (this.updated_level > this.level){
+                let screen_speed: number = plane_calculations.calc_screen_speed(std_climb_angle, this.speed)
+                this.screen_speed = screen_speed
+
+                const [change, fallback_diff] = plane_calculations.calc_climb(this.speed, this.level, std_climb_angle, scale, this.updated_level)
+                console.log("tf is that", change, fallback_diff)
+
+                if (fallback_diff > 0 && fallback_diff < 500){ //TODO: resolution size not always correct
+                    //Not done
+                    this.level = this.updated_level
+                    
+                    //set screen speed back to normal
+                    this.screen_speed = this.speed
+                    
+                }
+                else{
+                    //Done
+                    this.level = Math.round(this.level + change)
+                }
+            }
+            else if (this.updated_level < this.level){
+                let screen_speed: number = plane_calculations.calc_screen_speed(std_descent_angle, this.speed)
+                console.log(screen_speed)
+                this.screen_speed = screen_speed
+
+                const [change, fallback_diff] = plane_calculations.calc_descent(this.speed, this.level, std_descent_angle, scale, this.updated_level)
+                console.log(change, fallback_diff)
+
+                if (fallback_diff > 0 && fallback_diff < 500){
+                    //Not done
+                    this.level = this.updated_level
+
+                    //set screen speed back to normal
+                    this.screen_speed = this.speed
+                }
+                else{
+                    //Done
+                    this.level = parseFloat((this.level - change).toFixed(1))
+                }
+            }
+        }
+    }
+
+    public check_speed(std_accel: number){
+        if (this.updated_speed != this.speed){
+            var fallback_diff = this.speed + std_accel - this.updated_speed
+            if (fallback_diff > 0 && fallback_diff < std_accel){
+                //check if finished
+                this.speed = this.updated_speed
+            }
+
+            if (this.updated_speed > this.speed){
+                //increase velocity
+                this.speed = this.speed + std_accel
+                this.screen_speed = this.screen_speed + std_accel
+            }
+            else if (this.updated_speed < this.speed){
+                //decrease velocity
+                this.speed = this.speed - std_accel
+                this.screen_speed = this.screen_speed - std_accel
+            }
+        }
     }
 
     /*

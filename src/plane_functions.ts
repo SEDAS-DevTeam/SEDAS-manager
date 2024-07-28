@@ -348,55 +348,28 @@ export class Plane{
             this.level = this.updated_level
             this.screen_speed = this.speed
         }
-
-        /*
-        if (this.updated_level != this.level){
-            //compute screen 2d speed
-            if (this.updated_level > this.level){
-                let screen_speed: number = plane_calculations.calc_screen_speed(std_climb_angle, this.speed)
-                this.screen_speed = screen_speed
-
-                const [change, fallback_diff] = plane_calculations.calc_climb(this.speed, this.level, std_climb_angle, scale, this.updated_level)
-                console.log("tf is that", change, fallback_diff)
-
-                if (fallback_diff > 0 && fallback_diff < 500){ //TODO: resolution size not always correct
-                    //Done
-                    this.level = this.updated_level
-                    
-                    //set screen speed back to normal
-                    this.screen_speed = this.speed
-                    
-                }
-                else{
-                    //Not done
-                    this.level = Math.round(this.level + change)
-                }
-            }
-            else if (this.updated_level < this.level){
-                let screen_speed: number = plane_calculations.calc_screen_speed(std_descent_angle, this.speed)
-                console.log(screen_speed)
-                this.screen_speed = screen_speed
-
-                const [change, fallback_diff] = plane_calculations.calc_descent(this.speed, this.level, std_descent_angle, scale, this.updated_level)
-                console.log(change, fallback_diff)
-
-                if (fallback_diff > 0 && fallback_diff < 500){
-                    //Not done
-                    this.level = this.updated_level
-
-                    //set screen speed back to normal
-                    this.screen_speed = this.speed
-                }
-                else{
-                    //Done
-                    this.level = parseFloat((this.level - change).toFixed(1))
-                }
-            }
-        }
-        */
     }
 
     public check_speed(std_accel: number){
+        let napi_arguments = {
+            "accel": std_accel,
+            "refresh_rate": 1,
+            "speed": this.speed,
+            "updated_speed": this.updated_speed,
+            "screen_speed": this.screen_speed
+        }
+
+        const [new_speed, continue_change, new_screen_speed] = plane_calculations.calc_plane_speed(napi_arguments)
+        if (continue_change){
+            //Speed change is not done
+            this.speed = new_speed
+            this.screen_speed = new_screen_speed
+        }
+        else{
+            //Speed change is done
+            this.speed = this.updated_speed
+        }
+        /*
         if (this.updated_speed != this.speed){
             var fallback_diff = this.speed + std_accel - this.updated_speed
             if (fallback_diff > 0 && fallback_diff < std_accel){
@@ -415,6 +388,7 @@ export class Plane{
                 this.screen_speed = this.screen_speed - std_accel
             }
         }
+        */
     }
 
     /*

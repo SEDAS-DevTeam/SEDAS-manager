@@ -63,7 +63,7 @@ export namespace plane_calculations{
      * @param speed -> speed of a plane
      * @param refresh_rate -> refresh rate of the screen (ATC zones have different SSR refresh rate)
      * 
-     * @returns [level_change (number), continue (boolean), screen_speed (number)]
+     * @returns [new level (number), continue (boolean), screen_speed (number)]
     */
     export function calc_plane_level(arg: object){
         try{
@@ -101,6 +101,24 @@ export namespace plane_calculations{
     export function calc_plane_forward(arg: object){
         try{
             return plane_import.calc_plane_forward(arg)
+        }
+        catch(err){
+            handle_exception_js(err)
+        }
+    }
+
+    /**
+     * 
+     * @param accel -> acceleration of specific plane 
+     * @param refresh_rate -> refresh rate of the screen (ATC zones have different SSR refresh rate) 
+     * @param speed ->  speed of the plane
+     * @param updated_speed -> target speed for plane
+     * @param screen_speed -> the speed that the plane is moving on screen (smaller on plane climb/descent)
+     * @returns [ new speed (number), continue (boolean), new screen speed (number)]
+    */
+    export function calc_plane_speed(arg: object){
+        try{
+            return plane_import.calc_plane_speed(arg)
         }
         catch(err){
             handle_exception_js(err)

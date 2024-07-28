@@ -150,36 +150,21 @@ export class PlaneDB{
                     continue
                 }
                 if (this.plane_turn_DB[i]["id"] == this.DB[i_plane].id){
-                    var fallback_diff: number = plane_calculations.calc_turn_fallback_diff(this.DB[i].heading, this.plane_turn_DB[i]["rate_of_turn"], this.DB[i_plane].updated_heading)
-                    
-                    //check if completed
-                    if (fallback_diff > 0 && fallback_diff < 10){
-                        //automatically set to updated heading
-                        this.DB[i_plane].heading = this.DB[i_plane].updated_heading
-
-                        //heading == updated_heading => remove
-                        this.plane_turn_DB.splice(i, 1)
-                        continue
+                    let napi_arguments = {
+                        "heading": this.DB[i_plane].heading,
+                        "updated_heading": this.DB[i_plane].updated_heading,
+                        "rate_of_turn": this.plane_turn_DB[i]["rate_of_turn"],
+                        "refresh_rate": 1
                     }
-
-                    var divider = ((this.DB[i_plane].heading < 180) ? this.DB[i_plane].heading + 180 : this.DB[i_plane].heading - 180)
-                    if (this.DB[i_plane].updated_heading > divider || this.DB[i_plane].updated_heading < this.DB[i_plane].heading){
-                        //turn left
-                        this.DB[i_plane].heading = this.DB[i_plane].heading - this.plane_turn_DB[i]["rate_of_turn"]
+                    const [new_heading, continue_change] = plane_calculations.calc_plane_heading(napi_arguments)
+                    
+                    if (continue_change){
+                        // Heading change is not done
+                        this.DB[i_plane].heading = new_heading
                     }
                     else{
-                        //turn right
-                        this.DB[i_plane].heading = this.DB[i_plane].heading + this.plane_turn_DB[i]["rate_of_turn"]
-                    }
-
-                    //check if over 360
-                    if (this.DB[i_plane].heading > 360){
-                        this.DB[i_plane].heading = 0
-                    }
-
-                    //check if under 360
-                    if (this.DB[i_plane].heading < 0){
-                        this.DB[i_plane].heading = 355
+                        // Heading change is done
+                        this.DB[i_plane].heading = this.DB[i].updated_heading
                     }
                 }
             }
@@ -369,26 +354,6 @@ export class Plane{
             //Speed change is done
             this.speed = this.updated_speed
         }
-        /*
-        if (this.updated_speed != this.speed){
-            var fallback_diff = this.speed + std_accel - this.updated_speed
-            if (fallback_diff > 0 && fallback_diff < std_accel){
-                //check if finished
-                this.speed = this.updated_speed
-            }
-
-            if (this.updated_speed > this.speed){
-                //increase velocity
-                this.speed = this.speed + std_accel
-                this.screen_speed = this.screen_speed + std_accel
-            }
-            else if (this.updated_speed < this.speed){
-                //decrease velocity
-                this.speed = this.speed - std_accel
-                this.screen_speed = this.screen_speed - std_accel
-            }
-        }
-        */
     }
 
     /*

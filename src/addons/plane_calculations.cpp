@@ -23,53 +23,6 @@ napi_value Calc_rate_of_turn(napi_env env, napi_callback_info info) {
   return create_variable(env, result);
 }
 
-napi_value Calc_climb(napi_env env, napi_callback_info info){
-  // Parse the arguments
-  napi_value args[5];
-  get_args(env, info, args);
-
-  var_typecheck(env, args[0], napi_number);
-  var_typecheck(env, args[1], napi_number);
-  var_typecheck(env, args[2], napi_string);
-  var_typecheck(env, args[3], napi_string);
-  var_typecheck(env, args[4], napi_number);
-
-  int plane_speed = get_variable<int>(env, args[0]);
-  int level = get_variable<int>(env, args[1]);
-  float climb_angle = std::stof(get_variable<std::string>(env, args[2]));
-  float scale = get_variable<float>(env, args[3]);
-  int updated_level = get_variable<int>(env, args[4]);
-
-  float change = ((plane_speed / 3600) * sin(deg_to_rad(climb_angle)));
-  float fallback_diff = level + change - updated_level;
-
-  std::vector<float> result = {change, fallback_diff};
-  return create_array(env, result);
-}
-
-napi_value Calc_descent(napi_env env, napi_callback_info info){
-  napi_value args[5];
-  get_args(env, info, args);
-
-  var_typecheck(env, args[0], napi_number);
-  var_typecheck(env, args[1], napi_number);
-  var_typecheck(env, args[2], napi_string);
-  var_typecheck(env, args[3], napi_string);
-  var_typecheck(env, args[4], napi_number);
-
-  int plane_speed = get_variable<int>(env, args[0]);
-  int level = get_variable<int>(env, args[1]);
-  float descent_angle = std::stof(get_variable<std::string>(env, args[2]));
-  float scale = get_variable<float>(env, args[3]);
-  int updated_level = get_variable<int>(env, args[4]);
-
-  float change = plane_speed / 3600 * sin(deg_to_rad(descent_angle)) / scale;
-  float fallback_diff = updated_level - level - change;
-
-  std::vector<float> result = {change, fallback_diff};
-  return create_array(env, result);
-}
-
 napi_value Calc_plane_forward(napi_env env, napi_callback_info info){
   try{
     napi_value args[1];
@@ -130,7 +83,7 @@ napi_value Calc_plane_level(napi_env env, napi_callback_info info){
       float sel_angle = angles[(int) ceil(k / 2)];
 
       // calculating updated level
-      float change = (k * sin(sel_angle)) / scale;
+      float change = ((k * sin(sel_angle)) * refresh_rate) / scale;
       new_level = level + change;
 
       // calculating screen speed
@@ -210,42 +163,71 @@ napi_value Calc_plane_speed(napi_env env, napi_callback_info info){
   }
 }
 
-napi_value Calc_turn_fallback_diff(napi_env env, napi_callback_info info){
-  napi_value args[3];
-  get_args(env, info, args);
+napi_value Calc_plane_heading(napi_env env, napi_callback_info info){
+try{
+    napi_value args[1];
+    get_args(env, info, args);
+    napi_value arg_dict = args[0];
 
-  var_typecheck(env, args[0], napi_number);
-  var_typecheck(env, args[1], napi_number);
-  var_typecheck(env, args[2], napi_number);
+    // checking types of all variables passed as arguments
+    var_typecheck(env, arg_dict, napi_object);
 
-  int heading = get_variable<int>(env, args[0]);
-  float rate_of_turn = get_variable<float>(env, args[1]);
-  int updated_heading = get_variable<int>(env, args[2]);
+    int heading = get_variable<int>(env, get_dict_property(env, arg_dict, "heading"));
+    int updated_heading = get_variable<int>(env, get_dict_property(env, arg_dict, "updated_heading"));
+    float rate_of_turn = get_variable<int>(env, get_dict_property(env, arg_dict, "rate_of_turn"));
+    float refresh_rate = get_variable<float>(env, get_dict_property(env, arg_dict, "refresh_rate"));
 
-  float fallback_diff = abs(heading + rate_of_turn - updated_heading);
+    // return variables
+    float new_heading = heading;
+    bool continue_change = false;
 
-  return create_variable(env, fallback_diff);
+    if (updated_heading != heading){
+      // plane got update to new speed
+      continue_change = true;
+
+      // piecewise definition of k
+      int k;
+      if (heading == 180) k = -1;
+      else k = (heading - 180) / abs(heading - 180);
+
+      int in_h = heading + k * in_h;
+
+      // calculating new heading
+      new_heading = heading + ((updated_heading - in_h) / abs(updated_heading - in_h)) * rate_of_turn * refresh_rate;
+      
+      // calculating if plane did converge to specified heading
+      if (abs(updated_heading - heading) < rate_of_turn * refresh_rate) continue_change = false;
+    }
+
+    napi_value result = create_empty_array(env, 2);
+    napi_value param1 = create_variable(env, (float) new_heading);
+    set_array_element(env, result, param1, 0);
+    napi_value param2 = create_variable(env, continue_change);
+    set_array_element(env, result, param2, 1);
+
+    return result;
+  }
+  catch(const std::exception& e){
+    handle_exception(env, e);
+    return nullptr;
+  }
 }
 
 napi_value init(napi_env env, napi_value exports) {
   std::vector<std::string> str_vector{ 
     "calc_rate_of_turn",
-    "calc_descent",
-    "calc_climb",
     "calc_plane_forward",
     "calc_plane_level",
     "calc_plane_speed",
-    "calc_turn_fallback_diff"
+    "calc_plane_heading"
   };
   
   std::vector<napi_callback> func_vector{ 
     Calc_rate_of_turn,
-    Calc_descent, 
-    Calc_climb,
     Calc_plane_forward,
     Calc_plane_level,
     Calc_plane_speed,
-    Calc_turn_fallback_diff
+    Calc_plane_heading
   };
 
   return register_functions(env, exports, str_vector, func_vector);

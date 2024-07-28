@@ -73,12 +73,19 @@ export namespace plane_calculations{
             handle_exception_js(err)
         }
     }
-    /*
-        Function that calculates rate of turn regarding the standard bank angle used for airliners and aircraft TAS
+
+    /**
+     * Function that calculates plane forward step
+     * 
+     * **Parameters**:
+     * @param bank_angle -> plane bank angle
+     * @param speed -> plane speed
+     * 
+     * @returns rate of turn for specific plane
     */
-    export function calc_rate_of_turn(std_bank_angle: number, speed: number){
+    export function calc_rate_of_turn(bank_angle: number, speed: number){
         try{
-            return plane_import.calc_rate_of_turn(std_bank_angle, speed)
+            return plane_import.calc_rate_of_turn(bank_angle, speed)
         }
         catch(err){
             handle_exception_js(err)
@@ -125,11 +132,17 @@ export namespace plane_calculations{
         }
     }
 
-    export function calc_turn_fallback_diff(heading: number, rate_of_turn: number, updated_heading: number){
+    /**
+     * 
+     * @param heading -> heading of the plane
+     * @param updated_heading -> updated heading of the plane
+     * @param rate_of_turn -> rate of turn for the plane
+     * 
+     * @returns [ new heading (number), continue (boolean)]
+    */
+    export function calc_plane_heading(arg: object){
         try{
-            return plane_import.calc_turn_fallback_diff(heading,
-                                                        rate_of_turn,
-                                                        updated_heading)
+            return plane_import.calc_plane_heading(arg)
         }
         catch(err){
             handle_exception_js(err)

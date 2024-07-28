@@ -50,16 +50,17 @@ export namespace plane_calculations{
             handle_exception_js(err)
         }
     }
+
     /**
-     * Function that calculates plane level change
+     * Function that calculates plane forward step
      * 
      * **Parameters**:
-     * @param x -> current x coord
-     * @param y -> current y coord
+     * @param climb_angle -> plane climb angle
+     * @param descent_angle -> plane descent angle
      * @param scale -> scale (map scale) at which the calculations are made
-     * @param heading -> current heading of the plane
-     * @param speed -> current speed of the plane
-     * @param screen_speed -> the speed that the plane is moving on screen (smaller on plane climb/descent)
+     * @param level -> current level of the plane
+     * @param updated_level -> target level for plane
+     * @param speed -> speed of a plane
      * @param refresh_rate -> refresh rate of the screen (ATC zones have different SSR refresh rate)
      * 
      * @returns [level_change (number), continue (boolean), screen_speed (number)]
@@ -85,15 +86,14 @@ export namespace plane_calculations{
     }
 
     /**
-     * Function that calculates plane forward step
+     * Function that calculates plane level change
      * 
      * **Parameters**:
-     * @param climb_angle -> plane climb angle
-     * @param descent_angle -> plane descent angle
+     * @param x -> current x coord
+     * @param y -> current y coord
      * @param scale -> scale (map scale) at which the calculations are made
-     * @param level -> current level of the plane
-     * @param updated_level -> target level for plane
-     * @param speed -> plane speed
+     * @param heading -> current heading of the plane
+     * @param screen_speed -> the speed that the plane is moving on screen (smaller on plane climb/descent)
      * @param refresh_rate -> refresh rate of the screen (ATC zones have different SSR refresh rate)
      * 
      * @returns updated [x, y] coordinates of the plane

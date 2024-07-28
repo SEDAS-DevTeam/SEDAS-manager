@@ -289,8 +289,7 @@ export class Plane{
             "y": this.y,
             "scale": scale,
             "heading": this.heading,
-            "speed": this.speed,
-            "screen_speed": this.screen_speed, // to get (nm/s)
+            "screen_speed": this.screen_speed, // to get (nm/s);
             "refresh_rate": 1 // TODO: add to settings
         }
         let vals = plane_calculations.calc_plane_forward(napi_arguments)
@@ -338,12 +337,10 @@ export class Plane{
             "refresh_rate": 1
         }
         
-        const [change, continue_change, screen_speed] = plane_calculations.calc_plane_level(napi_arguments)
-        console.log(change, continue_change, screen_speed)
-        /*
+        const [new_level, continue_change, screen_speed] = plane_calculations.calc_plane_level(napi_arguments)
         if (continue_change){
             //Level change is not done
-            this.level = Math.round(this.level + change)
+            this.level = new_level
             this.screen_speed = screen_speed
         }
         else{
@@ -351,7 +348,6 @@ export class Plane{
             this.level = this.updated_level
             this.screen_speed = this.speed
         }
-        */
 
         /*
         if (this.updated_level != this.level){

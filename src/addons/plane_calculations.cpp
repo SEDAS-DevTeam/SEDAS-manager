@@ -82,17 +82,14 @@ napi_value Calc_plane_forward(napi_env env, napi_callback_info info){
     int y = get_variable<int>(env, get_dict_property(env, arg_dict, "y"));
     float scale = get_variable<float>(env, get_dict_property(env, arg_dict, "scale"));
     int heading = get_variable<int>(env, get_dict_property(env, arg_dict, "heading"));
-    int speed = get_variable<int>(env, get_dict_property(env, arg_dict, "speed"));
     int screen_speed = get_variable<int>(env, get_dict_property(env, arg_dict, "screen_speed"));
     float refresh_rate = get_variable<float>(env, get_dict_property(env, arg_dict, "refresh_rate"));
 
     //normalize and convert vars
-    float norm_speed = ((float) speed / 3600) * refresh_rate;
     float norm_screen_speed = ((float) screen_speed / 3600) * refresh_rate;
 
     std::vector<int> result;
-    if (norm_speed != norm_screen_speed) result = calc_pixel_change(x, y, norm_screen_speed, scale, heading);
-    else result = calc_pixel_change(x, y, norm_speed, scale, heading);
+    result = calc_pixel_change(x, y, norm_screen_speed, scale, heading);
 
     return create_array(env, result);
   }
@@ -114,27 +111,43 @@ napi_value Calc_plane_level(napi_env env, napi_callback_info info){
 
   float climb_angle = get_variable<float>(env, get_dict_property(env, arg_dict, "climb_angle"));
   float descent_angle = get_variable<float>(env, get_dict_property(env, arg_dict, "descent_angle"));
+  float angles[2] = {climb_angle, descent_angle};
+
   float scale = get_variable<float>(env, get_dict_property(env, arg_dict, "scale"));
   int level = get_variable<int>(env, get_dict_property(env, arg_dict, "level"));
   int updated_level = get_variable<int>(env, get_dict_property(env, arg_dict, "updated_level"));
   int speed = get_variable<int>(env, get_dict_property(env, arg_dict, "speed"));
   float refresh_rate = get_variable<float>(env, get_dict_property(env, arg_dict, "refresh_rate"));
 
-  if (updated_level != level){
-    float k = (updated_level - level) / abs(updated_level - level);
-    std::cout << k << std::endl;
-  }
+  // return variables
+  float new_level = level;
+  bool continue_change = false;
+  float screen_speed = speed; //default screen speed to speed
 
-  // calculating screen speed
-  //float screen_speed = cos(deg_to_rad(angle)) * speed;
+  if (updated_level != level){
+    // plane got update about new level
+    continue_change = true;
+    int k = (updated_level - level) / abs(updated_level - level);
+    float sel_angle = angles[(int) ceil(k / 2)];
+
+    // calculating updated level
+    float change = (k * sin(sel_angle)) / scale;
+    new_level = level + change;
+
+    // calculating screen speed
+    screen_speed = cos(deg_to_rad(sel_angle)) * speed;
+
+    // calculating if plane did converge in specific level
+    if (abs(updated_level - level) < change) continue_change = false;
+  }
 
   //Test
   napi_value result = create_empty_array(env, 3);
-  napi_value param1 = create_variable(env, (float) 0.5);
+  napi_value param1 = create_variable(env, (float) new_level);
   set_array_element(env, result, param1, 0);
-  napi_value param2 = create_variable(env, true);
+  napi_value param2 = create_variable(env, continue_change);
   set_array_element(env, result, param2, 1);
-  napi_value param3 = create_variable(env, (float) 0.7);
+  napi_value param3 = create_variable(env, (float) screen_speed);
   set_array_element(env, result, param3, 2);
 
   return result;

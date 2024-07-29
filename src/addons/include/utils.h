@@ -14,6 +14,20 @@ float calc_radius_of_turn(float bank_angle, int plane_speed){
     return pow(plane_speed, 2) / (11.26 * tan(bank_angle));
 }
 
+class trajectory_result{
+    public:
+        // This notation is nested, because the result is [[x, y], heading, ...]
+        std::vector<std::pair<std::pair<int, int>, uint16_t>> result;
+
+        void add_point(int x, int y, int heading){
+            result.push_back({ {x, y}, heading });
+        }
+
+        napi_value transform_to_napi(){
+            // TODO
+        }
+}
+
 /*
     Utils for main
 */

@@ -1,37 +1,6 @@
-#include <node_api.h>
-#include <iostream>
-#include <string>
-#include <cstring>
-#include <vector>
-
 /*
     Glob utils
 */
-
-int get_array_len(napi_env env, napi_callback_info array){
-    size_t arg_size;
-    napi_status status;
-
-    status = napi_get_cb_info(env, array, &arg_size, nullptr, nullptr, nullptr);
-    handle_napi_exception(status, env, "Failed to get argument list length");
-
-    return arg_size;
-}
-
-int get_array_len(napi_env env, napi_value napi_array){
-    size_t array_size;
-    napi_status status;
-
-    status = napi_get_array_length(env, napi_array, &array_size);
-    handle_napi_exception(status, env, "Failed to get napi_value array length");
-
-    return array_size;
-}
-
-template <typename T>
-int get_array_len(napi_env env, T array){
-    return sizeof(array) / sizeof(array[0]); 
-}
 
 void handle_napi_exception(napi_status status, napi_env env, std::string message){
     if (status != napi_ok){
@@ -54,6 +23,31 @@ void handle_exception(napi_env env, std::exception error){
     napi_value napi_error;
     napi_create_error(env, 0, napi_message, &napi_error);
     napi_throw(env, napi_error);
+}
+
+int get_array_len(napi_env env, napi_callback_info array){
+    size_t arg_size;
+    napi_status status;
+
+    status = napi_get_cb_info(env, array, &arg_size, nullptr, nullptr, nullptr);
+    handle_napi_exception(status, env, "Failed to get argument list length");
+
+    return arg_size;
+}
+
+int get_array_len(napi_env env, napi_value napi_array){
+    uint32_t array_size;
+    napi_status status;
+
+    status = napi_get_array_length(env, napi_array, &array_size);
+    handle_napi_exception(status, env, "Failed to get napi_value array length");
+
+    return array_size;
+}
+
+template <typename T>
+int get_array_len(napi_env env, T array){
+    return sizeof(array) / sizeof(array[0]); 
 }
 
 void get_args(napi_env env, napi_callback_info info, napi_value* args){
@@ -109,7 +103,7 @@ std::vector<std::string> get_string_array(napi_env env, napi_value napi_array) {
     return string_array;
 }
 
-napi_value get_dict_property(napi_env env, napi_value napi_dict, char* key) {
+napi_value get_dict_property(napi_env env, napi_value napi_dict, const char* key) {
     napi_value dict_value;
     napi_status status;
 
@@ -290,4 +284,12 @@ void set_array_element(napi_env env, napi_value array, napi_value value, uint16_
 
     status = napi_set_element(env, array, position, value);
     handle_napi_exception(status, env, "Failed to set array element");
+}
+
+napi_value get_array_element(napi_env env, napi_value array, uint32_t index){
+    napi_value elem;
+    napi_status status = napi_get_element(env, array, index, &elem);
+    handle_napi_exception(status, env, "Cannot read element at specified index");
+
+    return elem;
 }

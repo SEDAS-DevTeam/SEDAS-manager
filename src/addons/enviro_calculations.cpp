@@ -27,42 +27,50 @@ napi_value Compute_plane_trajectory(napi_env env, napi_callback_info info) {
 
     int trans_points_len = get_array_len(env, transport_points);
 
+    // variable definitions
+    std::pair<uint32_t, uint32_t> dep_point_coords;
+    std::pair<uint32_t, uint32_t> arr_point_coords;
+    std::vector<std::pair<uint32_t, uint32_t>> trans_point_coords;
+
     //get arrival & departure point coordinates
-    napi_value acc_zone = get_dict_property(env, map_data, "ACC");
-    napi_value acc_points = get_dict_property(env, acc_zone, "POINTS");
-    int acc_points_len = get_array_len(env, acc_points);
-    for (uint16_t i = 0; i < acc_points_len; i++){
-        napi_value point;
-        napi_status status = napi_get_element(env, acc_points, i, &point);
-        handle_napi_exception(status, env, "Cannot read point at specified index");
-
-        std::string point_name = get_variable<std::string>(env, get_dict_property(env, point, "name"));
-        if (departure_point == point_name){
-
-        }
+    napi_value points_list = get_dict_value<napi_value>(env, map_data, { "ACC", "POINTS" });
+    int points_len = get_array_len(env, points_list);
+    for (uint16_t i = 0; i < points_len; i++){
+        napi_value point = get_array_element(env, points_list, i);
+        std::string point_name = get_variable<std::string>(env, get_dict_element(env, point, "name"));
         
-        if (arrival_point == point_name){
-
+        if (point_name == departure_point){
+            // add to departure
+            dep_point_coords.first = get_variable<int>(env, get_dict_element(env, point, "x"));
+            dep_point_coords.second = get_variable<int>(env, get_dict_element(env, point, "y"));
+        }
+        else if (point_name == arrival_point){
+            // add to arrival
+            arr_point_coords.first = get_variable<int>(env, get_dict_element(env, point, "x"));
+            arr_point_coords.second = get_variable<int>(env, get_dict_element(env, point, "y"));
+        }
+        else{
+            // add to transport points
+            uint32_t point_x = get_variable<int>(env, get_dict_element(env, point, "x"));
+            uint32_t point_y = get_variable<int>(env, get_dict_element(env, point, "y"));
+            trans_point_coords.push_back({point_x, point_y});
         }
     }
+
+    // create trajectory result object
+    trajectory_result result;
 
     if (trans_points_len == 0){
         // plane trajectory is composed of just 2 points
+
+        // calculate departure
+        // TODO
     }
     else{
         // plane trajectory has more than 2 points
-
+        // TODO
     }
-
-    // Process data and create result
-    std::vector<std::pair<int, int>> int_pairs = {
-        {300, 0}, {50, 60}, {150, 120} // Test (TODO)
-    };
-
-    // Create and return the result array
-    napi_value result_array = create_pair_array(env, int_pairs);
-
-    return result_array;
+    return result.transform_to_napi()
 }
 
 napi_value init(napi_env env, napi_value exports) {

@@ -154,9 +154,9 @@ export namespace enviro_calculations{
     /*
         Function that calculates all headings and timestamps a plane has to do to follow designated route
     */
-    export function compute_heading_up(...args: any): any[]{
+    export function compute_plane_trajectory(arg: object): any[]{
         try{
-            return enviro_import.compute_heading_up(...args)
+            return enviro_import.compute_plane_trajectory(arg)
         }
         catch(err){
             handle_exception_js(err)

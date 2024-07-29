@@ -24,11 +24,12 @@ export class Environment {
     private map_data: any;
     private scenario_data: any;
     private airlines_data: any;
+    private std_bank_angle: number;
 
     private plane_database: PlaneDB;
     private plane_spawner_config: object[] = [];
     private plane_commander_config: object[] = []
-
+    
     public plane_conditions: object;
 
     public constructor(logger: EventLogger, abs_path: string, plane_database: PlaneDB,
@@ -36,9 +37,11 @@ export class Environment {
                         aircraft_data: object, 
                         airlines_data: object,
                         map_data: object, 
-                        scenario_data: object){
+                        scenario_data: object,
+                        std_bank_angle){
         this.logger = logger
         this.abs_path = abs_path
+        this.std_bank_angle = std_bank_angle
 
         this.command_data = command_data
         this.aircraft_data = aircraft_data["all_planes"] //get only planes resource
@@ -136,9 +139,17 @@ export class Environment {
             let arr_point: string = this.plane_objects[i]["schedule"]["arrival"]
             let trans_points: string = this.plane_objects[i]["schedule"]["transport_points"]
             
-            let plane_trajectory: any[] = enviro_calculations.compute_heading_up(this.map_data, this.plane_objects[i],
-                                                                                    dep_point, trans_points, arr_point)
+            console.log(this.std_bank_angle)
+            let napi_arguments = {
+                "map_data": this.map_data,
+                "plane": this.plane_objects[i],
+                "dep_point": dep_point,
+                "trans_points": trans_points,
+                "arr_point": arr_point,
+                "bank_angle": this.std_bank_angle
+            }
             
+            let plane_trajectory: any[] = enviro_calculations.compute_plane_trajectory(napi_arguments)
             this.plane_objects[i]["trajectory"] = plane_trajectory
         }
     }

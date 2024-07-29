@@ -1,16 +1,31 @@
+#include <node_api.h>
+#include <iostream>
+#include <string>
+#include <cstring>
+#include <vector>
+
 /*
     Glob utils
 */
 
-template <typename T>
-int get_array_len(napi_env env, T array);
-
-template <>
-int get_array_len<napi_callback_info>(napi_env env, napi_callback_info array){
+int get_array_len(napi_env env, napi_callback_info array){
     size_t arg_size;
-    napi_get_cb_info(env, array, &arg_size, nullptr, nullptr, nullptr);
+    napi_status status;
+
+    status = napi_get_cb_info(env, array, &arg_size, nullptr, nullptr, nullptr);
+    handle_napi_exception(status, env, "Failed to get argument list length");
 
     return arg_size;
+}
+
+int get_array_len(napi_env env, napi_value napi_array){
+    size_t array_size;
+    napi_status status;
+
+    status = napi_get_array_length(env, napi_array, &array_size);
+    handle_napi_exception(status, env, "Failed to get napi_value array length");
+
+    return array_size;
 }
 
 template <typename T>
@@ -73,8 +88,7 @@ std::vector<std::string> get_string_array(napi_env env, napi_value napi_array) {
     napi_status status;
     std::vector<std::string> string_array;
 
-    status = napi_get_array_length(env, napi_array, &array_length);
-    handle_napi_exception(status, env, "Failed to get array length");
+    array_length = get_array_len(env, napi_array);
 
     for (uint32_t i = 0; i < array_length; ++i) {
         napi_value element;

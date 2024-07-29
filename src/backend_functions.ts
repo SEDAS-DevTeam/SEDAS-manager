@@ -300,7 +300,8 @@ export class BackendFunctions{
             this.app.aircraft_preset_data,
             this.app.airline_preset_data,
             this.app.map_data, 
-            this.app.scenario_data)
+            this.app.scenario_data,
+            parseFloat(this.app.app_settings["std_bank_angle"]))
         
 
         this.app.loader.send_progress("Setting plane schedules")

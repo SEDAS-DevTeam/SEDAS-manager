@@ -10,6 +10,7 @@
                     "name": "A300",
                     "max_alt": 370,
                     "min_kias": 160,
+                    "cruise_kias": 450,
                     "max_kias": 470,
                     "roc": {
                         "std": 800,
@@ -34,7 +35,8 @@
                     "name": "A310",
                     "max_alt": 400,
                     "min_kias": 160,
-                    "max_kias": 480,
+                    "cruise_kias": 480,
+                    "max_kias": 528,
                     "roc": {
                         "std": 1500,
                         "fl50": 2500,
@@ -58,6 +60,7 @@
                     "name": "A318",
                     "max_alt": 370,
                     "min_kias": 160,
+                    "cruise_kias": 440,
                     "max_kias": 470,
                     "roc": {
                         "std": 800,

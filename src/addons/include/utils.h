@@ -6,22 +6,12 @@ float rad_to_deg(float rad){
     return round(rad * (180 / M_PI));
 }
 
-float calc_rate_of_turn(uint32_t std_bank_angle){
-    return 1.091 * tan(deg_to_rad((float) std_bank_angle));
-}
-
 /*
     Utils for enviro calculations
 */
 
-uint8_t calc_angle_between_two_points(std::vector<uint32_t> point_A_coords, std::vector<uint32_t> point_B_coords){
-    uint8_t angle = 0;
-    return angle;
-}
-
-uint32_t calc_turn_time(float angle_start, float angle_final){
-    uint32_t iter_time = 0;
-    return iter_time;
+float calc_radius_of_turn(float bank_angle, int plane_speed){
+    return pow(plane_speed, 2) / (11.26 * tan(bank_angle));
 }
 
 /*
@@ -32,6 +22,10 @@ uint32_t calc_turn_time(float angle_start, float angle_final){
 /*
     Utils for plane calculations
 */
+
+float calc_rate_of_turn(float bank_angle, int plane_speed){
+    return ((1.091 * tan(deg_to_rad(bank_angle))) / plane_speed) * 1000;
+}
 
 int heading_conversion(int heading){
     return (450 - heading) % 360;

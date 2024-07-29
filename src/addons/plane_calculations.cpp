@@ -19,7 +19,7 @@ napi_value Calc_rate_of_turn(napi_env env, napi_callback_info info) {
   float std_bank_angle = get_variable<float>(env, args[0]);
   int plane_speed = get_variable<int>(env, args[1]);
 
-  float result = ((1.091 * tan(deg_to_rad(std_bank_angle))) / plane_speed) * 1000;
+  float result = calc_rate_of_turn(std_bank_angle, plane_speed);
   return create_variable(env, result);
 }
 

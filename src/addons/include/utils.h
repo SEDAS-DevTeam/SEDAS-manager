@@ -14,6 +14,10 @@ float calc_radius_of_turn(float bank_angle, int plane_speed){
     return pow(plane_speed, 2) / (11.26 * tan(bank_angle));
 }
 
+float calc_change_by_radius(float radius, float angle_between_points){
+    //TODO
+}
+
 class trajectory_result{
     private:
         napi_value create_traj_array(napi_env env, uint16_t size){
@@ -38,6 +42,10 @@ class trajectory_result{
 
         void add_point(int x, int y, int heading){
             result.push_back({ {x, y}, heading });
+        }
+
+        uint32_t size(){
+            return result.size();
         }
 
         napi_value transform_to_napi(napi_env env){

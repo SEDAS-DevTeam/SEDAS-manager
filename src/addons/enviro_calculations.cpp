@@ -24,6 +24,9 @@ napi_value Compute_plane_trajectory(napi_env env, napi_callback_info info) {
     std::string departure_point = get_variable<std::string>(env, get_dict_property(env, arg_dict, "dep_point"));
     std::string arrival_point = get_variable<std::string>(env, get_dict_property(env, arg_dict, "arr_point"));
     float bank_angle = get_variable<float>(env, get_dict_property(env, arg_dict, "bank_angle"));
+    
+    // get useful plane data
+    int cruise_speed = get_dict_value<int>(env, plane_data, { "properties", "cruise_kias" });
 
     int trans_points_len = get_array_len(env, transport_points);
 
@@ -76,7 +79,38 @@ napi_value Compute_plane_trajectory(napi_env env, napi_callback_info info) {
     }
     else{
         // plane trajectory has more than 2 points
-        // TODO
+        float radius_of_turn = calc_radius_of_turn(bank_angle, cruise_speed);
+
+        // calculate heading between departure and trans point 1
+        float heading = calc_heading_between_two_points(dep_point_coords.first,
+                                        dep_point_coords.second,
+                                        trans_point_coords[0].first,
+                                        trans_point_coords[0].second);
+        result.add_point(dep_point_coords.first, dep_point_coords.second, heading);
+
+        // calculating headings on other points
+        for (uint32_t i = 0; i < trans_point_coords.size(); i++){
+            if (i == trans_point_coords.size() - 1){
+                // trans point is last of its kind
+                float heading = calc_heading_between_two_points(trans_point_coords[i].first,
+                                                        trans_point_coords[i].second,
+                                                        arr_point_coords.first,
+                                                        arr_point_coords.second);
+                result.add_point(trans_point_coords[i].first, trans_point_coords[i].second, heading);
+                break;
+            }
+
+            float heading = calc_heading_between_two_points(trans_point_coords[i].first,
+                                                        trans_point_coords[i].second,
+                                                        trans_point_coords[i + 1].first,
+                                                        trans_point_coords[i + 1].second);
+            result.add_point(trans_point_coords[i].first, trans_point_coords[i].second, heading);
+        }
+
+        // shifting points of turn respectfully to the plane turn radius
+        for (uint32_t i = 1; i < result.size(); i++){ // skipping first connection because no correction is necessary
+            //TODO
+        }
     }
     return result.transform_to_napi(env);
 }

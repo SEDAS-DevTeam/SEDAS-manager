@@ -11,6 +11,7 @@ export class Environment {
     private logger: EventLogger;
     private abs_path: string;
     private sim_time_worker: Worker;
+    private app: any;
 
     // time variables
     public current_time: Date;
@@ -32,7 +33,7 @@ export class Environment {
     
     public plane_conditions: object;
 
-    public constructor(logger: EventLogger, abs_path: string, plane_database: PlaneDB,
+    public constructor(logger: EventLogger, app: any, abs_path: string, plane_database: PlaneDB,
                         command_data: object, 
                         aircraft_data: object, 
                         airlines_data: object,
@@ -50,6 +51,8 @@ export class Environment {
         this.scenario_data = scenario_data
 
         this.plane_database = plane_database
+
+        this.app = app
 
         //create fake simulation time (TODO: pass time into main)
         this.sim_time_worker = new Worker(path.join(abs_path, "/src/workers/sim_time.js"))
@@ -90,12 +93,7 @@ export class Environment {
         this.set_plane_modifiers()
 
         //everything done, just validate everything
-        loader.send_progress("Done! Validating output...")
-        logger.log("INFO", "Validating output")
-        await utils.sleep(1000) //TODO: HUH?
-        this.validate()
-
-        logger.log("INFO", "Output succesfully validated")
+        logger.log("INFO", "Successfully created environment scenario")
     }
 
     public kill_enviro(){
@@ -139,7 +137,6 @@ export class Environment {
             let arr_point: string = this.plane_objects[i]["schedule"]["arrival"]
             let trans_points: string = this.plane_objects[i]["schedule"]["transport_points"]
             
-            console.log(this.std_bank_angle)
             let napi_arguments = {
                 "map_data": this.map_data,
                 "plane": this.plane_objects[i],
@@ -151,12 +148,7 @@ export class Environment {
             
             let plane_trajectory: any[] = enviro_calculations.compute_plane_trajectory(napi_arguments)
             this.plane_objects[i]["trajectory"] = plane_trajectory
-            console.log(plane_trajectory)
         }
-    }
-
-    public validate(){
-        
     }
 
     /*Inner functions*/
@@ -241,7 +233,6 @@ export class Environment {
 
     private set_plane_modifiers(){
         for (let i = 0; i < this.plane_objects.length; i++){
-            console.log(this.plane_objects[i])
 
             //Plane spawner set
             let sch_time: string = this.plane_objects[i]["schedule"]["time"]
@@ -255,17 +246,10 @@ export class Environment {
             })
 
             //Plane commander set
-            let plane_trajectory_mod: any[] = []
-            for (let i_tr = 0; i_tr < this.plane_objects[i]["trajectory"].length; i_tr++){
-                let des_head: number = this.plane_objects[i]["trajectory"][i_tr][0]
-                let des_time: Date = new Date(this.start_time.getTime() + this.plane_objects[i]["trajectory"])
-
-                plane_trajectory_mod.push([des_head, des_time])
-            }
 
             this.plane_commander_config.push({
                 "id": this.plane_objects[i]["hash"],
-                "content": plane_trajectory_mod
+                "content": this.plane_objects[i]["trajectory"]
             })
         }
     }
@@ -287,10 +271,28 @@ export class Environment {
                 console.log("Time to spawn!")
                 
                 //Spawn plane
+                let plane_data: object;
+                for (let i_plane = 0; i_plane < this.plane_objects.length; i_plane++){
+                    if (this.plane_objects[i_plane]["hash"] == this.plane_spawner_config[i]["id"]){
+                        plane_data = this.plane_objects[i_plane]
+                    }
+                }
+                let curr_plane_id = utils.generate_hash()
+                let plane = new Plane(curr_plane_id, plane_data["name"],
+                                plane_data["trajectory"][0][1], plane_data["trajectory"][0][1],
+                                1000, 1000,
+                                plane_data["min_kias"], plane_data["min_kias"],
+                                plane_data["schedule"]["departure"], plane_data["schedule"]["arrival"],
+                                "01:00:00",
+                                plane_data["trajectory"][0][0], plane_data["trajectory"][0][1]
+                )
+                this.app.PlaneDatabase.add_record(plane, "ACC")
+
+                this.app.broadcast_planes(this.app.PlaneDatabase.DB, this.app.PlaneDatabase.monitor_DB, this.app.PlaneDatabase.plane_paths_DB)
 
                 //delete from plane spawner (already moved to PlaneDB)
                 this.plane_spawner_config.splice(i, 1)
-
+                
             }
 
             //Plane commander check

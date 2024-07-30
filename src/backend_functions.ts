@@ -295,7 +295,7 @@ export class BackendFunctions{
         this.app.enviro_logger.log("INFO", "EventLogger instance on Environment is set up")
 
         this.app.loader.send_progress("Setting up environment")
-        this.app.enviro = new Environment(this.ev_logger, ABS_PATH, this.app.PlaneDatabase,
+        this.app.enviro = new Environment(this.ev_logger, this.app, ABS_PATH, this.app.PlaneDatabase,
             this.app.command_preset_data,
             this.app.aircraft_preset_data,
             this.app.airline_preset_data,

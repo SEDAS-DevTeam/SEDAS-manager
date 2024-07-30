@@ -151,6 +151,7 @@ export class Environment {
             
             let plane_trajectory: any[] = enviro_calculations.compute_plane_trajectory(napi_arguments)
             this.plane_objects[i]["trajectory"] = plane_trajectory
+            console.log(plane_trajectory)
         }
     }
 

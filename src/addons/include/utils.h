@@ -15,21 +15,54 @@ float calc_radius_of_turn(float bank_angle, int plane_speed){
 }
 
 class trajectory_result{
+    private:
+        napi_value create_traj_array(napi_env env, uint16_t size){
+            napi_status status;
+            napi_value result;
+            status = napi_create_array_with_length(env, size, &result);
+            handle_napi_exception(status, env, "Failed to create array");
+
+            return result;
+        }
+
+        void set_traj_element(napi_env env, napi_value array, uint32_t pos, napi_value elem){
+            napi_status status;
+
+            status = napi_set_element(env, array, pos, elem);
+            handle_napi_exception(status, env, "Failed to set element");
+        }
+    
     public:
         // This notation is nested, because the result is [[x, y], heading, ...]
-        std::vector<std::pair<std::pair<int, int>, uint16_t>> result;
+        std::vector<std::pair<std::pair<int, int>, int>> result;
 
         void add_point(int x, int y, int heading){
             result.push_back({ {x, y}, heading });
         }
 
         napi_value transform_to_napi(napi_env env){
-            std::vector<std::pair<int, int>> int_pairs = {
-                {300, 0}, {50, 60}, {150, 120} // Test (TODO)
-            };
+            napi_status status;
+            napi_value result_array = create_traj_array(env, result.size());
 
-            // Create and return the result array
-            napi_value result_array = create_pair_array(env, int_pairs);
+            for (size_t i = 0; i < result.size(); i++){
+                // point object
+                napi_value point_data = create_traj_array(env, 2);
+
+                // coord object nested into point_data
+                napi_value coords = create_traj_array(env, 2);
+
+                napi_value x = create_variable(env, result[i].first.first);
+                napi_value y = create_variable(env, result[i].first.second);
+                napi_value heading = create_variable(env, result[i].second);
+
+                set_traj_element(env, coords, 0, x);
+                set_traj_element(env, coords, 1, y);
+
+                set_traj_element(env, point_data, 0, coords);
+                set_traj_element(env, point_data, 1, heading);
+
+                set_traj_element(env, result_array, i, point_data);
+            }
             return result_array;
         }
 };
@@ -61,7 +94,6 @@ float calc_heading_between_two_points(uint32_t x1, uint32_t y1, uint32_t x2, uin
     
     float heading = rad_to_deg(atan2(dy, dx));
     int heading_converted = atan2_to_heading_conversion(heading);
-    std::cout << heading_converted << std::endl;
 
     return heading_converted;
 }

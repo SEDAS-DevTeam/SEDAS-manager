@@ -69,7 +69,10 @@ napi_value Compute_plane_trajectory(napi_env env, napi_callback_info info) {
                                         arr_point_coords.first,
                                         arr_point_coords.second);
 
-        //TODO
+        // add point of departure (starting point)
+        result.add_point(dep_point_coords.first, dep_point_coords.second, heading);
+        // add point of arrival (termination point)
+        result.add_point(arr_point_coords.first, arr_point_coords.second, -1);
     }
     else{
         // plane trajectory has more than 2 points

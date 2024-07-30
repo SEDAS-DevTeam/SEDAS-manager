@@ -11,7 +11,7 @@
         "ARP": "none",
         "POINTS": [
             {"x": 300, "y": 300, "name": "VEPOT"},
-            {"x": 700, "y": 300, "name": "AFIS"}
+            {"x": 300, "y": 450, "name": "AFIS"}
         ],
         "SID": "none",
         "STAR": "none"

@@ -63,14 +63,19 @@ napi_value Compute_plane_trajectory(napi_env env, napi_callback_info info) {
     if (trans_points_len == 0){
         // plane trajectory is composed of just 2 points
 
-        // calculate departure
-        // TODO
+        // calculate departure and set termination at x, y
+        float heading = calc_heading_between_two_points(dep_point_coords.first,
+                                        dep_point_coords.second,
+                                        arr_point_coords.first,
+                                        arr_point_coords.second);
+
+        //TODO
     }
     else{
         // plane trajectory has more than 2 points
         // TODO
     }
-    return result.transform_to_napi()
+    return result.transform_to_napi(env);
 }
 
 napi_value init(napi_env env, napi_value exports) {

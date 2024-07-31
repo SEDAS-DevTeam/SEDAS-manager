@@ -109,7 +109,14 @@ napi_value Compute_plane_trajectory(napi_env env, napi_callback_info info) {
 
         // shifting points of turn respectfully to the plane turn radius
         for (uint32_t i = 1; i < result.size(); i++){ // skipping first connection because no correction is necessary
-            //TODO
+            int new_heading = result.get_result()[i].second;
+            int prev_heading = result.get_result()[i - 1].second;
+            
+            // calculate angle between points (proportional to change between headings)
+            int d_angle = prev_heading - new_heading;
+
+            float a  = calc_change_by_radius(radius_of_turn, d_angle);
+            // TODO: finish and debug
         }
     }
     return result.transform_to_napi(env);

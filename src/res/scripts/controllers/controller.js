@@ -114,7 +114,7 @@ window.onload = () => {
     })
 
     document.getElementById("menu-button").addEventListener("click", () => {
-        window.electronAPI.send_message("controller", ["redirect-to-menu"])
+        send_message("controller", "redirect-to-menu")
     })
 
     document.getElementById("save-button").addEventListener("click", () => {

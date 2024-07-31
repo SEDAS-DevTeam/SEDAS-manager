@@ -11,11 +11,11 @@ float rad_to_deg(float rad){
 */
 
 float calc_radius_of_turn(float bank_angle, int plane_speed){
-    return pow(plane_speed, 2) / (11.26 * tan(bank_angle));
+    return pow(plane_speed, 2) / (11.26 * tan(deg_to_rad(bank_angle)));
 }
 
 float calc_change_by_radius(float radius, float angle_between_points){
-    //TODO
+    return radius / tan(deg_to_rad(angle_between_points / 2));
 }
 
 class trajectory_result{
@@ -39,6 +39,9 @@ class trajectory_result{
     public:
         // This notation is nested, because the result is [[x, y], heading, ...]
         std::vector<std::pair<std::pair<int, int>, int>> result;
+        std::vector<std::pair<std::pair<int, int>, int>> get_result(){
+            return result;
+        }
 
         void add_point(int x, int y, int heading){
             result.push_back({ {x, y}, heading });

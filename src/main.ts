@@ -7,7 +7,7 @@ import fs from "fs";
 import { Worker } from "worker_threads"
 import { spawn } from "node:child_process"
 import path from "path"
-import { app, ipcMain, screen, Tray, nativeImage, Menu } from "electron";
+import { app, screen, Tray, nativeImage, Menu } from "electron";
 
 //relative imports
 import { Plane, PlaneDB } from "./plane_functions"
@@ -46,7 +46,7 @@ import {
     PATH_TO_AUDIO_UPDATE,
 } from "./app_config"
 
-import { BackendFunctions } from "./backend_functions"
+import { MainAppFunctions } from "./backend_functions"
 
 import { Environment } from "./environment"
 
@@ -56,87 +56,10 @@ import { main } from "./bind";
 //declaration for local workerWindow before assignment
 var workerWindow: Window;
 
-class MainApp{
-    //window variable declarations
-    public mainMenuWindow: Window;
-    public settingsWindow: Window;
-    public controllerWindow: Window;
-    public exitWindow: Window;
+class MainApp extends MainAppFunctions{
+    public constructor(app_settings: object, ev_logger: EventLogger){
+        super(app_settings, ev_logger)
 
-    //all variables that contain "low-level" functionalities of the app
-    public app_settings: object;
-    private dev_panel: boolean;
-    private displays = [];
-    private workers: object[] = [];
-    private widget_workers: object[] = []
-    private enviro: Environment;
-    private plugin_register: PluginRegister;
-    private wrapper: IPCwrapper;
-    private backend_functions: BackendFunctions;
-
-    //all variables related to frontend
-    private frontend_vars = {
-        "controller_mon": {},
-        "controller_set": {},
-        "controller_sim": {},
-        "wiki": {},
-        "glob": {} //variables used across windows
-    } //used to save variables that are then used on redirect between windows
-
-    //all variables related to environment/map
-    private map_configs_list: object[] = [];
-    private map_data: object;
-    private map_name: string;
-    private scenario_presets_list: object[] = []
-    private scenario_data: object = undefined;
-
-    private enviro_logger: EventLogger;
-
-    private scale: number;
-    private longitude: number = undefined;
-    private latitude: number = undefined;
-    private zoom: number = undefined;
-
-    //all variables related to aircrafts
-    private aircraft_presets_list: object[] = []
-    private aircraft_preset_data: object = undefined;
-    private aircraft_preset_name: string = ""
-
-    //all variables related to airlines
-    private airline_preset_data: object = undefined
-    private airline_preset_name: string = ""
-
-    //all variables related to commands
-    private command_presets_list: object[] = []
-    private command_preset_data: object = undefined;
-    private command_preset_name: string = ""
-
-    //app status (consists of switches/booleans for different functions 
-    //  => written in dict for better arg passing to funcs + better readibility
-    private app_status: Record<string, boolean> = {
-        "internet-connection": false, //switch for internet connectivity and how to handle it in code
-        "turn-on-backend": true,      //
-        "backup-db-on": true,         //
-        "app-running": true,          //
-        "sim-running": false,         //
-        "redir-to-main": false        //
-    }
-
-    //worker files
-    public backend_worker: Worker;
-    public backup_worker: Worker;
-    public PlaneDatabase: PlaneDB;
-
-    //temporary variables
-    private selected_plugin_id: string;
-    private current_popup_window: PopupWindow; //For now, app only permits one popup window at the time (TODO)
-
-    //other variables
-    private loader: ProgressiveLoader;
-    public backupdb_saving_frequency: number = 1000; //defaultly set to 1 second
-    private local_plugin_list: object[]
-
-    public constructor(app_settings: object){
         this.app_settings = app_settings
         this.dev_panel = app_settings["debug_panel"]
     }
@@ -145,7 +68,7 @@ class MainApp{
     //Built-in functions
     //
 
-    private setup_environment(){
+    public setup_environment(){
         this.enviro.setup_enviro(this.loader, this.enviro_logger)
 
         this.loader.destroy_loaders()
@@ -174,7 +97,7 @@ class MainApp{
         this.displays = displays_mod
     }
 
-    private broadcast_planes(planes: object[], plane_monitor_data: object[], plane_paths_data: object[]){
+    public broadcast_planes(planes: object[], plane_monitor_data: object[], plane_paths_data: object[]){
         if (this.controllerWindow != undefined && this.workers.length != 0){
             //update planes on controller window
             this.wrapper.send_message("controller", "update-plane-db", planes)
@@ -247,12 +170,12 @@ class MainApp{
     public add_listener_IPC(){
         //IPC listeners
 
-        this.wrapper.register_channel("redirect-to-menu", ["controller"], "unidirectional", () => this.backend_functions.redirect_to_menu("controller"))
-        this.wrapper.register_channel("redirect-to-menu", ["settings"], "unidirectional", () => this.backend_functions.redirect_to_menu("settings"))
-        this.wrapper.register_channel("redirect-to-settings", ["menu"], "unidirectional", () => this.backend_functions.redirect_to_settings())
-        this.wrapper.register_channel("redirect-to-main", ["menu"], "unidirectional", () => this.backend_functions.redirect_to_main())
+        this.wrapper.register_channel("redirect-to-menu", ["controller"], "unidirectional", () => this.redirect_to_menu("controller"))
+        this.wrapper.register_channel("redirect-to-menu", ["settings"], "unidirectional", () => this.redirect_to_menu("settings"))
+        this.wrapper.register_channel("redirect-to-settings", ["menu"], "unidirectional", () => this.redirect_to_settings())
+        this.wrapper.register_channel("redirect-to-main", ["menu"], "unidirectional", () => this.redirect_to_main())
 
-        this.wrapper.register_channel("save-settings", ["menu"], "unidirectional", (data: any[]) => this.backend_functions.save_settings(data))
+        this.wrapper.register_channel("save-settings", ["menu"], "unidirectional", (data: any[]) => this.save_settings(data))
         this.wrapper.register_channel("monitor-change-info", ["controller"], "unidirectional", (data: any[]) => this.monitor_change_info(data))
         this.wrapper.register_channel("exit", ["worker", "controller"], "unidirectional", () => this.exit())
         
@@ -260,9 +183,9 @@ class MainApp{
         this.wrapper.register_channel("ping", ["controller", "settings", "embed"], "bidirectional", (data: any[]) => this.ping(data))
         
         //send app configuration to controller
-        this.wrapper.register_channel("send-info", ["controller"], "bidirectional", () => this.backend_functions.send_info("controller"))
-        this.wrapper.register_channel("send-info", ["worker"], "bidirectional", () => this.backend_functions.send_info("worker"))
-        this.wrapper.register_channel("send-info", ["settings"], "bidirectional", () => this.backend_functions.send_info("settings"))
+        this.wrapper.register_channel("send-info", ["controller"], "bidirectional", () => this.send_info("controller"))
+        this.wrapper.register_channel("send-info", ["worker"], "bidirectional", () => this.send_info("worker"))
+        this.wrapper.register_channel("send-info", ["settings"], "bidirectional", () => this.send_info("settings"))
 
         //environment invokes
         this.wrapper.register_channel("start-sim", ["controller", "worker"], "unidirectional", () => this.start_sim())
@@ -270,19 +193,19 @@ class MainApp{
         this.wrapper.register_channel("restore-sim", ["controller"], "unidirectional", () => this.restore_sim())
         this.wrapper.register_channel("regenerate-map", ["controller"], "unidirectional", () => this.regenerate_map())
 
-        this.wrapper.register_channel("set-environment", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.set_environment(data))
+        this.wrapper.register_channel("set-environment", ["controller"], "unidirectional", (data: any[]) => this.set_environment(data))
         this.wrapper.register_channel("json-description", ["controller"], "bidirectional", (data: any[]) => this.json_description(data))
 
-        this.wrapper.register_channel("render-map", ["controller", "worker"], "unidirectional", () => this.backend_functions.render_map())
-        this.wrapper.register_channel("get-points", ["controller"], "bidirectional", (data: any[]) => this.backend_functions.get_points(data))
-        this.wrapper.register_channel("map-check", ["controller"], "bidirectional", () => this.backend_functions.map_check())
-        this.wrapper.register_channel("send-location-data", ["weather"], "unidirectional", () => this.backend_functions.send_location_data())
+        this.wrapper.register_channel("render-map", ["controller", "worker"], "unidirectional", () => this.render_map())
+        this.wrapper.register_channel("get-points", ["controller"], "bidirectional", (data: any[]) => this.get_points(data))
+        this.wrapper.register_channel("map-check", ["controller"], "bidirectional", () => this.map_check())
+        this.wrapper.register_channel("send-location-data", ["weather"], "unidirectional", () => this.send_location_data())
 
         //plane invokes
-        this.wrapper.register_channel("spawn-plane", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.spawn_plane(data))
-        this.wrapper.register_channel("plane-value-change", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.plane_value_change(data))
-        this.wrapper.register_channel("plane-delete-record", ["controller"], "unidirectional", (data: any[]) => this.backend_functions.plane_delete_record(data))
-        this.wrapper.register_channel("send-plane-data", ["dep_arra"], "unidirectional", () => this.backend_functions.send_plane_data())
+        this.wrapper.register_channel("spawn-plane", ["controller"], "unidirectional", (data: any[]) => this.spawn_plane(data))
+        this.wrapper.register_channel("plane-value-change", ["controller"], "unidirectional", (data: any[]) => this.plane_value_change(data))
+        this.wrapper.register_channel("plane-delete-record", ["controller"], "unidirectional", (data: any[]) => this.plane_delete_record(data))
+        this.wrapper.register_channel("send-plane-data", ["dep_arra"], "unidirectional", () => this.send_plane_data())
         
         //widget invokes
         this.wrapper.register_channel("min-widget", ["widget"], "unidirectional", (data: any[]) => this.min_widget(data))
@@ -299,7 +222,7 @@ class MainApp{
         this.wrapper.register_channel("confirm-schedules", ["popup"], "unidirectional", () => this.confirm_schedules())
 
         //other invokes
-        this.wrapper.register_channel("send-scenario-list", ["controller"], "bidirectional", (data: any[]) => this.backend_functions.send_scenario_list(data))
+        this.wrapper.register_channel("send-scenario-list", ["controller"], "bidirectional", (data: any[]) => this.send_scenario_list(data))
         this.wrapper.register_channel("rewrite-frontend-vars", ["controller"], "unidirectional", (data: any[]) => this.rewrite_frontend_vars(data))
 
         //setting all listeners to be active
@@ -564,9 +487,6 @@ class MainApp{
     //
     public async init_app(){
         this.get_screen_info() //getting screen info for all displays
-
-        //setup backend functions used in the app
-        this.backend_functions = new BackendFunctions(EvLogger, this)
 
         //setup IPC wrapper
         this.wrapper = new IPCwrapper()
@@ -852,7 +772,7 @@ app.on("ready", async () => {
     utils.delete_logs()
     EvLogger = new EventLogger(app_settings["logging"], "app_log", "system", "v1.0.0")
 
-    main_app = new MainApp(app_settings)
+    main_app = new MainApp(app_settings, EvLogger)
 
     await main_app.init_app() //initializing backend for app
     

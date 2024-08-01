@@ -484,18 +484,6 @@ function parse_scale(scale){
     return val
 }
 
-//currently not used (TODO)
-function create_widget_window(path_load: string, 
-                                    event_logger: EventLogger, 
-                                    coords: number[], widget_workers: any[]){
-    let datetimeWidgetWindow = new WidgetWindow(basic_worker_widget_dict, path_load, coords, event_logger)
-    let datetime_id = generate_id()
-    widget_workers.push({
-        "id": datetime_id,
-        "win": datetimeWidgetWindow
-    })
-}
-
 function create_popup_window(app_settings: any,
                                     event_logger: EventLogger,
                                     displays: any[],
@@ -575,7 +563,6 @@ const utils = {
     get_window_info,
     sleep,
     parse_scale,
-    create_widget_window,
     create_popup_window,
     delete_logs,
     readJSON,

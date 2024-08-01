@@ -14,9 +14,14 @@ import {
     settings_dict,
     load_dict,
 
-    //window Classes
+    //window classes
     Window,
+    WidgetWindow,
     PopupWindow,
+
+    //window handler classes
+    WidgetWindowHandler,
+    WorkerWindowHandler,
 
     //all init vars
     PATH_TO_MAIN_HTML,
@@ -36,7 +41,6 @@ import {
     PATH_TO_OUT_DEVICES,
 
     PATH_TO_SETTINGS_LAYOUT
-
 } from "./app_config"
 import { Environment } from "./environment"
 
@@ -55,11 +59,14 @@ export class MainAppFunctions{
     public dev_panel: boolean;
     public displays = [];
     public workers: object[] = [];
-    public widget_workers: object[] = []
+    public worker_coords: object[] = [];
+
     public enviro: Environment;
     public plugin_register: PluginRegister;
     public wrapper: IPCwrapper;
     public ev_logger: EventLogger;
+    public widget_handler: WidgetWindowHandler;
+    public worker_handler: WorkerWindowHandler;
 
     //all variables related to frontend
     public frontend_vars = {
@@ -162,11 +169,7 @@ export class MainAppFunctions{
                 this.wrapper.unregister_window(this.workers[i]["win"].window_id)
             }
 
-            for (let i = 0; i < this.widget_workers.length; i++){
-                this.widget_workers[i]["win"].close()
-                this.wrapper.unregister_window(this.widget_workers[i]["win"].window_id)
-            }
-            this.widget_workers = []
+            this.widget_handler.exit_all(this.wrapper)
         }
 
         //calculate x, y
@@ -180,7 +183,6 @@ export class MainAppFunctions{
         this.mainMenuWindow.show()
         
         this.workers = []
-        this.widget_workers = []
         this.controllerWindow = undefined
         this.PlaneDatabase = undefined
     }

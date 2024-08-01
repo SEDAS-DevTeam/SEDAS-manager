@@ -25,6 +25,9 @@ export const PATH_TO_DEP_ARR_HTML = join(ABS_PATH, "./src/res/html/worker/dep_ar
 export const PATH_TO_EMBED_HTML = join(ABS_PATH, "./src/res/html/worker/embed.html")
 export const PATH_TO_WEATHER_HTML = join(ABS_PATH, "./src/res/html/worker/weather.html")
 
+//paths to widget html files
+export const PATH_TO_WIDGET_HTML = join(ABS_PATH, "./src/res/html/widget/worker_widget.html")
+
 //paths for subprocesses
 export const PATH_TO_AUDIO_UPDATE: string = join(ABS_PATH, "/src/res/neural/get_info.py")
 
@@ -51,6 +54,9 @@ export const PATH_TO_SETTINGS_LAYOUT: string = join(ABS_PATH, "/src/res/data/app
 
 //paths for backup
 export const PATH_TO_DATABASE: string = join(ABS_PATH, "/src/res/data/tmp/backup.json")
+
+//constants used in this app
+export const WIDGET_OFFSET = 50
 
 /*
     Window configs for electron
@@ -313,6 +319,9 @@ export class WidgetWindow extends BaseWindow{
         this.localConfig.x = coords[0]
         this.localConfig.y = coords[1]
 
+        this.window = new BrowserWindow(this.localConfig);
+        this.window.setMenu(null);
+
         this.path_load = path
 
         this.event_logger.log("DEBUG", `Created worker widget window object(path_load=${this.path_load}, coords=${coords})`)
@@ -362,5 +371,87 @@ export class PopupWindow extends BaseWindow{
                 resolve()
             })
         })
+    }
+}
+
+/*
+    Window handler classes
+*/
+
+export class WidgetWindowHandler{
+    private widget_workers: any[] = [];
+
+    public show_all(){
+        for (let i = 0; i < this.widget_workers.length; i++){
+            this.widget_workers[i]["win"].show()
+            this.widget_workers[i]["win"].wait_for_load(() => {
+                this.widget_workers[i]["win"].send_message("register", ["id", this.widget_workers[i]["id"]])
+            })
+        }
+    }
+
+    public setup_all(worker_coords: object[], EvLogger: EventLogger){
+        for (let i = 0; i < worker_coords.length; i++){
+            //setting up all layer widgets (overlaying whole map) TODO
+            
+            // add offset to coord spawn
+            let coords = [worker_coords[i][0] + WIDGET_OFFSET, worker_coords[i][1] + WIDGET_OFFSET]
+
+            this.create_widget_window(basic_worker_widget_dict, PATH_TO_WIDGET_HTML, EvLogger, coords)
+        }
+    }
+
+    public exit_all(wrapper: any){
+        for (let i = 0; i < this.widget_workers.length; i++){
+            this.widget_workers[i]["win"].close()
+            wrapper.unregister_window(this.widget_workers[i]["win"].window_id)
+        }
+        this.widget_workers = []
+    }
+
+    public minimize_widget(data: any[]){
+        for (let i = 0; i < this.widget_workers.length; i++){
+            if (this.widget_workers[i]["id"] == data[0]){
+                this.widget_workers[i]["win"].minimize()
+            }
+        }
+    }
+
+    public maximize_widget(data: any[]){
+        for (let i = 0; i < this.widget_workers.length; i++){
+            if (this.widget_workers[i]["id"] == data[0]){
+                this.widget_workers[i]["win"].maximize()
+            }
+        }
+    }
+
+    public exit_widget(data: any[], wrapper: any){
+        for (let i = 0; i < this.widget_workers.length; i++){
+            if (this.widget_workers[i]["id"] == data[0]){
+                this.widget_workers[i]["win"].close()
+                wrapper.unregister_window(this.widget_workers[i]["win"].window_id)
+
+                this.widget_workers.splice(i, 1)
+            }
+        }
+    }
+
+    
+    public create_widget_window(widget_dict: object, path_load: string, 
+                                        event_logger: EventLogger, 
+                                        coords: number[]){
+        let datetimeWidgetWindow = new WidgetWindow(widget_dict, path_load, coords, event_logger)
+        let datetime_id = utils.generate_id()
+        
+        this.widget_workers.push({
+            "id": datetime_id,
+            "win": datetimeWidgetWindow
+        })
+    }
+}
+
+export class WorkerWindowHandler{
+    public constructor(){
+
     }
 }

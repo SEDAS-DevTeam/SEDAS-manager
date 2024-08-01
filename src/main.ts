@@ -25,11 +25,16 @@ import {
     worker_dict,
     popup_widget_dict,
     load_dict,
+    basic_worker_widget_dict,
 
-    //window Classes
+    //window lasses
     Window,
     WidgetWindow,
     PopupWindow,
+
+    //window handler classes
+    WidgetWindowHandler,
+    WorkerWindowHandler,
 
     //all init vars
     PATH_TO_MAIN_HTML,
@@ -44,11 +49,10 @@ import {
 
     ABS_PATH,
     PATH_TO_AUDIO_UPDATE,
+    PATH_TO_WIDGET_HTML,
 } from "./app_config"
 
 import { MainAppFunctions } from "./backend_functions"
-
-import { Environment } from "./environment"
 
 //C++ (N-API) imports
 import { main } from "./bind";
@@ -77,13 +81,9 @@ class MainApp extends MainAppFunctions{
         //everything is set up, time to load
         this.wrapper.broadcast("workers", "ask-for-render", []) //send workers command to fire "render-map" event
         
-        //rendering widget workers
-        for (let i = 0; i < this.widget_workers.length; i++){
-            this.widget_workers[i]["win"].show()
-            this.widget_workers[i]["win"].wait_for_load(() => {
-                this.widget_workers[i]["win"].send_message("register", ["id", this.widget_workers[i]["id"]])
-            })
-        }
+        //registering & rendering widget workers
+        this.widget_handler.setup_all(this.worker_coords, EvLogger)
+        this.widget_handler.show_all()
     }
 
     private get_screen_info(){
@@ -208,9 +208,9 @@ class MainApp extends MainAppFunctions{
         this.wrapper.register_channel("send-plane-data", ["dep_arra"], "unidirectional", () => this.send_plane_data())
         
         //widget invokes
-        this.wrapper.register_channel("min-widget", ["widget"], "unidirectional", (data: any[]) => this.min_widget(data))
-        this.wrapper.register_channel("max-widget", ["widget"], "unidirectional", (data: any[]) => this.max_widget(data))
-        this.wrapper.register_channel("exit-widget", ["widget"], "unidirectional", (data: any[]) => this.exit_widget(data))
+        this.wrapper.register_channel("min-widget", ["widget"], "unidirectional", (data: any[]) => this.widget_handler.minimize_widget(data))
+        this.wrapper.register_channel("max-widget", ["widget"], "unidirectional", (data: any[]) => this.widget_handler.maximize_widget(data))
+        this.wrapper.register_channel("exit-widget", ["widget"], "unidirectional", (data: any[]) => this.widget_handler.exit_widget(data, this.wrapper))
 
         //plugin invokes
         this.wrapper.register_channel("install-plugin", ["controller"], "unidirectional", (data: any[]) => this.install_plugin(data))
@@ -391,33 +391,6 @@ class MainApp extends MainAppFunctions{
         console.log(this.frontend_vars)
     }
 
-    private min_widget(data: any[]){
-        for (let i = 0; i < this.widget_workers.length; i++){
-            if (this.widget_workers[i]["id"] == data[0]){
-                this.widget_workers[i]["win"].minimize()
-            }
-        }
-    }
-
-    private max_widget(data: any[]){
-        for (let i = 0; i < this.widget_workers.length; i++){
-            if (this.widget_workers[i]["id"] == data[0]){
-                this.widget_workers[i]["win"].maximize()
-            }
-        }
-    }
-
-    private exit_widget(data: any[]){
-        for (let i = 0; i < this.widget_workers.length; i++){
-            if (this.widget_workers[i]["id"] == data[0]){
-                this.widget_workers[i]["win"].close()
-                this.wrapper.unregister_window(this.widget_workers[i]["win"].window_id)
-
-                this.widget_workers.splice(i, 1)
-            }
-        }
-    }
-
     private install_plugin(data: any[]){
         this.selected_plugin_id = data[0]
         let plugin_name = data[1]
@@ -466,10 +439,7 @@ class MainApp extends MainAppFunctions{
     private async ping(data: any[]){
         let status: boolean = await utils.ping(data[0])
         for (let i = 0; i < this.workers.length; i++){
-            console.log(this.workers[i]["win"]["win_type"])
-            if (this.workers[i]["win"]["win_type"] == "embed"){
-                this.wrapper.send_message(this.workers[i]["win-name"], "ping-status", status)
-            }
+            this.wrapper.send_message(this.workers[i]["win-name"], "ping-status", status)
         }
     }
 
@@ -486,14 +456,17 @@ class MainApp extends MainAppFunctions{
     //App phase functions (init/main/exit)
     //
     public async init_app(){
-        this.get_screen_info() //getting screen info for all displays
+        this.get_screen_info() // getting screen info for all displays
 
-        //setup IPC wrapper
+        // setup IPC wrapper
         this.wrapper = new IPCwrapper()
 
-        //set progressive loader object on loaders
+        // set progressive loader object on loaders
         this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
         this.loader.setup_loader(11, "SEDAS is loading, please wait...", "Initializing app")
+        
+        // set other important segments on MainApp
+        this.widget_handler = new WidgetWindowHandler()
 
         /*
             Loader segment 1
@@ -636,10 +609,8 @@ class MainApp extends MainAppFunctions{
                 let win_type: string = "ACC" //default option when spawing windows
                 workerWindow = new Window(this.app_status, this.dev_panel, worker_dict, PATH_TO_WORKER_HTML, coords, EvLogger, main_app, win_type, display_info)
                 this.wrapper.register_window(workerWindow, "worker-" + win_type)
+                this.worker_coords.push(coords)
             }
-        
-            //setting up all layer widgets (overlaying whole map) TODO
-            //utils.create_widget_window(basic_worker_widget_dict, "./res/html/widget/worker_widget.html", EvLogger, coords, this.widget_workers)
 
             let worker_id = utils.generate_id()
             this.workers.push({

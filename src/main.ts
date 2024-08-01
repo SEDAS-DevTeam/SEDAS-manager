@@ -751,6 +751,7 @@ class MainApp extends MainAppFunctions{
         this.backup_worker.terminate()
 
         EvLogger.log("DEBUG", "exit")
+        EvLogger.end()
         app.exit(0)
     }
 }
@@ -769,8 +770,9 @@ app.on("ready", async () => {
     main.main_hello()
 
     //setup app event logger
-    utils.delete_logs()
+    await utils.delete_logs()
     EvLogger = new EventLogger(app_settings["logging"], "app_log", "system", "v1.0.0")
+    await EvLogger.init_logger()
 
     main_app = new MainApp(app_settings, EvLogger)
 

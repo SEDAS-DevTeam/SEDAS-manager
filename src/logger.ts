@@ -1,9 +1,10 @@
-import { readdirSync, unlinkSync, openSync, appendFileSync} from "fs"
+import { readdirSync, unlinkSync, createWriteStream, WriteStream } from "fs"
 import path from "path"
 import os from "os"
 import {
     ABS_PATH
 } from "./app_config"
+import utils from "./utils"
 
 export class EventLogger{
     /*
@@ -20,24 +21,29 @@ export class EventLogger{
     private LOG_PATH: string = ""
     public log_header: string = ""
     private app_version: string = ""
+    private header_type: string = ""
+    private stream: WriteStream;
 
     public constructor(debug: boolean, log_header: string, header_type: string, app_ver: string = ""){
         this.debug_mode = debug
         this.LOG_PATH = path.join(ABS_PATH, `/src/logs/${log_header}.txt`)
         this.log_header = log_header
         this.app_version = app_ver
-
+        this.header_type = header_type
+    }
+    public async init_logger(){
         if(this.debug_mode){
             let time: string = this.get_time()
             console.log(`[${time}]`, "(DEBUG)", "Initialized event logger with DEBUGGING=TRUE")
         }
         
         //create log file
-        openSync(this.LOG_PATH, "w")
+        this.stream = createWriteStream(this.LOG_PATH)
 
         //write information header
-        this.create_header(header_type)
+        await this.create_header(this.header_type)
     }
+
     private get_time(){
         let date_obj = new Date()
         
@@ -77,25 +83,32 @@ export class EventLogger{
         }
 
         //log to main log file
-        appendFileSync(this.LOG_PATH, output + "\n")
+        this.stream.write(output + "\n")
     }
 
-    private create_header(header_type: string){
-        appendFileSync(this.LOG_PATH, "#########################################\n")
+    public end(){
+        this.stream.end()
+    }
 
-        switch (header_type){
-            case "system":
-                let os_type: string = os.type()
-                let os_release: string = os.release()
-                let os_platform: string = os.platform()
+    private async create_header(header_type: string){
+        return new Promise<void>((resolve) => {
+            this.stream.write("#########################################\n")
 
-                appendFileSync(this.LOG_PATH, `SEDAC manager ${this.app_version} ${os_type} ${os_platform} ${os_release}\n`)
-                break
-            case "environment":
-                appendFileSync(this.LOG_PATH, "SEDAC environment\n")
-                break
-        }
+            switch (header_type){
+                case "system":
+                    let os_type: string = os.type()
+                    let os_release: string = os.release()
+                    let os_platform: string = os.platform()
 
-        appendFileSync(this.LOG_PATH, "#########################################\n")
+                    this.stream.write(`SEDAC manager ${this.app_version} ${os_type} ${os_platform} ${os_release}\n`)
+                    break
+                case "environment":
+                    this.stream.write("SEDAC environment\n")
+                    break
+            }
+
+            this.stream.write("#########################################\n")
+            resolve()
+        })
     }
 }

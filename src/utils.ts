@@ -515,19 +515,23 @@ function create_popup_window(app_settings: any,
     return temp_popup_window
 }
 
-function delete_logs(){
-    fs.readdir(PATH_TO_LOGS, (err, files) => {
-        if (err){
-            console.error(err)
-        }
-
-        files.forEach((file) => {
-            let abs_path = path.join(PATH_TO_LOGS, file)
-            
-            if (file != ".gitkeep"){
-                fs.rmSync(abs_path)
+async function delete_logs(){
+    return new Promise<void>((resolve, reject) => {
+        fs.readdir(PATH_TO_LOGS, (err, files) => {
+            if (err){
+                console.error(err)
+                reject()
             }
-
+    
+            files.forEach((file) => {
+                let abs_path = path.join(PATH_TO_LOGS, file)
+                
+                if (file != ".gitkeep"){
+                    fs.rmSync(abs_path)
+                }
+    
+            })
+            resolve()
         })
     })
 }

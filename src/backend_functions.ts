@@ -382,6 +382,7 @@ export class MainAppFunctions{
         this.loader.setup_loader(5, "Setting up simulation, please wait...", "Initializing simulation setup")
         
         this.enviro_logger = new EventLogger(true, "enviro_log", "environment")
+        this.enviro_logger.init_logger()
         this.enviro_logger.log("INFO", "EventLogger instance on Environment is set up")
 
         this.loader.send_progress("Setting up environment")

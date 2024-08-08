@@ -277,6 +277,7 @@ export class Plane{
             "screen_speed": this.screen_speed, // to get (nm/s);
             "refresh_rate": 1 // TODO: add to settings
         }
+        console.log(napi_arguments)
         let vals = plane_calculations.calc_plane_forward(napi_arguments)
 
         //rewrite variables

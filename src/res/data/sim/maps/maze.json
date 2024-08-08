@@ -11,7 +11,7 @@
         "ARP": "none",
         "POINTS": [
             {"x": 300, "y": 300, "name": "VEPOT"},
-            {"x": 300, "y": 450, "name": "AFIS"}
+            {"x": 550, "y": 450, "name": "AFIS"}
         ],
         "SID": "none",
         "STAR": "none"
@@ -36,7 +36,7 @@
                 {
                     "category": "AI",
                     "wtc": "M",
-                    "time": "00:01:00",
+                    "time": "00:00:15",
                     "special_event": "none",
                     "departure": "VEPOT",
                     "arrival": "AFIS",

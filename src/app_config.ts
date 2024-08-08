@@ -321,6 +321,7 @@ export class WidgetWindow extends BaseWindow{
 
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
+        this.window.setAlwaysOnTop(true);
 
         this.path_load = path
 

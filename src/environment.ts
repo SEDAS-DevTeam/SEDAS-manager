@@ -263,6 +263,10 @@ export class Environment {
             return `${time_obj.getHours()}:${time_obj.getMinutes()}`
         }
 
+        if (!this.app.app_status["sim-running"]){
+            return;
+        }
+
         for (let i = this.plane_spawner_config.length - 1; i >= 0; i--){
 
             //Plane spawner check
@@ -277,14 +281,51 @@ export class Environment {
                         plane_data = this.plane_objects[i_plane]
                     }
                 }
-                let curr_plane_id = utils.generate_hash()
-                let plane = new Plane(curr_plane_id, plane_data["name"],
-                                plane_data["trajectory"][0][1], plane_data["trajectory"][0][1],
-                                1000, 1000,
-                                plane_data["min_kias"], plane_data["min_kias"],
-                                plane_data["schedule"]["departure"], plane_data["schedule"]["arrival"],
-                                "01:00:00",
-                                plane_data["trajectory"][0][0], plane_data["trajectory"][0][1]
+
+                let id = utils.generate_hash()
+                let name: string = plane_data["properties"]["name"]
+                let heading: number = plane_data["trajectory"][0][1]
+                let heading_up: number = heading
+                let level: number = 1000 // TODO
+                let level_up: number = level
+                let speed: number = plane_data["properties"]["min_kias"] // TODO
+                let speed_up: number = speed
+                let departure: string = plane_data["schedule"]["departure"]
+                let arrival: string = plane_data["schedule"]["arrival"]
+                let arrival_time: string = "01:00:00" // TODO
+                let x: number = plane_data["trajectory"][0][0][0]
+                let y: number = plane_data["trajectory"][0][0][1]
+
+                console.log(
+                    id,
+                    name,
+                    heading,
+                    heading_up,
+                    level,
+                    level_up,
+                    speed,
+                    speed_up,
+                    departure,
+                    arrival,
+                    arrival_time,
+                    x,
+                    y
+                )
+
+                let plane = new Plane(
+                    id,
+                    name,
+                    heading,
+                    heading_up,
+                    level,
+                    level_up,
+                    speed,
+                    speed_up,
+                    departure,
+                    arrival,
+                    arrival_time,
+                    x,
+                    y
                 )
                 this.app.PlaneDatabase.add_record(plane, "ACC")
 

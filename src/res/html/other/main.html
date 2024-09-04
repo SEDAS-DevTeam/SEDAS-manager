@@ -3,6 +3,8 @@
     <head>
         <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
         <link rel="stylesheet" href="../../styles/index.css">
+        <link href="../../source/sgui/sgui.css" rel="stylesheet"/>
+        <script src="../../source/sgui/sgui.js" type="module"></script>
         
         <meta charset="utf-8" />
         <script src="../../scripts/main.js"></script>
@@ -11,13 +13,13 @@
     <body>
         <div id="center">
             <img src="../../img/sedac-manager-logo.png" width="50%", height="auto">
-            <h2>SEDAC manager</h2>
-            <p>ATC control, simple</p>
+            <s-header s="2" m="10">SEDAC manager</s-header>
+            <s-text m="10">ATC control, simple</s-text>
         </div>
         <div id="center-overflow">
-            <button class="menubutton">Start</button>
-            <button class="menubutton">Settings</button>
-            <button class="menubutton">Reload last session</button>
+            <s-button class="menubutton">Start</s-button>
+            <s-button class="menubutton">Settings</s-button>
+            <s-button class="menubutton">Reload last session</s-button>
         </div>
     </body>
 </html>

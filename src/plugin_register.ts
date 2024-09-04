@@ -47,6 +47,10 @@ export class PluginRegister{
         this.plugin_list = initial_list
     }
 
+    public fetch_local_plugin_list(){
+        
+    }
+
     public load_local_plugins(){
 
     }

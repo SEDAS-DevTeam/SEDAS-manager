@@ -554,6 +554,7 @@ class MainApp extends MainAppFunctions{
         this.loader.send_progress("Loading local plugins")
 
         EvLogger.log("DEBUG", "Loading local plugins")
+        this.plugin_register.fetch_plugin_list()
         this.plugin_register.load_local_plugins()
     }
 

@@ -3,5 +3,12 @@
 */
 
 import {set_elements} from '../../source/sgui/register.js';
+import { get_elem } from '../../source/sgui/sgui_def.js';
 
 set_elements()
+
+const sg = {
+    get_elem
+}
+
+export default sg

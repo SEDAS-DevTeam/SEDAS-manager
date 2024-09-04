@@ -14,11 +14,25 @@ export const size_conversion = {
     "6": "10"
 }
 
-// Functions
+// element functions
 
 export function check_margin(elem){
     let margin_space = elem.getAttribute("m")
     if (margin_space != null){
         elem.style.margin = margin_space.split(" ").map((x) => x + "px")
     }
+}
+
+// global functions
+
+export function get_elem(identifier){
+    let elems = document.querySelectorAll(identifier)
+    if (elems.length == 1){
+        return elems[0]
+    }
+    else if (elems.length == 0){
+        return undefined;
+    }
+
+    return elems
 }

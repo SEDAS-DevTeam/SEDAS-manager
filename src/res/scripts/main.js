@@ -1,16 +1,12 @@
+import sg from '../source/sgui/sgui.js';
+
 window.onload = () => {
     //start simulation
-    document.getElementsByClassName("menubutton")[0].addEventListener("click", () => {
-        send_message("menu", "redirect-to-main")
-    })
+    sg.get_elem(".menubutton")[0].on_click(() => send_message("menu", "redirect-to-main"))
     
     //settings
-    document.getElementsByClassName("menubutton")[1].addEventListener("click", () => {
-        send_message("menu", "redirect-to-settings")
-    })
+    sg.get_elem(".menubutton")[1].on_click(() => send_message("menu", "redirect-to-settings"))
 
     //load simulation backup
-    document.getElementsByClassName("menubutton")[2].addEventListener("click", () => {
-        send_message("menu", "restore-sim")
-    })
+    sg.get_elem(".menubutton")[2].on_click(() => send_message("menu", "restore-sim"))
 }

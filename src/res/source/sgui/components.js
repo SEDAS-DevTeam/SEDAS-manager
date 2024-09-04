@@ -13,6 +13,10 @@ class Button extends HTMLElement{
 
     connectedCallback(){
     }
+
+    on_click(callback){
+        this.addEventListener("click", callback)
+    }
 }
 
 class Text extends HTMLElement{

@@ -45,3 +45,19 @@ align-center{
     text-align: center;
     overflow: hidden;
 }
+
+s-loadbar{
+    display: block;
+    width: 50%;
+    height: 20px;
+    margin: auto;
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid black
+}
+
+#loadbar{
+    width: 0%;
+    height: 100%;
+    background-color: #5271ff;
+}

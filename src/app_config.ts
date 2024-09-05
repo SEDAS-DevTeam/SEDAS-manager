@@ -281,7 +281,7 @@ export class LoaderWindow extends BaseWindow{
 
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
-        //this.window.webContents.openDevTools()
+        this.window.webContents.openDevTools()
 
         this.path_load = path
 

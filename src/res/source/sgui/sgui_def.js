@@ -36,3 +36,9 @@ export function get_elem(identifier){
 
     return elems
 }
+
+export function on_win_load(callback){
+    window.onload = () => {
+        callback()
+    }
+}

@@ -57,6 +57,37 @@ class Header extends HTMLElement{
 }
 
 /*
+    Higher components
+*/
+
+class Loadbar extends HTMLElement{
+    constructor(){
+        super();
+        this.seg_slice = 0
+        this.n_seg = 0
+        this.curr_n_seg = 0
+    }
+
+    connectedCallback(){
+        let loadbar = document.createElement("div")
+        loadbar.id = "loadbar"
+
+        this.appendChild(loadbar)
+    }
+
+    set_segments(num_seg){
+        this.n_seg = num_seg
+        this.seg_slice = 100 / this.n_seg
+    }
+
+    move_up(){
+        this.curr_n_seg += 1
+        let width = this.curr_n_seg * this.seg_slice
+        this.querySelector("#loadbar").style.width = width.toString() + "%"
+    }
+}
+
+/*
     Div and other utils
 */
 
@@ -64,7 +95,8 @@ const components = {
     Button,
     Text,
     Header,
-    AlignCenter
+    AlignCenter,
+    Loadbar
 }
 
 export default components;

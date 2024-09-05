@@ -1,22 +1,16 @@
-var n_seg = 0
-var seg_slice = 0
-var curr_n_seg = 0
-var header = ""
+import sg from '../source/sgui/sgui.js';
+import { on_message } from '../scripts/utils/ipc_wrapper.js';
 
 //get progress info
-window.electronAPI.on_message("progress", (data) => {
-    document.getElementById("info-text").innerHTML = data[0]
-    curr_n_seg += 1
-    let width = curr_n_seg * seg_slice
-    document.getElementById("loadbar").style.width = width.toString() + "%"
+on_message("progress", (data) => {
+    sg.get_elem("#info-text").innerHTML = data[0]
+    sg.get_elem("s-loadbar").move_up()
 })
 
 //get segment slicing
-window.electronAPI.on_message("setup", (data) => {
-    n_seg = data[0]
-    seg_slice = 100 / n_seg
+on_message("setup", (data) => {
+    sg.get_elem("s-loadbar").set_segments(data[0])
 
-    header = data[1]
-    document.getElementById("header-text").innerHTML = header
-    document.getElementById("info-text").innerHTML = data[2]
+    sg.get_elem("#header-text").innerHTML = data[1]
+    sg.get_elem("#info-text").innerHTML = data[2]
 })

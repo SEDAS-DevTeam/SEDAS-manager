@@ -196,21 +196,3 @@ div.grid-item.selected{
 #bot-content{
     margin-top: 40px;
 }
-
-/*
-    Load page css
-*/
-#loadbar-parent{
-    width: 50%;
-    height: 20px;
-    margin: auto;
-    background-color: white;
-    border-radius: 5px;
-    border: 1px solid black
-}
-
-#loadbar{
-    width: 0%;
-    height: 100%;
-    background-color: #5271ff;
-}

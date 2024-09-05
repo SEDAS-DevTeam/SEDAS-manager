@@ -464,7 +464,7 @@ class MainApp extends MainAppFunctions{
         // set progressive loader object on loaders
         this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
         this.loader.setup_loader(11, "SEDAS is loading, please wait...", "Initializing app")
-        
+
         // set other important segments on MainApp
         this.widget_handler = new WidgetWindowHandler()
 

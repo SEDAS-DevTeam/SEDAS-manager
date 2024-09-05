@@ -9,4 +9,5 @@ export function set_elements(){
     customElements.define("s-text", components.Text)
     customElements.define("s-header", components.Header)
     customElements.define("align-center", components.AlignCenter, {extends: "div"})
+    customElements.define("s-loadbar", components.Loadbar)
 }

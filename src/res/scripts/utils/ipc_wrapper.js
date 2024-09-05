@@ -45,3 +45,9 @@ export function send_message(sender, channel, data = []){
         n_ack_channels.push(channel + "-ack")
     })
 }
+
+export function on_message(channel, callback){
+    window.electronAPI.on_message(channel, (data) => {
+        callback(data)
+    })
+}

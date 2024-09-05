@@ -1,15 +1,5 @@
 /*GENERIC*/
 
-html{
-    height: 100%;
-}
-
-body{
-    margin: 0;
-    height: 100%;
-    overflow: hidden;
-}
-
 h1, h2, h3, h4, p, a, span, li{
     color: #5271ff;
     font-family: 'Montserrat', sans-serif;
@@ -35,19 +25,6 @@ h4{
     Button style def
 */
 
-button{
-    display: inline-block;
-    background-color: white;
-    color: #5271ff;
-    border: solid 2px #5271ff;
-    text-align: center;
-    text-decoration: none;
-    font-size: 24px;
-    padding: 8px 20px;
-    font-family: Arial, Helvetica, sans-serif;
-    cursor: pointer;
-}
-
 button#small{
     padding: 1px 12px;
     font-size: small;
@@ -67,10 +44,6 @@ button#small{
 .drop-button:hover{
     color: #5271ff;
     cursor: pointer;
-}
-
-img{
-    pointer-events: none;
 }
 
 

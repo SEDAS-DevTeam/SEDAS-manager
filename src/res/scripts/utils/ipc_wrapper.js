@@ -9,7 +9,7 @@ function md5_hash(value){
 
 var n_ack_channels = []
 
-function send_message(sender, channel, data = []){
+export function send_message(sender, channel, data = []){
     let message_content = []
     if (data.length == 0){
         //message does not have a content

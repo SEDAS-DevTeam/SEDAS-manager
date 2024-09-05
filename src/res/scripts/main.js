@@ -1,4 +1,5 @@
 import sg from '../source/sgui/sgui.js';
+import { send_message } from '../scripts/utils/ipc_wrapper.js';
 
 window.onload = () => {
     //start simulation

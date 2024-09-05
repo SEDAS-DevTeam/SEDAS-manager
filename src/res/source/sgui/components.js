@@ -19,6 +19,20 @@ class Button extends HTMLElement{
     }
 }
 
+/*
+    Text classes
+*/
+
+class AlignCenter extends HTMLElement{
+    constructor(){
+        super();
+    }
+
+    connectedCallback(){
+        
+    }
+}
+
 class Text extends HTMLElement{
     constructor(){
         super();
@@ -42,10 +56,15 @@ class Header extends HTMLElement{
     }
 }
 
+/*
+    Div and other utils
+*/
+
 const components = {
     Button,
     Text,
-    Header
+    Header,
+    AlignCenter
 }
 
 export default components;

@@ -6,6 +6,16 @@
     src: url('../../fonts/Montserrat-VariableFont_wght.ttf')
 }
 
+html{
+    height: 100%;
+}
+
+body{
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
 s-text, s-header {
     color: #5271ff;
     font-family: 'Montserrat', sans-serif;
@@ -24,4 +34,14 @@ s-button {
     padding: 8px 20px;
     cursor: pointer;
     font-family: Arial, Helvetica, sans-serif;
+}
+
+img{
+    pointer-events: none;
+}
+
+align-center{
+    display: block;
+    text-align: center;
+    overflow: hidden;
 }

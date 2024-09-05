@@ -37,6 +37,18 @@ export function get_elem(identifier){
     return elems
 }
 
+export function create_elem(type, 
+                            id, 
+                            inner_html,
+                            parent){
+    let elem = document.createElement(type)
+    elem.id = id
+    elem.innerHTML = inner_html
+    
+    parent.appendChild(elem)
+    return elem
+}
+
 export function on_win_load(callback){
     window.onload = () => {
         callback()

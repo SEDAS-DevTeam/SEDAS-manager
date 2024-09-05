@@ -1,49 +1,38 @@
+import sg from '../source/sgui/sgui.js';
+import { on_message } from '../scripts/utils/ipc_wrapper.js';
+
 //variables
 var comm_channel;
 
 function setup_confirm(content){
+    let yes_button = sg.create_elem("button", "yes", "Yes", content)
+    let no_button = sg.create_elem("button", "no", "No", content)
 
-    let yes_button = document.createElement("button")
-    yes_button.id = "yes"
-    yes_button.innerHTML = "Yes"
-
-    let no_button = document.createElement("button")
-    no_button.id = "no"
-    no_button.innerHTML = "No"
-
-    yes_button.onclick = () => {
-        console.log(comm_channel)
+    yes_button.on_click(() => {
         send_message("popup", comm_channel, [true])
-    }
-    no_button.onclick = () => {
+    })
+    no_button.on_click(() => {
         send_message("popup", comm_channel, [false])
-    }
-
-    content.appendChild(yes_button)
-    content.appendChild(no_button)
+    })
 }
 
 function setup_alert(content){
-    let ok_button = document.createElement("button")
-    ok_button.id = "yes"
-    ok_button.innerHTML = "Ok"
+    let ok_button = sg.create_elem("button", "yes", "Ok", content)
 
-    ok_button.onclick = () => {
+    ok_button.on_click(() => {
         send_message("popup", comm_channel)
-    }
-
-    content.appendChild(ok_button)
+    })
 }
 
 function setup_prompt(content){
     //TODO
 }
 
-window.electronAPI.on_message("popup-init-info", (data) => {
-    let content = document.getElementById("popup-content")
+on_message("popup-init-info", (data) => {
+    let content = sg.get_elem("#popup-content")
 
-    document.getElementById("main-text").innerHTML = data[2]
-    document.getElementsByClassName("norm-text")[0].innerHTML = data[3]
+    sg.get_elem("s-header").innerHTML = data[2]
+    sg.get_elem("s-text").innerHTML = data[3]
     comm_channel = data[1]
 
     switch(data[0]){

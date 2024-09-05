@@ -1,5 +1,14 @@
 /*GENERIC*/
 
+#exit-img{
+    position: absolute;
+    margin: auto;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
 h1, h2, h3, h4, p, a, span, li{
     color: #5271ff;
     font-family: 'Montserrat', sans-serif;

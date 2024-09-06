@@ -19,6 +19,30 @@ class Button extends HTMLElement{
     }
 }
 
+class Icon extends HTMLElement{
+    constructor(){
+        super();
+    }
+
+    connectedCallback(){
+        let type = this.getAttribute("type")
+        switch(type){
+            case "min": {
+                this.classList.add("fa-solid fa-minimize")
+                break
+            }
+            case "max": {
+                this.classList.add("fa-solid fa-maximize")
+                break
+            }
+            case "x": {
+                this.classList.add("fa-solid fa-xmark")
+                break
+            }
+        }
+    }
+}
+
 /*
     Text classes
 */
@@ -39,7 +63,6 @@ class Text extends HTMLElement{
     }
 
     connectedCallback(){
-        let margin_space = this.getAttribute("m")
         check_margin(this)
     }
 }
@@ -87,16 +110,28 @@ class Loadbar extends HTMLElement{
     }
 }
 
+class Topnav extends HTMLElement{
+    constructor(){
+        super();
+    }
+
+    connectedCallback(){
+
+    }
+}
+
 /*
     Div and other utils
 */
 
 const components = {
     Button,
+    Icon,
     Text,
     Header,
     AlignCenter,
-    Loadbar
+    Loadbar,
+    Topnav
 }
 
 export default components;

@@ -56,6 +56,26 @@ s-loadbar{
     border: 1px solid black
 }
 
+topnav{
+    padding: 5px;
+    text-align: right;
+    background-color: #b1b1b1;
+    display: flex;
+}
+
+topnav s-icon{
+    display: inline-block;
+    text-align: center;
+    padding: 5px;
+    text-decoration: none;
+    font-size: 10px;
+    border: solid 2px #5271ff;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+
 #loadbar{
     width: 0%;
     height: 100%;

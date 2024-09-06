@@ -1,38 +1,35 @@
+import sg from '../source/sgui/sgui.js';
+import { parse_settings_layout } from '../scripts/utils/layout_loader.js';
+import { on_message, send_message } from '../scripts/utils/ipc_wrapper.js';
+
 //variables
 var app_data_template = []
-var settings_area;
 
 function onload_specific(){
-
-    //set settings binder
-    settings_area = new SettingsFunctions("settings-area")
-
     //ask for settings to load
     send_message("settings", "send-info")
 
-    document.getElementById("redir_to_menu").addEventListener("click", () => {
+    sg.get_elem("#redir_to_menu").on_click(() => {
         send_message("settings", "redirect-to-menu")
     })
     
-    document.getElementById("save_settings").addEventListener("click", () => {
+    sg.get_elem("#save_settings").on_click(() => {
         save_settings()
     })
 
-    if (window.navigator.onLine){
-        document.getElementById("wiki-block-iframe").src = "https://sedas-docs.readthedocs.io/en/latest/"
-    }
+    let wiki_block_iframe = sg.get_elem("#wiki-block-iframe")
+    let wiki_block = sg.get_elem("#wiki-block")
+    if (sg.is_online()) wiki_block_iframe.src = "https://sedas-docs.readthedocs.io/en/latest/"
     else{
-        document.getElementById("wiki-block-iframe").remove()
-    
-        let warn_text = document.createElement("h1")
+        wiki_block_iframe.remove()
+        
+        let warn_text = sg.create_elem("s-header", "", "Not connected to internet, cannot show documentation in Iframe", wiki_block)
         warn_text.style.marginLeft = "15px"
-        warn_text.innerHTML = "Not connected to internet, cannot show documentation in Iframe"
-        document.getElementById("wiki-block").appendChild(warn_text)
     }
 
     //everything is set up and loaded
     document.body.id = "loaded-body"
-    document.getElementById("settings-loader-content").style.visibility = "hidden"
+    sg.get_elem("page-mask").hide()
 }
 
 //load settings
@@ -44,14 +41,14 @@ function load_settings(data){
 
     //spawn gui for settings area
     let layout = parse_settings_layout(layout_data)
-    settings_area.load_parsed_layout(layout)
+    sg.get_elem("#settings-area").appendChild(layout)
 
     for (const [key, value] of Object.entries(app_data)) {
         app_data_template.push(key)
     }
 
     //load all app data
-    var all_settings_elem = document.getElementsByClassName("settings-elem")
+    var all_settings_elem = sg.get_elem(".settings-elem")
 
     let i = 0;
     for (const [key, value] of Object.entries(app_data)) {
@@ -119,8 +116,8 @@ function load_settings(data){
     }
 
     //set wiki block to same height as settings-block
-    let height = document.getElementById("settings-block").offsetHeight
-    document.getElementById("wiki-block").setAttribute("style", `height: ${height}px`)
+    let height = sg.get_elem("#settings-block").offsetHeight
+    sg.get_elem("#wiki-block").setAttribute("style", `height: ${height}px`)
 }
 
 //save settings
@@ -153,22 +150,11 @@ function save_settings(){
     }
 
     let data_str = JSON.stringify(data, null, 4)
-    console.log(data_str)
 
     send_message("settings", "save-settings", [data_str])
 }
 
-//
-//file for basic functions that every controller window has
-//
-
-var INIT_DATA = [] //storing all vital data like airport list, command preset list, aircraft preset list in current session
-var APP_DATA = undefined
-
-//frontend variables dict
-var frontend_vars = {}
-
-window.onload = () => {
+sg.on_win_load(() => {
     onload_specific() //onloads set for specific page
-    window.electronAPI.on_message("app-data", load_settings)
-}
+    on_message("app-data", load_settings)
+})

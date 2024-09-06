@@ -42,7 +42,7 @@ export function create_elem(type,
                             inner_html,
                             parent){
     let elem = document.createElement(type)
-    elem.id = id
+    if(id.length != 0) elem.id = id
     elem.innerHTML = inner_html
     
     parent.appendChild(elem)
@@ -53,4 +53,8 @@ export function on_win_load(callback){
     window.onload = () => {
         callback()
     }
+}
+
+export function is_online(){
+    return window.navigator.onLine
 }

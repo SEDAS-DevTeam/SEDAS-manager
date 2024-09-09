@@ -1,0 +1,28 @@
+body{
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow-y: scroll;
+}
+
+#content{
+    margin-top: 15px;
+    height: 80%;
+}
+
+#wiki-resource{
+    margin-top: 15px;
+}
+
+#bot-content{
+    margin-top: 40px;
+    padding-bottom: 20px;
+}
+
+#warn-text{
+    margin-left: 15px;
+
+}
+
+.change-iframe{
+    margin-bottom: 20px;
+}

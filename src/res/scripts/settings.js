@@ -6,9 +6,6 @@ import { on_message, send_message } from '../scripts/utils/ipc_wrapper.js';
 var app_data_template = []
 
 function onload_specific(){
-    //ask for settings to load
-    send_message("settings", "send-info")
-
     sg.get_elem("#redir_to_menu").on_click(() => {
         send_message("settings", "redirect-to-menu")
     })
@@ -30,6 +27,9 @@ function onload_specific(){
     //everything is set up and loaded
     document.body.id = "loaded-body"
     sg.get_elem("page-mask").hide()
+
+    //ask for settings to load
+    send_message("settings", "send-info")
 }
 
 //load settings
@@ -156,5 +156,7 @@ function save_settings(){
 
 sg.on_win_load(() => {
     onload_specific() //onloads set for specific page
-    on_message("app-data", load_settings)
+    on_message("app-data", (data) => {
+        load_settings(data)
+    })
 })

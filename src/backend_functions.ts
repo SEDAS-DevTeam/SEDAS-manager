@@ -238,7 +238,7 @@ export class MainAppFunctions{
     public send_info(window_type: string){
         if (window_type == "settings"){
 
-            //ACAI backend¨
+            //ACAI backend
             let speech_config = utils.readJSON(PATH_TO_SPEECH_CONFIG)
             let text_config = utils.readJSON(PATH_TO_TEXT_CONFIG)
             let voice_config = utils.readJSON(PATH_TO_VOICE_CONFIG)
@@ -251,6 +251,7 @@ export class MainAppFunctions{
             let settings_layout = utils.readJSON(PATH_TO_SETTINGS_LAYOUT)
 
             //sending app data and alg configs
+            console.log("sending app data")
             this.wrapper.send_message("controller", "app-data", [this.app_settings, voice_config, text_config, speech_config, in_devices, out_devices, settings_layout])
         }
         else if (window_type == "controller"){

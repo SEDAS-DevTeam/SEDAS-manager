@@ -3,7 +3,8 @@
 */
 
 import {size_conversion,
-        check_margin
+        check_margin,
+        conversion_top_header
 } from '../../source/sgui/sgui_def.js';
 
 
@@ -33,18 +34,29 @@ class BasicElement extends HTMLElement{
             this.is_visible = true
         }
     }
+
+    on_click(callback){
+        this.addEventListener("click", (event) => {
+            callback(event)
+        })
+    }
+
+    has_class(classname){
+        return this.classList.contains(classname)
+    }
+
+    remove_class(classname){
+        this.classList.remove(classname)
+    }
+
+    add_class(classname){
+        this.classList.add(classname)
+    }
 }
 
 class Button extends BasicElement{
     constructor(){
         super();
-    }
-
-    connectedCallback(){
-    }
-
-    on_click(callback){
-        this.addEventListener("click", callback)
     }
 }
 
@@ -107,8 +119,14 @@ class Header extends BasicElement{
 
     connectedCallback(){
         let size_level = this.getAttribute("s")
-        this.style.fontSize = size_conversion[size_level] + "px"
+        if (size_level != ""){
+            this.style.fontSize = size_conversion[size_level] + "px"
+        }
         check_margin(this)
+    }
+
+    change_size(size_level){
+        this.style.fontSize = size_conversion[size_level] + "px"
     }
 }
 
@@ -174,6 +192,29 @@ class Topnav extends BasicElement{
     }
 
     connectedCallback(){
+        let id_conv = conversion_top_header[this.id]
+
+        this.innerHTML = 
+        `
+        <div id="top-content">
+            <div>
+                <s-header s="1" id="main-header">SEDAC manager Controller</s-header>
+                <s-button id="exit-button">Exit</s-button>
+                <s-button id="menu-button">Back to menu</s-button>
+                <s-button id="save-button">Save</s-button>
+            </div>
+            <hr>
+            <div class="topnav" id="controller-topnav">
+                <a href="controller_set.html">Setup</a>
+                <a href="controller_mon.html">Monitors</a>
+                <a href="controller_sim.html">Simulation</a>
+                <a href="plugins.html">Plugins</a>
+                <a href="wiki.html">Wiki</a>
+            </div>
+        </div>
+        `
+        
+        this.querySelector("#controller-topnav").children[id_conv].classList.add("active")
     }
 }
 
@@ -184,6 +225,24 @@ class PageMask extends BasicElement{
 
     connectedCallback(){
 
+    }
+}
+
+class IframeExtension extends BasicElement{
+    constructor(){
+        super();
+    }
+
+    connectedCallback(){
+        let iframe = document.createElement("iframe")
+        iframe.setAttribute("frameborder", "0")
+        iframe.setAttribute("allowfullscreen", "")
+
+        this.appendChild(iframe)
+    }
+
+    set_source(src){
+        this.children[0].src = src
     }
 }
 
@@ -200,7 +259,8 @@ const components = {
     Loadbar,
     CircleLoadbar,
     Topnav,
-    PageMask
+    PageMask,
+    IframeExtension
 }
 
 export default components;

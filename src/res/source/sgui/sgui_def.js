@@ -14,6 +14,14 @@ export const size_conversion = {
     "6": "10"
 }
 
+export const conversion_top_header = {
+    "set": 0,
+    "mon": 1,
+    "sim": 2,
+    "plugin": 3,
+    "wiki": 4
+}
+
 // element functions
 
 export function check_margin(elem){

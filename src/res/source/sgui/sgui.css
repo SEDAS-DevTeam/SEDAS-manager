@@ -16,7 +16,7 @@ body{
     overflow: hidden;
 }
 
-s-text, s-header {
+s-text, s-header, a {
     color: #5271ff;
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;
@@ -56,14 +56,24 @@ s-loadbar{
     border: 1px solid black
 }
 
+/*
+    Top navigation
+*/
+
 s-topnav{
+    display: block;
+    margin-top: 15px;
+}
+
+s-topnav#worker-widget{
+    margin-top: 0;
     padding: 5px;
     text-align: right;
     background-color: #b1b1b1;
     display: flex;
 }
 
-s-topnav s-icon{
+s-topnav#worker-widget s-icon{
     display: inline-block;
     text-align: center;
     padding: 5px;
@@ -75,6 +85,46 @@ s-topnav s-icon{
     border-radius: 5px;
 }
 
+/* Add a black background color to the top navigation */
+.topnav {
+    background-color: #c9c9c9;
+    overflow: hidden;
+}
+  
+/* Style the links inside the navigation bar */
+.topnav a {
+    float: left;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    border: solid 2px #5271ff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+    background-color: #04AA6D;
+    color: white;
+}
+
+#controller-topnav {
+    background-color: white;
+    overflow: hidden;
+    border: solid 3px #5271ff;
+}
+
+#controller-topnav a.active {
+    background-color:rgb(218, 215, 215);
+    color: black;
+}
 
 #loadbar{
     width: 0%;
@@ -119,4 +169,17 @@ page-mask{
     background-color: white;
     width: 100%;
     height: 100%;
+}
+
+/*
+    Resource frame (iframe)
+*/
+
+resource-frame iframe{
+    width: 100%;
+    height: 100%;
+}
+
+resource-frame{
+    height: 70%;
 }

@@ -1,3 +1,6 @@
+import sg from '../../source/sgui/sgui.js';
+import { on_message, send_message } from '../../scripts/utils/ipc_wrapper.js';
+
 //
 //file for basic functions that every controller window has
 //

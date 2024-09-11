@@ -41,6 +41,12 @@ class BasicElement extends HTMLElement{
         })
     }
 
+    on_load(callback){
+        this.onload = (event) => {
+            callback(event)
+        }
+    }
+
     has_class(classname){
         return this.classList.contains(classname)
     }
@@ -82,6 +88,10 @@ class Icon extends BasicElement{
             }
             case "arrow-left": {
                 this.classList.add("fa-solid fa-arrow-left")
+                break
+            }
+            case "refresh": {
+                this.classList.add("fa fa-refresh")
                 break
             }
         }
@@ -246,6 +256,63 @@ class IframeExtension extends BasicElement{
     }
 }
 
+class DefaultTable extends HTMLElement{
+    constructor(){
+        super();
+    }
+
+    connectedCallback(){
+        /*
+        parameter list config
+            dim=nxm -> defines initial table size
+            onload=func() -> defines what function should it run on default
+            header="true" | "false" -> defines if
+            even_color="true"
+        */
+
+        //variable retrival
+        let dim = this.getAttribute("dim").split("x").map((x) => {
+            return parseInt(x)
+        })
+        let onload_callback = this.getAttribute("onload")
+        let header = Boolean(this.getAttribute("header"))
+        let even_color = Boolean(this.getAttribute("even_color"))
+        let padding = parseInt(this.getAttribute("padding"))
+
+        //table setup
+        let main_table = document.createElement("table")
+
+        for (let i1 = 0; i1 < dim[0]; i1++){
+            let tr = document.createElement("tr")
+            tr.style.padding = padding
+
+            for (let i2 = 0; i2 < dim[1]; i2++){
+                let block_elem = "td"
+                if (header && i1 == 0){
+                    block_elem = "th" //rewrite to header
+                }
+                let elem = document.createElement(block_elem)
+                elem.style.padding = padding
+
+                tr.appendChild(elem)
+            }
+            if (even_color){
+                tr.id = "color"
+            }
+            main_table.appendChild(tr)
+        }
+        this.appendChild(main_table)
+
+        if (onload_callback != null){
+            this.evaluateFunction(onload_callback)
+        }
+    }
+
+    evaluateFunction(functionStr) {
+        return Function(functionStr).call(this);
+    }
+}
+
 /*
     Div and other utils
 */
@@ -260,7 +327,8 @@ const components = {
     CircleLoadbar,
     Topnav,
     PageMask,
-    IframeExtension
+    IframeExtension,
+    DefaultTable
 }
 
 export default components;

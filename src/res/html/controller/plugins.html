@@ -2,35 +2,29 @@
 <html>
     <head>
         <link rel="stylesheet" href="../../styles/index.css">
-        <link rel="stylesheet" href="../../styles/plugins.css">
-        
         <meta charset="utf-8" />
 
-        <script src="../../scripts/blocks/block.js"></script>
-        <script src="../../scripts/blocks/block_plugin.js"></script>
+        <link href="../../source/sgui/sgui.css" rel="stylesheet"/>
+        <script src="../../source/sgui/sgui.js" type="module"></script>
 
-        <script src="../../scripts/utils/ipc_wrapper.js"></script>
+        <link rel="stylesheet" href="../../styles/controller.css">
+        <link rel="stylesheet" href="../../styles/plugins.css">
 
-        <script src="../../scripts/controllers/controller.js"></script>
-        <script src="../../scripts/controllers/controller_plugins.js"></script>
+        <script src="../../scripts/controllers/controller_plugins.js" type="module"></script>
     </head>
-    <body style="margin-left: 20px; margin-right: 20px;" id="scrollable">
-        <top-header id="plugin"></top-header>
-        <div class="div-indent">
-            <h2>Plugins repository</h2>
+    <body>
+        <s-topnav id="plugin"></s-topnav>
+        <div id="content">
+            <s-header s="2">Plugins repository</s-header>
             <hr>
             
-            <div style="margin-bottom: 10px;">
-                <p class="inline-text">Refresh plugins tab</p><i class="fa fa-refresh" aria-hidden="true" id="refresh" onclick="refresh(this)"></i>
-            </div>
-            <default-table id="plugin-tab" dim="4x4" onload="getPlugins()"></default-table>
+            <s-text class="inline-text">Refresh plugins tab</s-text><s-icon type="refresh" id="refresh" onclick="refresh(this)"></s-icon>
+            <default-table id="plugin-tab" dim="4x4"></default-table>
 
-            <h2>Local plugins</h2>
+            <s-header s="2">Local plugins</s-header>
             <hr>
-
-            <div style="margin-bottom: 10px;">
-                <p class="inline-text">Reload all local plugins</p><i class="fa fa-refresh" aria-hidden="true" id="refresh" onclick="refresh(this)"></i>
-            </div>
+            
+            <s-text class="inline-text">Reload all local plugins</s-text><s-icon type="refresh" id="refresh" onclick="refresh(this)"></s-icon>
             <default-table id="local-plugin-tab" dim="4x4"></default-table>
         </div>
     </body>

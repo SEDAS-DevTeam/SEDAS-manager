@@ -1,3 +1,7 @@
+import sg from '../../source/sgui/sgui.js';
+import { on_message, send_message } from '../../scripts/utils/ipc_wrapper.js';
+import { frontend_vars, set_controller_buttons, set_controller_window, set_general_message_handlers } from '../utils/controller_utils.js'
+
 //variables
 var deg = 0
 var initial_plugin_list; //for local plugins list
@@ -9,24 +13,20 @@ function refresh(elem){
     //TODO send request message to main
 }
 
-function onload_specific(){
-    //blank
-}
-
-function process_specific(data){
-    //blank
-    console.log(data)
-}
-
-function getPlugins(){
+function onload_plugins(){
     send_message("controller", "get-plugin-list")
 }
 
-window.electronAPI.on_message("plugin-list", (data) => {
+function process_plugins(data){
+    //blank TODO
+    console.log(data)
+}
+
+on_message("plugin-list", (data) => {
     initial_plugin_list = data
 
     let headers = ["Plugin", "Version", "Last updated"]
-    let elem = document.getElementById("plugin-tab")
+    let elem = sg.get_elem("#plugin-tab")
 
     //update all the elements
     for (let i = 0; i < headers.length + 1; i++){
@@ -46,23 +46,19 @@ window.electronAPI.on_message("plugin-list", (data) => {
 
         for (let i2 = 0; i2 < spec_elem.children.length; i2++){
             if (typeof(args[i2][1]) == "boolean"){
-                let button_container = document.createElement("div")
-                let button = document.createElement("button")
+                let button_container = sg.create_elem("div", "", "", spec_elem.children[i2])
+                let button = sg.create_elem("s-button", "", "", button_container)
 
                 if (args[i2][1]){
                     //is installed
-                    button.classList.add("indicator-but")
-                    button.classList.add("installed")
+                    button.add_class("indicator-but")
+                    button.add_class("installed")
                     button.innerHTML = "Installed"
                     button.id = data[i - 1]["header"]["id"]
 
-                    let manage_button = document.createElement("button")
-                    manage_button.classList.add("indicator-but", "manage-but")
-                    manage_button.classList.add("manage")
-                    manage_button.innerHTML = "Manage plugin"
-
-                    button_container.appendChild(button)
-                    button_container.appendChild(manage_button)
+                    let manage_button = sg.create_elem("s-button", "", "Manage plugin", button_container)
+                    manage_button.add_class("indicator-but", "manage-but")
+                    manage_button.add_class("manage")
                 }
                 else{
                     //isn't installed
@@ -70,10 +66,7 @@ window.electronAPI.on_message("plugin-list", (data) => {
                     button.classList.add("not-installed")
                     button.innerHTML = "Not installed"
                     button.id = data[i - 1]["header"]["id"]
-                    
-                    button_container.appendChild(button)
                 }
-                spec_elem.children[i2].appendChild(button_container)
                 continue
             }
 
@@ -82,18 +75,25 @@ window.electronAPI.on_message("plugin-list", (data) => {
     }
 
     //reload all listeners
-    let not_installed_buttons = document.querySelectorAll("button.not-installed")
-    let manage_buttons = document.querySelectorAll("button.manage")
+    let not_installed_buttons = sg.get_elem("button.not-installed")
+    let manage_buttons = sg.get_elem("button.manage")
     
     for (let i = 0; i < not_installed_buttons.length; i++){
-        not_installed_buttons[i].addEventListener("click", (event) => {
-            send_message("controller", "install-plugin", [event.target.id, initial_plugin_list[i]["data"]["plugin"]])
+        not_installed_buttons[i].on_click(() => {
+            send_message("controller", "install-plugin", [not_installed_buttons[i].id, initial_plugin_list[i]["data"]["plugin"]])
         })
     }
 
     for (let i = 0; i < manage_buttons.length; i++){
-        manage_buttons[i].addEventListener("click", (event) => {
+        manage_buttons[i].on_click(() => {
             console.log("manage!")
         })
     }
+})
+
+sg.on_win_load(() => {
+    set_controller_window(frontend_vars)
+    onload_plugins()
+    set_controller_buttons()
+    set_general_message_handlers(process_plugins)
 })

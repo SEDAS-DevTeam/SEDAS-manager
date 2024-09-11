@@ -1,3 +1,10 @@
+body{
+    overflow-y: scroll;
+    margin-left: 20px; 
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
 #plugin-tab table{
     border-collapse:separate;
     border:solid gray 1px;
@@ -29,12 +36,6 @@ tr:nth-child(even) {
 
 .manage-but{
     margin-left: 10px;
-}
-
-.inline-text{
-    display: inline;
-    margin-right: 10px;
-    color: black;
 }
 
 i#refresh:hover{

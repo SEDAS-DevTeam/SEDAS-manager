@@ -131,11 +131,6 @@ div.grid-item.selected{
     background-color: #5271ff;
 }
 
-.div-indent{
-    margin-left: 20px; 
-    margin-right: 20px;
-}
-
 #scrollable{
     overflow-y: scroll;
 }

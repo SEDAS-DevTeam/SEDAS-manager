@@ -7,4 +7,5 @@ main.html
 popup.html
 #controller
 wiki.html
+settings.html -> little bit broken
 #worker

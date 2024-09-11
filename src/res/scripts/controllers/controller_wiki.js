@@ -46,7 +46,7 @@ function onload_wiki(){
     }
 }
 
-function process_specific(data){
+function process_wiki(data){
     //empty
 }
 
@@ -54,5 +54,5 @@ sg.on_win_load(() => {
     set_controller_window(frontend_vars)
     onload_wiki()
     set_controller_buttons()
-    set_general_message_handlers(process_specific)
+    set_general_message_handlers(process_wiki)
 })

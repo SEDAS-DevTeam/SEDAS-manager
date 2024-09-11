@@ -15,4 +15,5 @@ export function set_elements(){
     customElements.define("s-icon", components.Icon, {extends: "i"})
     customElements.define("page-mask", components.PageMask)
     customElements.define("resource-frame", components.IframeExtension)
+    customElements.define("default-table", components.DefaultTable)
 }

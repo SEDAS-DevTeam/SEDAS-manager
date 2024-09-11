@@ -436,3 +436,25 @@ span#tag{
 .time-form{
     display: none;
 }
+
+
+/*
+    Reworked css
+*/
+body{
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow-y: scroll;
+}
+
+#content{
+    margin-top: 15px;
+    height: 80%;
+}
+
+.inline-text{
+    display: inline;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    color: black;
+}

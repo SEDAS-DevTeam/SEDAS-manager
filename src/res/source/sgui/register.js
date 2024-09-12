@@ -4,6 +4,14 @@
 
 import components from '../../source/sgui/components.js';
 
+export function copy_methods(){
+    Object.getOwnPropertyNames(components.BasicElement.prototype).forEach(method => {
+        if (method !== 'constructor') {
+            HTMLElement.prototype[method] = components.BasicElement.prototype[method];
+        }
+    });
+}
+
 export function set_elements(){
     customElements.define("s-button", components.Button)
     customElements.define("s-text", components.Text)

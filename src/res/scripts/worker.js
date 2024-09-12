@@ -293,7 +293,7 @@ function mouse_down(event){
     let curr_x = event.clientX
     let curr_y = event.clientY
 
-    for(i = 0; i < plane_label_coords.length; i++){
+    for(let i = 0; i < plane_label_coords.length; i++){
         let curr_coords = plane_label_coords[i]["coords"]
 
         if (curr_coords[2] < curr_x && curr_coords[0] > curr_x){

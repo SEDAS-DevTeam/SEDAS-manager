@@ -202,29 +202,56 @@ class Topnav extends BasicElement{
     }
 
     connectedCallback(){
-        let id_conv = conversion_top_header[this.id]
+        if (this.id == "worker"){
+            // for worker window
 
-        this.innerHTML = 
-        `
-        <div id="top-content">
-            <div>
-                <s-header s="1" id="main-header">SEDAC manager Controller</s-header>
-                <s-button id="exit-button">Exit</s-button>
-                <s-button id="menu-button">Back to menu</s-button>
-                <s-button id="save-button">Save</s-button>
+            this.innerHTML = 
+            `
+            <div class="topnav">
+                <div class="leftalign">
+                    <a id="plankmsg2">Control 1</a>
+                    <a href="#test">Control 2</a>
+                    <a href="#test">Control 3</a>
+                    <a href="#test">Control 4</a>
+                    <a id="plankmsg">Click me!</a>
+                </div>
+                <div class="centeralign">
+                    <p><span id="date">Date</span><span id="time">Time</span></p>
+                </div>
+                <div class="rightalign">
+                    <a id="stopbutton" class="startsim">RUN</a>
+                    <a id="exit">EXIT</a>
+                </div>
             </div>
-            <hr>
-            <div class="topnav" id="controller-topnav">
-                <a href="controller_set.html">Setup</a>
-                <a href="controller_mon.html">Monitors</a>
-                <a href="controller_sim.html">Simulation</a>
-                <a href="plugins.html">Plugins</a>
-                <a href="wiki.html">Wiki</a>
+            `
+        }
+        else{
+            // for controller window
+
+            let id_conv = conversion_top_header[this.id]
+
+            this.innerHTML = 
+            `
+            <div id="top-content">
+                <div>
+                    <s-header s="1" id="main-header">SEDAC manager Controller</s-header>
+                    <s-button id="exit-button">Exit</s-button>
+                    <s-button id="menu-button">Back to menu</s-button>
+                    <s-button id="save-button">Save</s-button>
+                </div>
+                <hr>
+                <div class="topnav" id="controller-topnav">
+                    <a href="controller_set.html">Setup</a>
+                    <a href="controller_mon.html">Monitors</a>
+                    <a href="controller_sim.html">Simulation</a>
+                    <a href="plugins.html">Plugins</a>
+                    <a href="wiki.html">Wiki</a>
+                </div>
             </div>
-        </div>
-        `
-        
-        this.querySelector("#controller-topnav").children[id_conv].classList.add("active")
+            `
+            
+            this.querySelector("#controller-topnav").children[id_conv].classList.add("active")
+        }
     }
 }
 
@@ -351,6 +378,7 @@ class DefaultTable extends HTMLElement{
 */
 
 const components = {
+    BasicElement,
     Button,
     Icon,
     Text,

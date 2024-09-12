@@ -35,6 +35,7 @@ export function check_margin(elem){
 
 export function get_elem(identifier){
     let elems = document.querySelectorAll(identifier)
+    console.log(elems)
     if (elems.length == 1){
         return elems[0]
     }

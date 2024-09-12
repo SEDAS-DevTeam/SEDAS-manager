@@ -85,6 +85,10 @@ s-topnav#worker-widget s-icon{
     border-radius: 5px;
 }
 
+s-topnav#worker{
+    margin-top: 0;
+}
+
 /* Add a black background color to the top navigation */
 .topnav {
     background-color: #c9c9c9;

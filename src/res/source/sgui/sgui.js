@@ -1,8 +1,8 @@
 /*
-    Main file of gui (takes care of initializing S-GUi)
+    Main file of gui (takes care of initializing S-GUI)
 */
 
-import {set_elements} from '../../source/sgui/register.js';
+import { set_elements, copy_methods } from '../../source/sgui/register.js';
 import { create_elem, 
          get_elem, 
          is_online, 
@@ -10,6 +10,7 @@ import { create_elem,
          on_mouse_drag 
 } from '../../source/sgui/sgui_def.js';
 
+copy_methods()
 set_elements()
 
 const sg = {

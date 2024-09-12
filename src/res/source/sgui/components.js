@@ -256,6 +256,39 @@ class IframeExtension extends BasicElement{
     }
 }
 
+class WorkerCanvas extends HTMLElement{
+    constructor(){
+        super();
+    }
+
+    connectedCallback(){
+        for (let i = 0; i < 3; i++){
+            let canvas = document.createElement("canvas")
+            canvas.id = "canvas" + (i + 1).toString()
+            canvas.setAttribute("width", "640")
+            canvas.setAttribute("width", "480")
+
+            this.appendChild(canvas)
+        }
+    }
+
+    render(background_color, canvas_ids){
+        for (let i = 0; i < canvas_ids.length; i++){
+            let canvas_id = "#canvas" + canvas_ids[i].toString()
+            let canvas = this.querySelector(canvas_id)
+            let context = canvas.getContext("2d")
+
+            context.fillStyle = background_color
+            canvas.width = window.screen.width
+            canvas.height = window.screen.height
+            
+            if (canvas_ids[i] == 1){
+                context.fillRect(0, 0, canvas.width, canvas.height)
+            }       
+        }
+    }
+}
+
 class DefaultTable extends HTMLElement{
     constructor(){
         super();
@@ -328,7 +361,8 @@ const components = {
     Topnav,
     PageMask,
     IframeExtension,
-    DefaultTable
+    DefaultTable,
+    WorkerCanvas
 }
 
 export default components;

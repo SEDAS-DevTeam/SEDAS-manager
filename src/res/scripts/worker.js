@@ -1,9 +1,26 @@
+import sg from '../source/sgui/sgui.js';
+import {
+    render_vars,
+    renderPlane,
+    renderPlaneInfo,
+    renderPlanePath,
+    renderAirspace,
+    renderRunway,
+    renderPoint,
+    renderAirport,
+    renderText,
+    renderScale
+} from '../scripts/utils/render.js';
+import { on_message, send_message } from '../scripts/utils/ipc_wrapper.js';
+
 var map_data = undefined
 var plane_data = []
 var plane_label_coords = []
 var APP_DATA = undefined
 var plane_paths = []
 var scale = 0
+
+var main_canvas = undefined
 
 var curr_rel_dist = [0, 0] //x, y
 
@@ -22,9 +39,7 @@ var curr_plane = undefined
 function process_map_data(){
 
     //rewrite all canvas data
-    renderCanvas(1)
-    renderCanvas(2)
-    renderCanvas(3)
+    main_canvas.render(render_vars.BACKROUND_COLOR, [1, 2, 3])
 
     if (map_data[0] == undefined){
         //render empty map placeholder on init
@@ -192,7 +207,7 @@ function render_planes(){
 }
 
 function update_labels(curr_x, curr_y){
-    renderCanvas(3)
+    main_canvas.render(render_vars.BACKROUND_COLOR, [3])
 
     for (let i = 0; i < plane_label_coords.length; i++){        
         if (plane_label_coords[i]["id"] == curr_plane["id"]){
@@ -237,7 +252,9 @@ function update_labels(curr_x, curr_y){
 
 }
 
-window.onload = () => {
+sg.on_win_load(() => {
+    main_canvas = sg.get_elem("s-canvas")
+    
     //ask for map data
     send_message("worker", "render-map")
 
@@ -248,19 +265,17 @@ window.onload = () => {
     send_message("worker", "send-plane-data")
 
     //render all essential things
-    renderCanvas(1)
-    renderCanvas(2)
-    renderCanvas(3)
+    main_canvas.render(render_vars.BACKROUND_COLOR, [1, 2, 3])
 
     //render empty map placeholder on init
     renderText(50, 100, "Empty map placeholder", "white", "48px", "canvas3")
     
-    document.querySelector("a#exit").addEventListener("click", () => {
+    sg.get_elem("a#exit").on_click(() => {
         send_message("worker", "exit")
     })
 
-    document.querySelector("a#stopbutton").addEventListener("click", () => {
-        let elem = document.querySelector("a#stopbutton")
+    sg.get_elem("a#stopbutton").on_click(() => {
+        let elem = sg.get_elem("a#stopbutton")
         if (elem.className == "stopsim"){
             send_message("worker", "stop-sim") //stop simulation
         }
@@ -268,13 +283,13 @@ window.onload = () => {
             send_message("worker", "start-sim") //start simulation
         }
     })
-}
+})
 
 /*
 MOUSE EVENTS
 */
 
-document.onmousedown = (event) => {
+function mouse_down(event){
     let curr_x = event.clientX
     let curr_y = event.clientY
 
@@ -283,44 +298,41 @@ document.onmousedown = (event) => {
 
         if (curr_coords[2] < curr_x && curr_coords[0] > curr_x){
             if (curr_coords[1] > curr_y){
-                //is dragging on elem
-                is_dragging = true
-
                 curr_plane = plane_data[i]
-
                 curr_rel_dist = [Math.abs(curr_x - curr_coords[2]), Math.abs(curr_y - curr_coords[3])]
             }
         }
     }
 }
 
-document.onmouseup = () => {
-    is_dragging = false
+function mouse_up(){
     curr_rel_dist = [0, 0]
 }
 
-document.onmousemove = (event) => {
-    if (is_dragging){
-        update_labels(event.clientX, event.clientY)
+function mouse_move(event){
+    update_labels(event.clientX, event.clientY)
 
-        //also still render paths
-        for (let i = 0; i < plane_paths.length; i++){
-            renderPlanePath(plane_paths[i]["coords"])
-        }
-
-        //render scale
-        renderScale(scale)
+    //also still render paths
+    for (let i = 0; i < plane_paths.length; i++){
+        renderPlanePath(plane_paths[i]["coords"])
     }
+
+    //render scale
+    renderScale(scale)
 }
+
+// set all callbacks
+sg.on_mouse_drag(mouse_down, mouse_move, mouse_up)
+
 
 window.electronAPI.on_map_data((data) => {
     map_data = data //set map data to global on session
     process_map_data()
 })
-window.electronAPI.on_message("ask-for-render", () => {
+on_message("ask-for-render", () => {
     send_message("worker", "render-map")
 })
-window.electronAPI.on_message("update-plane-db", (data) => { //for updating plane list
+on_message("update-plane-db", (data) => { //for updating plane list
     plane_data = data
 
     process_map_data()
@@ -344,11 +356,11 @@ window.electronAPI.on_message("update-plane-db", (data) => { //for updating plan
     //render scale
     renderScale(scale)
 })
-window.electronAPI.on_message("update-paths", (data) => {
+on_message("update-paths", (data) => {
     plane_paths = data
 })
-window.electronAPI.on_message("sim-event", (data) => {
-    let elem = document.querySelector("a#stopbutton")
+on_message("sim-event", (data) => {
+    let elem = sg.get_elem("a#stopbutton")
     if (data == "stopsim"){
         elem.className = "startsim"
         elem.innerHTML = "RUN"
@@ -358,12 +370,12 @@ window.electronAPI.on_message("sim-event", (data) => {
         elem.innerHTML = "STOP"
     }
 })
-window.electronAPI.on_message("time", (time_data) => {
+on_message("time", (time_data) => {
     let date_str = time_data[0].toDateString()
     let time_str = time_data[0].toLocaleTimeString();
 
-    document.getElementById("date").innerHTML = date_str
-    document.getElementById("time").innerHTML = time_str
+    sg.get_elem("#date").innerHTML = date_str
+    sg.get_elem("#time").innerHTML = time_str
 })
 
 window.electronAPI.on_init_info((data) => {

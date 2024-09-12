@@ -63,6 +63,26 @@ export function on_win_load(callback){
     }
 }
 
+export function on_mouse_drag(callback_down, callback_move, callback_up){
+    var is_dragging = false
+
+    if (callback_down != undefined) {document.onmousedown = (event) => {
+        is_dragging = true
+        callback_down(event)
+    }}
+
+    if (callback_up != undefined) {document.onmouseup = (event) => {
+        is_dragging = false
+        callback_up(event)
+    }}
+
+    if (callback_move != undefined) {document.onmousemove = (event) => {
+        if (is_dragging){
+            callback_move(event)
+        }
+    }}
+}
+
 export function is_online(){
     return window.navigator.onLine
 }

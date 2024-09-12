@@ -16,7 +16,7 @@ body{
     overflow: hidden;
 }
 
-s-text, s-header, a {
+s-text, s-header, a, li{
     color: #5271ff;
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;

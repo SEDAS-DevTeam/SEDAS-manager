@@ -7,5 +7,6 @@ main.html
 popup.html
 #controller
 wiki.html
+plugins.html
 settings.html -> little bit broken
 #worker

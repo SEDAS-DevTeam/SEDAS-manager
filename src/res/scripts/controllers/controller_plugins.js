@@ -4,7 +4,7 @@ import { frontend_vars, set_controller_buttons, set_controller_window, set_gener
 
 //variables
 var deg = 0
-var initial_plugin_list; //for local plugins list
+var initial_plugin_list = undefined; //for local plugins list
 
 function refresh(elem){
     deg += 360
@@ -23,6 +23,9 @@ function process_plugins(data){
 }
 
 on_message("plugin-list", (data) => {
+    if (data == undefined){
+        return
+    }
     initial_plugin_list = data
 
     let headers = ["Plugin", "Version", "Last updated"]

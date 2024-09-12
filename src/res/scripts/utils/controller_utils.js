@@ -7,6 +7,10 @@ export var APP_DATA = undefined
 export var frontend_vars = {}
 export var monitor_objects = []
 
+export var map_name = undefined
+export var command_preset_name = undefined
+export var aircraft_preset_name = undefined
+
 var path = window.location.pathname;
 var page_name = path.split("/").pop().replace(".html", "");
 
@@ -47,7 +51,6 @@ function set_dropdown_buttons(){
 
 function process_init_data(data){
     APP_DATA = JSON.parse(data[3])
-
     map_name = data[4][0]
     command_preset_name = data[4][1]
     aircraft_preset_name = data[4][2]
@@ -64,7 +67,7 @@ function process_init_data(data){
     let drop_buttons = sg.get_elem(".drop-button")
     let drop_contents = sg.get_elem(".dropdown-content")
 
-    if (drop_buttons.length == 0){
+    if (drop_buttons == undefined){
         return
     }
 

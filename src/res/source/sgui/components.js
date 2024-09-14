@@ -2,10 +2,7 @@
     File that contains all the extended elements used by S-GUI
 */
 
-import {size_conversion,
-        check_margin,
-        conversion_top_header
-} from '../../source/sgui/sgui_def.js';
+import * as defs from '../../source/sgui/sgui_def.js';
 
 
 class BasicElement extends HTMLElement{
@@ -35,8 +32,18 @@ class BasicElement extends HTMLElement{
         }
     }
 
+    /*
+        Events
+    */
+
     on_click(callback){
         this.addEventListener("click", (event) => {
+            callback(event)
+        })
+    }
+
+    on_dblclick(callback){
+        this.addEventListener("dblclick", (event) => {
             callback(event)
         })
     }
@@ -45,6 +52,30 @@ class BasicElement extends HTMLElement{
         this.onload = (event) => {
             callback(event)
         }
+    }
+
+    on_blur(callback){
+        this.onblur = (event) => {
+            callback(event)
+        }
+    }
+
+    on_mousedown(callback){
+        this.addEventListener("mousedown", (event) => {
+            callback(event)
+        })
+    }
+
+    on_mouseup(callback){
+        this.addEventListener("mouseup", (event) => {
+            callback(event)
+        })
+    }
+
+    on_mousemove(callback){
+        this.addEventListener("mousemove", (event) => {
+            callback(event)
+        })
     }
 
     has_class(classname){
@@ -57,6 +88,14 @@ class BasicElement extends HTMLElement{
 
     add_class(classname){
         this.classList.add(classname)
+    }
+
+    get_selected_elem(){ //works only for <select> tag etc.
+        return this.options[this.selectedIndex].value
+    }
+
+    get_elem(identifier){
+        defs.get_elem(identifier, this)
     }
 }
 
@@ -118,7 +157,7 @@ class Text extends BasicElement{
     }
 
     connectedCallback(){
-        check_margin(this)
+        defs.check_margin(this)
     }
 }
 
@@ -130,13 +169,13 @@ class Header extends BasicElement{
     connectedCallback(){
         let size_level = this.getAttribute("s")
         if (size_level != ""){
-            this.style.fontSize = size_conversion[size_level] + "px"
+            this.style.fontSize = defs.size_conversion[size_level] + "px"
         }
-        check_margin(this)
+        defs.check_margin(this)
     }
 
     change_size(size_level){
-        this.style.fontSize = size_conversion[size_level] + "px"
+        this.style.fontSize = defs.size_conversion[size_level] + "px"
     }
 }
 
@@ -228,7 +267,7 @@ class Topnav extends BasicElement{
         else{
             // for controller window
 
-            let id_conv = conversion_top_header[this.id]
+            let id_conv = defs.conversion_top_header[this.id]
 
             this.innerHTML = 
             `
@@ -373,6 +412,28 @@ class DefaultTable extends HTMLElement{
     }
 }
 
+class MonitorTable extends HTMLElement{
+    constructor(){
+        super();
+    }
+
+    connectedCallback(){
+        let main_table = document.createElement("table")
+        main_table.id = "monitor-panel"
+
+        //TODO: add to settings
+        for (let i1 = 0; i1 < 3; i1++){
+            let tr = document.createElement("tr")
+            for (let i2 = 0; i2 < 3; i2++){
+                tr.appendChild(document.createElement("td"))
+            }
+            main_table.appendChild(tr)
+        }
+
+        this.appendChild(main_table)
+    }
+}
+
 /*
     Div and other utils
 */
@@ -390,6 +451,7 @@ const components = {
     PageMask,
     IframeExtension,
     DefaultTable,
+    MonitorTable,
     WorkerCanvas
 }
 

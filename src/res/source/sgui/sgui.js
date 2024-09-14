@@ -7,7 +7,8 @@ import { create_elem,
          get_elem, 
          is_online, 
          on_win_load, 
-         on_mouse_drag 
+         on_mouse_drag, 
+         on_key_events
 } from '../../source/sgui/sgui_def.js';
 
 copy_methods()
@@ -18,7 +19,8 @@ const sg = {
     create_elem,
     on_win_load,
     is_online,
-    on_mouse_drag
+    on_mouse_drag,
+    on_key_events
 }
 
 export default sg

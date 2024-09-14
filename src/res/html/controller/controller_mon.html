@@ -1,31 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="../../styles/index.css">
+        <meta charset="utf-8" />
+
+        <link href="../../source/sgui/sgui.css" rel="stylesheet"/>
+        <script src="../../source/sgui/sgui.js" type="module"></script>
+
         <link rel="stylesheet" href="../../styles/controller.css">
         <link rel="stylesheet" href="../../styles/monitor.css">
 
-        <meta charset="utf-8" />
-
-        <script src="../../scripts/blocks/block.js"></script>
-        <script src="../../scripts/blocks/block_mon.js"></script>
-
-        <script src="../../scripts/utils/ipc_wrapper.js"></script>
-
-        <script src="../../scripts/utils/monitor_control.js"></script>
-        <script src="../../scripts/controllers/controller_mon.js"></script>
-        <script src="../../scripts/controllers/controller.js"></script>
+        <script src="../../scripts/controllers/controller_mon.js" type="module"></script>
     </head>
-    <body id="controller-body">
-        <top-header id="mon"></top-header>
-        <div class="div-indent" id="page-content">
-            <h2>Monitors setup</h2>
+    <body>
+        <s-topnav id="mon"></s-topnav>
+        <div id="content">
+            <s-header s="2">Monitors setup</s-header>
             <default-table id="monitor-panel" dim="3x3"></default-table>
-            <div id="monit-rename">
-                <form><span>Monitor 0: </span><input type="text" placeholder="Rename monitor..."><button id="small">Apply</button></form>
-            </div>
-            <button id="res_to_def">reset to default</button>
-            <button id="apply-changes">Apply</button>
+            <s-button id="res_to_def">reset to default</s-button>
+            <s-button id="apply-changes">Apply</s-button>
         </div>
     </body>
 </html>

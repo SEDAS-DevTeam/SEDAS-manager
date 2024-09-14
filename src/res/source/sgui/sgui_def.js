@@ -33,9 +33,8 @@ export function check_margin(elem){
 
 // global functions
 
-export function get_elem(identifier){
-    let elems = document.querySelectorAll(identifier)
-    console.log(elems)
+export function get_elem(identifier, element = document){
+    let elems = element.querySelectorAll(identifier)
     if (elems.length == 1){
         return elems[0]
     }
@@ -82,6 +81,16 @@ export function on_mouse_drag(callback_down, callback_move, callback_up){
             callback_move(event)
         }
     }}
+}
+
+export function on_key_events(callback_keydown, callback_keyup){
+    if (callback_keydown != undefined) {document.addEventListener("keydown", (event) => {
+        callback_keydown(event)
+    })}
+
+    if (callback_keyup != undefined) {document.addEventListener("keyup", (event) => {
+        callback_keyup(event)
+    })}
 }
 
 export function is_online(){

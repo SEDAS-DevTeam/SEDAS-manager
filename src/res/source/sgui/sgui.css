@@ -23,6 +23,12 @@ s-text, s-header, a, li{
     display: block;
 }
 
+span{
+    color: #5271ff;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+}
+
 s-button {
     display: inline-block;
     background-color: white;
@@ -107,6 +113,19 @@ s-topnav#worker{
     cursor: pointer;
 }
 
+.leftalign{
+    float: left;
+}
+
+.centeralign{
+    display: inline-block;
+    margin-left: 25%;
+}
+
+.rightalign{
+    float: right;
+}
+
 /* Change the color of links on hover */
 .topnav a:hover {
     background-color: #ddd;
@@ -186,4 +205,24 @@ resource-frame iframe{
 
 resource-frame{
     height: 70%;
+}
+
+/*
+    Table
+*/
+
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid black;
+    text-align: left;
+    padding: 8px;
+}
+
+table#color > tr:nth-child(even) {
+    background-color: #dddddd;
 }

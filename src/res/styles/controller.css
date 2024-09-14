@@ -167,13 +167,6 @@ div.popup-box p{
     margin-bottom: 25px;
 }
 
-#controller-body{
-    overflow-y: scroll;
-    margin-left: 20px; 
-    margin-right: 20px;
-    margin-bottom: 20px;
-}
-
 #confirm{
     margin-bottom: 20px;
     margin-top: 20px;
@@ -457,4 +450,8 @@ body{
     margin-right: 10px;
     margin-bottom: 10px;
     color: black;
+}
+
+#main-header{
+    display: inline-block;
 }

@@ -2,19 +2,26 @@
 //Controller Monitors JS
 //
 
+import sg from '../../source/sgui/sgui.js';
+import { on_message, send_message } from '../../scripts/utils/ipc_wrapper.js';
+import { frontend_vars, set_controller_buttons, set_controller_window, set_general_message_handlers } from '../utils/controller_utils.js'
+import { element_init, delete_monitor_elem } from '../utils/monitor_control.js'
+
+
 var Windows = []
 var monitor_objects = []
 var monitor_data = [] //data for storing monitors
+var init_data = []
 
 function send_monitor_data(){
-    var monitor_headers = document.getElementsByClassName("monitor-header")
-    var monitor_options_elem = document.getElementsByClassName("monitor-functions")
+    var monitor_headers = sg.get_elem(".monitor-header")
+    var monitor_options_elem = sg.get_elem(".monitor-functions")
 
     let data = []
 
     for (let i_mon = 0; i_mon < monitor_headers.length; i_mon++){
         let monitor_header = monitor_headers[i_mon].innerHTML
-        var monitor_type = monitor_options_elem[i_mon].options[monitor_options_elem[i_mon].selectedIndex].value;
+        var monitor_type = monitor_options_elem[i_mon].get_selected_elem();
 
         data.push({
             "name": monitor_header,
@@ -30,15 +37,17 @@ function send_monitor_data(){
     Processing initial data
 */
 
-function process_specific(data, reset = false){
+function process_mon(data){
+    init_data = data
     if (data[0] == "window-info"){
         monitor_data = JSON.parse(data[1])
+        console.log(monitor_data)
 
         //initialize all the monitor objects
         for (let i = 0; i < monitor_data.length; i++){
             let x = i % 4
             let y = Math.round(i / 4)
-            let elemParent = document.querySelector("default-table#monitor-panel").children[0].children[y].children[x]
+            let elemParent = sg.get_elem("default-table#monitor-panel").children[0].children[y].children[x]
 
             element_init(monitor_data[i], i, elemParent)
         }
@@ -49,23 +58,13 @@ function process_specific(data, reset = false){
     function for window load
 */
 
-function onload_specific(){
-    //set page content div height
-    let page_content = document.getElementById("page-content")
-    let top_content = document.getElementById("top-content")
-
-    let absolute_height = window.screen.height
-    let top_height = top_content.offsetHeight
-
-    page_content.setAttribute("style",`height:${absolute_height - top_height}px`);
-
+function onload_mon(){
     //event listeners
-    document.getElementById("res_to_def").addEventListener("click", () => {
+    sg.get_elem("#res_to_def").on_click(() => {
         delete_monitor_elem()
-        process_init_data(INIT_DATA, true)
-        process_specific(INIT_DATA, true)
+        process_mon(init_data)
     })
-    document.getElementById("apply-changes").addEventListener("click", () => {
+    sg.get_elem("#apply-changes").on_click(() => {
         //apply changes and send them to backend
         send_monitor_data(monitor_objects)
     })
@@ -73,3 +72,10 @@ function onload_specific(){
     //send data monitor data retrival request
     send_message("controller", "send-monitor-data")
 }
+
+sg.on_win_load(() => {
+    set_controller_window(frontend_vars)
+    set_controller_buttons()
+    onload_mon()
+    set_general_message_handlers(process_mon)
+})

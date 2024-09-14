@@ -55,37 +55,8 @@ button#small{
     cursor: pointer;
 }
 
-.leftalign{
-    float: left;
-}
-
-.centeralign{
-    display: inline-block;
-    margin-left: 25%;
-}
-
-.rightalign{
-    float: right;
-}
-
 .inline-but{
     margin-right: 15px;
-}
-
-table {
-    font-family: arial, sans-serif;
-    border-collapse: collapse;
-    width: 100%;
-}
-
-td, th {
-    border: 1px solid #dddddd;
-    text-align: left;
-    padding: 8px;
-}
-
-table#color > tr:nth-child(even) {
-    background-color: #dddddd;
 }
 
 /*
@@ -98,10 +69,6 @@ Generic declarations
 #center-overflow{
     text-align: center;
     overflow: hidden;
-}
-
-#main-header{
-    display: inline-block;
 }
 
 /*

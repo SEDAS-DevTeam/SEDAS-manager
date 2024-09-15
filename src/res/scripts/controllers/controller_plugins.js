@@ -1,8 +1,9 @@
 import sg from '../../source/sgui/sgui.js';
 import { on_message, send_message } from '../../scripts/utils/ipc_wrapper.js';
-import { frontend_vars, set_controller_buttons, set_controller_window, set_general_message_handlers } from '../utils/controller_utils.js'
+import { frontend_vars, set_controller_buttons, set_controller_window, process_init_data } from '../utils/controller_utils.js'
 
 //variables
+var INIT_DATA = undefined
 var deg = 0
 var initial_plugin_list = undefined; //for local plugins list
 
@@ -15,11 +16,6 @@ function refresh(elem){
 
 function onload_plugins(){
     send_message("controller", "get-plugin-list")
-}
-
-function process_plugins(data){
-    //blank TODO
-    console.log(data)
 }
 
 on_message("plugin-list", (data) => {
@@ -96,7 +92,11 @@ on_message("plugin-list", (data) => {
 
 sg.on_win_load(() => {
     set_controller_window(frontend_vars)
-    onload_plugins()
     set_controller_buttons()
-    set_general_message_handlers(process_plugins)
+    onload_plugins()
+    
+    window.electronAPI.on_init_info((data) => {
+        INIT_DATA = data
+        process_init_data(data)
+    })
 })

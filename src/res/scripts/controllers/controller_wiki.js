@@ -1,12 +1,13 @@
 import sg from '../../source/sgui/sgui.js';
 import { on_message, send_message } from '../../scripts/utils/ipc_wrapper.js';
-import { set_controller_buttons, set_controller_window, set_general_message_handlers } from '../utils/controller_utils.js'
+import { set_controller_buttons, set_controller_window, process_init_data } from '../utils/controller_utils.js'
 
 //
 //Controller Wiki
 //
 
 //wiki variables
+var INIT_DATA = undefined
 var sources = [
     "https://sedas-docs.readthedocs.io/en/latest/",
     "https://wiki.ivao.aero/en/home"
@@ -46,13 +47,13 @@ function onload_wiki(){
     }
 }
 
-function process_wiki(data){
-    //empty
-}
-
 sg.on_win_load(() => {
     set_controller_window(frontend_vars)
     set_controller_buttons()
     onload_wiki()
-    set_general_message_handlers(process_wiki)
+    
+    window.electronAPI.on_init_info((data) => {
+        INIT_DATA = data
+        process_init_data(data)
+    })
 })

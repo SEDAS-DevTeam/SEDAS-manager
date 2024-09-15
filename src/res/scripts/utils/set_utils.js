@@ -1,29 +1,83 @@
-class DescPopup extends HTMLElement{
+import sg from '../../source/sgui/sgui.js';
+
+const head_airports = ["Scenario preset name", "Type", "Code", "Country", "City", "Description"]
+const head_aircrafts = ["Aircraft preset name", "Inspect"]
+const head_commands = ["Command preseet name", "Inspect"]
+const head_scenarios = ["Scenario name", "category tags", "weight category tags"]
+
+const head_category = ["AI", "HE", "GL", "AE"]
+const head_weight_category = ["UL", "L", "M", "H", "S"]
+
+export class FrontendFunctions{
     constructor(){
-        super();
+        this.init_data = undefined;
     }
 
-    connectedCallback(){
-        let parent_div = document.createElement("div")
-        parent_div.classList.add("desc-content")
-        
-        let i = document.createElement("i")
-        i.classList.add("fa-solid")
-        i.classList.add("fa-xmark")
-        i.id = "close-desc"
-        parent_div.appendChild(i)
+    #selection(event){
+        let sel_id = event.target.id
+        let prefix = sel_id.split("-")[0]
+    
+        let selection_path;
+        let selection_name;
+        let selection_hash;
 
-        let div = document.createElement("div")
-        div.id = "inner-content"
-        parent_div.appendChild(div)
-
-        this.appendChild(parent_div)
+        switch(prefix){
+            case "aircraft":
+                for (let i = 0; i < this.init_data[5].length; i++){
+                    if (sel_id == this.init_data[5][i]["hash"]){
+                        selection_path = this.init_data[5][i]["path"]
+                        selection_name = this.init_data[5][i]["name"]
+                    }
+                }
+                sg.get_elem("#confirmresult-aircraft").innerHTML = selection_name
+                selected_aircraft_preset = selection_path
+                
+                break
+            case "command":
+                for (let i = 0; i < this.init_data[6].length; i++){
+                    if (sel_id == this.init_data[6][i]["hash"]){
+                        selection_path = this.init_data[6][i]["path"]
+                        selection_name = this.init_data[6][i]["name"]
+                    }
+                }
+                sg.get_elem("#confirmresult-command").innerHTML = selection_name
+                selected_command_preset = selection_path
+    
+                break
+            case "airport":
+                for (let i = 0; i < this.init_data[2].length; i++){
+                    if (sel_id == this.init_data[2][i]["hash"]){
+                        selection_path = this.init_data[2][i]["content"]["FILENAME"]
+                        selection_name = this.init_data[2][i]["content"]["AIRPORT_NAME"]
+                    }
+                }
+                sg.get_elem("#confirmresult-airport").innerHTML = selection_name
+                selected_map = selection_path
+    
+                send_message("controller", "send-scenario-list", [selected_map])
+                break
+            case "scenario": {
+                for (let i = 0; i < all_selected_scenarios.length; i++){
+                    if (sel_id == all_selected_scenarios[i]["hash"]){
+                        selection_name = all_selected_scenarios[i]["name"]
+                        selection_hash = all_selected_scenarios[i]["hash"]
+                        break
+                    }
+                }
+    
+                sg.get_elem("#confirmresult-scenario").innerHTML = selection_name
+                selected_scenario = selection_hash
+    
+                break
+            }
+        }
     }
-}
 
-customElements.define("desc-popup", DescPopup)
+    set_init_data(init_data){
+        this.init_data = init_data
+        console.log(this.init_data)
+    }
 
-class FrontendFunctions{
     show_description_airport(idx){
         let desc_data = document.querySelectorAll("div.popup-box")
         for (let i = 0; i < desc_data.length; i++){
@@ -47,8 +101,8 @@ class FrontendFunctions{
         let select_buttons = document.getElementsByClassName("tablebutton")
         for (let i = 0; i < select_buttons.length; i++){
             //remove click listeners (just in case)
-            select_buttons[i].removeEventListener("click", selection)
-            select_buttons[i].addEventListener("click", selection)
+            select_buttons[i].removeEventListener("click", (event) => this.#selection(event))
+            select_buttons[i].addEventListener("click", (event) => this.#selection(event))
         }
     }
 
@@ -76,11 +130,9 @@ class FrontendFunctions{
     }
 }
 
-class TableFunctions extends ElementBind{
-    constructor(element_query, selection_type = ""){
-        super(element_query);
-
-        console.log(this.attributes)
+export class TableFunctions{
+    constructor(element, selection_type = ""){
+        this.element = element
         this.selection_type = selection_type
     }
 
@@ -113,17 +165,17 @@ class TableFunctions extends ElementBind{
         }
     }
 
-    #check_even(){
-        if (this.attributes.even_color == "true"){
-            this.element.children[0].id = "color"
+    #check_even(elem){
+        if (elem.attributes.even_color == "true"){
+            elem.id = "color"
         }
     }
 
     /*
         Content generation
     */
-    set_aircrafts_list(){
-        let aircraft_data = INIT_DATA[5]
+    set_aircrafts_list(data){
+        let aircraft_data = data[5]
         console.log(aircraft_data)
         for (let i = 0; i < aircraft_data.length; i++){
             let record = document.createElement("tr")
@@ -152,12 +204,12 @@ class TableFunctions extends ElementBind{
             
             this.element.children[0].appendChild(record)
 
-            this.#check_even()
+            this.#check_even(record)
         }
     }
 
-    set_commands_list(){
-        let command_data = INIT_DATA[6]
+    set_commands_list(data){
+        let command_data = data[6]
         for (let i = 0; i < command_data.length; i++){
             let record = document.createElement("tr")
             let name = command_data[i]["name"]
@@ -186,12 +238,12 @@ class TableFunctions extends ElementBind{
     
             this.element.children[0].appendChild(record)
 
-            this.#check_even()
+            this.#check_even(record)
         }
     }
 
-    set_airports_list(){
-        let airport_data = INIT_DATA[2]
+    set_airports_list(data){
+        let airport_data = data[2]
         for (let i = 0; i < airport_data.length; i++){
             let airport = airport_data[i]["content"]
             let airport_hash = airport_data[i]["hash"]
@@ -245,7 +297,7 @@ class TableFunctions extends ElementBind{
     
             this.element.children[0].appendChild(record)
 
-            this.#check_even()
+            this.#check_even(record)
         }
     }
 
@@ -324,7 +376,7 @@ class TableFunctions extends ElementBind{
     
             this.element.children[0].appendChild(record)
 
-            this.#check_even()
+            this.#check_even(record)
         }
     }
 

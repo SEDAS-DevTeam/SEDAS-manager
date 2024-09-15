@@ -96,3 +96,9 @@ export function on_key_events(callback_keydown, callback_keyup){
 export function is_online(){
     return window.navigator.onLine
 }
+
+export function on_click(callback){
+    document.addEventListener("click", (event) => {
+        callback(event)
+    })
+}

@@ -23,7 +23,7 @@ s-text, s-header, a, li{
     display: block;
 }
 
-span{
+span, b, i{
     color: #5271ff;
     font-family: 'Montserrat', sans-serif;
     font-weight: 400;

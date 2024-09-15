@@ -26,4 +26,5 @@ export function set_elements(){
     customElements.define("s-canvas", components.WorkerCanvas)
     customElements.define("default-table", components.DefaultTable)
     customElements.define("monitor-table", components.MonitorTable)
+    customElements.define("desc-popup", components.DescPopup)
 }

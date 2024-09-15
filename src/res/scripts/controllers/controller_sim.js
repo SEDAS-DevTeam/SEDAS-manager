@@ -649,4 +649,8 @@ function onload_specific(){
             warn_text.style.display = "none"
         }
     })
+
+    on_message("map-points", (data) => {
+        process_monitor_points(data)
+    })
 }

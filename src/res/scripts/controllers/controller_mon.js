@@ -3,12 +3,12 @@
 //
 
 import sg from '../../source/sgui/sgui.js';
-import { on_message, send_message } from '../../scripts/utils/ipc_wrapper.js';
-import { frontend_vars, set_controller_buttons, set_controller_window, set_general_message_handlers } from '../utils/controller_utils.js'
+import { send_message } from '../../scripts/utils/ipc_wrapper.js';
+import { frontend_vars, set_controller_buttons, set_controller_window, process_init_data } from '../utils/controller_utils.js'
 import { element_init, delete_monitor_elem } from '../utils/monitor_control.js'
 
 
-var Windows = []
+var INIT_DATA = undefined
 var monitor_objects = []
 var monitor_data = [] //data for storing monitors
 var init_data = []
@@ -77,5 +77,10 @@ sg.on_win_load(() => {
     set_controller_window(frontend_vars)
     set_controller_buttons()
     onload_mon()
-    set_general_message_handlers(process_mon)
+    
+    window.electronAPI.on_init_info((data) => {
+        INIT_DATA = data
+        process_init_data(data)
+        process_mon(data)
+    })
 })

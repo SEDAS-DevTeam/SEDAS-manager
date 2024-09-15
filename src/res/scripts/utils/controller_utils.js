@@ -1,8 +1,7 @@
 import sg from '../../source/sgui/sgui.js';
-import { on_message, send_message } from '../../scripts/utils/ipc_wrapper.js';
+import { send_message } from '../../scripts/utils/ipc_wrapper.js';
 
 //variables
-export var INIT_DATA = [] //storing all vital data like airport list, command preset list, aircraft preset list in current session
 export var APP_DATA = undefined
 export var frontend_vars = {}
 export var monitor_objects = []
@@ -49,7 +48,7 @@ function set_dropdown_buttons(){
     }
 }
 
-function process_init_data(data){
+export function process_init_data(data){
     APP_DATA = JSON.parse(data[3])
     map_name = data[4][0]
     command_preset_name = data[4][1]
@@ -58,8 +57,6 @@ function process_init_data(data){
     if (data.length == 0){
         alert("FATAL ERROR: There is nothing to process, no data sent")
     }
-
-    INIT_DATA = data //save it into global variable
 
     //load frontend vars
     frontend_vars = data[7]
@@ -112,28 +109,5 @@ export function set_controller_buttons(){
 
     sg.get_elem("#save-button").on_click(() => {
         alert("TODO")
-    })
-}
-
-export function set_general_message_handlers(process_callback){
-    on_message("map-points", (data) => {
-        //TODO what?
-    })
-
-    on_message("map-checked", (data) => {
-        let data_temp = JSON.parse(data)
-        if (data_temp["user-check"]){
-            sg.get_elem("#mask-sim").hide()
-        }
-        else{
-            sg.get_elem("#mask-sim").show()
-        }
-
-        send_message("controller", "send-info")
-    })
-
-    window.electronAPI.on_init_info((data) => {
-        process_init_data(data)
-        process_callback(data)
     })
 }

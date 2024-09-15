@@ -1,14 +1,13 @@
 //
 //Controller Setup JS
 //
-const head_airports = ["Scenario preset name", "Type", "Code", "Country", "City", "Description"]
-const head_aircrafts = ["Aircraft preset name", "Inspect"]
-const head_commands = ["Command preseet name", "Inspect"]
-const head_scenarios = ["Scenario name", "category tags", "weight category tags"]
 
-const head_category = ["AI", "HE", "GL", "AE"]
-const head_weight_category = ["UL", "L", "M", "H", "S"]
+import sg from '../../source/sgui/sgui.js';
+import { on_message, send_message } from '../../scripts/utils/ipc_wrapper.js';
+import { frontend_vars, set_controller_buttons, set_controller_window, process_init_data } from '../utils/controller_utils.js'
+import { FrontendFunctions, TableFunctions } from '../utils/set_utils.js'
 
+var INIT_DATA = undefined
 var desc_rendered = false
 var clicked = false
 var curr_desc = -1
@@ -18,7 +17,6 @@ var all_selected_scenarios = [];
 var selected_map = ""
 var selected_aircraft_preset = ""
 var selected_command_preset = ""
-var selected_name = ""
 var selected_scenario = ""
 
 var map_name = ""
@@ -38,63 +36,45 @@ var table_scenario_adjustments_weight;
 table setups
 */
 
-function selection(event){
-    let sel_id = event.target.id
-    let prefix = sel_id.split("-")[0]
+function process_JSON(data){
+    let res_str = ""
 
-    let selection_path;
-    let selection_name;
-    let selection_hash;
-    switch(prefix){
-        case "aircraft":
-            for (let i = 0; i < INIT_DATA[5].length; i++){
-                if (sel_id == INIT_DATA[5][i]["hash"]){
-                    selection_path = INIT_DATA[5][i]["path"]
-                    selection_name = INIT_DATA[5][i]["name"]
-                }
-            }
-            document.getElementById("confirmresult-aircraft").innerHTML = selection_name
-            selected_aircraft_preset = selection_path
+    let data_json = JSON.parse(data["content"])
+    for (const [key, value] of Object.entries(data_json)) {
+        //create header
+        res_str += `<span class="man-header">${value["manufacturer"]}</span><br>`
+
+        //create planes
+        for (const [plane_key, plane_value] of Object.entries(value["planes"])){
+            res_str += '<div class="plane">'
+            res_str += `<span class="plane-header">${plane_value["name"]}`
             
-            break
-        case "command":
-            for (let i = 0; i < INIT_DATA[6].length; i++){
-                if (sel_id == INIT_DATA[6][i]["hash"]){
-                    selection_path = INIT_DATA[6][i]["path"]
-                    selection_name = INIT_DATA[6][i]["name"]
+            //add content switch
+            res_str += `<i class="plane-content-switch fa-solid fa-caret-right"></i></span><br>`
+
+            //add plane hidden content
+            res_str += `<div class="plane-content">`
+            for (const [plane_inner_key, plane_inner_value] of Object.entries(plane_value)){
+                if (plane_inner_key == "name"){
+                    continue
                 }
-            }
-            document.getElementById("confirmresult-command").innerHTML = selection_name
-            selected_command_preset = selection_path
 
-            break
-        case "airport":
-            for (let i = 0; i < INIT_DATA[2].length; i++){
-                if (sel_id == INIT_DATA[2][i]["hash"]){
-                    selection_path = INIT_DATA[2][i]["content"]["FILENAME"]
-                    selection_name = INIT_DATA[2][i]["content"]["AIRPORT_NAME"]
+                //more nested elements
+                if (plane_inner_key == "roc" || plane_inner_key == "rod"){
+                    res_str += `<b>${plane_inner_key}:</b><br>`
+                    for (const [plane_ro_key, plane_ro_value] of Object.entries(plane_inner_value)){
+                        res_str += `<b class="nested">${plane_ro_key}:</b> ${plane_ro_value}<br>`
+                    }
+                    continue
                 }
+
+                res_str += `<b>${plane_inner_key}:</b> ${plane_inner_value}<br>`
             }
-            document.getElementById("confirmresult-airport").innerHTML = selection_name
-            selected_map = selection_path
-
-            send_message("controller", "send-scenario-list", [selected_map])
-            break
-        case "scenario": {
-            for (let i = 0; i < all_selected_scenarios.length; i++){
-                if (sel_id == all_selected_scenarios[i]["hash"]){
-                    selection_name = all_selected_scenarios[i]["name"]
-                    selection_hash = all_selected_scenarios[i]["hash"]
-                    break
-                }
-            }
-
-            document.getElementById("confirmresult-scenario").innerHTML = selection_name
-            selected_scenario = selection_hash
-
-            break
+            res_str += "</div><br>"
+            res_str += "</div>"
         }
     }
+    return res_str
 }
 
 function set_environment(){
@@ -120,7 +100,7 @@ function set_environment(){
     Processing initial data
 */
 
-function process_specific(data, reset = false){
+function process_set(data){
     if (map_name != undefined){
         //loaded from backup, change map name 
         document.getElementById("confirmresult-airport").innerHTML = map_name
@@ -129,9 +109,9 @@ function process_specific(data, reset = false){
     }
 
     //initial data generation from configs sent through IPC
-    table_map.set_airports_list()
-    table_aircraft.set_aircrafts_list()
-    table_command.set_commands_list()
+    table_map.set_airports_list(data)
+    table_aircraft.set_aircrafts_list(data)
+    table_command.set_commands_list(data)
 
     frontend.listener_on_select()
     frontend.listener_on_description()
@@ -143,17 +123,17 @@ function process_specific(data, reset = false){
     function for window load
 */
 
-function onload_specific(){
+function onload_set(){
     //create frontend binder
     frontend = new FrontendFunctions()
 
     //create all element binders
-    table_map = new TableFunctions("default-table#airports", "airports")
-    table_aircraft = new TableFunctions("default-table#aircrafts", "aircrafts")
-    table_command = new TableFunctions("default-table#commands", "commands")
-    table_scenario = new TableFunctions("default-table#scenarios", "scenario")
-    table_scenario_adjustments_category = new TableFunctions("default-table#scenario-adjustments-category")
-    table_scenario_adjustments_weight = new TableFunctions("default-table#scenario-adjustments-weight")
+    table_map = new TableFunctions(sg.get_elem("default-table#airports"), "airports")
+    table_aircraft = new TableFunctions(sg.get_elem("default-table#aircrafts"), "aircrafts")
+    table_command = new TableFunctions(sg.get_elem("default-table#commands"), "commands")
+    table_scenario = new TableFunctions(sg.get_elem("default-table#scenarios"), "scenario")
+    table_scenario_adjustments_category = new TableFunctions(sg.get_elem("default-table#scenario-adjustments-category"))
+    table_scenario_adjustments_weight = new TableFunctions(sg.get_elem("default-table#scenario-adjustments-weight"))
 
     table_map.set_header()
     table_aircraft.set_header()
@@ -164,7 +144,7 @@ function onload_specific(){
     table_scenario_adjustments_weight.set_adjustments_list("weight")
 
 
-    document.addEventListener("click", () => {
+    sg.on_click(() => {
         if (clicked){
             clicked = false
             return
@@ -182,54 +162,58 @@ function onload_specific(){
         }
     })
 
-    document.getElementById("confirm").addEventListener("click", () => {
+    sg.get_elem("#confirm").on_click(() => {
         set_environment()
     })
 
-    document.getElementById("close-desc").addEventListener("click", () => {
+    sg.get_elem("#close-desc").on_click(() => {
         desc_rendered = false
         document.getElementsByClassName("desc-content")[0].style.visibility = "hidden"
     })
 
     //listeners
-
-    window.electronAPI.on_message("description-data", (data) => {
-        document.getElementById("inner-content").innerHTML = process_JSON(data)
-        //set all event listeners for inner content
-        let plane_content_selectors = document.getElementsByClassName("plane-content-switch")
-        for (let i = 0; i < plane_content_selectors.length; i++){
-            plane_content_selectors[i].addEventListener("click", (event) => {
-                if (plane_content_selectors[i].classList.contains("fa-caret-right")){
-                    //not visible
-                    event.target.parentNode.parentNode.childNodes[2].style.display = "block"
-                    plane_content_selectors[i].classList.remove("fa-caret-right")
-                    plane_content_selectors[i].classList.add("fa-caret-down")
-                }
-                else {
-                    //visible
-                    event.target.parentNode.parentNode.childNodes[2].style.display = "none"
-                    plane_content_selectors[i].classList.remove("fa-caret-down")
-                    plane_content_selectors[i].classList.add("fa-caret-right")
-                }
-            })
-        }
-    })
-    
-    window.electronAPI.on_message("scenario-list", (data) => {
-        all_selected_scenarios = data
-        table_scenario.delete_list()
-        table_scenario.set_scenarios_list(all_selected_scenarios)
-
-        /*
-        let scenario_select_buttons = document.querySelectorAll('[id*="scenario"] .tablebutton');
-        console.log(scenario_select_buttons)
-        for (let i = 0; i < scenario_select_buttons.length; i++){
-            scenario_select_buttons[i].addEventListener("click", () => {
-                selection(scenario_select_buttons[i])
-            })
-        }
-        */
-        frontend.listener_on_select()
-        frontend.listener_on_select_dropdown()
-    })
 }
+
+on_message("scenario-list", (data) => {
+    all_selected_scenarios = data
+    table_scenario.delete_list()
+    table_scenario.set_scenarios_list(all_selected_scenarios)
+
+    frontend.listener_on_select()
+    frontend.listener_on_select_dropdown()
+})
+
+on_message("description-data", (data) => {
+   sg.get_elem("#inner-content").innerHTML = process_JSON(data)
+    //set all event listeners for inner content
+    let plane_content_selectors = document.getElementsByClassName("plane-content-switch")
+    for (let i = 0; i < plane_content_selectors.length; i++){
+        plane_content_selectors[i].addEventListener("click", (event) => {
+            if (plane_content_selectors[i].has_class("fa-caret-right")){
+                //not visible
+                event.target.parentNode.parentNode.childNodes[2].style.display = "block"
+                plane_content_selectors[i].remove_class("fa-caret-right")
+                plane_content_selectors[i].add_class("fa-caret-down")
+            }
+            else {
+                //visible
+                event.target.parentNode.parentNode.childNodes[2].style.display = "none"
+                plane_content_selectors[i].remove_class("fa-caret-down")
+                plane_content_selectors[i].add_class("fa-caret-right")
+            }
+        })
+    }
+})
+
+sg.on_win_load(() => {
+    set_controller_window(frontend_vars)
+    set_controller_buttons()
+    onload_set()
+
+    window.electronAPI.on_init_info((data) => {
+        INIT_DATA = data
+        frontend.set_init_data(data)
+        process_init_data(data)
+        process_set(data)
+    })
+})

@@ -8,7 +8,12 @@ import * as defs from '../../source/sgui/sgui_def.js';
 class BasicElement extends HTMLElement{
     constructor(){
         super();
-        this.is_visible = true
+        this.is_visible = true;
+        this.callback_on_click = undefined;
+        this.callback_on_dblclick = undefined;
+        this.callback_on_mousedown = undefined;
+        this.callback_on_mouseup = undefined;
+        this.callback_on_mousemove = undefined;
     }
 
     show(){
@@ -37,14 +42,18 @@ class BasicElement extends HTMLElement{
     */
 
     on_click(callback){
+        this.callback_on_click = callback
+        console.log(callback)
+        console.log(this.callback_on_click)
         this.addEventListener("click", (event) => {
-            callback(event)
+            this.callback_on_click(event)
         })
     }
 
     on_dblclick(callback){
+        this.callback_on_dblclick = callback
         this.addEventListener("dblclick", (event) => {
-            callback(event)
+            this.callback_on_dblclick(event)
         })
     }
 
@@ -61,20 +70,23 @@ class BasicElement extends HTMLElement{
     }
 
     on_mousedown(callback){
+        this.callback_on_mousedown = callback
         this.addEventListener("mousedown", (event) => {
-            callback(event)
+            this.callback_on_mousedown(event)
         })
     }
 
     on_mouseup(callback){
+        this.callback_on_mouseup = callback
         this.addEventListener("mouseup", (event) => {
-            callback(event)
+            this.callback_on_mouseup(event)
         })
     }
 
     on_mousemove(callback){
+        this.callback_on_mousemove = callback
         this.addEventListener("mousemove", (event) => {
-            callback(event)
+            this.callback_on_mousemove(event)
         })
     }
 
@@ -96,6 +108,32 @@ class BasicElement extends HTMLElement{
 
     get_elem(identifier){
         defs.get_elem(identifier, this)
+    }
+
+    remove_listener(listener_name){
+        let listener_callback;
+
+        switch(listener_name){
+            case "click":
+                listener_callback = this.callback_on_click
+                break
+            case "dblclick":
+                listener_callback = this.callback_on_dblclick
+                break
+            case "mousedown":
+                listener_callback = this.callback_on_mousedown
+                break
+            case "mousemove":
+                listener_callback = this.callback_on_mousemove
+                break
+            case "mouseup":
+                listener_callback = this.callback_on_mouseup
+                break
+        }
+
+        if (listener_callback != undefined){
+            this.removeEventListener(listener_name, listener_callback)
+        }
     }
 }
 

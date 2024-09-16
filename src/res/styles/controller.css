@@ -17,6 +17,10 @@
     overflow-y: scroll;
 }
 
+s-text.desc{
+    color: white;
+}
+
 .upper-mask{
     position: absolute;
     z-index: 2;

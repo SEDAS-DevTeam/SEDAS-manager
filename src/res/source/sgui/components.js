@@ -205,13 +205,15 @@ class Icon extends BasicElement{
     Text classes
 */
 
-class AlignCenter extends BasicElement{
+class AlignHCenter extends BasicElement{
     constructor(){
         super();
     }
+}
 
-    connectedCallback(){
-        
+class AlignVCenter extends BasicElement{
+    constructor(){
+        super();
     }
 }
 
@@ -527,7 +529,8 @@ const components = {
     Icon,
     Text,
     Header,
-    AlignCenter,
+    AlignHCenter,
+    AlignVCenter,
     Loadbar,
     CircleLoadbar,
     Topnav,

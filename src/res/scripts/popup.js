@@ -5,8 +5,8 @@ import { on_message,send_message } from '../scripts/utils/ipc_wrapper.js';
 var comm_channel;
 
 function setup_confirm(content){
-    let yes_button = sg.create_elem("button", "yes", "Yes", content)
-    let no_button = sg.create_elem("button", "no", "No", content)
+    let yes_button = sg.create_elem("s-button", "yes", "Yes", content)
+    let no_button = sg.create_elem("s-button", "no", "No", content)
 
     yes_button.on_click(() => {
         send_message("popup", comm_channel, [true])
@@ -17,7 +17,7 @@ function setup_confirm(content){
 }
 
 function setup_alert(content){
-    let ok_button = sg.create_elem("button", "yes", "Ok", content)
+    let ok_button = sg.create_elem("s-button", "yes", "Ok", content)
 
     ok_button.on_click(() => {
         send_message("popup", comm_channel)

@@ -4,7 +4,7 @@ worker_widget.html
 exit.html
 load.html
 main.html
-popup.html -> broken
+popup.html
 #controller
 wiki.html
 plugins.html

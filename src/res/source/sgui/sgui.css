@@ -46,10 +46,17 @@ img{
     pointer-events: none;
 }
 
-align-center{
+align-h-center{
     display: block;
     text-align: center;
     overflow: hidden;
+    width: 100vh;
+}
+
+align-v-center{
+    display: flex;
+    align-items: center;
+    height: 100vh;
 }
 
 s-loadbar{

@@ -5,7 +5,7 @@
 import sg from '../../source/sgui/sgui.js';
 import { on_message, send_message } from '../../scripts/utils/ipc_wrapper.js';
 import { add_log, remove_log } from '../../scripts/utils/plane_terminal.js'
-import { frontend_vars, set_controller_buttons, set_controller_window, process_init_data } from '../utils/controller_utils.js'
+import { frontend_vars, set_controller_buttons, set_controller_window, process_init_data, APP_DATA } from '../utils/controller_utils.js'
 
 //plane labels
 const PLANE_LABELS = ["Heading", "Level", "Speed"]
@@ -147,7 +147,18 @@ function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival,
 
     console.log("created plane element")
 
-    let plane_cell = sg.create_elem("div", "", `<div class="plane-cell-header" id="plane${plane_id}"><h2>${plane_name} (from ${plane_departure.split("_")[0]} to ${plane_arrival.split("_")[0]})</h2><i class="fa-solid fa-trash" id="delete-icon" onclick="delete_plane(event.target)"></i><div>`, sg.get_elem("#plane-list"))
+    let plane_cell = sg.create_elem("div", "", "", sg.get_elem("#plane-list"))
+    let plane_cell_header = sg.create_elem("div", `plane${plane_id}`, "", plane_cell)
+    plane_cell_header.add_class("plane-cell-header")
+
+    sg.create_elem("s-header", "", `${plane_name} (from ${plane_departure.split(" ")[0]} to ${plane_arrival.split("_")[0]})`, plane_cell_header)
+    let trash_icon = sg.create_elem("i", "delete-icon", "", plane_cell_header)
+    trash_icon.add_class("fa-solid")
+    trash_icon.add_class("fa-trash")
+    trash_icon.on_click((event) => {
+        delete_plane(event.target)
+    })
+
     plane_cell.add_class("plane-cell")
 
     for(let i_row = 0; i_row < 3; i_row++){
@@ -325,7 +336,7 @@ function random_generate_names(){
     let nums = "0123456789"
 
     //random generate all buttons
-    var choice_buttons = document.getElementsByClassName("choice-but")
+    var choice_buttons = sg.get_elem(".choice-but")
     for (let i = 0; i < choice_buttons.length; i++){
         //unselect all buttons
         if (choice_buttons[i].classList.contains("selected-choice")){
@@ -520,10 +531,10 @@ function onload_sim(){
     })
 
     sg.get_elem("#sim_button").on_click((event) => {
-        if (event.has_class("stopsim")){
+        if (event.target.has_class("stopsim")){
             send_message("controller", "stop-sim") //stop simulation
         }
-        else if (event.target.className == "startsim"){
+        else if (event.target.has_class("startsim")){
             send_message("controller", "start-sim") //start simulation
         }
     })
@@ -611,7 +622,7 @@ on_message("sim-event", (data) => {
     let mask = sg.get_elem("#mask-plane-list")
     let warn_text = sg.get_elem("#sim-not-running")
 
-    let elem = sg.get_elem("button#sim_button")
+    let elem = sg.get_elem("s-button#sim_button")
     if (data == "stopsim"){
         elem.className = "startsim"
         elem.innerHTML = "RUN"
@@ -642,6 +653,21 @@ on_message("terminal-add", (comm_data) => {
 
 on_message("map-points", (data) => {
     process_monitor_points(data)
+})
+
+on_message("map-checked", (data) => {
+    let data_temp = JSON.parse(data)
+    if (data_temp["user-check"]){
+        sg.get_elem("#mask-sim").hide()
+    }
+    else{
+        sg.get_elem("#mask-sim").show()
+    }
+
+    map_checked = data_temp["user-check"]
+
+    //send message to get new data
+    send_message("controller", "send-info")
 })
 
 sg.on_win_load(() => {

@@ -188,10 +188,24 @@ s-topnav#worker{
 
 page-mask{
     position: absolute;
+    text-align: center;
+    margin: auto;
+    font-weight: bolder;
+    font-family: 'Montserrat';
+    font-size: larger;
     z-index: 2;
-    background-color: white;
     width: 100%;
     height: 100%;
+}
+
+page-mask.transparent{
+    background-color: rgba(0, 0, 0, 0.01);
+    color: red;
+    backdrop-filter: blur(50px);
+}
+
+page-mask.white{
+    background-color: white;
 }
 
 /*

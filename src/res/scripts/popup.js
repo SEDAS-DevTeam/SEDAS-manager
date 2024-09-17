@@ -1,5 +1,5 @@
 import sg from '../source/sgui/sgui.js';
-import { on_message } from '../scripts/utils/ipc_wrapper.js';
+import { on_message,send_message } from '../scripts/utils/ipc_wrapper.js';
 
 //variables
 var comm_channel;

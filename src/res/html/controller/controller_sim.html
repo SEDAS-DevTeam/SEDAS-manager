@@ -1,36 +1,34 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="../../styles/index.css">
-        <link rel="stylesheet" href="../../styles/controller.css">
-        
         <meta charset="utf-8" />
 
-        <script src="../../scripts/blocks/block.js"></script>
-        <script src="../../scripts/blocks/block_sim.js"></script>
+        <link rel="stylesheet" href="../../styles/index.css">
 
-        <script src="../../scripts/utils/ipc_wrapper.js"></script>
+        <link href="../../source/sgui/sgui.css" rel="stylesheet"/>
+        <script src="../../source/sgui/sgui.js" type="module"></script>
 
-        <script src="../../scripts/utils/plane_terminal.js"></script>
-        <script src="../../scripts/controllers/controller_sim.js"></script>
-        <script src="../../scripts/controllers/controller.js"></script>
+        <link rel="stylesheet" href="../../styles/controller.css">
+
+        <script src="../../scripts/controllers/controller_sim.js" type=module></script>
     </head>
-    <body id="controller-body">
-        <top-header id="sim"></top-header>
-        <div class="upper-mask" id="mask-sim">
+    <body>
+        <s-topnav id="sim"></s-topnav>
+
+        <page-mask class="transparent" id="mask-sim">
             You did not select any map to be rendered
-        </div>
-        <div class="div-indent">
+        </page-mask>
+        <div class="content">
             <div>
-                <h2 style="display: inline; margin-right: 15px;">Simulation control</h2>
-                <button id="sim_button" class="startsim">START</button>
+                <s-header s="2">Simulation control</s-header>
+                <s-button id="sim_button" class="startsim">START</s-button>
             </div>
             <hr>
     
             <!--1. dropdown content-->
             <div>
-                <i class="drop-button fa-solid fa-caret-down"></i>
-                <h3 id="ai-control-header" class="header-inline">AI control</h3>
+                <s-icon type="caret-down"></s-icon>
+                <s-header s="3" id="ai-control-header" class="header-inline">AI control</s-header>
             </div>
             <div class="dropdown-content">
                 <label class="switch">
@@ -43,13 +41,13 @@
             <div id="main-content">
                 <!--2. dropdown content-->
                 <div>
-                    <i class="drop-button fa-solid fa-caret-down"></i>
-                    <h3 class="header-inline">Plane spawn</h3>
+                    <s-icon type="caret-down"></s-icon>
+                    <s-header s="3" class="header-inline">Plane spawn</s-header>
                 </div>
                 <div class="dropdown-content">
                     <div class="plane-cell">
                         <div class="plane-block">
-                            <p class="header">NAME: </p>
+                            <s-text class="header">NAME: </s-text>
                             <div id="rand-gen-but">
                                 <button class="choice-but"></button>
                                 <button class="choice-but"></button>
@@ -60,70 +58,70 @@
                             <form><input type="text" placeholder="Type callsign..." name="callsign" class="choice-text"></form>
                         </div>
                         <div class="plane-block">
-                            <p class="header">HEADING: <span class="val-out"></span></p>
+                            <s-text class="header">HEADING: <span class="val-out"></span></s-text>
                             <input type="range" class="val-range">
                         </div>
                         <div class="plane-block">
-                            <p class="header">LEVEL: <span class="val-out"></span></p>
+                            <s-text class="header">LEVEL: <span class="val-out"></span></s-text>
                             <input type="range" class="val-range">
                         </div>
                         <div class="plane-block">
-                            <p class="header">SPEED: <span class="val-out"></span></p>
+                            <s-text class="header">SPEED: <span class="val-out"></span></s-text>
                             <input type="range" class="val-range">
                         </div>
                         <div class="plane-block">
-                            <p class="header">MONITOR</p>
+                            <s-text class="header">MONITOR</s-text>
                             <select id="monitor_spawn">
                             </select>
                         </div>
                         <div class="plane-block">
-                            <p class="header">PLANE TYPE</p>
+                            <s-text class="header">PLANE TYPE</s-text>
                             <select id="plane_type">
                             </select>
                         </div>
                         <div class="plane-block" style="margin-left: 20px;">
-                            <p class="header">DEPARTURE POINT</p>
+                            <s-text class="header">DEPARTURE POINT</s-text>
                             <select id="departure_point">
                             </select>
                         </div>
                         <div class="plane-block" style="margin-left: 20px;">
-                            <p class="header">ARRIVAL POINT</p>
+                            <s-text class="header">ARRIVAL POINT</s-text>
                             <select id="arrival_point">
                             </select>
                         </div>
                         <div class="time-block-full">
-                            <p class="header" style="display: inline-block;">ARRIVAL TIME: (note: is in 24-hour format)</p>
+                            <s-text class="header">ARRIVAL TIME: (note: is in 24-hour format)</s-text>
                             <div style="display: inline-block; margin-left: 25px;">
                                 <div id="time-block">
                                     <div class="time-row">
-                                        <i class="fa-solid fa-arrow-up arr-up" style="margin-left: 5px;"></i>
-                                        <i class="fa-solid fa-arrow-up arr-up"></i>
+                                        <s-icon type="arrow-up" class="arr-up" style="margin-left: 5px;"></s-icon>
+                                        <s-icon type="arrow-up" class="arr-up"></s-icon>
                                     </div>
                                     <div class="time-row">
-                                        <p class="time-col" id="hours">00</p>
-                                        <p class="time-col" id="minutes">00</p>
+                                        <s-text class="time-col" id="hours">00</s-text>
+                                        <s-text class="time-col" id="minutes">00</s-text>
                                     </div>
                                     <div class="time-row">
-                                        <i class="fa-solid fa-arrow-down arr-down" style="margin-left: 5px;"></i>
-                                        <i class="fa-solid fa-arrow-down arr-down"></i>
+                                        <s-icon type="arrow-down" class="arr-down" style="margin-left: 5px;"></s-icon>
+                                        <s-icon type="arrow-down" class="arr-down"></s-icon>
                                     </div>
                                 </div>
                             </div>
-                            <p>Prediction by selected points: 00:00</p>
-                            <button>Select predicted time</button>
+                            <s-text>Prediction by selected points: 00:00</s-text>
+                            <s-button>Select predicted time</s-button>
                         </div>
-                        <button id="confirm-button-plane">Confirm</button>
+                        <s-button id="confirm-button-plane">Confirm</s-button>
                     </div>
                 </div>
                 <hr>
 
                 <!--3. dropdown content-->
                 <div>
-                    <i class="drop-button fa-solid fa-caret-down"></i>
-                    <h3 class="header-inline">Plane control</h3>
+                    <s-icon type="caret-down"></s-icon>
+                    <s-header s="3" class="header-inline">Plane control</s-header>
                 </div>
                 <div class="dropdown-content">
-                    <p class="warn-text" id="sim-not-running">You have to start simulation first to change plane values</p>
+                    <s-text class="warn-text" id="sim-not-running">You have to start simulation first to change plane values</s-text>
                     <div class="mask mask-unselect" id="mask-plane-list">
                         <div id="plane-list">
                             <form><input type="text" placeholder="Search for aircraft name..." name="callsign" class="plane-search"></form>
@@ -134,21 +132,20 @@
     
                 <!--4. dropdown content-->
                 <div>
-                    <i class="drop-button fa-solid fa-caret-down"></i>
-                    <h3 class="header-inline">Plane terminal</h3>
+                    <s-icon type="caret-down"></s-icon>
+                    <s-header class="header-inline">Plane terminal</s-header>
                 </div>
                 <div class="dropdown-content">
                     <div id="terminal-content">
-                        <div style="margin-top: 15px; margin-left: 15px;">
-                        </div>
+                        <div style="margin-top: 15px; margin-left: 15px;"></div>
                     </div>
                 </div>
                 <hr>
     
                 <!--5. dropdown content-->
                 <div>
-                    <i class="drop-button fa-solid fa-caret-down"></i>
-                    <h3 class="header-inline">Environment control</h3>
+                    <s-icon type="caret-down"></s-icon>
+                    <s-header s="3" class="header-inline">Environment control</s-header>
                 </div>
                 <div class="dropdown-content">
                     <div>
@@ -159,7 +156,7 @@
                         <span class="inline-text">Enable wind control</span>
                     </div>
                     <div id="wind-control">
-                        <h2>TODO: wind control</h2>
+                        <s-header s="2">TODO: wind control</s-header>
                     </div>
                 </div>
             </div>

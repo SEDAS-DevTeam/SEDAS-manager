@@ -9,6 +9,8 @@ class BasicElement extends HTMLElement{
     constructor(){
         super();
         this.is_visible = true;
+        this.callback_on_change = undefined;
+        this.callback_on_input = undefined;
         this.callback_on_click = undefined;
         this.callback_on_dblclick = undefined;
         this.callback_on_mousedown = undefined;
@@ -41,10 +43,22 @@ class BasicElement extends HTMLElement{
         Events
     */
 
+    on_change(callback){
+        this.callback_on_change = callback
+        this.addEventListener("change", (event) => {
+            this.callback_on_change(event)
+        })
+    }
+
+    on_input(callback){
+        this.callback_on_input = callback
+        this.addEventListener("input", (event) => {
+            this.callback_on_input(event)
+        })
+    }
+
     on_click(callback){
         this.callback_on_click = callback
-        console.log(callback)
-        console.log(this.callback_on_click)
         this.addEventListener("click", (event) => {
             this.callback_on_click(event)
         })
@@ -152,27 +166,35 @@ class Icon extends BasicElement{
         let type = this.getAttribute("type")
         switch(type){
             case "min": {
-                this.classList.add("fa-solid fa-minimize")
+                this.classList.add("fa-solid", "fa-minimize")
                 break
             }
             case "max": {
-                this.classList.add("fa-solid fa-maximize")
+                this.classList.add("fa-solid", "fa-maximize")
                 break
             }
             case "x": {
-                this.classList.add("fa-solid fa-xmark")
+                this.classList.add("fa-solid", "fa-xmark")
                 break
             }
             case "arrow-left": {
-                this.classList.add("fa-solid fa-arrow-left")
+                this.classList.add("fa-solid", "fa-arrow-left")
+                break
+            }
+            case "arrow-up": {
+                this.classList.add("fa-solid", "fa-arrow-up")
+                break
+            }
+            case "arrow-down": {
+                this.classList.add("fa-solid", "fa-arrow-down")
                 break
             }
             case "refresh": {
-                this.classList.add("fa fa-refresh")
+                this.classList.add("fa", "fa-refresh")
                 break
             }
             case "caret-down": {
-                this.classList.add("drop-button fa-solid fa-caret-down")
+                this.classList.add("drop-button", "fa-solid", "fa-caret-down")
                 break
             }
         }
@@ -339,10 +361,6 @@ class Topnav extends BasicElement{
 class PageMask extends BasicElement{
     constructor(){
         super();
-    }
-
-    connectedCallback(){
-
     }
 }
 

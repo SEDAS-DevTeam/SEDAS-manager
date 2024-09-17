@@ -21,22 +21,6 @@ s-text.desc{
     color: white;
 }
 
-.upper-mask{
-    position: absolute;
-    z-index: 2;
-    width: 100%;
-    text-align: center;
-    margin: auto;
-    background-color: rgba(0, 0, 0, 0.01);
-    color: red;
-    margin-left: -20px;
-    font-weight: bolder;
-    padding-top: 20%;
-    font-family: 'Montserrat';
-    font-size: larger;
-    backdrop-filter: blur(50px);
-}
-
 .mask{
     z-index: 2;
     width: 100%;

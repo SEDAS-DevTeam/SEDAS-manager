@@ -443,3 +443,7 @@ body{
 #main-header{
     display: inline-block;
 }
+
+#mask-sim{
+    margin-left: -20px;
+}

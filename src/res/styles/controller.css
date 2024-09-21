@@ -448,3 +448,8 @@ body{
     margin-left: -20px;
     padding-top: 20%;
 }
+
+.warn-text{
+    color: red;
+    font-weight: bolder;
+}

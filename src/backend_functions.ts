@@ -252,7 +252,7 @@ export class MainAppFunctions{
 
             //sending app data and alg configs
             console.log("sending app data")
-            this.wrapper.send_message("controller", "app-data", [this.app_settings, voice_config, text_config, speech_config, in_devices, out_devices, settings_layout])
+            this.wrapper.send_message("settings", "app-data", [this.app_settings, voice_config, text_config, speech_config, in_devices, out_devices, settings_layout])
         }
         else if (window_type == "controller"){
             //sending monitor data

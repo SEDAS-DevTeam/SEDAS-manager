@@ -224,6 +224,7 @@ class Text extends BasicElement{
 
     connectedCallback(){
         defs.check_margin(this)
+        defs.check_special(this)
     }
 }
 
@@ -238,6 +239,7 @@ class Header extends BasicElement{
             this.style.fontSize = defs.size_conversion[size_level] + "px"
         }
         defs.check_margin(this)
+        defs.check_special(this)
     }
 
     change_size(size_level){

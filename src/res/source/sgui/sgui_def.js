@@ -27,8 +27,13 @@ export const conversion_top_header = {
 export function check_margin(elem){
     let margin_space = elem.getAttribute("m")
     if (margin_space != null){
-        elem.style.margin = margin_space.split(" ").map((x) => x + "px")
+        elem.style.margin = margin_space.split(" ").map((x) => x + "px").join(" ")
     }
+}
+
+export function check_special(elem){
+    let bold = elem.getAttribute("b")
+    console.log(bold)
 }
 
 // global functions

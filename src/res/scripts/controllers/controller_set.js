@@ -203,8 +203,8 @@ class TableFunctions{
         }
     }
 
-    #check_even(elem){
-        if (elem.attributes.even_color == "true"){
+    #add_colored_header(i, elem){
+        if (elem.attributes.even_color == "true" && i == 0){
             elem.id = "color"
         }
     }
@@ -214,9 +214,10 @@ class TableFunctions{
     */
     set_aircrafts_list(data){
         let aircraft_data = data[5]
-        console.log(aircraft_data)
         for (let i = 0; i < aircraft_data.length; i++){
             let record = sg.create_elem("tr", "", "", this.element.children[0])
+            this.#add_colored_header(i, record)
+
             let name = aircraft_data[i]["name"]
     
             sg.create_elem("td", "", name, record)
@@ -229,8 +230,6 @@ class TableFunctions{
     
             let select_button = sg.create_elem("s-button", aircraft_data[i]["hash"], "Select", select_obj)
             select_button.classList.add("tablebutton")
-
-            this.#check_even(record)
         }
     }
 
@@ -238,6 +237,8 @@ class TableFunctions{
         let command_data = data[6]
         for (let i = 0; i < command_data.length; i++){
             let record = sg.create_elem("tr", "", "", this.element.children[0])
+            this.#add_colored_header(i, record)
+
             let name = command_data[i]["name"]
     
             sg.create_elem("td", "", name, record)
@@ -250,8 +251,6 @@ class TableFunctions{
     
             let select_button = sg.create_elem("s-button", command_data[i]["hash"], "Select", select_obj)
             select_button.classList.add("tablebutton")
-
-            this.#check_even(record)
         }
     }
 
@@ -262,6 +261,7 @@ class TableFunctions{
             let airport_hash = airport_data[i]["hash"]
     
             let record = sg.create_elem("tr", "", "", this.element.children[0])
+            this.#add_colored_header(i, record)
     
             let i2 = 0;
             for (const [key, value] of Object.entries(airport)) {
@@ -292,13 +292,11 @@ class TableFunctions{
             let desc = sg.create_elem("s-text", "", airport["DESC"], popup_box)
             desc.classList.add("desc");
 
-            let select_button = sg.create_elem("button", airport_hash, "Select", select_obj)
+            let select_button = sg.create_elem("s-button", airport_hash, "Select", select_obj)
             select_button.classList.add("tablebutton")
     
             desc_obj.appendChild(popup_box)
             select_obj.appendChild(select_button)
-
-            this.#check_even(record)
         }
     }
 
@@ -344,6 +342,7 @@ class TableFunctions{
             console.log(scenario_weight_categories, scenario_categories)
 
             let record = sg.create_elem("tr", "", "", this.element.children[0])
+            this.#add_colored_header(i, record)
             
             sg.create_elem("td", "", scenario_name, record)
 
@@ -356,11 +355,10 @@ class TableFunctions{
             for (let i = 0; i < scenario_weight_categories.length; i++){
                 weight_category_tags_parent.innerHTML += `<span id="tag">${scenario_weight_categories[i]}</span>`
             }
-
-            let select_button = sg.create_elem("s-button", scenario_id, "Select", record)
+            
+            let select_parent = sg.create_elem("td", "", "", record)
+            let select_button = sg.create_elem("s-button", scenario_id, "Select", select_parent)
             select_button.classList.add("tablebutton")
-
-            this.#check_even(record)
         }
     }
 

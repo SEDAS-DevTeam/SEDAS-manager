@@ -5,7 +5,7 @@ import { on_message, send_message } from '../scripts/utils/ipc_wrapper.js';
 //variables
 var app_data_template = []
 
-function onload_specific(){
+function onload_settings(){
     sg.get_elem("#redir_to_menu").on_click(() => {
         send_message("settings", "redirect-to-menu")
     })
@@ -33,7 +33,8 @@ function onload_specific(){
 }
 
 //load settings
-function load_settings(data){
+function process_settings(data){
+
     let app_data = data[0]
     let config_data = data.slice(1, 4)
     let device_data = data.slice(4, 6)
@@ -41,6 +42,7 @@ function load_settings(data){
 
     //spawn gui for settings area
     let layout = parse_settings_layout(layout_data)
+    console.log(layout)
     sg.get_elem("#settings-area").appendChild(layout)
 
     for (const [key, value] of Object.entries(app_data)) {
@@ -155,8 +157,9 @@ function save_settings(){
 }
 
 sg.on_win_load(() => {
-    onload_specific() //onloads set for specific page
+    onload_settings() //onloads set for specific page
     on_message("app-data", (data) => {
-        load_settings(data)
+        console.log(data)
+        process_settings(data)
     })
 })

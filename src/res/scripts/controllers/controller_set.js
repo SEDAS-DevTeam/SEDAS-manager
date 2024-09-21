@@ -57,7 +57,7 @@ class FrontendFunctions{
         let prefix = sel_id.split("-")[0]
     
         let selection_path;
-        let selection_name;
+        let selection_name = "None";
         let selection_hash;
 
         switch(prefix){
@@ -438,12 +438,6 @@ function set_environment(){
 */
 
 function process_set(data){
-    if (map_name != undefined){
-        //loaded from backup, change map name 
-        document.getElementById("confirmresult-airport").innerHTML = map_name
-        document.getElementById("confirmresult-command").innerHTML = command_preset_name
-        document.getElementById("confirmresult-aircraft").innerHTML = aircraft_preset_name
-    }
 
     //initial data generation from configs sent through IPC
     table_map.set_airports_list(data)
@@ -508,7 +502,15 @@ function onload_set(){
         document.getElementsByClassName("desc-content")[0].style.visibility = "hidden"
     })
 
-    //listeners
+    sg.get_elem("#time-form").hide()
+    sg.get_elem("#time-mode").on_change((event) => {
+        if (event.target.value == "custom"){
+            sg.get_elem("#time-form").show()
+        }
+        else{
+            sg.get_elem("#time-form").hide()
+        }
+    })
 }
 
 on_message("scenario-list", (data) => {

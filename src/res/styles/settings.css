@@ -37,6 +37,14 @@ body{
     margin-bottom: 5px;
 }
 
+#settings-block{
+    display: inline-block;
+    width: 50%;
+}
+
+select, input{
+    margin-left: 10px;
+}
 
 /*Animations*/
 @keyframes spin {

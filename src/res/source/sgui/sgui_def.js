@@ -32,8 +32,10 @@ export function check_margin(elem){
 }
 
 export function check_special(elem){
-    let bold = elem.getAttribute("b")
-    console.log(bold)
+    let bold = elem.hasAttribute("b")
+    if (bold){
+        elem.style.fontWeight = "bolder"
+    }
 }
 
 // global functions

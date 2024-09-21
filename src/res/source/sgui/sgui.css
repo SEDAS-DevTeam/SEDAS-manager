@@ -29,6 +29,10 @@ span, b, i{
     font-weight: 400;
 }
 
+b{
+    font-weight: 700;
+}
+
 s-button {
     display: inline-block;
     background-color: white;

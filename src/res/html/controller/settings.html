@@ -7,20 +7,20 @@
         <link href="../../source/sgui/sgui.css" rel="stylesheet"/>
         <script src="../../source/sgui/sgui.js" type="module"></script>
 
-        <link rel="stylesheet" href="../../styles/index.css">
         <link rel="stylesheet" href="../../styles/settings.css">
-        
+        <link rel="stylesheet" href="../../styles/index.css">
+
         <script src="../../scripts/settings.js" type="module"></script>
     </head>
     <body>
         <page-mask class="white">
             <s-circle-loadbar text="Loading settings"></s-circle-loadbar>
         </page-mask>
-        <div style="display: inline-block;" id="settings-block">
+        <div id="settings-block">
             <s-button id="redir_to_menu" style="margin-top: 20px;"><s-icon type="arrow-left"></s-icon> Back to menu</s-button>
             <s-button id="save_settings" style="margin-top: 20px;">Save</s-button>
             
-            <s-header s="1">SEDAC manager settings</s-header>
+            <s-header s="1" m="10 0">SEDAS manager settings</s-header>
             <s-text>NOTE: Changes will be activated after restart (TODO)</s-text>
     
             <div id="settings-area"></div>

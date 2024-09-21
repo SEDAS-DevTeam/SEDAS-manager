@@ -42,7 +42,6 @@ function process_settings(data){
 
     //spawn gui for settings area
     let layout = parse_settings_layout(layout_data)
-    console.log(layout)
     sg.get_elem("#settings-area").appendChild(layout)
 
     for (const [key, value] of Object.entries(app_data)) {

@@ -7,6 +7,7 @@
         <script src="../../source/sgui/sgui.js" type="module"></script>
 
         <link rel="stylesheet" href="../../styles/controller.css">
+        <link rel="stylesheet" href="../../styles/index.css">
 
         <!--some util imports-->
         <script src="../../scripts/controllers/controller_set.js" type="module"></script>
@@ -15,35 +16,38 @@
         <s-topnav id="set"></s-topnav>
         <desc-popup></desc-popup>
         <div class="content">
-            <s-header s="2" m="10 0">Simulation setup</s-header>
+            <s-header s="1" m="10 0">Simulation setup</s-header>
             <hr>
             
             <!--1. dropdown content-->
             <div>
                 <s-icon type="caret-down"></s-icon>
-                <s-header s="3" m="10 0" class="header-inline">Map & Scenario selection</s-header>
+                <s-header s="2" m="10 0" class="header-inline">Map & Scenario selection</s-header>
             </div>
             <div class="dropdown-content">
                 <!--Map selection-->
-                <s-header s="4" m="5 0" b>Map selection</s-header>
+                <s-header s="3" m="5 0" b>Map selection</s-header>
                 <default-table id="airports" dim="1x7" header="true" even_color="true"></default-table>
                 
                 <!--Scenario selection-->
-                <s-header s="4" m="5 0" b>Scenario selection</s-header>
+                <s-header s="3" m="5 0" b>Scenario selection</s-header>
                 <default-table id="scenarios" dim="1x4" header="true" even_color="true"></default-table>
                 <align-h-center>
                     <s-text class="warn-text" id="map-not-selected" m="20 0">First select map to change scenarios</s-text>
                 </align-h-center>
 
-                <s-header s="4" b>Scenario adjustments</s-header>
-                <s-header s="4">Allowed weight & approach classes</s-header>
+                <s-header s="3" b m="10 0">Scenario adjustments</s-header>
+                <align-h-center>
+                    <s-text id="note"><b style="margin-right: 5px;">NOTE:</b>First you have to select scenario to make scenario adjustments</s-text>
+                </align-h-center>
+                <s-header s="3" m="5 0">Allowed weight & approach classes</s-header>
                 <br>
                 <div><span class="inline-span">CAT</span><default-table class="cat-table" id="scenario-adjustments-category" dim="1x4" header="false" even_color="false" padding="0"></default-table></div>
                 <div><span class="inline-span">WTC</span><default-table class="cat-table" id="scenario-adjustments-weight" dim="1x5" header="false" even_color="false" padding="0"></default-table></div>
                 <div><span class="inline-span">APC</span><default-table class="cat-table" id="scenario-adjustments-approach" dim="1x5" header="false" even_color="false" padding="0"></default-table></div>
                 <br>
 
-                <s-header>Scenario time</s-header>
+                <s-header s="3" m="5 0">Scenario time</s-header>
                 <br>
                 <div class="time-select">
                     <select id="time-mode">
@@ -52,17 +56,6 @@
                     </select>
                     <form id="time-form"><input type="text" placeholder="Type time in notation 00:00:00" name="time" class="choice-text"></form>
                 </div>
-                <s-text><b style="margin-right: 5px;">NOTE:</b>First you have to select scenario to make scenario adjustments</s-text>
-                <div>
-                    <div class="result">
-                        <s-header s="4">Selected map:</s-header>
-                        <s-header s="2" id="confirmresult-airport">None</s-header>
-                    </div>
-                    <div class="result">
-                        <s-header s="4">Selected scenario:</s-header>
-                        <s-header s="2" id="confirmresult-scenario">None</s-header>
-                    </div>
-                </div>
             </div>
 
             <hr>
@@ -70,31 +63,39 @@
             <!--2. dropdown content-->
             <div>
                 <s-icon class="caret-down"></s-icon>
-                <s-header s="3" class="header-inline">Aircraft preset selection</s-header>
+                <s-header s="2" class="header-inline">Aircraft preset selection</s-header>
             </div>
             <div class="dropdown-content">
                 <default-table id="aircrafts" dim="1x3" header="true" even_color="true"></default-table>
-                <s-header s="4">Selected aircraft preset:</s-header>
-                <div class="result">
-                    <s-header s="2" id="confirmresult-aircraft">None</s-header>
-                </div>
             </div>
             <hr>
 
             <!--3. dropdown content-->
             <div>
                 <s-icon type="caret-down"></s-icon>
-                <s-header s="3" class="header-inline">Commands preset selection</s-header>
+                <s-header s="2" class="header-inline">Commands preset selection</s-header>
             </div>
             <div class="dropdown-content">
                 <default-table id="commands" dim="1x3" header="true" even_color="true"></default-table>
-                <s-header s="4">Selected command preset:</s-header>
-                <div class="result">
-                    <s-header s="2" id="confirmresult-command">None</s-header>
-                </div>
             </div>
             <hr>
-            <s-button id="confirm">Confirm and setup</s-button>
+                <div class="result">
+                    <s-header s="3">Selected map:</s-header>
+                    <s-header s="1" id="confirmresult-airport">None</s-header>
+                </div>
+                <div class="result">
+                    <s-header s="3">Selected scenario:</s-header>
+                    <s-header s="1" id="confirmresult-scenario">None</s-header>
+                </div>
+                <div class="result">
+                    <s-header s="3">Selected aircraft preset:</s-header>
+                    <s-header s="1" id="confirmresult-aircraft">None</s-header>
+                </div>
+                <div class="result">
+                    <s-header s="3">Selected command preset:</s-header>
+                    <s-header s="1" id="confirmresult-command">None</s-header>
+                </div>
+                <s-button id="confirm">Confirm and setup</s-button>
         </div>
     </body>
 </html>

@@ -110,3 +110,7 @@ div.grid-item.selected{
 .dropdown-content{
     margin-left: 20px;
 }
+
+#note, #note b {
+    color: red;
+}

@@ -71,19 +71,19 @@ function process_map_data(){
                 case "POINTS":
                     //rendering all other route points
                     for (let i = 0; i < value.length; i++){
-                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], POINT_COLOR, POINT_TRIAG_LENGTH)
+                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], render_vars.POINT_COLOR, render_vars.POINT_TRIAG_LENGTH)
                     }
                     break
                 case "SID":
                     //rendering SID instruments
                     for (let i = 0; i < value.length; i++){
-                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], SID_COLOR, SID_TRIAG_LENGTH)
+                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], render_vars.SID_COLOR, render_vars.SID_TRIAG_LENGTH)
                     }
                     break
                 case "STAR":
                     //rendering STAR instruments
                     for (let i = 0; i < value.length; i++){
-                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], STAR_COLOR, STAR_TRIAG_LENGTH)
+                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], render_vars.STAR_COLOR, render_vars.STAR_TRIAG_LENGTH)
                     }
                     break
                 case "SECTOR":
@@ -92,7 +92,7 @@ function process_map_data(){
                     for (let i = 0; i < value.length; i++){
                         SECTOR_points.push([value[i]["x"], value[i]["y"]])
                     }
-                    renderAirspace(SECTOR_COLOR, SECTOR_BORDER_COLOR, SECTOR_BORDER_WIDTH, SECTOR_points)
+                    renderAirspace(render_vars.SECTOR_COLOR, render_vars.SECTOR_BORDER_COLOR, render_vars.SECTOR_BORDER_WIDTH, SECTOR_points)
 
                     break
                 case "TERRAIN":
@@ -101,7 +101,7 @@ function process_map_data(){
                     for (let i = 0; i < value.length; i++){
                         TERRAIN_points.push([value[i]["x"], value[i]["y"]])
                     }
-                    renderAirspace(TERRAIN_COLOR, TERRAIN_BORDER_COLOR, TERRAIN_BORDER_WIDTH, TERRAIN_points)
+                    renderAirspace(render_vars.TERRAIN_COLOR, render_vars.TERRAIN_BORDER_COLOR, render_vars.TERRAIN_BORDER_WIDTH, TERRAIN_points)
                     break
                 case "RESTRICTED_AREA":
                     //rendering no-fly zones
@@ -109,7 +109,7 @@ function process_map_data(){
                     for (let i = 0; i < value.length; i++){
                         AREA_points.push([value[i]["x"], value[i]["y"]])
                     }
-                    renderAirspace(NO_FLY_ZONE_COLOR, NO_FLY_ZONE_BORDER_COLOR, NO_FLY_ZONE_BORDER_WIDTH, AREA_points)
+                    renderAirspace(render_vars.NO_FLY_ZONE_COLOR, render_vars.NO_FLY_ZONE_BORDER_COLOR, render_vars.NO_FLY_ZONE_BORDER_WIDTH, AREA_points)
                     break
             }
         }
@@ -163,7 +163,7 @@ function render_planes(){
         let label_x = 0
         let label_y = 0
 
-        plane_level = check_trans_altitude(plane_data[i])
+        let plane_level = check_trans_altitude(plane_data[i])
 
         let found_plane = false
         for (let i2 = 0; i2 < plane_label_coords.length; i2++){
@@ -217,7 +217,7 @@ function update_labels(curr_x, curr_y){
             x = curr_x - curr_rel_dist[0]
             y = curr_y - curr_rel_dist[1]
 
-            plane_level = check_trans_altitude(curr_plane)
+            let plane_level = check_trans_altitude(curr_plane)
 
             let label_coords = renderPlaneInfo(curr_plane["x"], curr_plane["y"], x, y, {
                 "callsign": curr_plane["callsign"],

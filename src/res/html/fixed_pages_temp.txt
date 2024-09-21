@@ -8,7 +8,8 @@ popup.html
 #controller
 wiki.html
 plugins.html
-settings.html -> little bit broken
-controller_set.html -> minor bug fixes
+settings.html
+controller_set.html -> popup info not ack
+contrller_sim.html -> graphics ok
 #worker
 worker.html

@@ -164,29 +164,30 @@ class Icon extends BasicElement{
 
     connectedCallback(){
         let type = this.getAttribute("type")
+        let icon = document.createElement("i")
         switch(type){
             case "min": {
-                this.classList.add("fa-solid", "fa-minimize")
+                icon.classList.add("fa-solid", "fa-minimize")
                 break
             }
             case "max": {
-                this.classList.add("fa-solid", "fa-maximize")
+                icon.classList.add("fa-solid", "fa-maximize")
                 break
             }
             case "x": {
-                this.classList.add("fa-solid", "fa-xmark")
+                icon.classList.add("fa-solid", "fa-xmark")
                 break
             }
             case "arrow-left": {
-                this.classList.add("fa-solid", "fa-arrow-left")
+                icon.classList.add("fa-solid", "fa-arrow-left")
                 break
             }
             case "arrow-up": {
-                this.classList.add("fa-solid", "fa-arrow-up")
+                icon.classList.add("fa-solid", "fa-arrow-up")
                 break
             }
             case "arrow-down": {
-                this.classList.add("fa-solid", "fa-arrow-down")
+                icon.classList.add("fa-solid", "fa-arrow-down")
                 break
             }
             case "refresh": {
@@ -194,10 +195,11 @@ class Icon extends BasicElement{
                 break
             }
             case "caret-down": {
-                this.classList.add("drop-button", "fa-solid", "fa-caret-down")
+                icon.classList.add("drop-button", "fa-solid", "fa-caret-down")
                 break
             }
         }
+        this.appendChild(icon)
     }
 }
 
@@ -328,6 +330,19 @@ class Topnav extends BasicElement{
                 <div class="rightalign">
                     <a id="stopbutton" class="startsim">RUN</a>
                     <a id="exit">EXIT</a>
+                </div>
+            </div>
+            `
+        }
+        else if (this.id == "widget-topnav"){
+            this.innerHTML = 
+            `
+            <div id="widget-topnav">
+                <s-text id="header-text">Header</s-text>
+                <div id="right-icons">
+                    <s-icon type="min" id="minimize"></s-icon>
+                    <s-icon type="max" id="maximize"></s-icon>
+                    <s-icon type="x" id="exit"></s-icon>
                 </div>
             </div>
             `

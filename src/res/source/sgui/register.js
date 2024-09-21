@@ -21,7 +21,7 @@ export function set_elements(){
     customElements.define("s-loadbar", components.Loadbar)
     customElements.define("s-circle-loadbar", components.CircleLoadbar)
     customElements.define("s-topnav", components.Topnav)
-    customElements.define("s-icon", components.Icon, {extends: "i"})
+    customElements.define("s-icon", components.Icon)
     customElements.define("page-mask", components.PageMask)
     customElements.define("resource-frame", components.IframeExtension)
     customElements.define("s-canvas", components.WorkerCanvas)

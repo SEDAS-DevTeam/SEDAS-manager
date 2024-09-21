@@ -22,63 +22,12 @@ var LEVEL_VALS = []
 var SPEED_VALS = []
 var ALL = []
 
-var selected_hours = 0
-var selected_mins = 0
 var already_generated_names = []
 var plane_data = [] //data for storing all planes
 var all_points = []
 var map_checked = false
 var sim_running = false
 var selected_name = undefined
-
-//function definitions TODO: I should probably change the format
-function ChangeTime(inc_fact, i){
-    switch(i){
-        case 0:
-            //increment hours
-            selected_hours += inc_fact
-            break
-        case 1:
-            //increment minutes
-            selected_mins += inc_fact
-            break
-    }
-    //check
-    if (selected_hours > 24){
-        selected_hours = 0
-    }
-    if (selected_mins > 60){
-        selected_mins = 0
-    }
-
-    if (selected_hours < 0){
-        selected_hours = 24
-    }
-    if (selected_mins < 0){
-        selected_mins = 60
-    }
-
-    //better formatting
-    let res_h = ""
-    let res_m = ""
-
-    if (selected_hours < 10){
-        res_h = "0" + selected_hours.toString()
-    }
-    else{
-        res_h = selected_hours.toString()
-    }
-
-    if (selected_mins < 10){
-        res_m = "0" + selected_mins.toString()
-    }
-    else{
-        res_m = selected_mins.toString()
-    }
-
-    sg.get_elem("#hours").innerHTML = res_h
-    sg.get_elem("#minutes").innerHTML = res_m
-}
 
 function MoveSlider(idx){
     let range_value = sg.get_elem(".val-range")[idx].value
@@ -595,21 +544,6 @@ function onload_sim(){
             }
         }
     })
-
-    //time selection
-    var up_arrows = sg.get_elem(".arr-up")
-    for (let i = 0; i < up_arrows.length; i++){
-        up_arrows[i].addEventListener("click", () => {
-            ChangeTime(1, i)
-        })
-    }
-
-    var down_arrows = sg.get_elem(".arr-down")
-    for (let i = 0; i < down_arrows.length; i++){
-        down_arrows[i].addEventListener("click", () => {
-            ChangeTime(-1, i)
-        })
-    }
 }
 
 on_message("update-plane-db", (data) => {

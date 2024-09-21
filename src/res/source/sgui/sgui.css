@@ -82,15 +82,15 @@ s-topnav{
     margin-top: 15px;
 }
 
-s-topnav#worker-widget{
-    margin-top: 0;
+s-topnav#widget-topnav{
+    margin-top: 0px;
     padding: 5px;
     text-align: right;
     background-color: #b1b1b1;
     display: flex;
 }
 
-s-topnav#worker-widget s-icon{
+s-topnav#widget-topnav s-icon{
     display: inline-block;
     text-align: center;
     padding: 5px;

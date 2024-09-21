@@ -19,6 +19,10 @@
     color: black;
 }
 
+#date, #time{
+    margin: 0px 5px;
+}
+
 /*Worker widget elements*/
 
 body#worker-widget{
@@ -41,10 +45,10 @@ button{
     padding: 5px;
     text-align: right;
     background-color: #b1b1b1;
-    display: flex;
+    width: 100%;
 }
 
-#draggable-top{
+#header-text{
     flex-grow: 1;
     float: left;
     height: 100%;
@@ -53,7 +57,7 @@ button{
     margin-bottom: 0;
 }
 
-#widget-topnav > #draggable-top{
+#widget-topnav{
     -webkit-app-region: drag;
 }
 
@@ -61,6 +65,7 @@ button{
     padding: 10px;
 }
 
-#date, #time{
-    margin: 0px 5px;
+#widget-topnav #right-icons{
+    float: right;
+    margin-right: 10px;
 }

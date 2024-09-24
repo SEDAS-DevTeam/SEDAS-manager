@@ -208,9 +208,9 @@ class MainApp extends MainAppFunctions{
         this.wrapper.register_channel("send-plane-data", ["dep_arra"], "unidirectional", () => this.send_plane_data())
         
         //widget invokes
-        this.wrapper.register_channel("min-widget", ["widget"], "unidirectional", (data: any[]) => this.widget_handler.minimize_widget(data))
-        this.wrapper.register_channel("max-widget", ["widget"], "unidirectional", (data: any[]) => this.widget_handler.maximize_widget(data))
-        this.wrapper.register_channel("exit-widget", ["widget"], "unidirectional", (data: any[]) => this.widget_handler.exit_widget(data, this.wrapper))
+        this.wrapper.register_channel("min-widget", ["worker-widget"], "unidirectional", (data: any[]) => this.widget_handler.minimize_widget(data))
+        this.wrapper.register_channel("max-widget", ["worker-widget"], "unidirectional", (data: any[]) => this.widget_handler.maximize_widget(data))
+        this.wrapper.register_channel("exit-widget", ["worker-widget"], "unidirectional", (data: any[]) => this.widget_handler.exit_widget(data, this.wrapper))
 
         //plugin invokes
         this.wrapper.register_channel("install-plugin", ["controller"], "unidirectional", (data: any[]) => this.install_plugin(data))

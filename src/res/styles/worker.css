@@ -68,4 +68,5 @@ button{
 #widget-topnav #right-icons{
     float: right;
     margin-right: 10px;
+    -webkit-app-region: none;
 }

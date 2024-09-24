@@ -115,6 +115,6 @@ if __name__ == "__main__":
     # Parse all args
     args = vars(parser.parse_args())
     for key, value in args.items():
-        if value is not False:
+        if value is True:
             FUNC_DICT[key]()
             break # TODO: rework so that project can run from multiple-args

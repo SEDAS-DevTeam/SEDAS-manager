@@ -80,6 +80,7 @@ export class IPCwrapper{
 
     public set_all_listeners(){
         ipcMain.handle("message", async (event, data: any[]) => {
+            console.log(data)
             if (!this.open){
                 return
             }

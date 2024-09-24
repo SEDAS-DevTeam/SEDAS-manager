@@ -129,7 +129,7 @@ class FrontendFunctions{
     }
 
     ask_for_content(idx, type){
-        window.electronAPI.send_message("controller", ["json-description", idx, type])
+        send_message("controller", "json-description", [idx, type])
         desc_rendered = true
         clicked = true
         sg.get_elem(".desc-content").show()
@@ -523,7 +523,8 @@ on_message("scenario-list", (data) => {
 })
 
 on_message("description-data", (data) => {
-   sg.get_elem("#inner-content").innerHTML = process_JSON(data)
+    console.log(data)
+    sg.get_elem("#inner-content").innerHTML = process_JSON(data)
     //set all event listeners for inner content
     let plane_content_selectors = document.getElementsByClassName("plane-content-switch")
     for (let i = 0; i < plane_content_selectors.length; i++){

@@ -8,14 +8,12 @@
 
         <link href="../../../../node_modules/leaflet/dist/leaflet.css" rel="stylesheet"/>
         <script src="../../../../node_modules/leaflet/dist/leaflet.js"></script>
-        <script src="../../scripts/weather.js"></script>
-
-        <script src="../../scripts/utils/ipc_wrapper.js"></script>
+        <script src="../../scripts/weather.js" type="module"></script>
     </head>
     <body id="weather-background">
         <div class="weather-top">
-            <button class="weather-but-run" onclick="play()">RUN</button>
-            <button class="weather-but-stop" onclick="stop()">STOP</button>
+            <button class="weather-but-run">RUN</button>
+            <button class="weather-but-stop">STOP</button>
             <p id="timestamp">FRAME TIME</p>
         </div>
         <div id="mapid" style="height: 85%;"></div>

@@ -17,6 +17,14 @@
     overflow-y: scroll;
 }
 
+.desc-content i {
+    color: white;
+}
+
+.plane-content b{
+    color: white;
+}
+
 s-text.desc{
     color: white;
 }

@@ -321,7 +321,6 @@ export class WidgetWindow extends BaseWindow{
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
         this.window.setAlwaysOnTop(true);
-        this.window.webContents.openDevTools()
 
         this.path_load = path
 
@@ -354,7 +353,6 @@ export class PopupWindow extends BaseWindow{
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
         this.window.setAlwaysOnTop(true);
-        this.window.webContents.openDevTools()
 
         this.event_logger.log("DEBUG", `Created popup window object(path_load=${this.path_load}, coords=${coords})`)
     }

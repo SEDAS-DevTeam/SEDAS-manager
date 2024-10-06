@@ -175,8 +175,7 @@ function process_plane_data(){
     let arr_point = arr_elem.get_selected_elem()
 
     //arrival time
-    let hours = sg.get_elem("#hours").innerHTML
-    let mins = sg.get_elem("minutes").innerHTML
+    //TODO
 
 
     send_message("controller", "spawn-plane", [{
@@ -187,7 +186,7 @@ function process_plane_data(){
         "monitor": spawn_on,
         "departure": dep_point,
         "arrival": arr_point,
-        "arrival_time": `${hours}:${mins}`
+        "arrival_time": ""
     }])
 }
 

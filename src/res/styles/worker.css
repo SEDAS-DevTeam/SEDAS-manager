@@ -41,6 +41,25 @@ button{
     cursor: pointer;
 }
 
+canvas, s-topnav#worker, div#labels{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+canvas{
+    top: 50px
+}
+
+#canvas1 {z-index: 1;}
+#canvas2 {z-index: 2;}
+#canvas3 {z-index: 3;}
+
+s-topnav, div#labels{
+    z-index: 4;
+    width: 100%;
+}
+
 #widget-topnav {
     padding: 5px;
     text-align: right;

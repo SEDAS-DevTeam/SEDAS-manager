@@ -24,14 +24,6 @@ var main_canvas = undefined
 
 var curr_rel_dist = [0, 0] //x, y
 
-/*
-in format
-[{
-    "id": 
-    "coords": [x1, y1, x2, y2]
-}]
-*/
-
 var is_dragging = false
 
 var curr_plane = undefined
@@ -43,7 +35,7 @@ function process_map_data(){
 
     if (map_data[0] == undefined){
         //render empty map placeholder on init
-        renderText(50, 100, "Empty map placeholder", "white", "48px", "canvas3")
+        renderText(50, 100, "Empty map placeholder", "white", "48px", "canvas1")
         return;
     }
 
@@ -51,7 +43,7 @@ function process_map_data(){
     scale = map_data[0]["scale"]
     if (spec_data == undefined){
         //map resource for type does not exist
-        renderText(50, 100, `Map resource for type "${map_data[1]}" does not exist`, "white", "48px", "canvas3")
+        renderText(50, 100, `Map resource for type "${map_data[1]}" does not exist`, "white", "48px", "canvas1")
         return
     }
 

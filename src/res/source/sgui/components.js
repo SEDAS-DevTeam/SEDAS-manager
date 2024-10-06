@@ -407,9 +407,9 @@ class WorkerCanvas extends HTMLElement{
     }
 
     connectedCallback(){
-        for (let i = 0; i < 3; i++){
+        for (let i = 3; i > 0; i--){
             let canvas = document.createElement("canvas")
-            canvas.id = "canvas" + (i + 1).toString()
+            canvas.id = "canvas" + i.toString()
             canvas.setAttribute("width", "640")
             canvas.setAttribute("width", "480")
 
@@ -421,13 +421,13 @@ class WorkerCanvas extends HTMLElement{
         for (let i = 0; i < canvas_ids.length; i++){
             let canvas_id = "#canvas" + canvas_ids[i].toString()
             let canvas = this.querySelector(canvas_id)
-            let context = canvas.getContext("2d")
 
-            context.fillStyle = background_color
             canvas.width = window.screen.width
             canvas.height = window.screen.height
             
             if (canvas_ids[i] == 1){
+                let context = canvas.getContext("2d")
+                context.fillStyle = background_color
                 context.fillRect(0, 0, canvas.width, canvas.height)
             }       
         }

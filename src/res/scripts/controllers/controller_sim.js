@@ -56,7 +56,8 @@ function OnInput(elem){
 }
 
 function plane_value_change(elem){
-    var header_full = elem.parentNode.parentNode.get_elem("s-header").innerHTML
+    console.log(elem.parentNode.parentNode.children)
+    var header_full = elem.parentNode.parentNode.children[0].innerText
     
     header_full = header_full.split("(")[0]
     var header = header_full.substring(0, header_full.length - 1)

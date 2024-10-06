@@ -199,49 +199,7 @@ function render_planes(){
 }
 
 function update_labels(curr_x, curr_y){
-    main_canvas.render(render_vars.BACKROUND_COLOR, [3])
-
-    for (let i = 0; i < plane_label_coords.length; i++){        
-        if (plane_label_coords[i]["id"] == curr_plane["id"]){
-            // render moved plane label
-
-            //update x and y by cursor location
-            x = curr_x - curr_rel_dist[0]
-            y = curr_y - curr_rel_dist[1]
-
-            let plane_level = check_trans_altitude(curr_plane)
-
-            let label_coords = renderPlaneInfo(curr_plane["x"], curr_plane["y"], x, y, {
-                "callsign": curr_plane["callsign"],
-                "level": plane_level,
-                "speed": curr_plane["speed"],
-                "code": undefined
-            })
-
-            plane_label_coords[i] = {
-                "id": curr_plane["id"],
-                "coords": label_coords,
-                "dist": [plane_label_coords[i]["coords"][2] - plane_data[i]["x"], plane_label_coords[i]["coords"][3] - plane_data[i]["y"]]
-            }
-        }
-        else{
-            //render rest of the plane labels
-
-            for(let i2 = 0; i2 < plane_data.length; i2++){
-                if (plane_label_coords[i]["id"] == plane_data[i2]["id"]){
-                    //rerender rest of unused labels onmousemove
-                    renderPlaneInfo(plane_data[i2]["x"], plane_data[i2]["y"], plane_label_coords[i]["coords"][2], plane_label_coords[i]["coords"][3], {
-                        "callsign": plane_data[i2]["callsign"],
-                        "level": plane_data[i2]["level"],
-                        "speed": plane_data[i2]["speed"],
-                        "code": undefined
-                    })
-                }
-            }
-        }
-    }
-
-
+    //TODO: finish this someday
 }
 
 sg.on_win_load(() => {

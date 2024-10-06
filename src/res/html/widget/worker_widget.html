@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
+        <meta charset="utf-8" />
+
+        <link href="../../source/sgui/sgui.css" rel="stylesheet"/>
+        <script src="../../source/sgui/sgui.js" type="module"></script>
+
         <link rel="stylesheet" href="../../styles/index.css">
         <link rel="stylesheet" href="../../styles/worker.css">
 
-        <meta charset="utf-8" />
-        <script src="../../scripts/worker_widget.js"></script>
+        <script src="../../scripts/worker_widget.js" type="module"></script>
     </head>
     <body id="worker-widget">
-        <div id="widget-topnav">
-            <p id="draggable-top">Header</p>
-            <i class="fa-solid fa-minimize" id="minimize"></i>
-            <i class="fa-solid fa-maximize" id="maximize"></i>
-            <i class="fa-solid fa-xmark" id="exit"></i>
-        </div>
+        <s-topnav id="widget-topnav"></s-topnav>
         <div id="content">
-            <button>Test button</button>
-            <button>Test button 2</button>
+            <s-button>Test button</s-button>
+            <s-button>Test button 2</s-button>
         </div>
     </body>
 </html>

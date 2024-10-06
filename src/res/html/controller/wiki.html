@@ -1,29 +1,25 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="../../styles/index.css">
-
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
         <meta charset="utf-8" />
 
-        <script src="../../scripts/blocks/block.js"></script>
-        
-        <script src="../../scripts/utils/ipc_wrapper.js"></script>
+        <link href="../../source/sgui/sgui.css" rel="stylesheet"/>
+        <script src="../../source/sgui/sgui.js" type="module"></script>
 
-        <script src="../../scripts/controllers/controller_wiki.js"></script>
-        <script src="../../scripts/controllers/controller.js"></script>
+        <link rel="stylesheet" href="../../styles/controller.css">
+        <link rel="stylesheet" href="../../styles/wiki.css">
+
+        <script src="../../scripts/controllers/controller_wiki.js" type="module"></script>
     </head>
-    <body style="margin-left: 20px; margin-right: 20px;" id="scrollable">
-        <top-header id="wiki"></top-header>
-        <div style="margin-top: 15px; height: 80%;">
-            <div>
-                <button class="change-iframe">SEDAS documentation</button>
-                <button class="change-iframe">IVAO</button>
-            </div>
-            <div id="parent-iframe">
-                <iframe id="wiki-content" style="margin-top: 15px;" frameborder="0" allowfullscreen></iframe>
-            </div>
+    <body>
+        <s-topnav id="wiki"></s-topnav>
+        <div id="content">
+            <s-button class="change-iframe">SEDAS documentation</s-button>
+            <s-button class="change-iframe">IVAO</s-button>
+            <resource-frame id="wiki-resource"></resource-frame>
             <div id="bot-content">
-                <h2>Other sources:</h2>
+                <s-header s="2">Other sources:</s-header>
                 <ul>
                     <li>Skybrary: <a href="https://skybrary.aero/" target="_blank">https://skybrary.aero/</a></li>
                 </ul>

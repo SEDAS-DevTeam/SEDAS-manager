@@ -62,46 +62,15 @@ const SCALE_WIDTH = 3
 const SCALE_CORNER = 5
 
 //low level functions
-function deg_to_rad(deg){
+export function deg_to_rad(deg){
   return deg * (Math.PI / 180)
 }
 
-function rad_to_deg(rad){
+export function rad_to_deg(rad){
   return Math.round(rad * (180 / Math.PI))
 }
 
-function renderCanvas(canvas_id){
-  var canvas = document.querySelector("#canvas" + canvas_id.toString());
-  var ctx = canvas.getContext("2d");
-
-  switch(canvas_id){
-    case 1:
-      //low-level canvas (airspace, no-fly zone, background, terrain)
-      ctx.fillStyle = BACKROUND_COLOR
-
-      //canvas resize
-      canvas.width = window.screen.width
-      canvas.height = window.screen.height
-    
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      break
-    case 2:
-      //mid-level canvas (airplanes, airplane paths)
-      //canvas resize
-      canvas.width = window.screen.width
-      canvas.height = window.screen.height
-      break
-    case 3:
-      //top-level canvas (airplane info, selected labels, selected paths)
-      //canvas resize
-      canvas.width = window.screen.width
-      canvas.height = window.screen.height
-      break
-  }
-}
-
-function renderPlane(x, y, angle, plane_speed, max_speed, min_speed){ //0 - 360 degrees
+export function renderPlane(x, y, angle, plane_speed, max_speed, min_speed){ //0 - 360 degrees
   /*
   plane_info example:
   plane_info = {
@@ -187,7 +156,7 @@ function renderPlane(x, y, angle, plane_speed, max_speed, min_speed){ //0 - 360 
   context.stroke()
 }
 
-function renderPlaneInfo(x_plane, y_plane, x, y, plane_info){
+export function renderPlaneInfo(x_plane, y_plane, x, y, plane_info){
   //plane info rendering
   var canvas1 = document.querySelector("#canvas3")
   var context1 = canvas1.getContext("2d")
@@ -268,7 +237,7 @@ function renderPlaneInfo(x_plane, y_plane, x, y, plane_info){
   return [init_x, init_y + height, init_x - width, init_y]
 }
 
-function renderPlanePath(coordinates){
+export function renderPlanePath(coordinates){
   var canvas = document.querySelector("#canvas3");
   var context = canvas.getContext('2d');
 
@@ -281,7 +250,7 @@ function renderPlanePath(coordinates){
   }
 }
 
-function renderAirspace(fill_style, stroke_style, line_width, ...coordinates){
+export function renderAirspace(fill_style, stroke_style, line_width, ...coordinates){
   //coordinates are in [x, y] format
 
   var canvas = document.querySelector("#canvas1");
@@ -306,7 +275,7 @@ function renderAirspace(fill_style, stroke_style, line_width, ...coordinates){
   context.fill()
 }
 
-function renderRunway(x1, y1, x2, y2){
+export function renderRunway(x1, y1, x2, y2){
   var canvas = document.querySelector("#canvas1");
   var context = canvas.getContext('2d');
 
@@ -319,7 +288,7 @@ function renderRunway(x1, y1, x2, y2){
   context.stroke()
 }
 
-function renderPoint(x, y, name, color, triag_len){
+export function renderPoint(x, y, name, color, triag_len){
   var canvas3 = document.querySelector("#canvas1");
   var context3 = canvas3.getContext('2d');
 
@@ -335,7 +304,7 @@ function renderPoint(x, y, name, color, triag_len){
   renderText(x + 15, y - 15, name, color, "12px", "canvas1")
 }
 
-function renderAirport(x, y, name){
+export function renderAirport(x, y, name){
   var canvas3 = document.querySelector("#canvas1");
   var context3 = canvas3.getContext('2d');
 
@@ -354,7 +323,7 @@ function renderAirport(x, y, name){
   renderText(x + 15, y - 15, name, ARP_COLOR, "12px", "canvas1")
 }
 
-function renderText(x, y, text, color, weight, canvas_layer){
+export function renderText(x, y, text, color, weight, canvas_layer){
   var canvas = document.querySelector("#" + canvas_layer);
   var context = canvas.getContext('2d');
 
@@ -363,7 +332,7 @@ function renderText(x, y, text, color, weight, canvas_layer){
   context.fillText(text, x, y)
 }
 
-function renderScale(scale){
+export function renderScale(scale){
   var canvas = document.querySelector("#canvas3")
   var context = canvas.getContext('2d');
 
@@ -387,4 +356,44 @@ function renderScale(scale){
   context.strokeStyle = "white"
   context.lineWidth = SCALE_WIDTH
   context.stroke()
+}
+
+export const render_vars = {
+  BACKROUND_COLOR,
+  MARKER_COLOR,
+  PLANE_HEADING_MARKER,
+  STD_LINE_WIDTH,
+  PLANE_MARKER_RADIUS,
+  PLANE_POINTER_WIDTH,
+  BBOX_PAD,
+  POINTER_INDENT,
+  MAX_RECT_WIDTH,
+  LINE_INDENT,
+  INFO_TEXT_SIZE,
+  MARKER_SCALE_CONST,
+  PLANE_PATH_RADIUS,
+  SECTOR_COLOR,
+  SECTOR_BORDER_COLOR,
+  SECTOR_BORDER_WIDTH,
+  NO_FLY_ZONE_COLOR,
+  NO_FLY_ZONE_BORDER_COLOR,
+  NO_FLY_ZONE_BORDER_WIDTH,
+  TERRAIN_COLOR,
+  TERRAIN_BORDER_COLOR,
+  TERRAIN_BORDER_WIDTH,
+  RUNWAY_COLOR,
+  RUNWAY_WIDTH,
+  POINT_TRIAG_LENGTH,
+  POINT_COLOR,
+  ARP_TRIAG_LENGTH,
+  ARP_COLOR,
+  SID_TRIAG_LENGTH,
+  SID_COLOR,
+  STAR_TRIAG_LENGTH,
+  STAR_COLOR,
+  SCALE_DIST_FROM_SCREEN_X,
+  SCALE_DIST_FROM_SCREEN_Y,
+  SCALE_LEN,
+  SCALE_WIDTH,
+  SCALE_CORNER
 }

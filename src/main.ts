@@ -11,7 +11,6 @@ import { app, screen, Tray, nativeImage, Menu } from "electron";
 
 //relative imports
 import { Plane, PlaneDB } from "./plane_functions"
-import { update_models } from "./fetch"
 import { EventLogger } from "./logger"
 
 import utils, {ProgressiveLoader, IPCwrapper} from "./utils"
@@ -208,9 +207,9 @@ class MainApp extends MainAppFunctions{
         this.wrapper.register_channel("send-plane-data", ["dep_arra"], "unidirectional", () => this.send_plane_data())
         
         //widget invokes
-        this.wrapper.register_channel("min-widget", ["widget"], "unidirectional", (data: any[]) => this.widget_handler.minimize_widget(data))
-        this.wrapper.register_channel("max-widget", ["widget"], "unidirectional", (data: any[]) => this.widget_handler.maximize_widget(data))
-        this.wrapper.register_channel("exit-widget", ["widget"], "unidirectional", (data: any[]) => this.widget_handler.exit_widget(data, this.wrapper))
+        this.wrapper.register_channel("min-widget", ["worker-widget"], "unidirectional", (data: any[]) => this.widget_handler.minimize_widget(data))
+        this.wrapper.register_channel("max-widget", ["worker-widget"], "unidirectional", (data: any[]) => this.widget_handler.maximize_widget(data))
+        this.wrapper.register_channel("exit-widget", ["worker-widget"], "unidirectional", (data: any[]) => this.widget_handler.exit_widget(data, this.wrapper))
 
         //plugin invokes
         this.wrapper.register_channel("install-plugin", ["controller"], "unidirectional", (data: any[]) => this.install_plugin(data))
@@ -444,11 +443,11 @@ class MainApp extends MainAppFunctions{
     }
 
     private json_description(data: any[]){
-        if (data[0] == "command"){
-            this.wrapper.send_message("controller", "description-data", this.command_presets_list[data[1][1]])
+        if (data[1] == "command"){
+            this.wrapper.send_message("controller", "description-data", this.command_presets_list[data[0]])
         }
-        else if (data[0] == "aircraft"){
-            this.wrapper.send_message("controller", "description-data", this.aircraft_presets_list[data[1][1]])
+        else if (data[1] == "aircraft"){
+            this.wrapper.send_message("controller", "description-data", this.aircraft_presets_list[data[0]])
         }
     }
 
@@ -463,8 +462,8 @@ class MainApp extends MainAppFunctions{
 
         // set progressive loader object on loaders
         this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
-        this.loader.setup_loader(11, "SEDAS is loading, please wait...", "Initializing app")
-        
+        this.loader.setup_loader(9, "SEDAS is loading, please wait...", "Initializing app")
+
         // set other important segments on MainApp
         this.widget_handler = new WidgetWindowHandler()
 
@@ -486,10 +485,6 @@ class MainApp extends MainAppFunctions{
 
         //check internet connectivity
         this.app_status["internet-connection"] = Boolean(await utils.checkInternet(EvLogger))
-
-        if (this.app_status["internet-connection"] && this.app_settings["fetch_alg"]){
-            await update_models(EvLogger, this.loader)
-        }
 
         /*
             Loader segment 7 (rest of segments are in update_all)
@@ -526,16 +521,6 @@ class MainApp extends MainAppFunctions{
         }
 
         EvLogger.log("DEBUG", `BackupDB saving frequency is set to ${this.backupdb_saving_frequency / 1000} seconds`)
-        
-        /*
-            Loader segment 8
-        */
-        this.loader.send_progress("Updating audio devices")
-
-        //update audio devices
-        EvLogger.log("DEBUG", "Updating audio device list using get_info.py")
-        const update_devices = spawn("python3", [PATH_TO_AUDIO_UPDATE])
-        //TODO: add fallback logger to update_devices subprocess
 
         // setup plugin register
         this.plugin_register = new PluginRegister()
@@ -554,7 +539,6 @@ class MainApp extends MainAppFunctions{
         this.loader.send_progress("Loading local plugins")
 
         EvLogger.log("DEBUG", "Loading local plugins")
-        this.plugin_register.fetch_plugin_list()
         this.plugin_register.load_local_plugins()
     }
 

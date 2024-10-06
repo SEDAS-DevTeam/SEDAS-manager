@@ -164,6 +164,10 @@ export namespace enviro_calculations{
     }
 }
 
+export namespace neural_module{
+    
+}
+
 export namespace main{
     /*
         Hello World!

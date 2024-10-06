@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="../../styles/index.css">
-
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
         <meta charset="utf-8" />
-        <script src="../../scripts/load.js"></script>
+        
+        <link href="../../source/sgui/sgui.css" rel="stylesheet"/>
+        <script src="../../source/sgui/sgui.js" type="module"></script>
+
+        <script src="../../scripts/load.js" type="module"></script>
     </head>
     <body>
-        <div id="center">
-            <img src="../../img/sedac-manager-logo2.png" width="50%", height="auto">
-            <h2 id="header-text"></h2>
-            <div id="loadbar-parent">
-                <div id="loadbar"></div>
-            </div>
-            <p id="info-text">Placeholder</p>
-        </div>
+        <align-v-center>
+            <align-h-center>
+                <img src="../../img/sedac-manager-logo2.png" width="50%", height="auto">
+                <s-header s="2" id="header-text" m="20 0"></s-header>
+                <s-loadbar></s-loadbar>
+                <s-text id="info-text" m="5 0"></s-text>
+            <align-h-center>
+        </align-v-center>
     </body>
 </html>

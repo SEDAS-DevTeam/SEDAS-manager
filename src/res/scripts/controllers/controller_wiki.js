@@ -1,49 +1,59 @@
+import sg from '../../source/sgui/sgui.js';
+import { on_message, send_message } from '../../scripts/utils/ipc_wrapper.js';
+import { set_controller_buttons, set_controller_window, process_init_data } from '../utils/controller_utils.js'
+
 //
 //Controller Wiki
 //
 
 //wiki variables
+var INIT_DATA = undefined
 var sources = [
     "https://sedas-docs.readthedocs.io/en/latest/",
     "https://wiki.ivao.aero/en/home"
 ]
 
-function onload_specific(){
-    let iframe_buttons = document.getElementsByClassName("change-iframe")
+var frontend_vars = {}
+
+function onload_wiki(){
+    let iframe_buttons = sg.get_elem(".change-iframe")
 
     //always try to load sedas docs
-    if (window.navigator.onLine){
-        document.getElementById("wiki-content").src = sources[0]
-        iframe_buttons[0].classList.add("selected")
+    if(sg.is_online()){
+        sg.get_elem("#wiki-resource").set_source(sources[0])
+        iframe_buttons[0].add_class("selected")
     }
     else{
-        document.getElementById("wiki-content").remove()
-    
-        let warn_text = document.createElement("h1")
-        warn_text.style.marginLeft = "15px"
-        warn_text.innerHTML = "Not connected to internet, cannot show documentation in Iframe"
-        document.getElementById("parent-iframe").appendChild(warn_text)
+        document.get_elem("#wiki-resource").hide()
+        let warn_text = sg.create_elem("s-header", "warn-text", "Not connected to internet, cannot show documentation in Iframe", sg.get_elem("#content"))
+        warn_text.change_size("2")
 
         return //do not allow to set listeners for iframe buttons
     }
 
     for (let i = 0; i < iframe_buttons.length; i++){
-        iframe_buttons[i].addEventListener("click", (event) => {
+        iframe_buttons[i].on_click(() => {
             //remove all residual class lists
             for (let elem of iframe_buttons) {
-                console.log(elem)
-                if (elem.classList.contains("selected")){
-                    elem.classList.remove("selected")
+                if (elem.has_class("selected")){
+                    elem.remove_class("selected")
                 }
             }
 
-            event.target.classList.add("selected")
+            iframe_buttons[i].add_class("selected")
 
-            document.getElementById("wiki-content").src = sources[i]
+            sg.get_elem("#wiki-resource").set_source(sources[i])
         })
     }
 }
 
-function process_specific(){
-    //empty
-}
+sg.on_win_load(() => {
+    set_controller_window(frontend_vars)
+    set_controller_buttons()
+    onload_wiki()
+    
+    window.electronAPI.on_init_info((data) => {
+        INIT_DATA = data
+        process_init_data(data)
+    })
+})

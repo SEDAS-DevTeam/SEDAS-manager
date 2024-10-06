@@ -15,7 +15,6 @@
     "./src/main.ts",
     "./src/utils.ts",
     "./src/plane_functions.ts",
-    "./src/fetch.ts",
     "./src/logger.ts",
     "./src/app_config.ts",
     "./src/environment.ts",

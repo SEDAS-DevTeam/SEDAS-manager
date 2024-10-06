@@ -2,6 +2,11 @@
 //Controller Simulation JS
 //
 
+import sg from '../../source/sgui/sgui.js';
+import { on_message, send_message } from '../../scripts/utils/ipc_wrapper.js';
+import { add_log, remove_log } from '../../scripts/utils/plane_terminal.js'
+import { frontend_vars, set_controller_buttons, set_controller_window, process_init_data, APP_DATA } from '../utils/controller_utils.js'
+
 //plane labels
 const PLANE_LABELS = ["Heading", "Level", "Speed"]
 const PLANE_CLASSES = ["change-heading", "change-level", "change-speed"]
@@ -12,79 +17,30 @@ const HEAD_STEP = 10
 const HEADING_VALS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240, 250, 260, 270, 280, 290, 300, 310, 320, 330, 340, 350]
 
 //other vars
+var INIT_DATA = []
 var LEVEL_VALS = []
 var SPEED_VALS = []
 var ALL = []
 
-var selected_hours = 0
-var selected_mins = 0
 var already_generated_names = []
 var plane_data = [] //data for storing all planes
 var all_points = []
 var map_checked = false
 var sim_running = false
-
-//function definitions
-function ChangeTime(inc_fact, i){
-    switch(i){
-        case 0:
-            //increment hours
-            selected_hours += inc_fact
-            break
-        case 1:
-            //increment minutes
-            selected_mins += inc_fact
-            break
-    }
-    //check
-    if (selected_hours > 24){
-        selected_hours = 0
-    }
-    if (selected_mins > 60){
-        selected_mins = 0
-    }
-
-    if (selected_hours < 0){
-        selected_hours = 24
-    }
-    if (selected_mins < 0){
-        selected_mins = 60
-    }
-
-    //better formatting
-    let res_h = ""
-    let res_m = ""
-
-    if (selected_hours < 10){
-        res_h = "0" + selected_hours.toString()
-    }
-    else{
-        res_h = selected_hours.toString()
-    }
-
-    if (selected_mins < 10){
-        res_m = "0" + selected_mins.toString()
-    }
-    else{
-        res_m = selected_mins.toString()
-    }
-
-    document.getElementById("hours").innerHTML = res_h
-    document.getElementById("minutes").innerHTML = res_m
-}
+var selected_name = undefined
 
 function MoveSlider(idx){
-    let range_value = document.getElementsByClassName("val-range")[idx].value
-    let range_header = document.getElementsByClassName("val-out")[idx]
+    let range_value = sg.get_elem(".val-range")[idx].value
+    let range_header = sg.get_elem(".val-out")[idx]
 
     range_header.innerHTML = range_value
 }
 
 function OnInput(elem){
-    let choice_buttons = document.getElementsByClassName("choice-but")
+    let choice_buttons = sg.get_elem(".choice-but")
     for (let i = 0; i < choice_buttons.length; i++){
-        if (choice_buttons[i].classList.contains("selected-choice")){
-            choice_buttons[i].classList.remove("selected-choice")
+        if (choice_buttons[i].has_class("selected-choice")){
+            choice_buttons[i].remove_class("selected-choice")
         }
     }
 
@@ -100,7 +56,8 @@ function OnInput(elem){
 }
 
 function plane_value_change(elem){
-    var header_full = elem.parentNode.parentNode.querySelector("h2").innerHTML
+    console.log(elem.parentNode.parentNode.children)
+    var header_full = elem.parentNode.parentNode.children[0].innerText
     
     header_full = header_full.split("(")[0]
     var header = header_full.substring(0, header_full.length - 1)
@@ -120,7 +77,7 @@ function plane_value_change(elem){
 
 function delete_plane(elem){
     var plane_id;
-    var header_full = elem.parentNode.querySelector("h2").innerHTML
+    var header_full = elem.parentNode.get_elem("h2").innerHTML
     
     header_full = header_full.split("(")[0]
     var header = header_full.substring(0, header_full.length - 1)
@@ -140,17 +97,27 @@ function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival,
 
     console.log("created plane element")
 
-    let plane_cell = document.createElement("div")
-    plane_cell.classList.add("plane-cell")
-    plane_cell.innerHTML = `<div class="plane-cell-header" id="plane${plane_id}"><h2>${plane_name} (from ${plane_departure.split("_")[0]} to ${plane_arrival.split("_")[0]})</h2><i class="fa-solid fa-trash" id="delete-icon" onclick="delete_plane(event.target)"></i><div>`
+    let plane_cell = sg.create_elem("div", "", "", sg.get_elem("#plane-list"))
+    let plane_cell_header = sg.create_elem("div", `plane${plane_id}`, "", plane_cell)
+    plane_cell_header.add_class("plane-cell-header")
+
+    sg.create_elem("s-header", "", `${plane_name} (from ${plane_departure.split(" ")[0]} to ${plane_arrival.split("_")[0]})`, plane_cell_header)
+    let trash_icon = sg.create_elem("i", "delete-icon", "", plane_cell_header)
+    trash_icon.add_class("fa-solid")
+    trash_icon.add_class("fa-trash")
+    trash_icon.on_click((event) => {
+        delete_plane(event.target)
+    })
+
+    plane_cell.add_class("plane-cell")
+
     for(let i_row = 0; i_row < 3; i_row++){
-        let grid_container = document.createElement("div")
-        grid_container.classList.add("grid-container")
+        let grid_container = sg.create_elem("div", "", "", plane_cell)
+        grid_container.add_class("grid-container")
 
         for(let i_col = 0; i_col < ALL[i_row].length + 1; i_col++){
-            let grid_row = document.createElement("div")
-            grid_row.classList.add("grid-item")
-            grid_container.appendChild(grid_row)
+            let grid_row = sg.create_elem("div", "", "", grid_container)
+            grid_row.add_class("grid-item")
 
             if (i_col == 0){
                 grid_row.id = "label"
@@ -162,23 +129,20 @@ function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival,
             if (elem_value == undefined){
                 continue
             }
-
             grid_row.innerHTML = elem_value
-            grid_row.classList.add(PLANE_CLASSES[i_row])
+            grid_row.add_class(PLANE_CLASSES[i_row])
 
             //add onclick event to them
-            grid_row.addEventListener("click", (event) => {
-                plane_value_change(event.target)
+            grid_row.on_click(() => {
+                plane_value_change(grid_row)
             })
 
             //added selected to already selected elements
             if (grid_row.innerHTML == other_plane_components[i_row]){
-                grid_row.classList.add("selected")
+                grid_row.add_class("selected")
             }
         }
-        plane_cell.appendChild(grid_container)
     }
-    document.getElementById("plane-list").appendChild(plane_cell)
 }
 
 function process_plane_data(){
@@ -189,7 +153,7 @@ function process_plane_data(){
         return
     }
 
-    let val_spans = document.getElementsByClassName("val-out")
+    let val_spans = sg.get_elem(".val-out")
     //heading
     let heading = parseInt(val_spans[0].innerHTML)
 
@@ -200,20 +164,19 @@ function process_plane_data(){
     let speed = val_spans[2].innerHTML
 
     //on which monitor to spawn
-    let spawn_elem = document.getElementById("monitor_spawn")
-    let spawn_on  = spawn_elem.options[spawn_elem.selectedIndex].value;
+    let spawn_elem = sg.get_elem("#monitor_spawn")
+    let spawn_on  = spawn_elem.get_selected_elem()
 
     //departure point
-    let dep_elem = document.getElementById("departure_point")
-    let dep_point = dep_elem.options[dep_elem.selectedIndex].value;
+    let dep_elem = sg.get_elem("#departure_point")
+    let dep_point = dep_elem.get_selected_elem()
 
     //monitor_spawn
-    let arr_elem = document.getElementById("arrival_point")
-    let arr_point = arr_elem.options[arr_elem.selectedIndex].value;
+    let arr_elem = sg.get_elem("#arrival_point")
+    let arr_point = arr_elem.get_selected_elem()
 
     //arrival time
-    let hours = document.getElementById("hours").innerHTML
-    let mins = document.getElementById("minutes").innerHTML
+    //TODO
 
 
     send_message("controller", "spawn-plane", [{
@@ -224,14 +187,14 @@ function process_plane_data(){
         "monitor": spawn_on,
         "departure": dep_point,
         "arrival": arr_point,
-        "arrival_time": `${hours}:${mins}`
+        "arrival_time": ""
     }])
 }
 
 function refresh_plane_data(){
 
     //delete currently generated GUI
-    let plane_list = document.getElementById("plane-list")
+    let plane_list = sg.get_elem("#plane-list")
     if (plane_list == undefined){
         return
     }
@@ -252,26 +215,26 @@ function refresh_plane_data(){
 }
 
 function on_choice_select(n){
-    let buttons = document.getElementsByClassName("choice-but")
-    let choice_text = document.getElementsByClassName("choice-text")[0]
+    let buttons = sg.get_elem(".choice-but")
+    let choice_text = sg.get_elem(".choice-text")
     if (choice_text.value.length != 0){
         choice_text.id = ""
         choice_text.value = ""
     }
 
-    if(buttons[n].classList.contains("selected-choice")){
+    if(buttons[n].has_class("selected-choice")){
         //this button was already selected
-        buttons[n].classList.remove("selected-choice")
+        buttons[n].remove_class("selected-choice")
         selected_name = ""
         return
     }
 
     for (let i = 0; i < buttons.length; i++){
-        if (buttons[i].classList.contains("selected-choice")){
-            buttons[i].classList.remove("selected-choice")
+        if (buttons[i].has_class("selected-choice")){
+            buttons[i].remove_class("selected-choice")
         }
     }
-    buttons[n].classList.add("selected-choice")
+    buttons[n].add_class("selected-choice")
     selected_name = buttons[n].innerHTML
 }
 
@@ -294,25 +257,20 @@ function process_monitor_points(monitor_map_data){
         }
     }
 
-    let dep_select = document.getElementById("departure_point")
+    let dep_select = sg.get_elem("#departure_point")
     for (let i = 0; i < all_points.length; i++){
-        let option_elem = document.createElement("option")
-        option_elem.innerHTML = `${all_points[i]["name"]} (${all_points[i]["type"]})`
+        let option_elem = sg.create_elem("option", "", `${all_points[i]["name"]} (${all_points[i]["type"]})`, dep_select)
         option_elem.value = `${all_points[i]["name"]}_${all_points[i]["type"]}`
-
-        dep_select.appendChild(option_elem)
     }
 
-    let arr_select = document.getElementById("arrival_point")
+    let arr_select = sg.get_elem("#arrival_point")
     for (let i = 0; i < all_points.length; i++){
-        let option_elem = document.createElement("option")
-        option_elem.innerHTML = `${all_points[i]["name"]} (${all_points[i]["type"]})`
+        let option_elem = sg.create_elem("option", "", `${all_points[i]["name"]} (${all_points[i]["type"]})`, arr_select)
         option_elem.value = `${all_points[i]["name"]}_${all_points[i]["type"]}`
-        
-        arr_select.appendChild(option_elem)
     }
 }
 
+//TODO: move to backend
 function random_generate_names(){
     /*
     CALLSIGN GENERATION RULES
@@ -327,7 +285,7 @@ function random_generate_names(){
     let nums = "0123456789"
 
     //random generate all buttons
-    var choice_buttons = document.getElementsByClassName("choice-but")
+    var choice_buttons = sg.get_elem(".choice-but")
     for (let i = 0; i < choice_buttons.length; i++){
         //unselect all buttons
         if (choice_buttons[i].classList.contains("selected-choice")){
@@ -365,7 +323,7 @@ function random_generate_names(){
 }
 
 function change_according_points(){
-    var monit_sel = document.getElementById("monitor_spawn");
+    var monit_sel = sg.get_elem("#monitor_spawn");
     var selectedValue = monit_sel.options[monit_sel.selectedIndex].value;
     send_message("controller", "get-points", [selectedValue])
 }
@@ -379,17 +337,13 @@ function switch_change_ai(elem){
         send_message("controller", "ai-control-start")
 
         //disable visibility on whole content
-        document.querySelectorAll("#main-content").forEach(elem => {
-            elem.style.visibility = "hidden"
-        })
+        sg.get_elem("div#main-content").hide()
     }
     else{
         send_message("controller", "ai-control-stop")
 
         //enable visibility on whole content
-        document.querySelectorAll("#main-content").forEach(elem => {
-            elem.style.visibility = "visible"
-        })
+        sg.get_elem("div#main-content").show()
     }
 }
 
@@ -398,17 +352,13 @@ function switch_change_wind(elem){
         send_message("controller", "wind-control-start")
 
         //disable visibility on whole content
-        document.querySelectorAll("#wind-control").forEach(elem => {
-            elem.style.visibility = "visible"
-        })
+        sg.get_elem("div#wind-control").show()
     }
     else{
         send_message("controller", "wind-control-stop")
 
         //enable visibility on whole content
-        document.querySelectorAll("#wind-control").forEach(elem => {
-            elem.style.visibility = "hidden"
-        })
+        sg.get_elem("div#wind-control").hide()
     }
 }
 
@@ -416,38 +366,37 @@ function switch_change_wind(elem){
     Processing initial data
 */
 
-function process_specific(data, reset = false){
+function process_sim(data){
     if (!map_checked){
         //user did not check, do nothing
         return 
     }
 
-    let mask = document.getElementById("mask-plane-list")
-    let warn_text = document.getElementById("sim-not-running")
+    let mask = sg.get_elem("#mask-plane-list")
+    let warn_text = sg.get_elem("#sim-not-running")
+
     sim_running = data[8]["sim-running"]
     if (sim_running){
-        mask.classList.remove("mask-unselect")
-        mask.classList.add("mask-select")
-        warn_text.style.display = "none"
+        mask.remove_class("mask-unselect")
+        mask.add_class("mask-select")
+        warn_text.hide()
     }
     else{
-        mask.classList.remove("mask-select")
-        mask.classList.add("mask-unselect")
-        warn_text.style.display = "block"
+        mask.remove_class("mask-select")
+        mask.add_class("mask-unselect")
+        warn_text.show()
     }
 
     //clear parent element innerHTML
-    document.getElementById("monitor_spawn").innerHTML = ""
+    sg.get_elem("#monitor_spawn").innerHTML = ""
 
     var monitor_data = JSON.parse(data[1])
 
     for (let i = 0; i < monitor_data.length; i++){
         console.log(monitor_data[i])
 
-        let monitor_option = document.createElement("option")
+        let monitor_option = sg.create_elem("option", "", `monitor ${i} (${monitor_data[i]["win"]["win_type"]})`, sg.get_elem("#monitor_spawn"))
         monitor_option.value = `monitor${i}${monitor_data[i]["win"]["win_type"]}`
-        monitor_option.innerHTML = `monitor ${i} (${monitor_data[i]["win"]["win_type"]})`
-        document.getElementById("monitor_spawn").appendChild(monitor_option)
     }
 
     //modify ranges according to APP DATA
@@ -469,8 +418,8 @@ function process_specific(data, reset = false){
     }
 
     //setting attributes to ranges
-    var range_elements = document.getElementsByClassName("val-range")
-    var label_elements = document.getElementsByClassName("val-out")
+    var range_elements = sg.get_elem(".val-range")
+    var label_elements = sg.get_elem(".val-out")
 
     range_elements[0].min = Math.min(...HEADING_VALS)
     range_elements[0].max = Math.max(...HEADING_VALS)
@@ -504,9 +453,9 @@ function process_specific(data, reset = false){
     function for window load
 */
 
-function onload_specific(){
+function onload_sim(){
     //set mask to whole page
-    document.getElementById("mask-sim").style.height = `${document.body.scrollHeight}px`
+    sg.get_elem("#mask-sim").style.height = `${document.body.scrollHeight}px`
 
     //check if user had already selected map
     send_message("controller", "map-check")
@@ -514,60 +463,59 @@ function onload_specific(){
     random_generate_names()
 
     //event listeners
-    document.getElementById("confirm-button-plane").addEventListener("click", () => {
+    sg.get_elem("#confirm-button-plane").on_click(() => {
         process_plane_data()
     })
 
-    document.getElementsByClassName("randomize-but")[0].addEventListener("click", () => {
+    sg.get_elem(".randomize-but").on_click(() => {
         random_generate_names()
     })
 
-    document.getElementById("ai-control-switch").addEventListener("change", (event) => {
+    sg.get_elem("#ai-control-switch").on_change((event) => {
         switch_change_ai(event.target)
     })
 
-    document.getElementById("wind-control-switch").addEventListener("change", (event) => {
+    sg.get_elem("#wind-control-switch").on_change((event) => {
         switch_change_wind(event.target, ["wind-control-start", "wind-control-stop", "#wind-control"])
     })
 
-    document.getElementById("sim_button").addEventListener("click", (event) => {
-        
-        if (event.target.className == "stopsim"){
+    sg.get_elem("#sim_button").on_click((event) => {
+        if (event.target.has_class("stopsim")){
             send_message("controller", "stop-sim") //stop simulation
         }
-        else if (event.target.className == "startsim"){
+        else if (event.target.has_class("startsim")){
             send_message("controller", "start-sim") //start simulation
         }
     })
 
-    let choice_buttons = document.getElementsByClassName("choice-but")
+    let choice_buttons = sg.get_elem(".choice-but")
     for (let i = 0; i < choice_buttons.length; i++){
-        choice_buttons[i].addEventListener("click", () => {
+        choice_buttons[i].on_click(() => {
             on_choice_select(i)
         })
     }
 
-    let ranges = document.getElementsByClassName("val-range")
+    let ranges = sg.get_elem(".val-range")
     for (let i = 0; i < ranges.length; i++){
-        ranges[i].addEventListener("input", () => {
+        ranges[i].on_input(() => {
             MoveSlider(i)
         })
     }
 
-    document.getElementsByClassName("choice-text")[0].addEventListener("input", (event) => {
+    sg.get_elem(".choice-text").on_input((event) => {
         OnInput(event.target)
     })
 
     //check whenever monitor_spawn is selected and change departure and arrival points accordingly
-    document.getElementById("monitor_spawn").addEventListener("change", (event) => {
+    sg.get_elem("#monitor_spawn").on_change(() => {
         change_according_points()
     })
 
-    document.getElementById("departure_point").addEventListener("change", (event) => {
+    sg.get_elem("#departure_point").on_change((event) => {
         //disable that specific point on other point select
-        let selectedValue = event.target.options[event.target.selectedIndex].value;
+        let selectedValue = event.target.get_selected_elem()
 
-        let children = document.getElementById("arrival_point").children
+        let children = sg.get_elem("#arrival_point").children
         for (let i = 0; i < children.length; i++){
             children[i].disabled = false
         }
@@ -580,11 +528,11 @@ function onload_specific(){
         }
     })
 
-    document.getElementById("arrival_point").addEventListener("change", (event) => {
+    sg.get_elem("#arrival_point").on_change((event) => {
         //disable that specific point on other point select
-        let selectedValue = event.target.options[event.target.selectedIndex].value;
+        let selectedValue = event.target.get_selected_elem()
 
-        let children = document.getElementById("departure_point").children
+        let children = sg.get_elem("#departure_point").children
         for (let i = 0; i < children.length; i++){
             children[i].disabled = false
         }
@@ -594,59 +542,76 @@ function onload_specific(){
                 children[i].disabled = true
                 break
             }
-        }
-    })
-
-    //time selection
-    var up_arrows = document.getElementsByClassName("arr-up")
-    for (let i = 0; i < up_arrows.length; i++){
-        up_arrows[i].addEventListener("click", () => {
-            ChangeTime(1, i)
-        })
-    }
-
-    var down_arrows = document.getElementsByClassName("arr-down")
-    for (let i = 0; i < down_arrows.length; i++){
-        down_arrows[i].addEventListener("click", () => {
-            ChangeTime(-1, i)
-        })
-    }
-
-    //listeners
-
-    //plane messages
-    window.electronAPI.on_message("update-plane-db", (data) => {
-        plane_data = data
-        console.log(plane_data)
-        refresh_plane_data()
-    })
-
-    window.electronAPI.on_message("sim-event", (data) => {
-        let mask = document.getElementById("mask-plane-list")
-        let warn_text = document.getElementById("sim-not-running")
-
-        let elem = document.querySelector("button#sim_button")
-        if (data == "stopsim"){
-            elem.className = "startsim"
-            elem.innerHTML = "RUN"
-
-            sim_running = false
-
-            mask.classList.remove("mask-select")
-            mask.classList.add("mask-unselect")
-
-            warn_text.style.display = "block"
-        }
-        else if (data == "startsim"){
-            elem.className = "stopsim"
-            elem.innerHTML = "STOP"
-
-            sim_running = true
-
-            mask.classList.remove("mask-unselect")
-            mask.classList.add("mask-select")
-
-            warn_text.style.display = "none"
         }
     })
 }
+
+on_message("update-plane-db", (data) => {
+    plane_data = data
+    console.log(plane_data)
+    refresh_plane_data()
+})
+
+on_message("sim-event", (data) => {
+    let mask = sg.get_elem("#mask-plane-list")
+    let warn_text = sg.get_elem("#sim-not-running")
+
+    let elem = sg.get_elem("s-button#sim_button")
+    if (data == "stopsim"){
+        elem.className = "startsim"
+        elem.innerHTML = "RUN"
+
+        sim_running = false
+
+        mask.remove_class("mask-select")
+        mask.add_class("mask-unselect")
+
+        warn_text.show()
+    }
+    else if (data == "startsim"){
+        elem.className = "stopsim"
+        elem.innerHTML = "STOP"
+
+        sim_running = true
+
+        mask.remove_class("mask-unselect")
+        mask.add_class("mask-select")
+
+        warn_text.hide()
+    }
+})
+
+on_message("terminal-add", (comm_data) => {
+    add_log(`${comm_data[2]}: ${comm_data[1]} ${comm_data[0]}`)
+})
+
+on_message("map-points", (data) => {
+    process_monitor_points(data)
+})
+
+on_message("map-checked", (data) => {
+    let data_temp = JSON.parse(data)
+    if (data_temp["user-check"]){
+        sg.get_elem("#mask-sim").hide()
+    }
+    else{
+        sg.get_elem("#mask-sim").show()
+    }
+
+    map_checked = data_temp["user-check"]
+
+    //send message to get new data
+    send_message("controller", "send-info")
+})
+
+sg.on_win_load(() => {
+    set_controller_window(frontend_vars)
+    set_controller_buttons()
+    onload_sim()
+
+    window.electronAPI.on_init_info((data) => {
+        INIT_DATA = data
+        process_init_data(data)
+        process_sim(data)
+    })
+})

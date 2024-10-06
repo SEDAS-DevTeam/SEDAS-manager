@@ -1,0 +1,15 @@
+#widget
+worker_widget.html
+#utils
+exit.html
+load.html
+main.html
+popup.html
+#controller
+wiki.html
+plugins.html
+settings.html
+controller_set.html -> popup info not ack
+contrller_sim.html -> graphics ok
+#worker
+worker.html

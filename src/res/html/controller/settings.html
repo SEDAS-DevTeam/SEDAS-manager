@@ -1,40 +1,33 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="../../styles/index.css">
-        <link rel="stylesheet" href="../../styles/settings.css">
-
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
         <meta charset="utf-8" />
 
-        <script src="../../scripts/blocks/block.js"></script>
-        <script src="../../scripts/blocks/block_settings.js"></script>
+        <link href="../../source/sgui/sgui.css" rel="stylesheet"/>
+        <script src="../../source/sgui/sgui.js" type="module"></script>
 
-        <script src="../../scripts/utils/layout_loader.js"></script>
-        <script src="../../scripts/utils/ipc_wrapper.js"></script>
-        
-        <script src="../../scripts/settings.js"></script>
+        <link rel="stylesheet" href="../../styles/settings.css">
+        <link rel="stylesheet" href="../../styles/index.css">
+
+        <script src="../../scripts/settings.js" type="module"></script>
     </head>
     <body>
-        <div id="settings-loader-content">
-            <div id="settings-loader-inner">
-                <div id="settings-loader"></div>
-                <h2 style="text-align: center; margin-top: 50px;">Loading settings</h2>
-            </div>
-        </div>
-        <div style="display: inline-block;" id="settings-block">
-            <div>
-                <button id="redir_to_menu" style="margin-top: 20px;"><i class="fa-solid fa-arrow-left"></i> Back to menu</button>
-                <button id="save_settings" style="margin-top: 20px;">Save</button>
-            </div>
-            <h1>SEDAC manager settings</h1>
-            <p>NOTE: Changes will be activated after restart (TODO)</p>
+        <page-mask class="white">
+            <s-circle-loadbar text="Loading settings"></s-circle-loadbar>
+        </page-mask>
+        <div id="settings-block">
+            <s-button id="redir_to_menu" style="margin-top: 20px;"><s-icon type="arrow-left"></s-icon> Back to menu</s-button>
+            <s-button id="save_settings" style="margin-top: 20px;">Save</s-button>
+            
+            <s-header s="1" m="10 0">SEDAS manager settings</s-header>
+            <s-text>NOTE: Changes will be activated after restart (TODO)</s-text>
     
-            <settings-area></settings-area>
-            <p>NOTE: transition altitude is set to 1000 feet on default (TODO)</p>
+            <div id="settings-area"></div>
+            <s-text>NOTE: transition altitude is set to 1000 feet on default (TODO)</s-text>
         </div>
         <div id="wiki-block">
             <iframe style="margin-top: 15px;" frameborder="0" allowfullscreen id="wiki-block-iframe"></iframe>
         </div>
     </body>
 </html>
-

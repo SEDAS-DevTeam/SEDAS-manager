@@ -1,4 +1,4 @@
-function parse_settings_layout(config){
+export function parse_settings_layout(config){
     const createElement = (tag, attributes = {}, children = []) => {
         const element = document.createElement(tag)
         Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value))

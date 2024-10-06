@@ -19,6 +19,10 @@
     color: black;
 }
 
+#date, #time{
+    margin: 0px 5px;
+}
+
 /*Worker widget elements*/
 
 body#worker-widget{
@@ -37,14 +41,33 @@ button{
     cursor: pointer;
 }
 
+canvas, s-topnav#worker, div#labels{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+canvas{
+    top: 50px
+}
+
+#canvas1 {z-index: 1;}
+#canvas2 {z-index: 2;}
+#canvas3 {z-index: 3;}
+
+s-topnav, div#labels{
+    z-index: 4;
+    width: 100%;
+}
+
 #widget-topnav {
     padding: 5px;
     text-align: right;
     background-color: #b1b1b1;
-    display: flex;
+    width: 100%;
 }
 
-#draggable-top{
+#header-text{
     flex-grow: 1;
     float: left;
     height: 100%;
@@ -53,26 +76,16 @@ button{
     margin-bottom: 0;
 }
 
-#widget-topnav > #draggable-top{
+#widget-topnav{
     -webkit-app-region: drag;
-}
-
-#widget-topnav i{
-    display: inline-block;
-    text-align: center;
-    padding: 5px;
-    text-decoration: none;
-    font-size: 10px;
-    border: solid 2px #5271ff;
-    font-weight: 600;
-    cursor: pointer;
-    border-radius: 5px;
 }
 
 #content{
     padding: 10px;
 }
 
-#date, #time{
-    margin: 0px 5px;
+#widget-topnav #right-icons{
+    float: right;
+    margin-right: 10px;
+    -webkit-app-region: none;
 }

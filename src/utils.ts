@@ -110,12 +110,17 @@ export class IPCwrapper{
                             
                             //send back acknowledge and call callback
                             this.send_ack(sender, channel)
+                            console.log("acknowledged")
                             callback(message_data)
                         }
                         else{
                             //message not correct -> writing into log & resend
                             this.send_nack(sender, channel)
                             console.log("not acknowledged")
+                            console.log(sender)
+                            console.log(channel)
+                            console.log(desired_hash)
+                            console.log(hash)
                         }
                     }
                 }

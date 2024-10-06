@@ -1,3 +1,5 @@
+import { send_message } from '../scripts/utils/ipc_wrapper.js';
+
 var apiData = {};
 var mapFrames = [];
 var lastPastFramePosition = -1;
@@ -218,6 +220,11 @@ function remove_map(){
         map.remove()
         map = undefined
     }
+}
+
+window.onload = () => {
+    document.getElementsByClassName("weather-but-run")[0].addEventListener("click", () => play())
+    document.getElementsByClassName("weather-but-stop")[0].addEventListener("click", () => stop())
 }
 
 //play loop to render frames

@@ -17,20 +17,16 @@
     overflow-y: scroll;
 }
 
-.upper-mask{
-    position: absolute;
-    z-index: 2;
-    width: 100%;
-    text-align: center;
-    margin: auto;
-    background-color: rgba(0, 0, 0, 0.01);
-    color: red;
-    margin-left: -20px;
-    font-weight: bolder;
-    padding-top: 20%;
-    font-family: 'Montserrat';
-    font-size: larger;
-    backdrop-filter: blur(50px);
+.desc-content i {
+    color: white;
+}
+
+.plane-content b{
+    color: white;
+}
+
+s-text.desc{
+    color: white;
 }
 
 .mask{
@@ -116,7 +112,7 @@ div.popup-box p{
     font-weight: bold;
 }
 
-.choice-text {
+.choice-text, .time-text {
     width: 100%;
     padding: 12px 20px;
     margin: 8px 0;
@@ -165,13 +161,6 @@ div.popup-box p{
     color: #5271ff;
     font-weight: bold;
     margin-bottom: 25px;
-}
-
-#controller-body{
-    overflow-y: scroll;
-    margin-left: 20px; 
-    margin-right: 20px;
-    margin-bottom: 20px;
 }
 
 #confirm{
@@ -435,4 +424,40 @@ span#tag{
 
 .time-form{
     display: none;
+}
+
+
+/*
+    Reworked css
+*/
+body{
+    margin-left: 20px;
+    margin-right: 20px;
+    overflow-y: scroll;
+}
+
+#content{
+    margin-top: 15px;
+    height: 80%;
+}
+
+.inline-text{
+    display: inline;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    color: black;
+}
+
+#main-header{
+    display: inline-block;
+}
+
+#mask-sim{
+    margin-left: -20px;
+    padding-top: 20%;
+}
+
+.warn-text{
+    color: red;
+    font-weight: bolder;
 }

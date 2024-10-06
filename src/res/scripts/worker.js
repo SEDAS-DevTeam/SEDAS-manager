@@ -1,3 +1,18 @@
+import sg from '../source/sgui/sgui.js';
+import {
+    render_vars,
+    renderPlane,
+    renderPlaneInfo,
+    renderPlanePath,
+    renderAirspace,
+    renderRunway,
+    renderPoint,
+    renderAirport,
+    renderText,
+    renderScale
+} from '../scripts/utils/render.js';
+import { on_message, send_message } from '../scripts/utils/ipc_wrapper.js';
+
 var map_data = undefined
 var plane_data = []
 var plane_label_coords = []
@@ -5,15 +20,9 @@ var APP_DATA = undefined
 var plane_paths = []
 var scale = 0
 
-var curr_rel_dist = [0, 0] //x, y
+var main_canvas = undefined
 
-/*
-in format
-[{
-    "id": 
-    "coords": [x1, y1, x2, y2]
-}]
-*/
+var curr_rel_dist = [0, 0] //x, y
 
 var is_dragging = false
 
@@ -22,13 +31,11 @@ var curr_plane = undefined
 function process_map_data(){
 
     //rewrite all canvas data
-    renderCanvas(1)
-    renderCanvas(2)
-    renderCanvas(3)
+    main_canvas.render(render_vars.BACKROUND_COLOR, [1, 2, 3])
 
     if (map_data[0] == undefined){
         //render empty map placeholder on init
-        renderText(50, 100, "Empty map placeholder", "white", "48px", "canvas3")
+        renderText(50, 100, "Empty map placeholder", "white", "48px", "canvas1")
         return;
     }
 
@@ -36,7 +43,7 @@ function process_map_data(){
     scale = map_data[0]["scale"]
     if (spec_data == undefined){
         //map resource for type does not exist
-        renderText(50, 100, `Map resource for type "${map_data[1]}" does not exist`, "white", "48px", "canvas3")
+        renderText(50, 100, `Map resource for type "${map_data[1]}" does not exist`, "white", "48px", "canvas1")
         return
     }
 
@@ -56,19 +63,19 @@ function process_map_data(){
                 case "POINTS":
                     //rendering all other route points
                     for (let i = 0; i < value.length; i++){
-                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], POINT_COLOR, POINT_TRIAG_LENGTH)
+                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], render_vars.POINT_COLOR, render_vars.POINT_TRIAG_LENGTH)
                     }
                     break
                 case "SID":
                     //rendering SID instruments
                     for (let i = 0; i < value.length; i++){
-                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], SID_COLOR, SID_TRIAG_LENGTH)
+                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], render_vars.SID_COLOR, render_vars.SID_TRIAG_LENGTH)
                     }
                     break
                 case "STAR":
                     //rendering STAR instruments
                     for (let i = 0; i < value.length; i++){
-                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], STAR_COLOR, STAR_TRIAG_LENGTH)
+                        renderPoint(value[i]["x"], value[i]["y"], value[i]["name"], render_vars.STAR_COLOR, render_vars.STAR_TRIAG_LENGTH)
                     }
                     break
                 case "SECTOR":
@@ -77,7 +84,7 @@ function process_map_data(){
                     for (let i = 0; i < value.length; i++){
                         SECTOR_points.push([value[i]["x"], value[i]["y"]])
                     }
-                    renderAirspace(SECTOR_COLOR, SECTOR_BORDER_COLOR, SECTOR_BORDER_WIDTH, SECTOR_points)
+                    renderAirspace(render_vars.SECTOR_COLOR, render_vars.SECTOR_BORDER_COLOR, render_vars.SECTOR_BORDER_WIDTH, SECTOR_points)
 
                     break
                 case "TERRAIN":
@@ -86,7 +93,7 @@ function process_map_data(){
                     for (let i = 0; i < value.length; i++){
                         TERRAIN_points.push([value[i]["x"], value[i]["y"]])
                     }
-                    renderAirspace(TERRAIN_COLOR, TERRAIN_BORDER_COLOR, TERRAIN_BORDER_WIDTH, TERRAIN_points)
+                    renderAirspace(render_vars.TERRAIN_COLOR, render_vars.TERRAIN_BORDER_COLOR, render_vars.TERRAIN_BORDER_WIDTH, TERRAIN_points)
                     break
                 case "RESTRICTED_AREA":
                     //rendering no-fly zones
@@ -94,7 +101,7 @@ function process_map_data(){
                     for (let i = 0; i < value.length; i++){
                         AREA_points.push([value[i]["x"], value[i]["y"]])
                     }
-                    renderAirspace(NO_FLY_ZONE_COLOR, NO_FLY_ZONE_BORDER_COLOR, NO_FLY_ZONE_BORDER_WIDTH, AREA_points)
+                    renderAirspace(render_vars.NO_FLY_ZONE_COLOR, render_vars.NO_FLY_ZONE_BORDER_COLOR, render_vars.NO_FLY_ZONE_BORDER_WIDTH, AREA_points)
                     break
             }
         }
@@ -148,7 +155,7 @@ function render_planes(){
         let label_x = 0
         let label_y = 0
 
-        plane_level = check_trans_altitude(plane_data[i])
+        let plane_level = check_trans_altitude(plane_data[i])
 
         let found_plane = false
         for (let i2 = 0; i2 < plane_label_coords.length; i2++){
@@ -192,52 +199,12 @@ function render_planes(){
 }
 
 function update_labels(curr_x, curr_y){
-    renderCanvas(3)
-
-    for (let i = 0; i < plane_label_coords.length; i++){        
-        if (plane_label_coords[i]["id"] == curr_plane["id"]){
-            // render moved plane label
-
-            //update x and y by cursor location
-            x = curr_x - curr_rel_dist[0]
-            y = curr_y - curr_rel_dist[1]
-
-            plane_level = check_trans_altitude(curr_plane)
-
-            let label_coords = renderPlaneInfo(curr_plane["x"], curr_plane["y"], x, y, {
-                "callsign": curr_plane["callsign"],
-                "level": plane_level,
-                "speed": curr_plane["speed"],
-                "code": undefined
-            })
-
-            plane_label_coords[i] = {
-                "id": curr_plane["id"],
-                "coords": label_coords,
-                "dist": [plane_label_coords[i]["coords"][2] - plane_data[i]["x"], plane_label_coords[i]["coords"][3] - plane_data[i]["y"]]
-            }
-        }
-        else{
-            //render rest of the plane labels
-
-            for(let i2 = 0; i2 < plane_data.length; i2++){
-                if (plane_label_coords[i]["id"] == plane_data[i2]["id"]){
-                    //rerender rest of unused labels onmousemove
-                    renderPlaneInfo(plane_data[i2]["x"], plane_data[i2]["y"], plane_label_coords[i]["coords"][2], plane_label_coords[i]["coords"][3], {
-                        "callsign": plane_data[i2]["callsign"],
-                        "level": plane_data[i2]["level"],
-                        "speed": plane_data[i2]["speed"],
-                        "code": undefined
-                    })
-                }
-            }
-        }
-    }
-
-
+    //TODO: finish this someday
 }
 
-window.onload = () => {
+sg.on_win_load(() => {
+    main_canvas = sg.get_elem("s-canvas")
+    
     //ask for map data
     send_message("worker", "render-map")
 
@@ -248,19 +215,17 @@ window.onload = () => {
     send_message("worker", "send-plane-data")
 
     //render all essential things
-    renderCanvas(1)
-    renderCanvas(2)
-    renderCanvas(3)
+    main_canvas.render(render_vars.BACKROUND_COLOR, [1, 2, 3])
 
     //render empty map placeholder on init
     renderText(50, 100, "Empty map placeholder", "white", "48px", "canvas3")
     
-    document.querySelector("a#exit").addEventListener("click", () => {
+    sg.get_elem("a#exit").on_click(() => {
         send_message("worker", "exit")
     })
 
-    document.querySelector("a#stopbutton").addEventListener("click", () => {
-        let elem = document.querySelector("a#stopbutton")
+    sg.get_elem("a#stopbutton").on_click(() => {
+        let elem = sg.get_elem("a#stopbutton")
         if (elem.className == "stopsim"){
             send_message("worker", "stop-sim") //stop simulation
         }
@@ -268,59 +233,56 @@ window.onload = () => {
             send_message("worker", "start-sim") //start simulation
         }
     })
-}
+})
 
 /*
 MOUSE EVENTS
 */
 
-document.onmousedown = (event) => {
+function mouse_down(event){
     let curr_x = event.clientX
     let curr_y = event.clientY
 
-    for(i = 0; i < plane_label_coords.length; i++){
+    for(let i = 0; i < plane_label_coords.length; i++){
         let curr_coords = plane_label_coords[i]["coords"]
 
         if (curr_coords[2] < curr_x && curr_coords[0] > curr_x){
             if (curr_coords[1] > curr_y){
-                //is dragging on elem
-                is_dragging = true
-
                 curr_plane = plane_data[i]
-
                 curr_rel_dist = [Math.abs(curr_x - curr_coords[2]), Math.abs(curr_y - curr_coords[3])]
             }
         }
     }
 }
 
-document.onmouseup = () => {
-    is_dragging = false
+function mouse_up(){
     curr_rel_dist = [0, 0]
 }
 
-document.onmousemove = (event) => {
-    if (is_dragging){
-        update_labels(event.clientX, event.clientY)
+function mouse_move(event){
+    update_labels(event.clientX, event.clientY)
 
-        //also still render paths
-        for (let i = 0; i < plane_paths.length; i++){
-            renderPlanePath(plane_paths[i]["coords"])
-        }
-
-        //render scale
-        renderScale(scale)
+    //also still render paths
+    for (let i = 0; i < plane_paths.length; i++){
+        renderPlanePath(plane_paths[i]["coords"])
     }
+
+    //render scale
+    renderScale(scale)
 }
+
+// set all callbacks
+sg.on_mouse_drag(mouse_down, mouse_move, mouse_up)
+
 
 window.electronAPI.on_map_data((data) => {
     map_data = data //set map data to global on session
     process_map_data()
 })
-window.electronAPI.on_message("ask-for-render", () => {
+on_message("ask-for-render", () => {
     send_message("worker", "render-map")
 })
-window.electronAPI.on_message("update-plane-db", (data) => { //for updating plane list
+on_message("update-plane-db", (data) => { //for updating plane list
     plane_data = data
 
     process_map_data()
@@ -344,11 +306,11 @@ window.electronAPI.on_message("update-plane-db", (data) => { //for updating plan
     //render scale
     renderScale(scale)
 })
-window.electronAPI.on_message("update-paths", (data) => {
+on_message("update-paths", (data) => {
     plane_paths = data
 })
-window.electronAPI.on_message("sim-event", (data) => {
-    let elem = document.querySelector("a#stopbutton")
+on_message("sim-event", (data) => {
+    let elem = sg.get_elem("a#stopbutton")
     if (data == "stopsim"){
         elem.className = "startsim"
         elem.innerHTML = "RUN"
@@ -358,12 +320,12 @@ window.electronAPI.on_message("sim-event", (data) => {
         elem.innerHTML = "STOP"
     }
 })
-window.electronAPI.on_message("time", (time_data) => {
+on_message("time", (time_data) => {
     let date_str = time_data[0].toDateString()
     let time_str = time_data[0].toLocaleTimeString();
 
-    document.getElementById("date").innerHTML = date_str
-    document.getElementById("time").innerHTML = time_str
+    sg.get_elem("#date").innerHTML = date_str
+    sg.get_elem("#time").innerHTML = time_str
 })
 
 window.electronAPI.on_init_info((data) => {

@@ -1,72 +1,13 @@
 import {parentPort} from "worker_threads"
-import {spawn} from "node:child_process"
-import net from "net"
 import fs from "fs";
-import path from "path";
 import {
-    ABS_PATH,
     PATH_TO_SETTINGS
 } from "../app_config"
-
-const PORT = 36000
-
-const QUERY_TIMEOUT: number = 10
+import { NATO_ALPHA, NATO_NUMS } from "../atc_config"
 
 //read JSON
 const app_settings_raw = fs.readFileSync(PATH_TO_SETTINGS, "utf-8")
 const app_settings = JSON.parse(app_settings_raw);
-
-//variables
-var last_value_voice: string = "";
-var last_value_command: string = "";
-
-//debug messages: core, text, voice, speech
-var last_debug_messages: string[] = ["", "", "", ""]
-
-var plane_data = []
-var logging: boolean = undefined
-var current_query_timeout: number = 0
-
-const NATO_ALPHA = {
-    "A": "alpha",
-    "B": "beta",
-    "C": "charlie",
-    "D": "delta",
-    "E": "echo",
-    "F": "foxtrot",
-    "G": "golf",
-    "H": "hotel",
-    "I": "india",
-    "J": "juliet",
-    "K": "kilo",
-    "L": "lima",
-    "M": "mike",
-    "N": "november",
-    "O": "oscar",
-    "P": "papa",
-    "Q": "quebec",
-    "R": "romeo",
-    "S": "sierra",
-    "T": "tango",
-    "U": "uniform",
-    "V": "victor",
-    "W": "whiskey",
-    "X": "x-ray",
-    "Y": "yankee",
-    "Z": "zulu"
-}
-const NUMS = {
-    "0": "zero",
-    "1": "one",
-    "2": "two",
-    "3": "three",
-    "4": "four",
-    "5": "five",
-    "6": "six",
-    "7": "seven",
-    "8": "eight",
-    "9": "niner"
-}
 
 function command_processor(command_args: string[]){
     let response: string = ""
@@ -75,7 +16,7 @@ function command_processor(command_args: string[]){
     let trans_plane_name: string = ""
     for (let i = 0; i < command_args[0].length; i++){
         if (NATO_ALPHA[command_args[0][i]] == undefined){
-            trans_plane_name += `${NUMS[command_args[0][i]]} `
+            trans_plane_name += `${NATO_NUMS[command_args[0][i]]} `
         }
         else{
             trans_plane_name += `${NATO_ALPHA[command_args[0][i]]} `
@@ -92,7 +33,7 @@ function command_processor(command_args: string[]){
             //translate updated heading
             let trans_heading: string = ""
             for (let i = 0; i < command_args[2].length; i++){
-                trans_heading += `${NUMS[command_args[2][i]]} `
+                trans_heading += `${NATO_NUMS[command_args[2][i]]} `
             }
 
             response = `Fly heading ${trans_heading}, ${trans_plane_name}`
@@ -102,9 +43,11 @@ function command_processor(command_args: string[]){
     return response
 }
 
-const PATH_TO_TERRAIN: string = path.join(ABS_PATH, "/src/res/neural/generate_terrain.py")
-const PATH_TO_CORE: string = path.join(ABS_PATH, "/src/res/neural/core.py")
+parentPort.on("message", (message) => {
+    console.log(`backend said ${message}`)
+})
 
+/*
 const core_server = net.createServer((socket) => {
     console.log('Client connected');
 
@@ -198,3 +141,4 @@ const core_process = spawn("python3", [PATH_TO_CORE])
 core_server.listen(PORT, '127.0.0.1', () => {
     console.log('Server listening on 127.0.0.1');
 });
+*/

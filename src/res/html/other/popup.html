@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="../../styles/index.css">
+        <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
+        <meta charset="utf-8" />
+
+        <link href="../../source/sgui/sgui.css" rel="stylesheet"/>
+        <script src="../../source/sgui/sgui.js" type="module"></script>
+
         <link rel="stylesheet" href="../../styles/popup.css">
 
-        <meta charset="utf-8" />
-        <script src="../../scripts/popup.js"></script>
-        <script src="../../scripts/utils/ipc_wrapper.js"></script>
+        <script src="../../scripts/popup.js" type="module"></script>
     </head>
     <body>
-        <div id="center">
-            <h2 id="main-text"></h2>
-            <p class="norm-text">Proceed?</p>
-            <div id="popup-content"></div>
-        </div>
+        <align-v-center>
+            <align-h-center>
+                <s-header s="2">Balls</s-header>
+                <s-text>Proceed?</s-text>
+                <div id="popup-content"></div>
+            </align-h-center>
+        </align-v-center>
     </body>
 </html>

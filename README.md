@@ -12,14 +12,41 @@ The application is made in `electron`. The app also uses `python` to implement t
 
 ## Setup/Installation
 
-**1) Setup for standard usage**
+### Setup for standard usage
+
 Installation is very straightforward, just download binary that is compatible with your system, you can download it here: 
 [sedas releases](https://github.com/SEDAS-DevTeam/SEDAS-manager/releases)
 
-**2) Setup for developement**
-If you want to contribute on this project, you will have to go through these steps to setup **SEDAS developement environment:**
+### Setup for development
 
-## TODO
+Whole project runs on `invoke` configuration system (location: `tasks.py`), there are several defined functions that can be invoked from command line.
+
+#### Setting up repository (step by step)
+
+**Install dependencies from** `package.json` **:**
+
+``` shell
+npm install
+```
+
+**Build AI-backend**
+``` shell
+TODO: fix this
+```
+
+**Compile C++ and JS files**
+``` shell
+invoke compile
+```
+
+**Run app in development mode**
+``` shell
+invoke devel
+```
+
+Everything should be set up by now :).
+
+## Project TODO list
 
 ### Current version
 

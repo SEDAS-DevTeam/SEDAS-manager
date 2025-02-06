@@ -23,28 +23,50 @@ Whole project runs on `invoke` configuration system (location: `tasks.py`), ther
 
 #### Setting up repository (step by step)
 
-**Install dependencies from** `package.json` **:**
+**Setup project**
+
+``` shell
+git clone --recursive https://github.com/SEDAS-DevTeam/SEDAS-manager.git
+cd SEDAS-manager
+```
+
+**Setup virtual environment**
+
+``` shell
+virtualenv sedas_manager_env
+sedas_manager_env/bin/activate # To deactivate, use: deactivate
+pip install -r requirements.txt
+cd src # get to working directory
+```
+
+**Install dependencies from** `package.json`
 
 ``` shell
 npm install
 ```
 
-**Build AI-backend**
-``` shell
-TODO: fix this
-```
 
 **Compile C++ and JS files**
+
 ``` shell
 invoke compile
 ```
 
 **Run app in development mode**
+
 ``` shell
 invoke devel
 ```
 
 Everything should be set up by now :).
+
+**For building and publishing**
+TODO
+
+``` shell
+invoke build <-- exec build
+invoke publish <-- publish to github
+```
 
 ## Project TODO list
 
@@ -58,6 +80,9 @@ Everything should be set up by now :).
 - [ ] First build when?
 - [ ] Make project portable + rework project.py into invoke
 - [ ] Unify with the .vscode file
+- [ ] Fix the build with electron-builder
+- [ ] Fix app publishing
+- [ ] Log colors in invoke
 
 ### Upcoming versions
 

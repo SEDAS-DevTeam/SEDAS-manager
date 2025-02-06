@@ -17,6 +17,6 @@
       'sources': [ './addons/main.cpp' ],
       "cflags": [ "-fexceptions", "-frtti" ],
       "cflags_cc": [ "-fexceptions", "-frtti" ]
-    }
+    },
   ]
 }

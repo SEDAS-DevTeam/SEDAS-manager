@@ -5,7 +5,7 @@ from pathlib import Path
 import shutil
 
 DESCRIPTION = "SEDAS Manager project toolkit, run --list to get info about args"
-PATH = str(Path(__file__).parents[1])
+PATH = str(Path(__file__).parent)
 
 PURPLE = '\033[0;35m'
 BLUE = '\033[0;34m'
@@ -68,10 +68,8 @@ def compile(ctx):
             1) TS -> JS
             2) C++ -> bind to TS part
     """
-
-    path_src = path.join(PATH, "src")
-
     def compile_cpp():
+        path_src = path.join(PATH, "src")
         chdir(path_src)
         ctx.run("node-gyp configure build")
         print_color(PURPLE, "Built all C++ files")
@@ -95,7 +93,7 @@ def devel(ctx):
     """
     path_main = path.join(PATH, "src/main.js")
     print_color(PURPLE, "Running app in dev mode...")
-    ctx.run(f"electron {path_main}")
+    ctx.run(f"{path.join(PATH, "node_modules/electron/dist/electron")} {path_main}")
 
 
 @task
@@ -104,8 +102,15 @@ def build(ctx):
         Create SEDAS executable
     """
     print_color(PURPLE, "Building app...")
-    ctx.run("electron-builder build -wl")
+    ctx.run("npm run make")
 
+@task
+def publish(ctx):
+    """
+        Publish SEDAS executable
+    """
+    print_color(PURPLE, "Publishing app...")
+    ctx.run("npm run publish") # TODO
 
 # runtime
 print_color(PURPLE, DESCRIPTION)

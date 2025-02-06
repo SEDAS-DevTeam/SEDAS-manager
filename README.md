@@ -45,7 +45,6 @@ cd src # get to working directory
 npm install
 ```
 
-
 **Compile C++ and JS files**
 
 ``` shell
@@ -64,8 +63,8 @@ Everything should be set up by now :).
 TODO
 
 ``` shell
-invoke build <-- exec build
-invoke publish <-- publish to github
+invoke build # exec build
+invoke publish # publish to github
 ```
 
 ## Project TODO list

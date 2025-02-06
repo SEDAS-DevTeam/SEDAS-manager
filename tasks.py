@@ -104,6 +104,16 @@ def build(ctx):
     print_color(PURPLE, "Building app...")
     ctx.run("npm run make")
 
+
+@task
+def update(ctx):
+    """
+        Update submodules to newest commit
+    """
+    print_color(PURPLE, "Updating submodules...")
+    ctx.run("git submodule update --remote")
+
+
 @task
 def publish(ctx):
     """

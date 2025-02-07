@@ -64,9 +64,9 @@ export const WIDGET_OFFSET = 50
 export const main_menu_dict = {
     width: 800,
     height: 600,
-    title: "SEDAC manager",
+    title: "SEDAS manager",
     resizable: false,
-    icon: "./res/img/sedac-manager-logo.png",
+    icon: "./res/img/sedas-manager-logo.png",
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
@@ -75,9 +75,9 @@ export const main_menu_dict = {
 export const load_dict = {
     width: 800,
     height: 600,
-    title: "SEDAC manager - loading",
+    title: "SEDAS manager - loading",
     resizable: false,
-    icon: "./res/img/sedac-manager-logo.png",
+    icon: "./res/img/sedas-manager-logo.png",
     frame: false,
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
@@ -88,9 +88,9 @@ export const load_dict = {
 export const settings_dict = {
     width: 1920,
     height: 1080,
-    title: "SEDAC manager - settings",
+    title: "SEDAS manager - settings",
     resizable: true,
-    icon: "./res/img/sedac-manager-logo.png",
+    icon: "./res/img/sedas-manager-logo.png",
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
@@ -99,9 +99,9 @@ export const settings_dict = {
 export const exit_dict = {
     width: 500,
     height: 300,
-    title: "SEDAC manager - exit tray",
+    title: "SEDAS manager - exit tray",
     resizable: false,
-    icon: "./res/img/sedac-manager-logo.png",
+    icon: "./res/img/sedas-manager-logo.png",
     frame: false,
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
@@ -111,9 +111,9 @@ export const exit_dict = {
 export const controller_dict = {
     width: 1920,
     height: 1080,
-    title: "SEDAC manager - control",
+    title: "SEDAS manager - control",
     resizable: true,
-    icon: "./res/img/sedac-manager-logo.png",
+    icon: "./res/img/sedas-manager-logo.png",
     frame: true,
     //focusable: true,
     webPreferences: {
@@ -124,9 +124,9 @@ export const controller_dict = {
 export const worker_dict = {
     width: 1920,
     height: 1080,
-    title: "SEDAC",
+    title: "SEDAS",
     resizable: false,
-    icon: "./res/img/sedac-manager-logo.png",
+    icon: "./res/img/sedas-manager-logo.png",
     //frame: false, //TODO turn off when testing
     //focusable: false, //same here
     webPreferences: {
@@ -137,9 +137,9 @@ export const worker_dict = {
 export const basic_worker_widget_dict = {
     width: 300,
     height: 300,
-    title: "SEDAC widget",
+    title: "SEDAS widget",
     resizable: true,
-    icon: "./res/img/sedac-manager-logo.png",
+    icon: "./res/img/sedas-manager-logo.png",
     frame: false,
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
@@ -149,9 +149,9 @@ export const basic_worker_widget_dict = {
 export const popup_widget_dict = {
     width: 500,
     height: 300,
-    title: "SEDAC popup",
+    title: "SEDAS popup",
     resizable: false,
-    icon: "./res/img/sedac-manager-logo.png",
+    icon: "./res/img/sedas-manager-logo.png",
     frame: false,
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")

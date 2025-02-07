@@ -8,7 +8,7 @@ To get started, you can read **SEDAS** documentation on: [sedas docs](https://se
 
 ## Technical
 
-The application is made in `electron`. The app also uses `python` to implement the **AI** part. It is packaged using `electron-packager`. The frontend is fully made in `VanillaJS`.
+The application is made in `electron`. The app also uses `python` to implement the **AI** part. It is packaged using `electron-packager`. The frontend is fully made in `VanillaJS`. Project currently runs on the newest LTS `node.js` version: `v22.13.1`
 
 ## Setup/Installation
 

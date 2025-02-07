@@ -356,7 +356,7 @@ class Topnav extends BasicElement{
             `
             <div id="top-content">
                 <div>
-                    <s-header s="1" id="main-header">SEDAC manager Controller</s-header>
+                    <s-header s="1" id="main-header">SEDAS manager Controller</s-header>
                     <s-button id="exit-button">Exit</s-button>
                     <s-button id="menu-button">Back to menu</s-button>
                     <s-button id="save-button">Save</s-button>

@@ -4,7 +4,7 @@
 try {
     var plane_import = require("./build/Release/plane.node")
     var enviro_import = require("./build/Release/environment.node")
-    var audio_import = require("./build/Release/audio.node")
+    var itc_import = require("./build/Release/itc.node")
 }
 catch (err){
     console.log("Problem registering functions")
@@ -12,6 +12,9 @@ catch (err){
     console.log("Quitting program...")
     process.exit(0)
 }
+
+// utils library
+import utils from "./utils"
 
 function handle_exception_js(error: Error){
     /* Function for handling error on javascript side
@@ -164,10 +167,27 @@ export namespace enviro_calculations{
     }
 }
 
-export namespace audio_utils{
+export namespace itc{
     /*
-        Functions for audio management
+        Functions for Inter-thread-communication
     */
+
+    export class ITCwrapper{
+        private modules_config: any;
+
+        constructor(modules_config_path: string){
+            this.modules_config = utils.readJSON(modules_config_path);
+        }
+
+        public register_modules(){
+            for (let i = 0; i < this.modules_config["modules"].length; i++){
+                let name: string = this.modules_config["modules"][i]["name"]
+                let integration_path: string = this.modules_config["modules"][i]["name"]
+
+                itc_import.register_module()
+            }
+        }
+    }
 }
 
 export namespace main{
@@ -185,8 +205,7 @@ export namespace main{
         try{
             load_check(plane_import.test_addon, "plane")
             load_check(enviro_import.test_addon, "environment")
-            load_check(audio_import.test_addon, "audio")
-            console.log("Addon loading passed!")
+            load_check(itc_import.test_addon, "itc")
         }
         catch(err){
             handle_exception_js(err)

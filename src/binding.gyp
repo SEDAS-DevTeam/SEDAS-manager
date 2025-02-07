@@ -13,8 +13,8 @@
             "cflags_cc": ["-fexceptions", "-frtti"]
         },
         {
-            "target_name": "audio",
-            "sources": ['./addons/audio.cpp'],
+            "target_name": "itc",
+            "sources": ['./addons/itc.cpp'],
             "cflags": ["-fexceptions", "-frtti"],
             "cflags_cc": ["-fexceptions", "-frtti"]
         },

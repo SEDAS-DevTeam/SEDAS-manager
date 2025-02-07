@@ -81,9 +81,12 @@ invoke publish # publish to github
 - [ ] Unify with the .vscode file
 - [ ] Fix the build with electron-builder
 - [ ] Fix app publishing
-- [ ] Log colors in invoke
+- [x] Log colors in invoke
+- [ ] Fix settings message
+- [ ] Rework loader segments
 
 ### Upcoming versions
 
 - [ ] Rework CSS/JS
 - [ ] Better time
+- [ ] Finish PluginRegister

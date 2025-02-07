@@ -71,12 +71,12 @@ def compile(ctx):
     def compile_cpp():
         path_src = path.join(PATH, "src")
         chdir(path_src)
-        ctx.run("node-gyp configure build")
+        ctx.run("node-gyp configure build", pty=True)
         print_color(PURPLE, "Built all C++ files")
 
     def compile_ts():
         chdir(PATH)
-        ctx.run("npx tsc --project ./tsconfig.json")
+        ctx.run("npx tsc --project ./tsconfig.json", pty=True)
         print_color(PURPLE, "Compiled Typescript")
 
     print_color(PURPLE, "Compiling target files...")
@@ -93,7 +93,7 @@ def devel(ctx):
     """
     path_main = path.join(PATH, "src/main.js")
     print_color(PURPLE, "Running app in dev mode...")
-    ctx.run(f"{path.join(PATH, "node_modules/electron/dist/electron")} {path_main}")
+    ctx.run(f"{path.join(PATH, "node_modules/electron/dist/electron")} {path_main}", pty=True)
 
 
 @task
@@ -102,7 +102,7 @@ def build(ctx):
         Create SEDAS executable
     """
     print_color(PURPLE, "Building app...")
-    ctx.run("npm run make")
+    ctx.run("npm run make", pty=True)
 
 
 @task
@@ -111,7 +111,7 @@ def update(ctx):
         Update submodules to newest commit
     """
     print_color(PURPLE, "Updating submodules...")
-    ctx.run("git submodule update --remote")
+    ctx.run("git submodule update --remote", pty=True)
 
 
 @task
@@ -120,7 +120,8 @@ def publish(ctx):
         Publish SEDAS executable
     """
     print_color(PURPLE, "Publishing app...")
-    ctx.run("npm run publish") # TODO
+    ctx.run("npm run publish", pty=True) # TODO
+
 
 # runtime
 print_color(PURPLE, DESCRIPTION)

@@ -1,3 +1,7 @@
+/*
+  Main file for plane-agent calculation
+*/
+
 #include "include/napi_utils.hpp"
 #include "include/utils.hpp"
 
@@ -160,7 +164,7 @@ napi_value Calc_plane_speed(napi_env env, napi_callback_info info){
 }
 
 napi_value Calc_plane_heading(napi_env env, napi_callback_info info){
-try{
+  try{
     napi_value args[1];
     get_args(env, info, args);
     napi_value arg_dict = args[0];

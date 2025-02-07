@@ -40,14 +40,8 @@ export const PATH_TO_AIRLINES: string = join(ABS_PATH, "/src/res/data/sim/airlin
 export const PATH_TO_CACHE: string = join(ABS_PATH, "/src/res/neural/alg_cache")
 export const PATH_TO_CONFIG: string = join(ABS_PATH, "/src/res/data/alg/")
 export const PATH_TO_SETTINGS: string = join(ABS_PATH, "/src/res/data/app/settings.json")
-
-//paths for modifiable local storage (e. g. storage that is updated frequently)
-export const PATH_TO_SPEECH_CONFIG: string = join(ABS_PATH, "/src/res/data/alg/speech_config.json")
-export const PATH_TO_TEXT_CONFIG: string = join(ABS_PATH, "/src/res/data/alg/text_config.json")
-export const PATH_TO_VOICE_CONFIG: string = join(ABS_PATH, "/src/res/data/alg/voice_config.json")
-
-export const PATH_TO_IN_DEVICES: string = join(ABS_PATH, "/src/res/data/app/in_device_list.json")
-export const PATH_TO_OUT_DEVICES: string = join(ABS_PATH, "/src/res/data/app/out_device_list.json")
+export const PATH_TO_PLUGINS: string = join(ABS_PATH, "/src/res/data/app/config/plugins_config.json")
+export const PATH_TO_MODULES: string = join(ABS_PATH, "/src/res/data/app/config/modules_config.json")
 
 //paths for gui layouts
 export const PATH_TO_SETTINGS_LAYOUT: string = join(ABS_PATH, "/src/res/data/app/gui/settings_layout.json")

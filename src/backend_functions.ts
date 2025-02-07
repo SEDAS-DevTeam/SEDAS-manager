@@ -33,16 +33,11 @@ import {
     PATH_TO_AIRCRAFTS,
     PATH_TO_AIRLINES,
 
-    PATH_TO_SPEECH_CONFIG,
-    PATH_TO_TEXT_CONFIG,
-    PATH_TO_VOICE_CONFIG,
-
-    PATH_TO_IN_DEVICES,
-    PATH_TO_OUT_DEVICES,
-
     PATH_TO_SETTINGS_LAYOUT
 } from "./app_config"
 import { Environment } from "./environment"
+
+import { itc } from "./bind";
 
 import fs from "fs";
 import path from "path"
@@ -64,6 +59,7 @@ export class MainAppFunctions{
     public enviro: Environment;
     public plugin_register: PluginRegister;
     public wrapper: IPCwrapper;
+    public itc_wrapper: itc.ITCwrapper
     public ev_logger: EventLogger;
     public widget_handler: WidgetWindowHandler;
     public worker_handler: WorkerWindowHandler;
@@ -238,21 +234,13 @@ export class MainAppFunctions{
     public send_info(window_type: string){
         if (window_type == "settings"){
 
-            //ACAI backend
-            let speech_config = utils.readJSON(PATH_TO_SPEECH_CONFIG)
-            let text_config = utils.readJSON(PATH_TO_TEXT_CONFIG)
-            let voice_config = utils.readJSON(PATH_TO_VOICE_CONFIG)
-
-            //audio devices
-            let in_devices = utils.readJSON(PATH_TO_IN_DEVICES)
-            let out_devices = utils.readJSON(PATH_TO_OUT_DEVICES)
-
             //reading settings gui layouts
             let settings_layout = utils.readJSON(PATH_TO_SETTINGS_LAYOUT)
 
             //sending app data and alg configs
             console.log("sending app data")
-            this.wrapper.send_message("settings", "app-data", [this.app_settings, voice_config, text_config, speech_config, in_devices, out_devices, settings_layout])
+            //TODO: rework this...
+            //this.wrapper.send_message("settings", "app-data", [this.app_settings, voice_config, text_config, speech_config, in_devices, out_devices, settings_layout])
         }
         else if (window_type == "controller"){
             //sending monitor data

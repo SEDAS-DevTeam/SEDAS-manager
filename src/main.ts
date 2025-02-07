@@ -35,7 +35,7 @@ import {
     WidgetWindowHandler,
     WorkerWindowHandler,
 
-    //all init vars
+    //html resource paths
     PATH_TO_MAIN_HTML,
     PATH_TO_CONTROLLER_HTML,
     PATH_TO_EXIT_HTML,
@@ -45,16 +45,19 @@ import {
     PATH_TO_DEP_ARR_HTML,
     PATH_TO_EMBED_HTML,
     PATH_TO_WEATHER_HTML,
-
-    ABS_PATH,
-    PATH_TO_AUDIO_UPDATE,
     PATH_TO_WIDGET_HTML,
+    
+    //local storage paths
+    PATH_TO_PLUGINS,
+    PATH_TO_MODULES,
+
+    ABS_PATH
 } from "./app_config"
 
 import { MainAppFunctions } from "./backend_functions"
 
 //C++ (N-API) imports
-import { main } from "./bind";
+import { itc, main } from "./bind";
 
 //declaration for local workerWindow before assignment
 var workerWindow: Window;
@@ -460,6 +463,9 @@ class MainApp extends MainAppFunctions{
         // setup IPC wrapper
         this.wrapper = new IPCwrapper()
 
+        // setup ITC wrapper
+        this.itc_wrapper = new itc.ITCwrapper(PATH_TO_MODULES)
+
         // set progressive loader object on loaders
         this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
         this.loader.setup_loader(9, "SEDAS is loading, please wait...", "Initializing app")
@@ -485,6 +491,12 @@ class MainApp extends MainAppFunctions{
 
         //check internet connectivity
         this.app_status["internet-connection"] = Boolean(await utils.checkInternet(EvLogger))
+
+        /*
+            Loader segment i guess 3? (TODO: check)
+        */
+        this.loader.send_progress("Loading SEDAS modules")
+        this.itc_wrapper.register_modules()
 
         /*
             Loader segment 7 (rest of segments are in update_all)
@@ -523,15 +535,7 @@ class MainApp extends MainAppFunctions{
         EvLogger.log("DEBUG", `BackupDB saving frequency is set to ${this.backupdb_saving_frequency / 1000} seconds`)
 
         // setup plugin register
-        this.plugin_register = new PluginRegister()
-
-        /*
-            Loader segment 9
-        */
-        this.loader.send_progress("Fetching new plugin list")
-
-        EvLogger.log("DEBUG", "Fetching new plugin list")
-        this.plugin_register.fetch_plugin_list()
+        this.plugin_register = new PluginRegister(PATH_TO_PLUGINS)
 
         /*
             Loader segment 10
@@ -539,7 +543,6 @@ class MainApp extends MainAppFunctions{
         this.loader.send_progress("Loading local plugins")
 
         EvLogger.log("DEBUG", "Loading local plugins")
-        this.plugin_register.load_local_plugins()
     }
 
     public init_gui(){
@@ -722,12 +725,14 @@ const app_settings = JSON.parse(app_settings_raw);
 
 //app main code
 app.on("ready", async () => {
-    main.test_modules() // test that C++ addons loaded successfully
-
     //setup app event logger
     await utils.delete_logs()
     EvLogger = new EventLogger(app_settings["logging"], "app_log", "system", "v1.0.0")
     await EvLogger.init_logger()
+
+    // test that C++ addons loaded successfully
+    main.test_modules()
+    EvLogger.log("DEBUG", "Addons loaded successfully")
 
     main_app = new MainApp(app_settings, EvLogger)
 

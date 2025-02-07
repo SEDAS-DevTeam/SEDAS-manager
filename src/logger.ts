@@ -1,10 +1,9 @@
-import { readdirSync, unlinkSync, createWriteStream, WriteStream } from "fs"
+import { createWriteStream, WriteStream } from "fs"
 import path from "path"
 import os from "os"
 import {
     ABS_PATH
 } from "./app_config"
-import utils from "./utils"
 
 export class EventLogger{
     /*

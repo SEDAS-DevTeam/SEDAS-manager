@@ -1,3 +1,7 @@
+/*
+    Main file for environment communication
+*/
+
 #include "include/napi_utils.hpp"
 #include "include/utils.hpp"
 #include "include/read_dict.hpp"

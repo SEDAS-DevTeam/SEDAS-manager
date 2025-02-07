@@ -1,0 +1,8 @@
+{
+    "modules": [
+        {
+            "name": "SEDAS-AI-backend",
+            "integration_path": "/src/addons/modules/SEDAS-AI-backend/src/integrate.hpp"
+        }
+    ]
+}

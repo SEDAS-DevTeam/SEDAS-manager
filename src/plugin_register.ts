@@ -2,56 +2,14 @@
     File that handles plugins, their fetching, registering, etc.
 */
 
+import utils from "./utils"
+
 export class PluginRegister{
-    public plugin_list: object[] = []
+    private json_config: any;
 
-    public fetch_plugin_list(){
-        //TODO
-    
-        let initial_list = [
-            {
-                "header": {
-                    "id": "asdasdsdasdasd4561" //TODO
-                },
-                "data": {
-                    "plugin": "SEDAC MapBuilder",
-                    "version": "ver 1.0.0",
-                    "last-updated": "Last week",
-                    "installed": true
-                }
-            },
-            {
-                "header": {
-                    "id": "abfhagbakgnk"
-                },
-                "data": {
-                    "plugin": "Lorem Ipsum",
-                    "version": "ver 1.0.0",
-                    "last-updated": "Last year",
-                    "installed": false
-                }
-            },
-            {
-                "header": {
-                    "id": "angjkang"
-                },
-                "data": {
-                    "plugin": "Map Randgen",
-                    "version": "ver 1.0.0",
-                    "last-updated": "Last year",
-                    "installed": false
-                }
-            }
-        ]
-    
-        this.plugin_list = initial_list
+    constructor (plugin_config_path: string){
+        this.json_config = utils.readJSON(plugin_config_path);
     }
 
-    public fetch_local_plugin_list(){
-        
-    }
-
-    public load_local_plugins(){
-
-    }
+    // TODO: add more...
 }

@@ -1,14 +1,10 @@
-#include <node_api.h>
-#include <iostream>
-#include <string>
-#include <cstring>
-#include <vector>
-#include <cmath>
-#include <type_traits>
+#include "include/napi_utils.hpp"
+#include "include/utils.hpp"
+#include "include/read_dict.hpp"
 
-#include "include/napi_utils.h"
-#include "include/utils.h"
-#include "include/read_dict.h"
+napi_value Test_import(napi_env env, napi_callback_info info){
+  return test_module(env, info);
+}
 
 napi_value Compute_plane_trajectory(napi_env env, napi_callback_info info) {
     // Parse the arguments
@@ -124,14 +120,16 @@ napi_value Compute_plane_trajectory(napi_env env, napi_callback_info info) {
 
 napi_value init(napi_env env, napi_value exports) {
     std::vector<std::string> str_vector{ 
-        "compute_plane_trajectory"
+        "compute_plane_trajectory",
+        "test_addon"
     };
 
     std::vector<napi_callback> func_vector{
-        Compute_plane_trajectory
+        Compute_plane_trajectory,
+        Test_import
     };
 
     return register_functions(env, exports, str_vector, func_vector);
 }
 
-NAPI_MODULE(NODE_GYP_MODULE_NAME, init)
+NAPI_MODULE(NODE_GYP_MODULE_NAME, init);

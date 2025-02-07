@@ -1,3 +1,10 @@
+#include <node_api.h>
+#include <vector>
+#include <type_traits>
+#include <string>
+#include <cstring>
+#include <cmath>
+
 /*
     Glob utils
 */
@@ -292,4 +299,9 @@ napi_value get_array_element(napi_env env, napi_value array, uint32_t index){
     handle_napi_exception(status, env, "Cannot read element at specified index");
 
     return elem;
+}
+
+napi_value test_module(napi_env env, napi_callback_info args){
+    napi_value test_msg = create_variable(env, (std::string) "working");
+    return test_msg;
 }

@@ -1,13 +1,9 @@
-#include <node_api.h>
-#include <iostream>
-#include <string>
-#include <cstring>
-#include <vector>
-#include <cmath>
-#include <type_traits>
+#include "include/napi_utils.hpp"
+#include "include/utils.hpp"
 
-#include "include/napi_utils.h"
-#include "include/utils.h"
+napi_value Test_import(napi_env env, napi_callback_info info){
+  return test_module(env, info);
+}
 
 napi_value Calc_rate_of_turn(napi_env env, napi_callback_info info) {
   napi_value args[2];
@@ -219,7 +215,8 @@ napi_value init(napi_env env, napi_value exports) {
     "calc_plane_forward",
     "calc_plane_level",
     "calc_plane_speed",
-    "calc_plane_heading"
+    "calc_plane_heading",
+    "test_addon"
   };
   
   std::vector<napi_callback> func_vector{ 
@@ -227,10 +224,11 @@ napi_value init(napi_env env, napi_value exports) {
     Calc_plane_forward,
     Calc_plane_level,
     Calc_plane_speed,
-    Calc_plane_heading
+    Calc_plane_heading,
+    Test_import
   };
 
   return register_functions(env, exports, str_vector, func_vector);
 }
 
-NAPI_MODULE(NODE_GYP_MODULE_NAME, init)
+NAPI_MODULE(NODE_GYP_MODULE_NAME, init);

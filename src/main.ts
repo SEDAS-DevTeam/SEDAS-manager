@@ -14,7 +14,7 @@ import { Plane, PlaneDB } from "./plane_functions"
 import { EventLogger } from "./logger"
 
 import utils, {ProgressiveLoader, IPCwrapper} from "./utils"
-import {PluginRegister} from "./plugin_register"
+import {PluginRegister} from "./plugin_register" // TODO
 
 import {
     //window configs
@@ -722,8 +722,7 @@ const app_settings = JSON.parse(app_settings_raw);
 
 //app main code
 app.on("ready", async () => {
-    //test
-    main.main_hello()
+    main.test_modules() // test that C++ addons loaded successfully
 
     //setup app event logger
     await utils.delete_logs()

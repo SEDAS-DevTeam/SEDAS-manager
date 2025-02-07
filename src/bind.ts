@@ -2,9 +2,9 @@
     File that imports all C++ libraries and passes them to main app code
 */
 try {
-    var plane_import = require("./build/Release/plane_calculations.node")
-    var enviro_import = require("./build/Release/enviro_calculations.node")
-    var main_import = require("./build/Release/main.node")
+    var plane_import = require("./build/Release/plane.node")
+    var enviro_import = require("./build/Release/environment.node")
+    var audio_import = require("./build/Release/audio.node")
 }
 catch (err){
     console.log("Problem registering functions")
@@ -164,17 +164,29 @@ export namespace enviro_calculations{
     }
 }
 
-export namespace neural_module{
-    
+export namespace audio_utils{
+    /*
+        Functions for audio management
+    */
 }
 
 export namespace main{
     /*
-        Hello World!
+        Some main functions for all modules
     */
-    export function main_hello(){
+    export function test_modules(){
+        var load_check = ((test_func: Function, desig: string) => {
+            if (test_func() != "working"){
+                // module load failed
+                throw new Error(`module: ${desig} failed to load`)
+            }
+        })
+
         try{
-            console.log(main_import.hello_world())
+            load_check(plane_import.test_addon, "plane")
+            load_check(enviro_import.test_addon, "environment")
+            load_check(audio_import.test_addon, "audio")
+            console.log("Addon loading passed!")
         }
         catch(err){
             handle_exception_js(err)

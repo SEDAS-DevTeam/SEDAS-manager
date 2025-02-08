@@ -10,20 +10,17 @@ napi_value Test_import(napi_env env, napi_callback_info info){
 }
 
 napi_value Register_module(napi_env env, napi_callback_info info){
-    try{
-        napi_value args[2];
-        get_args(env, info, args);
+    napi_value result;
+    napi_value args[2];
+    get_args(env, info, args);
 
-        var_typecheck(env, args[0], napi_string);
-        var_typecheck(env, args[1], napi_string);
+    var_typecheck(env, args[0], napi_string);
+    var_typecheck(env, args[1], napi_string);
 
-        std::string name = get_variable<std::string>(env, args[0]);
-        std::string integration_path = get_variable<std::string>(env, args[1]);
-    }
-        catch(const std::exception& e){
-        handle_exception(env, e);
-        return nullptr;
-    }
+    std::string name = get_variable<std::string>(env, args[0]);
+    std::string integration_path = get_variable<std::string>(env, args[1]);
+    
+    return result; // return empty napi_value -> status OK
 }
 
 napi_value init(napi_env env, napi_value exports) {

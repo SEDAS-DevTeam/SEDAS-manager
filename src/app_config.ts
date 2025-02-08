@@ -11,7 +11,7 @@ import utils from "./utils"
 //init vars
 export const ABS_PATH = resolve("")
 
-//paths for all html files
+//paths for main html files
 export const PATH_TO_MAIN_HTML = join(ABS_PATH, "./src/res/html/other/main.html")
 export const PATH_TO_SETTINGS_HTML = join(ABS_PATH, "./src/res/html/controller/settings.html")
 export const PATH_TO_CONTROLLER_HTML = join(ABS_PATH, "./src/res/html/controller/controller_set.html")
@@ -28,9 +28,6 @@ export const PATH_TO_WEATHER_HTML = join(ABS_PATH, "./src/res/html/worker/weathe
 //paths to widget html files
 export const PATH_TO_WIDGET_HTML = join(ABS_PATH, "./src/res/html/widget/worker_widget.html")
 
-//paths for subprocesses
-export const PATH_TO_AUDIO_UPDATE: string = join(ABS_PATH, "/src/res/neural/get_info.py")
-
 //paths for local storage
 export const PATH_TO_LOGS: string = join(ABS_PATH, "/src/logs/")
 export const PATH_TO_MAPS: string = join(ABS_PATH, "/src/res/data/sim/maps/")
@@ -42,6 +39,7 @@ export const PATH_TO_CONFIG: string = join(ABS_PATH, "/src/res/data/alg/")
 export const PATH_TO_SETTINGS: string = join(ABS_PATH, "/src/res/data/app/settings.json")
 export const PATH_TO_PLUGINS: string = join(ABS_PATH, "/src/res/data/app/config/plugins_config.json")
 export const PATH_TO_MODULES: string = join(ABS_PATH, "/src/res/data/app/config/modules_config.json")
+export const PATH_TO_ICON: string = join(ABS_PATH, "/src/res/img/sedas-manager-logo-rounded.png")
 
 //paths for gui layouts
 export const PATH_TO_SETTINGS_LAYOUT: string = join(ABS_PATH, "/src/res/data/app/gui/settings_layout.json")
@@ -60,7 +58,7 @@ export const main_menu_dict = {
     height: 600,
     title: "SEDAS manager",
     resizable: false,
-    icon: "./res/img/sedas-manager-logo.png",
+    icon: PATH_TO_ICON,
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
@@ -71,7 +69,7 @@ export const load_dict = {
     height: 600,
     title: "SEDAS manager - loading",
     resizable: false,
-    icon: "./res/img/sedas-manager-logo.png",
+    icon: PATH_TO_ICON,
     frame: false,
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
@@ -84,7 +82,7 @@ export const settings_dict = {
     height: 1080,
     title: "SEDAS manager - settings",
     resizable: true,
-    icon: "./res/img/sedas-manager-logo.png",
+    icon: PATH_TO_ICON,
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }
@@ -95,7 +93,7 @@ export const exit_dict = {
     height: 300,
     title: "SEDAS manager - exit tray",
     resizable: false,
-    icon: "./res/img/sedas-manager-logo.png",
+    icon: PATH_TO_ICON,
     frame: false,
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
@@ -107,7 +105,7 @@ export const controller_dict = {
     height: 1080,
     title: "SEDAS manager - control",
     resizable: true,
-    icon: "./res/img/sedas-manager-logo.png",
+    icon: PATH_TO_ICON,
     frame: true,
     //focusable: true,
     webPreferences: {
@@ -120,7 +118,7 @@ export const worker_dict = {
     height: 1080,
     title: "SEDAS",
     resizable: false,
-    icon: "./res/img/sedas-manager-logo.png",
+    icon: PATH_TO_ICON,
     //frame: false, //TODO turn off when testing
     //focusable: false, //same here
     webPreferences: {
@@ -133,7 +131,7 @@ export const basic_worker_widget_dict = {
     height: 300,
     title: "SEDAS widget",
     resizable: true,
-    icon: "./res/img/sedas-manager-logo.png",
+    icon: PATH_TO_ICON,
     frame: false,
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
@@ -145,7 +143,7 @@ export const popup_widget_dict = {
     height: 300,
     title: "SEDAS popup",
     resizable: false,
-    icon: "./res/img/sedas-manager-logo.png",
+    icon: PATH_TO_ICON,
     frame: false,
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")

@@ -183,8 +183,8 @@ export namespace itc{
             for (let i = 0; i < this.modules_config["modules"].length; i++){
                 let name: string = this.modules_config["modules"][i]["name"]
                 let integration_path: string = this.modules_config["modules"][i]["name"]
-
-                itc_import.register_module()
+                
+                itc_import.register_module(name, integration_path)
             }
         }
     }

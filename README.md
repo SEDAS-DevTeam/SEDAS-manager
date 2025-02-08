@@ -84,6 +84,7 @@ invoke publish # publish to github
 - [x] Log colors in invoke
 - [ ] Fix settings message
 - [ ] Rework loader segments
+- [ ] Better error handling on node_api side
 
 ### Upcoming versions
 

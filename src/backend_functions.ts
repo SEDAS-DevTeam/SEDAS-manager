@@ -76,9 +76,10 @@ export class MainAppFunctions{
     //all variables related to environment/map
     public map_configs_list: object[] = [];
     public map_data: object;
-    public map_name: string;
+    public map_name: string = "None";
     public scenario_presets_list: object[] = []
     public scenario_data: object = undefined;
+    public scenario_name: string = "None"
 
     public enviro_logger: EventLogger;
 
@@ -90,16 +91,12 @@ export class MainAppFunctions{
     //all variables related to aircrafts
     public aircraft_presets_list: object[] = []
     public aircraft_preset_data: object = undefined;
-    public aircraft_preset_name: string = ""
-
-    //all variables related to airlines
-    public airline_preset_data: object = undefined
-    public airline_preset_name: string = ""
+    public aircraft_preset_name: string = "None"
 
     //all variables related to commands
     public command_presets_list: object[] = []
     public command_preset_data: object = undefined;
-    public command_preset_name: string = ""
+    public command_preset_name: string = "None"
 
     //app status (consists of switches/booleans for different functions 
     //  => written in dict for better arg passing to funcs + better readibility
@@ -283,9 +280,15 @@ export class MainAppFunctions{
                     "content": JSON.stringify(commands_config["commands"])
                 })
             }
-            this.wrapper.send_message("controller", "init-info", ["window-info", JSON.stringify(this.workers), this.map_configs_list, 
-                            JSON.stringify(this.app_settings), [this.map_name, this.command_preset_name, this.aircraft_preset_name], this.aircraft_presets_list, 
-                            this.command_presets_list, this.frontend_vars, this.app_status])
+            this.wrapper.send_message("controller", "init-info", ["window-info", 
+                                    JSON.stringify(this.workers), 
+                                    this.map_configs_list, 
+                                    JSON.stringify(this.app_settings), 
+                                    [this.map_name, this.command_preset_name, this.aircraft_preset_name, this.scenario_name], 
+                                    this.aircraft_presets_list, 
+                                    this.command_presets_list, 
+                                    this.frontend_vars, 
+                                    this.app_status])
         }
         else if (window_type == "worker"){
             //send to all workers
@@ -333,6 +336,7 @@ export class MainAppFunctions{
         for (let i = 0; i < this.scenario_presets_list.length; i++){
             if (scenario_hash == this.scenario_presets_list[i]["hash"]){
                 this.scenario_data = this.scenario_presets_list[i]["content"]
+                this.scenario_name = this.scenario_presets_list[i]["name"]
             }
         }
 
@@ -345,10 +349,6 @@ export class MainAppFunctions{
 
         this.aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft)
         this.aircraft_preset_name = this.aircraft_preset_data["info"]["name"]
-
-        //set now to default (TODO: change later?)
-        this.airline_preset_data = utils.read_file_content(PATH_TO_AIRLINES, "airline_data.json")
-        this.airline_preset_name = this.aircraft_preset_data["info"]["name"]
 
         //read scale
         this.scale = utils.parse_scale(this.map_data["scale"])
@@ -380,7 +380,6 @@ export class MainAppFunctions{
         this.enviro = new Environment(this.ev_logger, this, ABS_PATH, this.PlaneDatabase,
             this.command_preset_data,
             this.aircraft_preset_data,
-            this.airline_preset_data,
             this.map_data, 
             this.scenario_data,
             parseFloat(this.app_settings["std_bank_angle"]))

@@ -36,7 +36,6 @@ export class Environment {
     public constructor(logger: EventLogger, app: any, abs_path: string, plane_database: PlaneDB,
                         command_data: object, 
                         aircraft_data: object, 
-                        airlines_data: object,
                         map_data: object, 
                         scenario_data: object,
                         std_bank_angle){
@@ -46,7 +45,6 @@ export class Environment {
 
         this.command_data = command_data
         this.aircraft_data = aircraft_data["all_planes"] //get only planes resource
-        this.airlines_data = airlines_data["airlines"]
         this.map_data = map_data
         this.scenario_data = scenario_data
 

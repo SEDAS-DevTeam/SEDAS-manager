@@ -6,9 +6,10 @@ export var APP_DATA = undefined
 export var frontend_vars = {}
 export var monitor_objects = []
 
-export var map_name = undefined
-export var command_preset_name = undefined
-export var aircraft_preset_name = undefined
+export var map_name = ""
+export var command_preset_name = ""
+export var aircraft_preset_name = ""
+export var scenario_preset_name = ""
 
 var path = window.location.pathname;
 var page_name = path.split("/").pop().replace(".html", "");
@@ -49,14 +50,22 @@ function set_dropdown_buttons(){
 }
 
 export function process_init_data(data){
+    console.log(data)
     APP_DATA = JSON.parse(data[3])
     map_name = data[4][0]
     command_preset_name = data[4][1]
     aircraft_preset_name = data[4][2]
+    scenario_preset_name = data[4][3]
 
     if (data.length == 0){
         alert("FATAL ERROR: There is nothing to process, no data sent")
     }
+
+    // set names as test in confirm-result
+    sg.get_elem("#confirmresult-airport").innerHTML = map_name
+    sg.get_elem("#confirmresult-scenario").innerHTML = scenario_preset_name
+    sg.get_elem("#confirmresult-aircraft").innerHTML = aircraft_preset_name
+    sg.get_elem("#confirmresult-command").innerHTML = command_preset_name
 
     //load frontend vars
     frontend_vars = data[7]

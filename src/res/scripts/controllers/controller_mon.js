@@ -19,9 +19,21 @@ function send_monitor_data(){
 
     let data = []
 
-    for (let i_mon = 0; i_mon < monitor_headers.length; i_mon++){
-        let monitor_header = monitor_headers[i_mon].innerHTML
-        var monitor_type = monitor_options_elem[i_mon].get_selected_elem();
+    console.log(monitor_headers)
+    if (Array.isArray(monitor_headers)){
+        for (let i_mon = 0; i_mon < monitor_headers.length; i_mon++){
+            let monitor_header = monitor_headers[i_mon].innerHTML
+            var monitor_type = monitor_options_elem[i_mon].get_selected_elem();
+    
+            data.push({
+                "name": monitor_header,
+                "type": monitor_type
+            })
+        }
+    }
+    else{
+        let monitor_header = monitor_headers.innerHTML
+        let monitor_type = monitor_options_elem.get_selected_elem()
 
         data.push({
             "name": monitor_header,

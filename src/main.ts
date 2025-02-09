@@ -316,6 +316,7 @@ class MainApp extends MainAppFunctions{
     }
 
     private monitor_change_info(data: any[]){
+        console.log(data)
         let mon_data = data[0]
         for (let i = 0; i < this.workers.length; i++){
             if (this.workers[i]["win"].win_type != mon_data[i]["type"]){

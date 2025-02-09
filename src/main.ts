@@ -192,6 +192,8 @@ class MainApp extends MainAppFunctions{
         //environment invokes
         this.wrapper.register_channel("start-sim", ["controller", "worker"], "unidirectional", () => this.start_sim())
         this.wrapper.register_channel("stop-sim", ["controller", "worker"], "unidirectional", () => this.stop_sim())
+        this.wrapper.register_channel("start-mic", ["worker"], "unidirectional", () => this.start_mic_record())
+        this.wrapper.register_channel("stop-mic", ["worker"], "unidirectional", () => this.stop_mic_record())
         this.wrapper.register_channel("restore-sim", ["controller"], "unidirectional", () => this.restore_sim())
         this.wrapper.register_channel("regenerate-map", ["controller"], "unidirectional", () => this.regenerate_map())
 
@@ -377,6 +379,15 @@ class MainApp extends MainAppFunctions{
         //send stop event to all workers
         this.wrapper.broadcast("workers", "sim-event", "stopsim")
         this.wrapper.send_message("controller", "sim-event", "stopsim")
+    }
+
+    // TODO: solve for multi-session (multiple ATCos)
+    private start_mic_record(){
+        console.log("Started mic record!")
+    }
+
+    private stop_mic_record(){
+        console.log("Stopped mic record!")
     }
 
     private restore_sim(){

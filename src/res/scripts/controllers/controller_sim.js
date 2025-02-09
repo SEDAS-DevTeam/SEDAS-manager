@@ -77,7 +77,8 @@ function plane_value_change(elem){
 
 function delete_plane(elem){
     var plane_id;
-    var header_full = elem.parentNode.get_elem("h2").innerHTML
+    var header_full = elem.parentNode.children[0].innerHTML
+    console.log(header_full)
     
     header_full = header_full.split("(")[0]
     var header = header_full.substring(0, header_full.length - 1)
@@ -101,7 +102,7 @@ function create_plane_elem(plane_id, plane_name, plane_departure, plane_arrival,
     let plane_cell_header = sg.create_elem("div", `plane${plane_id}`, "", plane_cell)
     plane_cell_header.add_class("plane-cell-header")
 
-    sg.create_elem("s-header", "", `${plane_name} (from ${plane_departure.split(" ")[0]} to ${plane_arrival.split("_")[0]})`, plane_cell_header)
+    sg.create_elem("s-header", "plane-header", `${plane_name} (from ${plane_departure.split(" ")[0]} to ${plane_arrival.split("_")[0]})`, plane_cell_header)
     let trash_icon = sg.create_elem("i", "delete-icon", "", plane_cell_header)
     trash_icon.add_class("fa-solid")
     trash_icon.add_class("fa-trash")

@@ -318,13 +318,13 @@ class Topnav extends BasicElement{
             `
             <div class="topnav">
                 <div class="leftalign">
-                    <a id="mic-record">Talk</a>
+                    <a id="mic_button" class="startmic">Mic OFF</a>
                 </div>
                 <div class="centeralign">
                     <p><span id="date">Date</span><span id="time">Time</span></p>
                 </div>
                 <div class="rightalign">
-                    <a id="stopbutton" class="startsim">RUN</a>
+                    <a id="sim_button" class="startsim">RUN</a>
                     <a id="exit">EXIT</a>
                 </div>
             </div>

@@ -224,13 +224,26 @@ sg.on_win_load(() => {
         send_message("worker", "exit")
     })
 
-    sg.get_elem("a#stopbutton").on_click(() => {
-        let elem = sg.get_elem("a#stopbutton")
+    sg.get_elem("a#sim_button").on_click(() => {
+        let elem = sg.get_elem("a#sim_button")
         if (elem.className == "stopsim"){
             send_message("worker", "stop-sim") //stop simulation
         }
         else if (elem.className == "startsim"){
             send_message("worker", "start-sim") //start simulation
+        }
+    })
+    sg.get_elem("a#mic_button").on_click(() => {
+        let elem = sg.get_elem("a#mic_button")
+        if (elem.className == "startmic"){
+            elem.className = "stopmic"
+            elem.innerHTML = "Mic ON"
+            send_message("worker", "start-mic")
+        }
+        else if (elem.className == "stopmic"){
+            elem.className = "startmic"
+            elem.innerHTML = "Mic OFF"
+            send_message("worker", "stop-mic")
         }
     })
 })
@@ -310,7 +323,7 @@ on_message("update-paths", (data) => {
     plane_paths = data
 })
 on_message("sim-event", (data) => {
-    let elem = sg.get_elem("a#stopbutton")
+    let elem = sg.get_elem("a#sim_button")
     if (data == "stopsim"){
         elem.className = "startsim"
         elem.innerHTML = "RUN"

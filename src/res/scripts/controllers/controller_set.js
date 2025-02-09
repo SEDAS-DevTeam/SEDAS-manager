@@ -33,6 +33,7 @@ var selected_scenario = ""
 var map_name = ""
 var command_preset_name = ""
 var aircraft_preset_name = ""
+var scenario_preset_name = ""
 
 //element function binders definitions
 var frontend;
@@ -438,6 +439,16 @@ function set_environment(){
 */
 
 function process_set(data){
+    map_name = data[4][0]
+    command_preset_name = data[4][1]
+    aircraft_preset_name = data[4][2]
+    scenario_preset_name = data[4][3]
+
+    // set names as test in confirm-result
+    sg.get_elem("#confirmresult-airport").innerHTML = map_name
+    sg.get_elem("#confirmresult-scenario").innerHTML = scenario_preset_name
+    sg.get_elem("#confirmresult-aircraft").innerHTML = aircraft_preset_name
+    sg.get_elem("#confirmresult-command").innerHTML = command_preset_name
 
     //initial data generation from configs sent through IPC
     table_map.set_airports_list(data)

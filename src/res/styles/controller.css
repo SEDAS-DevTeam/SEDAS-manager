@@ -183,13 +183,15 @@ div.popup-box p{
 }
 
 
-.plane-cell-header h2, .plane-cell-header i{
+.plane-cell-header s-header, .plane-cell-header i{
     display: inline-block;
 }
 
 .plane-cell-header i{
     margin-left: 30px;
 }
+
+
 
 .plane-cell-header i:hover{
     color: #5271ff;
@@ -323,7 +325,11 @@ span.inline-text{
 #delete-icon{
     cursor: pointer;
     font-size: 24px;
+    color: #ccc;
+}
 
+#delete-icon:hover{
+    color: #5271ff;
 }
 
 #regen-map{

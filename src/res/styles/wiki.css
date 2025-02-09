@@ -2,6 +2,10 @@ body{
     margin-left: 20px;
     margin-right: 20px;
     overflow-y: scroll;
+    height: 100%;
+}
+html {
+    height: 100%;
 }
 
 #content{

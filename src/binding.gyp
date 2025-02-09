@@ -13,8 +13,8 @@
             "cflags_cc": ["-fexceptions", "-frtti"]
         },
         {
-            "target_name": "itc",
-            "sources": ['./addons/itc.cpp'],
+            "target_name": "ppc",
+            "sources": ['./addons/ppc.cpp'],
             "cflags": ["-fexceptions", "-frtti"],
             "cflags_cc": ["-fexceptions", "-frtti"]
         },

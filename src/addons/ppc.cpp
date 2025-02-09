@@ -1,5 +1,5 @@
 /*
-    Main file for Inter-Thread-Communication
+    Main file for Pipe-Process-Communication
 */
 
 #include "include/napi_utils.hpp"

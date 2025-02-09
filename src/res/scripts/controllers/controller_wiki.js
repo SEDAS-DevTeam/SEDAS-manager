@@ -32,7 +32,7 @@ function onload_wiki(){
     }
 
     for (let i = 0; i < iframe_buttons.length; i++){
-        iframe_buttons[i].on_click(() => {
+        iframe_buttons[i].on_click(async () => {
             //remove all residual class lists
             for (let elem of iframe_buttons) {
                 if (elem.has_class("selected")){
@@ -42,7 +42,9 @@ function onload_wiki(){
 
             iframe_buttons[i].add_class("selected")
 
-            sg.get_elem("#wiki-resource").set_source(sources[i])
+            let iframe_resource = sg.get_elem("#wiki-resource")
+            iframe_resource.set_source(sources[i])
+            // iframe causes window to scroll down - easy fix here
         })
     }
 }

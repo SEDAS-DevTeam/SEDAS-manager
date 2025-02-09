@@ -318,11 +318,7 @@ class Topnav extends BasicElement{
             `
             <div class="topnav">
                 <div class="leftalign">
-                    <a id="plankmsg2">Control 1</a>
-                    <a href="#test">Control 2</a>
-                    <a href="#test">Control 3</a>
-                    <a href="#test">Control 4</a>
-                    <a id="plankmsg">Click me!</a>
+                    <a id="mic-record">Talk</a>
                 </div>
                 <div class="centeralign">
                     <p><span id="date">Date</span><span id="time">Time</span></p>
@@ -396,8 +392,8 @@ class IframeExtension extends BasicElement{
         this.appendChild(iframe)
     }
 
-    set_source(src){
-        this.children[0].src = src
+    async set_source(src){
+        this.children[0].src = await src
     }
 }
 

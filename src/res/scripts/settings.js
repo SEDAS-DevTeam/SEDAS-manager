@@ -36,9 +36,7 @@ function onload_settings(){
 function process_settings(data){
 
     let app_data = data[0]
-    let config_data = data.slice(1, 4)
-    let device_data = data.slice(4, 6)
-    let layout_data = data[6]
+    let layout_data = data[1]
 
     //spawn gui for settings area
     let layout = parse_settings_layout(layout_data)
@@ -78,42 +76,6 @@ function process_settings(data){
             }
         }
         i += 1
-    }
-
-    //load all algorithms
-    let all_config_elem = document.querySelectorAll('[id*="skip"]');
-
-    //load all devices
-    for (let i_device = 0; i_device < device_data.length; i_device++){
-        //append all select values
-        let all_devices = ""
-        device_data[i_device]["devices"].forEach(device => {
-            all_devices += `<option value="${device["index"]}">${device["name"]} (device index: ${device["index"]})</option>`
-        })
-        all_config_elem[i_device].innerHTML = all_devices
-    }
-
-    for (let i_config = 0; i_config < config_data.length; i_config++){
-        //append all select values
-        let all_algs = ""
-        config_data[i_config]["algorithms"].forEach(alg => {
-            all_algs += `<option value="${alg["name"]}">${alg["name"]} (${alg["acc"]})</option>`
-        })
-        all_config_elem[i_config + device_data.length].innerHTML = all_algs
-    }
-
-    //select already "selected" data for "-skip" elements
-    i = 0;
-    for (const [key, value] of Object.entries(app_data)) {
-        if (key.includes("-skip")){
-            for(let i_child = 0; i_child < all_config_elem[i].children.length; i_child++){
-                if (all_config_elem[i].children[i_child].value == value){
-                    all_config_elem[i].children[i_child].setAttribute('selected', true);
-                }
-            }
-
-            i += 1
-        }
     }
 
     //set wiki block to same height as settings-block

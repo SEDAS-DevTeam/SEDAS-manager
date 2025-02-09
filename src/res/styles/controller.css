@@ -461,3 +461,8 @@ body{
     color: red;
     font-weight: bolder;
 }
+
+.selected{
+    background-color: #5271ff;
+    color: white;
+}

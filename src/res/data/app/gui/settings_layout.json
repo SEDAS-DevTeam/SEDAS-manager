@@ -105,18 +105,6 @@
                         }
                     ]
                 },
-                "out-device-skip": {
-                    "name": "output devices",
-                    "type": "select",
-                    "id": "out_device-skip",
-                    "options": []
-                },
-                "in-device-skip": {
-                    "name": "input devices",
-                    "type": "select",
-                    "id": "in_device-skip",
-                    "options": []
-                },
                 "backend-init": {
                     "name": "Initialize backend",
                     "type": "select",
@@ -213,24 +201,6 @@
                     "name": "show results on end of simulation",
                     "type": "checkbox",
                     "id": "results"
-                },
-                "voice-alg-skip": {
-                    "name": "voice recognition algorithm",
-                    "type": "select",
-                    "id": "voice_alg-skip",
-                    "options": []
-                },
-                "text-alg-skip": {
-                    "name": "language processing algorithm",
-                    "type": "select",
-                    "id": "text_alg-skip",
-                    "options": []
-                },
-                "speech-alg-skip": {
-                    "name": "speech synthesis algorithm",
-                    "type": "select",
-                    "id": "speech_alg-skip",
-                    "options": []
                 },
                 "noise": {
                     "name": "Add artificial noise to generated audio output (more realistic)",

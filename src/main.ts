@@ -57,7 +57,7 @@ import {
 import { MainAppFunctions } from "./backend_functions"
 
 //C++ (N-API) imports
-import { itc, main } from "./bind";
+import { ppc, main } from "./bind";
 
 //declaration for local workerWindow before assignment
 var workerWindow: Window;
@@ -464,7 +464,7 @@ class MainApp extends MainAppFunctions{
         this.wrapper = new IPCwrapper()
 
         // setup ITC wrapper
-        this.itc_wrapper = new itc.ITCwrapper(PATH_TO_MODULES)
+        this.ppc_wrapper = new ppc.PPCwrapper(PATH_TO_MODULES)
 
         // set progressive loader object on loaders
         this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
@@ -496,7 +496,7 @@ class MainApp extends MainAppFunctions{
             Loader segment i guess 3? (TODO: check)
         */
         this.loader.send_progress("Loading SEDAS modules")
-        this.itc_wrapper.register_modules()
+        this.ppc_wrapper.register_modules()
 
         /*
             Loader segment 7 (rest of segments are in update_all)

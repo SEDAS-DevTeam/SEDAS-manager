@@ -37,8 +37,6 @@ import {
 } from "./app_config"
 import { Environment } from "./environment"
 
-import { ppc } from "./bind";
-
 import fs from "fs";
 import path from "path"
 
@@ -59,7 +57,6 @@ export class MainAppFunctions{
     public enviro: Environment;
     public plugin_register: PluginRegister;
     public wrapper: IPCwrapper;
-    public ppc_wrapper: ppc.PPCwrapper
     public ev_logger: EventLogger;
     public widget_handler: WidgetWindowHandler;
     public worker_handler: WorkerWindowHandler;

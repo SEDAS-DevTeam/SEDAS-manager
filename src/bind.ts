@@ -4,7 +4,6 @@
 try {
     var plane_import = require("./build/Release/plane.node")
     var enviro_import = require("./build/Release/environment.node")
-    var ppc_import = require("./build/Release/ppc.node")
 }
 catch (err){
     console.log("Problem registering functions")
@@ -167,29 +166,6 @@ export namespace enviro_calculations{
     }
 }
 
-export namespace ppc{
-    /*
-        Functions for Inter-thread-communication
-    */
-
-    export class PPCwrapper{
-        private modules_config: any;
-
-        constructor(modules_config_path: string){
-            this.modules_config = utils.readJSON(modules_config_path);
-        }
-
-        public register_modules(){
-            for (let i = 0; i < this.modules_config["modules"].length; i++){
-                let name: string = this.modules_config["modules"][i]["name"]
-                let integration_path: string = this.modules_config["modules"][i]["name"]
-                
-                ppc_import.register_module(name, integration_path)
-            }
-        }
-    }
-}
-
 export namespace main{
     /*
         Some main functions for all modules
@@ -205,7 +181,6 @@ export namespace main{
         try{
             load_check(plane_import.test_addon, "plane")
             load_check(enviro_import.test_addon, "environment")
-            load_check(ppc_import.test_addon, "itc")
         }
         catch(err){
             handle_exception_js(err)

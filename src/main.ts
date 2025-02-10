@@ -57,7 +57,7 @@ import {
 import { MainAppFunctions } from "./backend_functions"
 
 //C++ (N-API) imports
-import { ppc, main } from "./bind";
+import { main } from "./bind";
 
 //declaration for local workerWindow before assignment
 var workerWindow: Window;
@@ -475,9 +475,6 @@ class MainApp extends MainAppFunctions{
         // setup IPC wrapper
         this.wrapper = new IPCwrapper()
 
-        // setup ITC wrapper
-        this.ppc_wrapper = new ppc.PPCwrapper(PATH_TO_MODULES)
-
         // set progressive loader object on loaders
         this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
         this.loader.setup_loader(9, "SEDAS is loading, please wait...", "Initializing app")
@@ -503,12 +500,6 @@ class MainApp extends MainAppFunctions{
 
         //check internet connectivity
         this.app_status["internet-connection"] = Boolean(await utils.checkInternet(EvLogger))
-
-        /*
-            Loader segment i guess 3? (TODO: check)
-        */
-        this.loader.send_progress("Loading SEDAS modules")
-        this.ppc_wrapper.register_modules()
 
         /*
             Loader segment 7 (rest of segments are in update_all)
@@ -545,6 +536,10 @@ class MainApp extends MainAppFunctions{
         }
 
         EvLogger.log("DEBUG", `BackupDB saving frequency is set to ${this.backupdb_saving_frequency / 1000} seconds`)
+
+        // load all modules
+        this.loader.send_progress("Loading SEDAS modules")
+        // TODO: load all modules using MSC :)
 
         // setup plugin register
         this.plugin_register = new PluginRegister(PATH_TO_PLUGINS)

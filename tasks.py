@@ -32,6 +32,9 @@ def clean(ctx):
     path_workers = path.join(PATH, "src/workers")
     path_build = path.join(PATH, "src_build")
     path_cpp_build = path.join(PATH, "src/build")
+    path_module_build = path.join(PATH, "src/addons/modules/build")
+
+    path_sedas_ai_src = path.join(PATH, "src/addons/modules/bin/SEDAS-AI-backend/src")
 
     def check_files(folder_path):
         for filename in listdir(folder_path):
@@ -57,16 +60,24 @@ def clean(ctx):
 
     clean_folder(path_build, ".gitkeep")
     clean_folder(path_cpp_build, ".gitkeep")
+    clean_folder(path_module_build, ".gitkeep")
 
     print_color(PURPLE, "Cleared build dirs")
 
+    # clean module build dirs
+    chdir(path_sedas_ai_src)
+    ctx.run("invoke clean", pty=True)
+
+    print_color(PURPLE, "Cleaned module dirs")
+
 
 @task
-def compile(ctx):
+def compile(ctx, only="none"):
     """
         Compile target files
             1) TS -> JS
             2) C++ -> bind to TS part
+            3) Compile all modules and move them to the module build directory
     """
     def compile_cpp():
         path_src = path.join(PATH, "src")
@@ -79,11 +90,35 @@ def compile(ctx):
         ctx.run("npx tsc --project ./tsconfig.json", pty=True)
         print_color(PURPLE, "Compiled Typescript")
 
-    print_color(PURPLE, "Compiling target files...")
-    compile_cpp()
-    compile_ts()
+    def compile_modules():
+        path_modules = path.join(PATH, "src/addons/modules/bin")
 
-    print_color(PURPLE, "Compiled target files")
+        # Compile SEDAS-AI-backend
+        sedas_ai_backend = path.join(path_modules, "SEDAS-AI-backend/src")
+        sedas_ai_resources = path.join(path_modules, "SEDAS-AI-backend/src/PlaneResponse/models/tts/voices")
+
+        chdir(sedas_ai_backend)
+        if len(listdir(sedas_ai_resources)) == 1:
+            print_color(PURPLE, "Fetching TTS resources for SEDAS-AI-backend (this my take some while)")
+            ctx.run("invoke fetch-resources") # fetch resources if not fetched earlier
+        ctx.run("invoke build --DTESTING=OFF", pty=True)
+        print_color(PURPLE, "Compile SEDAS-AI-backend")
+
+        sedas_ai_project_build = path.join(path_modules, "SEDAS-AI-backend/project_build")
+        sedas_ai_global_build = path.join(PATH, "src/addons/modules/build/sedas_ai_backend")
+        shutil.copytree(sedas_ai_project_build, sedas_ai_global_build)
+
+        # TODO: maybe add more modules?
+
+    if only == "none":
+        print_color(PURPLE, "Compiling target files...")
+        compile_cpp()
+        compile_ts()
+        compile_modules()
+        print_color(PURPLE, "Compiled target files")
+    elif only == "cpp": compile_cpp()
+    elif only == "ts": compile_ts()
+    elif only == "modules": compile_modules()
 
 
 @task
@@ -111,7 +146,7 @@ def update(ctx):
         Update submodules to newest commit
     """
     print_color(PURPLE, "Updating submodules...")
-    ctx.run("git submodule update --remote", pty=True)
+    ctx.run("git submodule update --remote --recursive", pty=True)
 
 
 @task

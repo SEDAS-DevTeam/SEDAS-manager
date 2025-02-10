@@ -2,12 +2,15 @@
 node_modules
 package-lock.json
 
-#clear useless build files
+#build files
 /src/build/*
 !/src/build/.gitkeep
 
 /src_build/*
 !/src_build/.gitkeep
+
+/src/addons/modules/build/*
+!/src/addons/modules/build/.gitkeep
 
 #javascript files that are automatically generated
 /src/*.js

@@ -4,7 +4,8 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${HOME}/.nvm/versions/node/v22.13.1/include/node"
+                "${HOME}/.nvm/versions/node/v22.13.1/include/node",
+                "${workspaceFolder}/src/addons/modules/bin/SEDAS-AI-backend/src/lib/json/single_include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",

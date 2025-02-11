@@ -1,13 +1,55 @@
 import {parentPort} from "worker_threads"
 import net from "net"
+import path from "path"
 
 const HOST = "localhost"
 const PORT = 65432
+
+function check_call_arguments(abs_path: string, module_arguments: string[]): string[]{
+    for (let i = 0; i < module_arguments.length; i++){
+        if (path.isAbsolute(module_arguments[i]) || module_arguments[i].includes(path.sep)){
+            module_arguments[i] = path.join(abs_path, module_arguments[i])
+        }
+    }
+    return module_arguments
+}
+
+class Module{
+
+}
+
+var module_registry: Module[] = [];
+var settings: object;
 
 parentPort.on("message", (message) => {
     if (Array.isArray(message)){
         if (message[0] == "action"){
             // global actions for backend
+            switch(message[1]){
+                case "settings":
+                    console.log("Data for settings")
+                    console.log(message[2])
+
+                    settings = JSON.parse(message[2])
+                    break
+                case "config":
+                    console.log("Configuration for backend")
+                    console.log(message[2])
+
+                    // read configuration and setup parentPort message channel
+                    let configuration: object = JSON.parse(message[2])
+                    for (let i = 0; i < configuration["modules"].length; i++){
+                        let module_config = configuration["modules"][i];
+
+                        let call_path: string = path.join(settings["abs_path"], module_config["integration_path"])
+                        check_call_arguments(settings["abs_path"], module_config["arguments"])
+
+                        let name: string = module_config["name"]
+                        let channel: string = module_config["channel"]
+                        console.log("Script call path: " + call_path)
+                    }
+                    break
+            }
         }
         else if (message[0] == "module"){
             // specific module-actions

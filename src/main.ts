@@ -507,7 +507,8 @@ class MainApp extends MainAppFunctions{
             EvLogger.log("DEBUG", "Starting Backend because flag backend_init is true")
 
             var backend_settings = { // settings only to be passed to backend
-                "noise": this.app_settings["noise"]
+                "noise": this.app_settings["noise"],
+                "abs_path": ABS_PATH
             }
 
             this.msc_wrapper = new MSCwrapper(PATH_TO_MSC, backend_settings, PATH_TO_MODULES)

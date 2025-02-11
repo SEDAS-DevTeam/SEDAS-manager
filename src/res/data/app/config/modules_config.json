@@ -8,7 +8,8 @@
                 "/src/addons/modules/build/sedas_ai_backend/tts",
                 "/src/addons/modules/build/sedas_ai_backend/config",
                 "/src/addons/modules/build/sedas_ai_backend/temp"
-                         ]
+                         ],
+            "channel": "ai_backend"
         }
     ]
 }

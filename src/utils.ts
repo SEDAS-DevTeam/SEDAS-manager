@@ -183,7 +183,7 @@ export class MSCwrapper{
         this.send_message("action", "settings", JSON.stringify(this.backend_settings))
 
         // send module configuration
-        
+        this.send_message("action", "config", JSON.stringify(this.module_config))
     }
 
     public send_message(channel: string, subchannel: string, content: string){

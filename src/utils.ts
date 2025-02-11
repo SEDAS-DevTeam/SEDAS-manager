@@ -27,8 +27,6 @@ import {
  } from "./app_config";
 import { desktopCapturer, ipcMain } from "electron";
 import { Worker } from "worker_threads";
-import { spawn } from "node:child_process";
-
 // variables
 const alphabet: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
@@ -528,7 +526,7 @@ function get_window_info(app_settings: object,
     return [coords, display_info]
 }
 
-function sleep(ms) {
+function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 

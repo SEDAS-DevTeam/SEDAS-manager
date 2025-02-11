@@ -1,6 +1,9 @@
 import {parentPort} from "worker_threads"
 import net from "net"
 import path from "path"
+import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
+
+// TODO: change from client to server
 
 const HOST = "localhost"
 const PORT = 65432
@@ -18,16 +21,24 @@ function send_message(channel: string, content: any){
     parentPort.postMessage([channel, JSON.stringify(content)])
 }
 
+function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 class Module{
     public name: string;
     public channel: string;
+    public call_path: string;
+    public arguments: string[];
 
     constructor(bin_path: string,
                 args: string[],
                 name: string,
                 channel: string){
-        this.channel = channel
-        this.name = name
+        this.channel = channel;
+        this.name = name;
+        this.arguments = args;
+        this.call_path = bin_path;
     }
 
     public terminate(){
@@ -37,6 +48,8 @@ class Module{
 
 class ModuleRegistry{
     public registry: Module[] = [];
+    public active_processes: object[] = [];
+    private client_socket: net.Socket;
 
     constructor(configuration: object){
         for (let i = 0; i < configuration["modules"].length; i++){
@@ -87,13 +100,81 @@ class ModuleRegistry{
                     switch(message[2]){
                         case "data":
                             let data: object = JSON.parse(message[3])
-                            console.log("SEDAS AI data")
-                            console.log(data)
                             break
+                        case "start-mic":
+                            console.log("Starting mic record")
+                            this.message_modules("start-mic")
+                            break
+                        case "stop-mic":
+                            console.log("Stopping mic record")
+                            this.message_modules("stop-mic")
+                            break
+                        case "register":
+                            console.log(`Registering pseudopilot: ${message[3]} ${message[4]}`)
+                            this.message_modules(`register ${message[3]} ${message[4]}`)
+                            break
+                        case "unregister":
+                            console.log("Unregistering pseudopilot")
+                            this.message_modules(`unregister ${message[3]}`)
                     }
                 }
             }
         }
+    }
+
+    public deploy_modules(){
+        // modules deploy
+        for (let i = 0; i < this.registry.length; i++){
+            let path: string = this.registry[i].call_path;
+            let args: string[] = this.registry[i].arguments;
+            let name: string = this.registry[i].name;
+            
+            let process = spawn(path, args);
+            this.active_processes.push({
+                "name": name, 
+                "process_obj": process
+            })
+        }
+
+        // modules stdout check
+        for (let i = 0; i < this.active_processes.length; i++){
+            let name: string = this.active_processes[i]["name"]
+            let process: ChildProcessWithoutNullStreams = this.active_processes[i]["process_obj"]
+
+            process.stdout.on("data", (data) => {
+                console.log(`${name}: ${data}`);
+            })
+            process.stderr.on("data", (data) => {
+                console.log(`${name}: ${data}`);
+            })
+            process.on("close", (code) => {
+                console.log(`${name} process exited!`)
+            })
+        }
+    }
+
+    public connect_to_server(){ // TODO: later change to create server
+        // connect to SEDAS-AI-Backend
+        this.client_socket = new net.Socket();
+        this.client_socket.connect(PORT, HOST, () => {
+            console.log("Connected to sedas_ai_backend!")
+        })
+        this.client_socket.on("data", (data) => {
+            console.log("Received: " + data)
+        })
+        this.client_socket.on("close", () => {
+            console.log("Connection closed")
+        })
+    }
+
+    public message_modules(message: string){ // TODO: do more unified standard for more modules
+        this.client_socket.write(message)
+    }
+    
+    public async close_modules(){
+        this.message_modules("quit")
+        await sleep(1000) // wait one second for graceful exit
+        this.client_socket.end()
     }
 }
 
@@ -109,7 +190,7 @@ parentPort.on("message", (message) => {
                     console.log("Data for settings")
                     console.log(message[2])
 
-                    settings = JSON.parse(message[2])
+                    settings = JSON.parse(message[2]) // TODO: add some more stuff to this
                     break
                 case "config":
                     console.log("Configuration for backend")
@@ -124,13 +205,20 @@ parentPort.on("message", (message) => {
                     send_message("channels", enabled_channels)
                     break
                 case "debug":
-                    console.log("Debug level: " + message[2])
+                    console.log("Debug level: " + message[2]) // TODO: later
                     break
                 case "stop":
                     console.log("Stopping all backend stuff")
+
+                    // stopping all modules
+                    module_registry.close_modules()
                     break
                 case "start":
                     console.log("Starting backend work")
+
+                    // running all modules
+                    module_registry.deploy_modules()
+                    module_registry.connect_to_server()
                     break
             }
         }
@@ -138,128 +226,5 @@ parentPort.on("message", (message) => {
             // check specific module-actions
             module_registry.check_call(message)
         }
-
-        /*
-        switch(message[0]){
-            case "data":
-                break
-            case "debug":
-                console.log("Debug what?")
-                console.log(message[1])
-                break
-            case "action":
-                switch(message[1]){
-                    case "settings":
-                        break
-                    case "start-neural":
-                        console.log("Start neural!")
-                        break
-                    case "stop-neural":
-                        console.log("Stop neural!")
-                        break
-                    case "interrupt":
-                        break
-                    case "terrain":
-                        break
-                }
-                break
-        }
-        */
     }
 })
-
-/*
-const core_server = net.createServer((socket) => {
-    console.log('Client connected');
-
-    // Handle data received from the client
-    socket.on('data', (data: Buffer) => {
-        let data_str: string = data.toString()
-        console.log(data_str)
-    
-        let value_command = data_str.split(":");
-        switch(value_command[0]){
-            case "data":
-                //check if plane exists
-                let exists: boolean = false
-                var args = value_command[1].split(" ")
-                for (let i = 0; i < args.length; i++){
-                    //strip input string of useless spaces
-                    if (args[i].length == 0){
-                        args.splice(i, 1)
-                    }
-                }
-                var callsign = args[0]
-
-                for (let i = 0; i < plane_data.length; i++){
-                    if (plane_data[i].callsign == callsign){
-                        exists = true
-                        break
-                    }
-                }
-                
-                if (exists){
-                    var message: string = command_processor(args)
-
-                    //send message to generate speech
-                    socket.write(`data-for-speech: ${message}\n`)
-    
-                    parentPort.postMessage("command:" + args.join(" ")) //post to main process for updates
-                }
-                break
-            case "debug":
-                console.log(value_command[1])
-                break
-        }
-    });
-
-    parentPort.on("message", async (message) => {
-        if (Array.isArray(message)){
-            switch(message[0]){
-                //command messages with args
-                case "debug":
-                    logging = message[1]
-                    break
-                case "action":
-                    switch(message[1]){
-                        case "start-neural":
-                            socket.write('action: start-neural\n')
-                            break
-                        case "stop-neural":
-                            socket.write('action: stop-neural\n')
-                            break
-                        case "terrain":
-                            console.log("terrain not working :(")
-                            break
-                        case "stop":
-                            break
-                        case "interrupt":
-                            parentPort.postMessage("debug: SIGINT for core.py")
-                            core_server.close()
-                            core_process.kill()
-
-                        //passing settings to backend process
-                        case "settings":
-                            socket.write(`settings ${message[2]}`)
-                            break
-                    }
-                //data messages
-                case "data":
-                    plane_data = message[1]
-                    break
-            }
-        }
-    })
-
-    // Handle client disconnect
-    socket.on('end', () => {
-        console.log('Client disconnected');
-    });
-});
-
-const core_process = spawn("python3", [PATH_TO_CORE])
-
-core_server.listen(PORT, '127.0.0.1', () => {
-    console.log('Server listening on 127.0.0.1');
-});
-*/

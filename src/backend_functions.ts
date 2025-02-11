@@ -198,11 +198,13 @@ export class MainAppFunctions{
     }
 
     //redirect to main app (starting workers and controller)
-    public redirect_to_main(){
+    public async redirect_to_main(){
         //message call to redirect to main program (start)
         this.app_status["redir-to-main"] = true
         if (this.app_status["turn-on-backend"]){
             this.msc_wrapper.send_message("action", "start") // TODO: let the location be here?
+            await utils.sleep(10000);
+            this.msc_wrapper.send_message("module", "ai_backend", "register", "CBA1127", "0.5") // Just an example
         }
         this.main_app()
     }

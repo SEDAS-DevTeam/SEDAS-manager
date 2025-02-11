@@ -386,16 +386,12 @@ class MainApp extends MainAppFunctions{
     }
 
     // TODO: solve for multi-session (multiple ATCos)
-    private async start_mic_record(){
-        this.msc_wrapper.send_message("module", "ai_backend", "register", "CBA1127", "0.5") // Just an example
-        await utils.sleep(2000);
+    private start_mic_record(){
         this.msc_wrapper.send_message("module", "ai_backend", "start-mic")
     }
 
     private async stop_mic_record(){
         this.msc_wrapper.send_message("module", "ai_backend", "stop-mic")
-        await utils.sleep(10000);
-        this.msc_wrapper.send_message("module", "ai_backend", "unregister", "CBA1127") // Just an example
     }
 
     private restore_sim(){
@@ -701,6 +697,10 @@ class MainApp extends MainAppFunctions{
 
         this.app_status["app-running"] = false; //stopping all Interval events from firing
         
+        // just an example
+        this.msc_wrapper.send_message("module", "ai_backend", "unregister", "CBA1127") // Just an example
+        await utils.sleep(10000) //TODO: do much better way
+
         if (this.enviro != undefined){
             EvLogger.log("DEBUG", "terminating environment")
             this.enviro.kill_enviro()

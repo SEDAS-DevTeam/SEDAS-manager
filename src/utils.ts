@@ -173,7 +173,7 @@ export class MSCwrapper{
     public worker: Worker;
     private backend_settings: object;
     private module_config: object;
-    public enabled_channels: string[];
+    public enabled_channels: string[] = [];
 
     constructor(worker_path: string,
                 backend_settings: object,
@@ -183,20 +183,21 @@ export class MSCwrapper{
         this.module_config = readJSON(module_config_path)
 
         // send settings configuration
-        this.send_message("action", "settings", JSON.stringify(this.backend_settings))
+        this.send_message("action", "settings", this.backend_settings)
 
         // send module configuration
-        this.send_message("action", "config", JSON.stringify(this.module_config))
+        this.send_message("action", "config", this.module_config)
     }
 
     public send_message(...message: any[]){
-        if (this.enabled_channels.length == 0){
+        let message_modified = message.map((elem) => {
+            if (typeof elem !== "string") return JSON.stringify(elem)
+            else return elem
+        })
+        if (this.enabled_channels.length == 0 && message[0] != "action"){
             console.log("Channels not yet enabled!")
             return;
         }
-        let message_modified = message.map((elem) => {
-            if (typeof elem !== "string") JSON.stringify(elem)
-        })
         this.worker.postMessage(message_modified)
     }
 

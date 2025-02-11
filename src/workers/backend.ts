@@ -87,6 +87,8 @@ class ModuleRegistry{
                     switch(message[2]){
                         case "data":
                             let data: object = JSON.parse(message[3])
+                            console.log("SEDAS AI data")
+                            console.log(data)
                             break
                     }
                 }

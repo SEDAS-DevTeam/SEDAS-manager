@@ -118,7 +118,7 @@ export class MainAppFunctions{
     //other variables
     public loader: ProgressiveLoader;
     public backupdb_saving_frequency: number = 1000; //defaultly set to 1 second
-    public local_plugin_list: object[]
+    public local_plugin_list: object[];
 
     public constructor(app_settings: object, ev_logger: EventLogger){
         this.app_settings = app_settings
@@ -202,7 +202,7 @@ export class MainAppFunctions{
         //message call to redirect to main program (start)
         this.app_status["redir-to-main"] = true
         if (this.app_status["turn-on-backend"]){
-            this.backend_worker.postMessage(["action", "start-neural"])
+            this.msc_wrapper.send_message("action", "start") // TODO: let the location be here?
         }
         this.main_app()
     }

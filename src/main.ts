@@ -5,9 +5,8 @@
 //glob imports
 import fs from "fs";
 import { Worker } from "worker_threads"
-import { spawn } from "node:child_process"
 import path from "path"
-import { app, screen, Tray, nativeImage, Menu } from "electron";
+import { app, screen } from "electron";
 
 //relative imports
 import { Plane, PlaneDB } from "./plane_functions"
@@ -133,6 +132,14 @@ class MainApp extends MainAppFunctions{
     public add_listener_backend(){
         //backend-worker events
         if (this.app_status["turn-on-backend"]){
+            this.msc_wrapper.set_listener((message: string[]) => {
+                if (message[0] == "channels"){
+                    // check which channels are permitted to send messages
+                    this.msc_wrapper.enabled_channels = JSON.parse(message[1])
+                }
+            })
+
+            /*
             this.backend_worker.on("message", (message: string) => {
                 //processing from backend.js
                 let arg = message.split(":")[0]
@@ -151,6 +158,7 @@ class MainApp extends MainAppFunctions{
                         break
                 }
             })
+            */
         }
     }
 
@@ -267,10 +275,10 @@ class MainApp extends MainAppFunctions{
                 setInterval(() => {
                     if (this.app_status["turn-on-backend"]){
                         if (this.PlaneDatabase == undefined){
-                            this.backend_worker.postMessage(["data", []]) //send empty array so the backend can still function without any problems
+                            this.msc_wrapper.send_message("module", "ai_backend", "data", [])
                         }
                         else{
-                            this.backend_worker.postMessage(["data", this.PlaneDatabase.DB])
+                            this.msc_wrapper.send_message("module", "ai_backend", "data", this.PlaneDatabase.DB)
                         }
                     }
                 }, 500)
@@ -392,7 +400,8 @@ class MainApp extends MainAppFunctions{
 
     private regenerate_map(){
         if (this.app_status["turn-on-backend"]){
-            this.backend_worker.postMessage(["action", "terrain"])
+            console.log("Terrain generation not done yet :)")
+            //this.backend_worker.postMessage(["action", "terrain"])
         }
     }
 
@@ -635,7 +644,7 @@ class MainApp extends MainAppFunctions{
 
         if (this.app_status["turn-on-backend"]){
             //setup voice recognition and ACAI backend
-            this.backend_worker.postMessage(["debug", app_settings["logging"]]) 
+            this.msc_wrapper.send_message("action", "debug", app_settings["logging"])
         }
 
         if (backup_db){
@@ -695,20 +704,15 @@ class MainApp extends MainAppFunctions{
 
         if (this.app_status["turn-on-backend"]){
             //disable voice recognition and ACAI backend
-            EvLogger.log("DEBUG", "stopping voice-recognition")
-            this.backend_worker.postMessage(["action", "stop-neural"])
+            EvLogger.log("DEBUG", "stopping SEDAS modules")
 
-            await utils.sleep(1000) //TODO: do much better way
-
-            //kill voice recognition
-            EvLogger.log("DEBUG", "killing core.py")
-            this.backend_worker.postMessage(["action", "interrupt"])
+            this.msc_wrapper.send_message("action", "stop")
 
             await utils.sleep(1000) //TODO: do much better way
 
             //stop backend worker
             EvLogger.log("DEBUG", "terminating backend worker")
-            this.backend_worker.terminate()
+            this.msc_wrapper.terminate()
         }
         EvLogger.log("DEBUG", "terminating database worker")
         this.backup_worker.terminate()

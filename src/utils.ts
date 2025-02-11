@@ -26,6 +26,8 @@ import {
     PATH_TO_LOGS
  } from "./app_config";
 import { desktopCapturer, ipcMain } from "electron";
+import { Worker } from "worker_threads";
+import { spawn } from "node:child_process";
 
 // variables
 const alphabet: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -171,6 +173,7 @@ export class MSCwrapper{
     public worker: Worker;
     private backend_settings: object;
     private module_config: object;
+    public enabled_channels: string[];
 
     constructor(worker_path: string,
                 backend_settings: object,
@@ -186,11 +189,28 @@ export class MSCwrapper{
         this.send_message("action", "config", JSON.stringify(this.module_config))
     }
 
-    public send_message(channel: string, subchannel: string, content: string){
-        this.worker.postMessage([channel, subchannel, content])
+    public send_message(...message: any[]){
+        if (this.enabled_channels.length == 0){
+            console.log("Channels not yet enabled!")
+            return;
+        }
+        let message_modified = message.map((elem) => {
+            if (typeof elem !== "string") JSON.stringify(elem)
+        })
+        this.worker.postMessage(message_modified)
     }
 
+    public set_listener(callback: Function){
+        this.worker.on("message", (message: string[]) => {
+            console.log("Got message from backend!")
+            console.log(message)
+            callback(message)
+        })
+    }
 
+    public terminate(){
+        this.worker.terminate()
+    }
 }
 
 export class ProgressiveLoader{

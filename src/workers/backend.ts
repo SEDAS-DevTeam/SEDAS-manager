@@ -14,11 +14,88 @@ function check_call_arguments(abs_path: string, module_arguments: string[]): str
     return module_arguments
 }
 
-class Module{
-
+function send_message(channel: string, content: any){
+    parentPort.postMessage([channel, JSON.stringify(content)])
 }
 
-var module_registry: Module[] = [];
+class Module{
+    public name: string;
+    public channel: string;
+
+    constructor(bin_path: string,
+                args: string[],
+                name: string,
+                channel: string){
+        this.channel = channel
+        this.name = name
+    }
+
+    public terminate(){
+        console.log("Terminated module")
+    }
+}
+
+class ModuleRegistry{
+    public registry: Module[] = [];
+
+    constructor(configuration: object){
+        for (let i = 0; i < configuration["modules"].length; i++){
+            let module_config = configuration["modules"][i];
+
+            let call_path: string = path.join(settings["abs_path"], module_config["integration_path"])
+            let call_args: string[] = check_call_arguments(settings["abs_path"], module_config["arguments"])
+
+            let name: string = module_config["name"]
+            let channel: string = module_config["channel"]
+            console.log("Script call path: " + call_path)
+
+
+            // initialize module
+            var module = new Module(call_path,
+                                    call_args,
+                                    name, 
+                                    channel)
+            this.registry.push(module)
+        }
+    }
+
+    public delete_module(module_name: string){
+        for (let i = 0; i < this.registry.length; i++){
+            if (this.registry[i].name == module_name){
+                // terminate module and delete from registry
+                this.registry[i].terminate()
+                this.registry.splice(i, 1)
+                break
+            }
+        }
+    }
+
+    public get_enabled_channels(){
+        var channels: string[] = []
+        for (let i = 0; i < this.registry.length; i++){
+            channels.push(this.registry[i].channel)
+        }
+        return channels
+    }
+
+    public check_call(message: any[]){
+        for (let i = 0; i < this.registry.length; i++){
+            if (this.registry[i].channel == message[1]){
+                // channel corresponds with message channel
+                if (this.registry[i].channel == "ai_backend"){
+                    // SEDAS-AI-Backend
+                    switch(message[2]){
+                        case "data":
+                            let data: object = JSON.parse(message[3])
+                            break
+                    }
+                }
+            }
+        }
+    }
+}
+
+var module_registry: ModuleRegistry;
 var settings: object;
 
 parentPort.on("message", (message) => {
@@ -38,23 +115,29 @@ parentPort.on("message", (message) => {
 
                     // read configuration and setup parentPort message channel
                     let configuration: object = JSON.parse(message[2])
-                    for (let i = 0; i < configuration["modules"].length; i++){
-                        let module_config = configuration["modules"][i];
 
-                        let call_path: string = path.join(settings["abs_path"], module_config["integration_path"])
-                        check_call_arguments(settings["abs_path"], module_config["arguments"])
-
-                        let name: string = module_config["name"]
-                        let channel: string = module_config["channel"]
-                        console.log("Script call path: " + call_path)
-                    }
+                    // setup module registry
+                    module_registry = new ModuleRegistry(configuration);
+                    let enabled_channels: string[] = module_registry.get_enabled_channels()
+                    send_message("channels", enabled_channels)
+                    break
+                case "debug":
+                    console.log("Debug level: " + message[2])
+                    break
+                case "stop":
+                    console.log("Stopping all backend stuff")
+                    break
+                case "start":
+                    console.log("Starting backend work")
                     break
             }
         }
         else if (message[0] == "module"){
-            // specific module-actions
+            // check specific module-actions
+            module_registry.check_call(message)
         }
 
+        /*
         switch(message[0]){
             case "data":
                 break
@@ -79,6 +162,7 @@ parentPort.on("message", (message) => {
                 }
                 break
         }
+        */
     }
 })
 

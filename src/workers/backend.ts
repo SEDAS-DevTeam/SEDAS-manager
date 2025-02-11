@@ -60,7 +60,6 @@ class ModuleRegistry{
 
             let name: string = module_config["name"]
             let channel: string = module_config["channel"]
-            console.log("Script call path: " + call_path)
 
 
             // initialize module
@@ -160,7 +159,10 @@ class ModuleRegistry{
             console.log("Connected to sedas_ai_backend!")
         })
         this.client_socket.on("data", (data) => {
-            console.log("Received: " + data)
+            // TODO: just done for parsing SEDAS-AI-backend
+            let comm_args: string[] = data.toString().split(" ")
+            comm_args.unshift("sedas_ai")
+            send_message("module", comm_args)
         })
         this.client_socket.on("close", () => {
             console.log("Connection closed")

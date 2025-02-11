@@ -106,7 +106,7 @@ def compile(ctx, only="none"):
 
         sedas_ai_project_build = path.join(path_modules, "SEDAS-AI-backend/project_build")
         sedas_ai_global_build = path.join(PATH, "src/addons/modules/build/sedas_ai_backend")
-        shutil.copytree(sedas_ai_project_build, sedas_ai_global_build)
+        shutil.copytree(sedas_ai_project_build, sedas_ai_global_build, dirs_exist_ok=True)
 
         # TODO: maybe add more modules?
 

@@ -137,6 +137,20 @@ class MainApp extends MainAppFunctions{
                     // check which channels are permitted to send messages
                     this.msc_wrapper.enabled_channels = JSON.parse(message[1])
                 }
+                else if (message[0] == "module"){
+                    let msg_command: string[] = JSON.parse(message[1])
+                    if (msg_command[0] == "sedas_ai"){
+                        let callsign: string = msg_command[1];
+                        let value: string = msg_command[2];
+                        let command: string = msg_command[3];
+
+                        // TODO: rework this, but currently that is only command working
+                        if (command == "turn-any") command = "change-heading"
+
+                        // update plane status
+                        this.plane_value_change([command, value, callsign])
+                    }
+                }
             })
 
             /*
@@ -696,10 +710,6 @@ class MainApp extends MainAppFunctions{
         this.exitWindow.show()
 
         this.app_status["app-running"] = false; //stopping all Interval events from firing
-        
-        // just an example
-        this.msc_wrapper.send_message("module", "ai_backend", "unregister", "CBA1127") // Just an example
-        await utils.sleep(10000) //TODO: do much better way
 
         if (this.enviro != undefined){
             EvLogger.log("DEBUG", "terminating environment")
@@ -709,10 +719,12 @@ class MainApp extends MainAppFunctions{
         if (this.app_status["turn-on-backend"]){
             //disable voice recognition and ACAI backend
             EvLogger.log("DEBUG", "stopping SEDAS modules")
+            
 
+            this.msc_wrapper.send_message("module", "ai_backend", "unregister-all")
+            await utils.sleep(1000) // TODO: find better way than this
             this.msc_wrapper.send_message("action", "stop")
-
-            await utils.sleep(1000) //TODO: do much better way
+            await utils.sleep(1000) // TODO: find better way than this
 
             //stop backend worker
             EvLogger.log("DEBUG", "terminating backend worker")

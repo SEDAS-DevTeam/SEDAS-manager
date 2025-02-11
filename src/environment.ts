@@ -1,7 +1,7 @@
 import { EventLogger } from "./logger"
 import { Worker } from 'worker_threads';
 import path from "path"
-import utils, { ProgressiveLoader } from "./utils";
+import utils, { ProgressiveLoader, MSCwrapper } from "./utils";
 
 //C++ (N-API) imports
 import { enviro_calculations } from "./bind";
@@ -12,6 +12,7 @@ export class Environment {
     private abs_path: string;
     private sim_time_worker: Worker;
     private app: any;
+    private msc_wrapper: MSCwrapper;
 
     // time variables
     public current_time: Date;
@@ -38,8 +39,10 @@ export class Environment {
                         aircraft_data: object, 
                         map_data: object, 
                         scenario_data: object,
-                        std_bank_angle){
+                        std_bank_angle: number,
+                        msc_wrapper: MSCwrapper){
         this.logger = logger
+        this.msc_wrapper = msc_wrapper
         this.abs_path = abs_path
         this.std_bank_angle = std_bank_angle
 
@@ -177,7 +180,6 @@ export class Environment {
                     })
                 }
             }
-            //let plane = new Plane(...plane_parameters)
         }
         return accepted_planes
     }
@@ -185,7 +187,7 @@ export class Environment {
     private get_conditions(){
         let condition_list = {}
         
-        //TODO: rework with frontend (+ add APC)
+        //TODO: rework with frontend (+ add APC) (WHAT IS APC???)
         let weight_conditions = this.scenario_data["wtc_category"]
         let cat_conditions = this.scenario_data["category"]
 

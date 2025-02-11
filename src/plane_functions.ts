@@ -116,7 +116,10 @@ export class PlaneDB{
         //delete from planes database
         for (let i = 0; i < this.DB.length; i++){
             if (this.DB[i].id == id){
+                console.log("THIS IS HIM")
+                console.log(this.DB[i])
                 this.DB.splice(i, 1)
+                break;
             }
         }
 

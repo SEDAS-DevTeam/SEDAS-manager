@@ -202,9 +202,8 @@ export class MainAppFunctions{
         //message call to redirect to main program (start)
         this.app_status["redir-to-main"] = true
         if (this.app_status["turn-on-backend"]){
-            this.msc_wrapper.send_message("action", "start") // TODO: let the location be here?
-            await utils.sleep(10000);
-            this.msc_wrapper.send_message("module", "ai_backend", "register", "CBA1127", "0.5") // Just an example
+             // TODO: let the location be here?
+            //this.msc_wrapper.send_message("module", "ai_backend", "register", "CBA1127", "0.5") // Just an example
         }
         this.main_app()
     }
@@ -375,13 +374,17 @@ export class MainAppFunctions{
         this.enviro_logger.init_logger()
         this.enviro_logger.log("INFO", "EventLogger instance on Environment is set up")
 
+        // turn on the modules
+        this.msc_wrapper.send_message("action", "start")
+
         this.loader.send_progress("Setting up environment")
         this.enviro = new Environment(this.ev_logger, this, ABS_PATH, this.PlaneDatabase,
             this.command_preset_data,
             this.aircraft_preset_data,
             this.map_data, 
             this.scenario_data,
-            parseFloat(this.app_settings["std_bank_angle"]))
+            parseFloat(this.app_settings["std_bank_angle"]),
+            this.msc_wrapper)
         
 
         this.loader.send_progress("Setting plane schedules")
@@ -488,6 +491,12 @@ export class MainAppFunctions{
                         x, y)
         this.PlaneDatabase.add_record(plane, plane_data["monitor"])
 
+        if(this.app_status["turn-on-backend"]){
+            // register plane on ai
+            let voice_intensity: string = ((Math.random() * 0.9) + 0.1).toFixed(2) // generate random voice intensity from range 0.1 to 0.9
+            this.msc_wrapper.send_message("module", "ai_backend", "register", plane_data["name"], voice_intensity)
+        }
+
         this.broadcast_planes(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
     }
 
@@ -498,7 +507,7 @@ export class MainAppFunctions{
         this.wrapper.send_message("controller", "terminal-add", data[1].slice(1))
     }
 
-    public plane_delete_record(data: any[]){
+    public plane_delete_record(data: any[]){ // add MSC_wrapper here!
         this.PlaneDatabase.delete_record(data[0])
         this.broadcast_planes(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
     }

@@ -41,6 +41,10 @@ export const PATH_TO_PLUGINS: string = join(ABS_PATH, "/src/res/data/app/config/
 export const PATH_TO_MODULES: string = join(ABS_PATH, "/src/res/data/app/config/modules_config.json")
 export const PATH_TO_ICON: string = join(ABS_PATH, "/src/res/img/sedas-manager-logo-rounded.png")
 
+//paths for workers
+export const PATH_TO_MSC: string = join(ABS_PATH, "/src/workers/backend.js")
+export const PATH_TO_BACKUP: string = join(ABS_PATH, "/src/workers/database.js")
+
 //paths for gui layouts
 export const PATH_TO_SETTINGS_LAYOUT: string = join(ABS_PATH, "/src/res/data/app/gui/settings_layout.json")
 

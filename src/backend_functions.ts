@@ -3,7 +3,7 @@
 */
 
 import { EventLogger } from "./logger"
-import utils, {ProgressiveLoader, IPCwrapper} from "./utils"
+import utils, {ProgressiveLoader, IPCwrapper, MSCwrapper} from "./utils"
 import {PluginRegister} from "./plugin_register"
 import { Plane, PlaneDB } from "./plane_functions"
 import { Worker } from "worker_threads"
@@ -57,6 +57,7 @@ export class MainAppFunctions{
     public enviro: Environment;
     public plugin_register: PluginRegister;
     public wrapper: IPCwrapper;
+    public msc_wrapper: MSCwrapper;
     public ev_logger: EventLogger;
     public widget_handler: WidgetWindowHandler;
     public worker_handler: WorkerWindowHandler;
@@ -107,7 +108,6 @@ export class MainAppFunctions{
     }
 
     //worker files
-    public backend_worker: Worker;
     public backup_worker: Worker;
     public PlaneDatabase: PlaneDB;
 

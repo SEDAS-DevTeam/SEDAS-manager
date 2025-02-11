@@ -30,6 +30,9 @@ import { desktopCapturer, ipcMain } from "electron";
 // variables
 const alphabet: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
+/*
+    Wrapper for IPC communication between frontend and backend
+*/
 export class IPCwrapper{
     /*
         Class that handles the IPC communication
@@ -159,6 +162,35 @@ export class IPCwrapper{
     private send_nack(destination: string, channel: string){
         this.send_message_to_window(destination, channel + "-ack", ["NACK"])
     }
+}
+
+/*
+    Wrapper for MSC (module socket communication) between modules like sedas_ai_backend
+*/
+export class MSCwrapper{
+    public worker: Worker;
+    private backend_settings: object;
+    private module_config: object;
+
+    constructor(worker_path: string,
+                backend_settings: object,
+                module_config_path: string) {
+        this.worker = new Worker(worker_path)
+        this.backend_settings = backend_settings
+        this.module_config = readJSON(module_config_path)
+
+        // send settings configuration
+        this.send_message("action", "settings", JSON.stringify(this.backend_settings))
+
+        // send module configuration
+        
+    }
+
+    public send_message(channel: string, subchannel: string, content: string){
+        this.worker.postMessage([channel, subchannel, content])
+    }
+
+
 }
 
 export class ProgressiveLoader{

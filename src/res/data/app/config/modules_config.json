@@ -2,7 +2,13 @@
     "modules": [
         {
             "name": "SEDAS-AI-backend",
-            "integration_path": "/src/addons/modules/SEDAS-AI-backend/src/integrate.hpp"
+            "integration_path": "/src/addons/modules/build/sedas_ai_backend/main",
+            "arguments": [
+                "/src/addons/modules/build/sedas_ai_backend/asr",
+                "/src/addons/modules/build/sedas_ai_backend/tts",
+                "/src/addons/modules/build/sedas_ai_backend/config",
+                "/src/addons/modules/build/sedas_ai_backend/temp"
+                         ]
         }
     ]
 }

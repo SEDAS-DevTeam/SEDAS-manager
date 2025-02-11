@@ -1,50 +1,43 @@
 import {parentPort} from "worker_threads"
-import fs from "fs";
-import {
-    PATH_TO_SETTINGS
-} from "../app_config"
-import { NATO_ALPHA, NATO_NUMS } from "../atc_config"
+import net from "net"
 
-//read JSON
-const app_settings_raw = fs.readFileSync(PATH_TO_SETTINGS, "utf-8")
-const app_settings = JSON.parse(app_settings_raw);
-
-function command_processor(command_args: string[]){
-    let response: string = ""
-
-    //translate plane name back from nato
-    let trans_plane_name: string = ""
-    for (let i = 0; i < command_args[0].length; i++){
-        if (NATO_ALPHA[command_args[0][i]] == undefined){
-            trans_plane_name += `${NATO_NUMS[command_args[0][i]]} `
-        }
-        else{
-            trans_plane_name += `${NATO_ALPHA[command_args[0][i]]} `
-        }
-    }
-
-    //check commands
-    switch (command_args[1]){
-        case "change-heading":
-            if (command_args[2].length == 2){
-                command_args[2] = "0" + command_args[2]
-            }
-
-            //translate updated heading
-            let trans_heading: string = ""
-            for (let i = 0; i < command_args[2].length; i++){
-                trans_heading += `${NATO_NUMS[command_args[2][i]]} `
-            }
-
-            response = `Fly heading ${trans_heading}, ${trans_plane_name}`
-            break
-    }
-
-    return response
-}
+const HOST = "localhost"
+const PORT = 65432
 
 parentPort.on("message", (message) => {
-    console.log(`backend said ${message}`)
+    if (Array.isArray(message)){
+        if (message[0] == "action"){
+            // global actions for backend
+        }
+        else if (message[0] == "module"){
+            // specific module-actions
+        }
+
+        switch(message[0]){
+            case "data":
+                break
+            case "debug":
+                console.log("Debug what?")
+                console.log(message[1])
+                break
+            case "action":
+                switch(message[1]){
+                    case "settings":
+                        break
+                    case "start-neural":
+                        console.log("Start neural!")
+                        break
+                    case "stop-neural":
+                        console.log("Stop neural!")
+                        break
+                    case "interrupt":
+                        break
+                    case "terrain":
+                        break
+                }
+                break
+        }
+    }
 })
 
 /*

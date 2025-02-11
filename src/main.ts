@@ -13,7 +13,7 @@ import { app, screen, Tray, nativeImage, Menu } from "electron";
 import { Plane, PlaneDB } from "./plane_functions"
 import { EventLogger } from "./logger"
 
-import utils, {ProgressiveLoader, IPCwrapper} from "./utils"
+import utils, {ProgressiveLoader, IPCwrapper, MSCwrapper} from "./utils"
 import {PluginRegister} from "./plugin_register" // TODO
 
 import {
@@ -51,7 +51,8 @@ import {
     PATH_TO_PLUGINS,
     PATH_TO_MODULES,
 
-    ABS_PATH
+    ABS_PATH,
+    PATH_TO_MSC
 } from "./app_config"
 
 import { MainAppFunctions } from "./backend_functions"
@@ -181,7 +182,6 @@ class MainApp extends MainAppFunctions{
         this.wrapper.register_channel("monitor-change-info", ["controller"], "unidirectional", (data: any[]) => this.monitor_change_info(data))
         this.wrapper.register_channel("exit", ["worker", "controller"], "unidirectional", () => this.exit())
         
-        this.wrapper.register_channel("invoke", ["worker"], "unidirectional", (data: any[]) => this.invoke(data))
         this.wrapper.register_channel("ping", ["controller", "settings", "embed"], "bidirectional", (data: any[]) => this.ping(data))
         
         //send app configuration to controller
@@ -311,10 +311,6 @@ class MainApp extends MainAppFunctions{
         //spawning info window
         EvLogger.log("DEBUG", "Closing app... Bye Bye")
         this.exit_app()
-    }
-
-    private invoke(data: any){
-        this.backend_worker.postMessage(data)
     }
 
     private monitor_change_info(data: any[]){
@@ -508,17 +504,17 @@ class MainApp extends MainAppFunctions{
 
         //workers
         if (this.app_settings["backend_init"]){
-            this.backend_worker = new Worker(path.join(ABS_PATH, "/src/workers/backend.js"))
-            EvLogger.log("DEBUG", "Starting Backend because flag backend_init is=true")
+            EvLogger.log("DEBUG", "Starting Backend because flag backend_init is true")
 
-            var backend_settings = {
+            var backend_settings = { // settings only to be passed to backend
                 "noise": this.app_settings["noise"]
             }
-            this.backend_worker.postMessage(["action", "settings", JSON.stringify(backend_settings)])
+
+            this.msc_wrapper = new MSCwrapper(PATH_TO_MSC, backend_settings, PATH_TO_MODULES)
         }
         else{
             this.app_status["turn-on-backend"] = false
-            EvLogger.log("DEBUG", "Starting Backend because backend_init is set to false")
+            EvLogger.log("DEBUG", "Not starting Backend because flag backend_init is false")
         }
         this.backup_worker = new Worker(path.join(ABS_PATH, "/src/workers/database.js"))
         

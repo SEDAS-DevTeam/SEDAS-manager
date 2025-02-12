@@ -227,6 +227,8 @@ export class Window extends BaseWindow{
 
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
+        
+        //dev_panel = false; // TODO
         if (dev_panel){
             this.window.webContents.openDevTools()
         }

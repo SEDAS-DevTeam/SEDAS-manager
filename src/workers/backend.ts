@@ -170,7 +170,9 @@ class ModuleRegistry{
     }
 
     public message_modules(message: string){ // TODO: do more unified standard for more modules
-        this.client_socket.write(message)
+        if (this.client_socket != undefined){
+            this.client_socket.write(message)
+        }
     }
     
     public async close_modules(){

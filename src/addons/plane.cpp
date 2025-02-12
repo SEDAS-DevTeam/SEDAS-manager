@@ -194,8 +194,6 @@ napi_value Calc_plane_heading(napi_env env, napi_callback_info info){
       else if (command == "turn-right") turn_right = true;
       else if (command == "turn-left") turn_right = false;
 
-      std::cout << "What the fuck man " << turn_right << std::endl;
-
       float delta = rate_of_turn * refresh_rate;
       new_heading = turn_right ? fmod(heading + delta, 360.0) : fmod(heading - delta, 360);
 

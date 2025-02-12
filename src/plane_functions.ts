@@ -173,6 +173,7 @@ export class PlaneDB{
     }
 
     private update_plane_turns(){
+
         //update plane turns
         for (let i = 0; i < this.plane_turn_DB.length; i++){
             for (let i_plane = 0; i_plane < this.DB.length; i_plane++){
@@ -180,27 +181,33 @@ export class PlaneDB{
                     continue
                 }
                 if (this.plane_turn_DB[i]["id"] == this.DB[i_plane].id){
-                    let napi_arguments = {
-                        "heading": this.DB[i_plane].heading,
-                        "updated_heading": this.DB[i_plane].updated_heading,
-                        "rate_of_turn": this.plane_turn_DB[i]["rate_of_turn"],
-                        "refresh_rate": 1,
-                        "command": this.DB[i_plane].current_command
+                    try{
+                        let napi_arguments = {
+                            "heading": this.DB[i_plane].heading,
+                            "updated_heading": this.DB[i_plane].updated_heading,
+                            "rate_of_turn": this.plane_turn_DB[i]["rate_of_turn"],
+                            "refresh_rate": 1,
+                            "command": this.DB[i_plane].current_command
+                        }
+    
+                        let [new_heading, continue_change] = plane_calculations.calc_plane_heading(napi_arguments)
+    
+                        // check when going over compas degrees
+                        if (new_heading > 360) new_heading = napi_arguments["rate_of_turn"]
+                        else if (new_heading < 0) new_heading = 360 - napi_arguments["rate_of_turn"]
+                        
+                        if (continue_change){
+                            // Heading change is not done
+                            this.DB[i_plane].heading = new_heading
+                        }
+                        else{
+                            // Heading change is done
+                            this.DB[i_plane].heading = this.DB[i].updated_heading
+                        }
                     }
-
-                    let [new_heading, continue_change] = plane_calculations.calc_plane_heading(napi_arguments)
-
-                    // check when going over compas degrees
-                    if (new_heading > 360) new_heading = napi_arguments["rate_of_turn"]
-                    else if (new_heading < 0) new_heading = 360 - napi_arguments["rate_of_turn"]
-                    
-                    if (continue_change){
-                        // Heading change is not done
-                        this.DB[i_plane].heading = new_heading
-                    }
-                    else{
-                        // Heading change is done
-                        this.DB[i_plane].heading = this.DB[i].updated_heading
+                    catch(error){
+                        console.log("Could not set plane heading! See error below")
+                        console.log(error.message)
                     }
                 }
             }

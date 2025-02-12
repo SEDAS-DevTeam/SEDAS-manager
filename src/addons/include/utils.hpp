@@ -111,9 +111,9 @@ float calc_heading_between_two_points(uint32_t x1, uint32_t y1, uint32_t x2, uin
     return heading_converted;
 }
 
-std::vector<int> calc_pixel_change(int x, int y, float speed, float scale, int heading){
-    int new_y = y - ((sin(deg_to_rad(heading_conversion(heading))) * speed) / scale);
-    int new_x = x + ((cos(deg_to_rad(heading_conversion(heading))) * speed) / scale);
+std::vector<int> calc_pixel_change(int x, int y, float speed, float scale, float heading){
+    int new_y = round(y - ((sin(deg_to_rad(heading_conversion(heading))) * speed) / scale));
+    int new_x = round(x + ((cos(deg_to_rad(heading_conversion(heading))) * speed) / scale));
 
     std::vector<int> result = {new_x, new_y};
     return result;

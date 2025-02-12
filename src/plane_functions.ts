@@ -3,7 +3,7 @@ import { plane_calculations } from "./bind";
 
 export class PlaneDB{
     /*Just an array with methods - for storing planes*/
-    public DB: any = [] //storing planes
+    public DB: Plane[] = [] //storing planes
     public monitor_DB: any = [] //storing where are planes rendered
     public plane_paths_DB: any = []
 
@@ -124,7 +124,7 @@ export class PlaneDB{
         })
     }
 
-    public add_path_record(id: number, coords: any){
+    public add_path_record(id: string, coords: any){
         for (let i = 0; i < this.plane_paths_DB.length; i++){
             if (this.plane_paths_DB[i]["id"] == id){
                 this.plane_paths_DB[i]["coords"].push(coords)
@@ -133,7 +133,7 @@ export class PlaneDB{
         }
     }
 
-    public find_record(id: number){
+    public find_record(id: string){
         for (let i = 0; i < this.DB.length; i++){
             if (this.DB[i].id == id){
                 return this.DB[i]
@@ -145,8 +145,6 @@ export class PlaneDB{
         //delete from planes database
         for (let i = 0; i < this.DB.length; i++){
             if (this.DB[i].id == id){
-                console.log("THIS IS HIM")
-                console.log(this.DB[i])
                 this.DB.splice(i, 1)
                 break;
             }
@@ -317,7 +315,6 @@ export class Plane{
             "screen_speed": this.screen_speed, // to get (nm/s);
             "refresh_rate": 1 // TODO: add to settings
         }
-        console.log(napi_arguments)
         let vals = plane_calculations.calc_plane_forward(napi_arguments)
 
         //rewrite variables
@@ -329,7 +326,6 @@ export class Plane{
         if (this.updated_heading != this.heading){
             //make turn
             let r_of_t = plane_calculations.calc_rate_of_turn(std_bank_angle, this.speed)
-
             let continue_change: boolean = true
             //scan plane turn database
             for (let i_db = 0; i_db < plane_turn_DB.length; i_db++){

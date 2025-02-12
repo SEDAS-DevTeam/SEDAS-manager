@@ -34,7 +34,7 @@ napi_value Calc_plane_forward(napi_env env, napi_callback_info info){
     int x = get_variable<int>(env, get_dict_property(env, arg_dict, "x"));
     int y = get_variable<int>(env, get_dict_property(env, arg_dict, "y"));
     float scale = get_variable<float>(env, get_dict_property(env, arg_dict, "scale"));
-    int heading = get_variable<int>(env, get_dict_property(env, arg_dict, "heading"));
+    float heading = get_variable<float>(env, get_dict_property(env, arg_dict, "heading"));
     int screen_speed = get_variable<int>(env, get_dict_property(env, arg_dict, "screen_speed"));
     float refresh_rate = get_variable<float>(env, get_dict_property(env, arg_dict, "refresh_rate"));
 
@@ -172,9 +172,9 @@ napi_value Calc_plane_heading(napi_env env, napi_callback_info info){
     // checking types of all variables passed as arguments
     var_typecheck(env, arg_dict, napi_object);
 
-    int heading = get_variable<int>(env, get_dict_property(env, arg_dict, "heading"));
-    int updated_heading = get_variable<int>(env, get_dict_property(env, arg_dict, "updated_heading"));
-    float rate_of_turn = get_variable<int>(env, get_dict_property(env, arg_dict, "rate_of_turn"));
+    float heading = get_variable<float>(env, get_dict_property(env, arg_dict, "heading"));
+    float updated_heading = get_variable<float>(env, get_dict_property(env, arg_dict, "updated_heading"));
+    float rate_of_turn = get_variable<float>(env, get_dict_property(env, arg_dict, "rate_of_turn"));
     float refresh_rate = get_variable<float>(env, get_dict_property(env, arg_dict, "refresh_rate"));
 
     // return variables

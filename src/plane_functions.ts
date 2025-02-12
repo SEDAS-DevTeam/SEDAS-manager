@@ -17,26 +17,55 @@ export class PlaneDB{
     */
     public command_config = {
         "commands": [
+            /*
+                Change heading commands
+            */
             {
-                "comm": "change-heading",
-                "variations": ["left", "right", "standard"],
-                "exec": ((plane: Plane, command: string, args: string[], value: any) => {
-                    plane.change_heading(command, args, value)
+                "comm": "turn-any",
+                "exec": ((plane: Plane, command: string, value: any) => {
+                    plane.change_heading(command, value)
                 })
             },
             {
-                "comm": "change-speed",
-                "variations": [],
-                "exec": ((plane: Plane, command: string, args: string[], value: any) => {
-                    plane.change_speed(command, args, value)
+                "comm": "turn-left",
+                "exec": ((plane: Plane, command: string, value: any) => {
+                    plane.change_heading(command, value)
                 })
             },
             {
-                "comm": "change-level",
+                "comm": "turn-right",
+                "exec": ((plane: Plane, command: string, value: any) => {
+                    plane.change_heading(command, value)
+                })
+            },
+            {
+                "comm": "speed-any",
+                "exec": ((plane: Plane, command: string, value: any) => {
+                    plane.change_speed(command, value)
+                })
+            },
+            {
+                "comm": "speed-accel"
+                // TODO
+            },
+            {
+                "comm": "speed-decel"
+                // TODO
+            },
+            {
+                "comm": "level-any",
                 "variations": ["expedite", "climb", "descend"],
-                "exec": ((plane: Plane, command: string, args: string[], value: any) => {
-                    plane.change_level(command, args, value)
+                "exec": ((plane: Plane, command: string, value: any) => {
+                    plane.change_level(command, value)
                 })
+            },
+            {
+                "comm": "level-descend",
+                // TODO
+            },
+            {
+                "comm": "level-climb"
+                // TODO
             }
         ]
     }
@@ -50,14 +79,14 @@ export class PlaneDB{
         }
     }
 
-    public set_command(callsign: string, command: string, value: any, args: string[] = []){
+    public set_command(callsign: string, command: string, value: any){
         for(let i = 0; i < this.DB.length; i++){
             if (callsign == this.DB[i].callsign){
                 //find specific command context
                 this.command_config.commands.forEach(command_elem => {
                     if (command == command_elem["comm"]){
                         console.log(command, command_elem)
-                        command_elem["exec"](this.DB[i], command, args, value)
+                        command_elem["exec"](this.DB[i], command, value)
                     }
                 })
             }
@@ -239,16 +268,24 @@ export class Plane{
     public x: number;
     public y: number;
 
+    public current_command: string = "";
+
     //special args that represent subcommand for command
     public special_comm: string[] = []
 
-    public constructor(id: string, callsign: string, 
-        heading: number, heading_up: number, 
-        level: number, level_up: number,
-        speed: number, speed_up: number,
-        departure: string, arrival: string, 
+    public constructor(id: string, 
+        callsign: string, 
+        heading: number,
+        heading_up: number, 
+        level: number,
+        level_up: number,
+        speed: number, 
+        speed_up: number,
+        departure: string, 
+        arrival: string, 
         arrival_time: string,
-        x: number, y: number){
+        x: number, 
+        y: number){
             this.id = id;
             this.callsign = callsign;
 
@@ -362,16 +399,26 @@ export class Plane{
 
     /*
         Functions for changing plane variables
+        Everytime there is some variation of command, for example:
+            turn-any
+            turn-left
+            turn-right
+        
+        Different commands get set, so that N-API can differentiate calculations
     */
-    public change_heading(command: string, args: string[], value: any){
-        if (args.length == 0) this.updated_heading = parseInt(value)
+    public change_heading(command: string, value: any){
+        this.updated_heading = parseInt(value)
+        this.current_command = command
+
     }
 
-    public change_speed(command: string, args: string[], value: any){
-        if (args.length == 0) this.updated_speed = parseInt(value)
+    public change_speed(command: string, value: any){
+        this.updated_speed = parseInt(value)
+        this.current_command = command
     }
 
-    public change_level(command: string, args: string[], value: any){
-        if (args.length == 0) this.updated_level = parseInt(value)
+    public change_level(command: string, value: any){
+        this.updated_level = parseInt(value)
+        this.current_command = command
     }
 }

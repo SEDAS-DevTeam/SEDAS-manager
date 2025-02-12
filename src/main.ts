@@ -144,9 +144,6 @@ class MainApp extends MainAppFunctions{
                         let value: string = msg_command[2];
                         let command: string = msg_command[3];
 
-                        // TODO: rework this, but currently that is only command working
-                        if (command == "turn-any") command = "change-heading"
-
                         // update plane status
                         this.plane_value_change([command, value, callsign])
                     }

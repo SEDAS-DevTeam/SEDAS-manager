@@ -201,10 +201,6 @@ export class MainAppFunctions{
     public async redirect_to_main(){
         //message call to redirect to main program (start)
         this.app_status["redir-to-main"] = true
-        if (this.app_status["turn-on-backend"]){
-             // TODO: let the location be here?
-            //this.msc_wrapper.send_message("module", "ai_backend", "register", "CBA1127", "0.5") // Just an example
-        }
         this.main_app()
     }
 
@@ -375,7 +371,9 @@ export class MainAppFunctions{
         this.enviro_logger.log("INFO", "EventLogger instance on Environment is set up")
 
         // turn on the modules
-        this.msc_wrapper.send_message("action", "start")
+        if (this.app_status["turn-on-backend"]){
+            this.msc_wrapper.send_message("action", "start")
+        }
 
         this.loader.send_progress("Setting up environment")
         this.enviro = new Environment(this.ev_logger, this, ABS_PATH, this.PlaneDatabase,

@@ -9,7 +9,7 @@ import { frontend_vars, set_controller_buttons, set_controller_window, process_i
 
 //plane labels
 const PLANE_LABELS = ["Heading", "Level", "Speed"]
-const PLANE_CLASSES = ["change-heading", "change-level", "change-speed"]
+const PLANE_CLASSES = ["turn-any", "level-any", "speed-any"]
 
 const SPEED_STEP = 10
 const ALT_STEP = 500

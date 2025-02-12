@@ -74,11 +74,11 @@ invoke publish # publish to github
 - [ ] Logging is rewriting app_log.txt on address check
 - [ ] Add plane path and spawn functionalities
 - [ ] Unify IPC
-- [ ] Fix model crashing after request
-- [ ] Add SEDAS-AI-backend as submodule
+- [x] Fix model crashing after request
+- [x] Add SEDAS-AI-backend as submodule
 - [ ] First build when?
-- [ ] Make project portable + rework project.py into invoke
-- [ ] Unify with the .vscode file
+- [x] Make project portable + rework project.py into invoke
+- [x] Unify with the .vscode file
 - [ ] Fix the build with electron-builder
 - [ ] Fix app publishing
 - [x] Log colors in invoke

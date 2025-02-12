@@ -184,9 +184,15 @@ export class PlaneDB{
                         "heading": this.DB[i_plane].heading,
                         "updated_heading": this.DB[i_plane].updated_heading,
                         "rate_of_turn": this.plane_turn_DB[i]["rate_of_turn"],
-                        "refresh_rate": 1
+                        "refresh_rate": 1,
+                        "command": this.DB[i_plane].current_command
                     }
-                    const [new_heading, continue_change] = plane_calculations.calc_plane_heading(napi_arguments)
+
+                    let [new_heading, continue_change] = plane_calculations.calc_plane_heading(napi_arguments)
+
+                    // check when going over compas degrees
+                    if (new_heading > 360) new_heading = napi_arguments["rate_of_turn"]
+                    else if (new_heading < 0) new_heading = 360 - napi_arguments["rate_of_turn"]
                     
                     if (continue_change){
                         // Heading change is not done
@@ -325,6 +331,7 @@ export class Plane{
     public check_heading(std_bank_angle: number, plane_turn_DB: object[]){ //TODO: rewrite
         if (this.updated_heading != this.heading){
             //make turn
+
             let r_of_t = plane_calculations.calc_rate_of_turn(std_bank_angle, this.speed)
             let continue_change: boolean = true
             //scan plane turn database

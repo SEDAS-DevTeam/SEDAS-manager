@@ -176,25 +176,29 @@ napi_value Calc_plane_heading(napi_env env, napi_callback_info info){
     float updated_heading = get_variable<float>(env, get_dict_property(env, arg_dict, "updated_heading"));
     float rate_of_turn = get_variable<float>(env, get_dict_property(env, arg_dict, "rate_of_turn"));
     float refresh_rate = get_variable<float>(env, get_dict_property(env, arg_dict, "refresh_rate"));
+    std::string command = get_variable<std::string>(env, get_dict_property(env, arg_dict, "command"));
 
     // return variables
     float new_heading = heading;
     bool continue_change = false;
 
     if (updated_heading != heading){
-      // plane got update to new speed
+      // plane got update to new heading
       continue_change = true;
 
-      // piecewise definition of k
-      int k;
-      if (heading == 180) k = -1;
-      else k = (heading - 180) / abs(heading - 180);
+      float d_cw = fmod(updated_heading - heading + 360.0, 360.0); // clockwise rotation
+      float d_ccw = fmod(heading - updated_heading + 360.0, 360.0);
 
-      int in_h = heading + k * in_h;
+      bool turn_right = false;
+      if (command == "turn-any") turn_right = (d_cw <= d_ccw); // automatically decide
+      else if (command == "turn-right") turn_right = true;
+      else if (command == "turn-left") turn_right = false;
 
-      // calculating new heading
-      new_heading = heading + ((updated_heading - in_h) / abs(updated_heading - in_h)) * rate_of_turn * refresh_rate;
-      
+      std::cout << "What the fuck man " << turn_right << std::endl;
+
+      float delta = rate_of_turn * refresh_rate;
+      new_heading = turn_right ? fmod(heading + delta, 360.0) : fmod(heading - delta, 360);
+
       // calculating if plane did converge to specified heading
       if (abs(updated_heading - heading) < rate_of_turn * refresh_rate) continue_change = false;
     }

@@ -23,7 +23,6 @@ var scale = 0
 var main_canvas = undefined
 
 var curr_rel_dist = [0, 0] //x, y
-
 var is_dragging = false
 
 var curr_plane = undefined
@@ -111,28 +110,6 @@ function process_map_data(){
     renderScale(scale)
 }
 
-function check_trans_altitude(plane_data){
-    //TODO: is set up only for 1000 transition altitude
-    let plane_level = ""
-
-    //check if altitude does exceed transition altitude
-    if (plane_data.level > parseInt(APP_DATA["transition_altitude"])){
-        let val = Math.floor(plane_data.level / 100).toString()
-        if (val.length < 3){
-            for (let i = 0; i < 3 - val.length; i++){
-                val = "0" + val
-            }
-        }
-
-        //convert to FL
-        plane_level = "FL " + val
-    }
-    else{
-        plane_level = plane_data.level + " ft"
-    }
-    return plane_level
-}
-
 function render_planes(){
     //check saved coordinates if we deleted any plane
     for (let i = 0; i < plane_label_coords.length; i++){
@@ -155,8 +132,6 @@ function render_planes(){
         let label_x = 0
         let label_y = 0
 
-        let plane_level = check_trans_altitude(plane_data[i])
-
         let found_plane = false
         for (let i2 = 0; i2 < plane_label_coords.length; i2++){
             if(plane_label_coords[i2]["id"] == plane_data[i]["id"]){
@@ -177,16 +152,13 @@ function render_planes(){
             label_y = plane_data[i]["y"] - 50
         }
 
-        //add metrics and other functionalities to label values
-        plane_data[i].speed = plane_data[i].speed + " kts"
-
         renderPlane(plane_data[i]["x"], plane_data[i]["y"], plane_data[i]["heading"], plane_data[i]["speed"], APP_DATA["max_speed"], APP_DATA["min_speed"])
         let label_coords = renderPlaneInfo(plane_data[i]["x"], plane_data[i]["y"], label_x, label_y, {
             "callsign": plane_data[i]["callsign"],
-            "level": plane_level,
-            "speed": plane_data[i]["speed"],
+            "level": parseInt(plane_data[i]["level"]),
+            "speed": parseInt(plane_data[i]["speed"]),
             "code": undefined
-        })
+        }, parseInt(APP_DATA["transition_altitude"]))
 
         if (!found_plane){
             plane_label_coords.push({

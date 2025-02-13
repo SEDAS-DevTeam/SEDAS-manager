@@ -61,6 +61,28 @@ const SCALE_LEN = 100
 const SCALE_WIDTH = 3
 const SCALE_CORNER = 5
 
+function check_trans_altitude(plane_input_level, transition_altitude){
+  //TODO: is set up only for 1000 transition altitude
+  let plane_level = ""
+
+  //check if altitude does exceed transition altitude
+  if (plane_input_level > transition_altitude){
+      let val = Math.floor(plane_input_level / 100).toString()
+      if (val.length < 3){
+          for (let i = 0; i < 3 - val.length; i++){
+              val = "0" + val
+          }
+      }
+
+      //convert to FL
+      plane_level = "FL" + val
+  }
+  else{
+      plane_level = plane_input_level + " ft"
+  }
+  return plane_level
+}
+
 //low level functions
 export function deg_to_rad(deg){
   return deg * (Math.PI / 180)
@@ -156,7 +178,7 @@ export function renderPlane(x, y, angle, plane_speed, max_speed, min_speed){ //0
   context.stroke()
 }
 
-export function renderPlaneInfo(x_plane, y_plane, x, y, plane_info){
+export function renderPlaneInfo(x_plane, y_plane, x, y, plane_info, trans_altitude){
   //plane info rendering
   var canvas1 = document.querySelector("#canvas3")
   var context1 = canvas1.getContext("2d")
@@ -170,10 +192,13 @@ export function renderPlaneInfo(x_plane, y_plane, x, y, plane_info){
   let init_y = proc_y
   let init_x = proc_x + width
 
-  for (const [key, value] of Object.entries(plane_info)) {
+  for (let [key, value] of Object.entries(plane_info)) {
     if (value == undefined){
       continue
     }
+
+    if (key == "speed") value = value + " kts"
+    else if (key == "level") value = check_trans_altitude(value, trans_altitude)
 
     renderText(proc_x, proc_y, `${key}: ${value}`, "white", INFO_TEXT_SIZE + "px", "canvas3")
     proc_y -= LINE_INDENT

@@ -76,17 +76,14 @@ invoke publish # publish to github
 - [x] Make project portable + rework project.py into invoke
 - [x] Unify with the .vscode file
 - [x] Log colors in invoke
+- [x] Logo loads are broken (init and outro)
+- [x] On level and speed change floats are showing
+- [ ] Settings not saving
 - [ ] Check logging
-- [ ] Add plane path and spawn functionalities
-- [ ] Unify IPC
-- [ ] Fix the build with electron-builder
-- [ ] Fix app publishing
 - [ ] Fix settings message
 - [ ] Fix departure_arrival points selection
 - [ ] Dropdowns are broken
 - [ ] Plane info not dragging
-- [ ] On level and speed change floats are showing
-- [ ] Logo loads are broken (init and outro)
 
 ### Upcoming versions
 
@@ -106,3 +103,7 @@ invoke publish # publish to github
 - [ ] Rework app backup
 - [ ] Enable geo_data channel
 - [ ] When switching to SEDAS wiki, whole page scrolls down
+- [ ] Add plane path and spawn functionalities
+- [ ] Unify IPC
+- [ ] Fix the build with electron-builder
+- [ ] Fix app publishing

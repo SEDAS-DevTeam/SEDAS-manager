@@ -71,23 +71,38 @@ invoke publish # publish to github
 
 ### Current version
 
-- [ ] Logging is rewriting app_log.txt on address check
-- [ ] Add plane path and spawn functionalities
-- [ ] Unify IPC
 - [x] Fix model crashing after request
 - [x] Add SEDAS-AI-backend as submodule
-- [ ] First build when?
 - [x] Make project portable + rework project.py into invoke
 - [x] Unify with the .vscode file
+- [x] Log colors in invoke
+- [ ] Check logging
+- [ ] Add plane path and spawn functionalities
+- [ ] Unify IPC
 - [ ] Fix the build with electron-builder
 - [ ] Fix app publishing
-- [x] Log colors in invoke
 - [ ] Fix settings message
-- [ ] Rework loader segments
-- [ ] Better error handling on node_api side
+- [ ] Fix departure_arrival points selection
+- [ ] Dropdowns are broken
+- [ ] Plane info not dragging
+- [ ] On level and speed change floats are showing
+- [ ] Logo loads are broken (init and outro)
 
 ### Upcoming versions
 
+- [ ] Rework WebGL rendering
 - [ ] Rework CSS/JS
 - [ ] Better time
 - [ ] Finish PluginRegister
+- [ ] Rework Plugins tab
+- [ ] Rework inspect in controller_SET (better spacing, make it hover on screen)
+- [ ] Better error handling on node_api side
+- [ ] Rework loader segments
+- [ ] Move plane name generation to C++
+- [ ] Plane terminal is undefined
+- [ ] Add unified audio backend
+- [ ] Finish scenarios setup
+- [ ] First build when?
+- [ ] Rework app backup
+- [ ] Enable geo_data channel
+- [ ] When switching to SEDAS wiki, whole page scrolls down

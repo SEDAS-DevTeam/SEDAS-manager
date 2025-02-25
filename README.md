@@ -84,6 +84,7 @@ invoke publish # publish to github
 - [ ] Fix departure_arrival points selection
 - [ ] Dropdowns are broken
 - [ ] Plane info not dragging
+- [ ] Planes seem to not unregister properly
 
 ### Upcoming versions
 

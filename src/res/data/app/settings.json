@@ -18,8 +18,8 @@
     "max_speed": "450",
     "min_alt": "500",
     "max_alt": "41000",
-    "standard_pitch_up": "15",
-    "standard_pitch_down": "10",
-    "standard_accel": "6.95",
+    "standard_pitch_up": "4",
+    "standard_pitch_down": "7",
+    "standard_accel": "4.18",
     "transition_altitude": "1000"
 }

@@ -85,6 +85,7 @@ invoke publish # publish to github
 - [ ] Dropdowns are broken
 - [ ] Plane info not dragging
 - [ ] Planes seem to not unregister properly
+- [ ] Two plugin paths
 
 ### Upcoming versions
 

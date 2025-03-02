@@ -92,7 +92,7 @@ class trajectory_result{
 */
 
 float calc_rate_of_turn(float bank_angle, int plane_speed){
-    return ((1.091 * tan(deg_to_rad(bank_angle))) / plane_speed) * 1000;
+    return (1091 * tan(deg_to_rad(bank_angle))) / plane_speed;
 }
 
 int atan2_to_heading_conversion(int heading){

@@ -1,0 +1,9 @@
+{
+    "FILENAME": "test_grid.json",
+    "AIRPORT_NAME": "Test GRID",
+    "TYPE": "ACC",
+    "CODE": "",
+    "COUNTRY": "",
+    "CITY": "",
+    "DESC": "Testing map for AI module testing and plane coordination"
+}

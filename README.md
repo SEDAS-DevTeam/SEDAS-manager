@@ -86,6 +86,7 @@ invoke publish # publish to github
 - [ ] Plane info not dragging
 - [ ] Planes seem to not unregister properly
 - [ ] Two plugin paths
+- [ ] Logs still showing SEDAC instead of SEDAS
 
 ### Upcoming versions
 

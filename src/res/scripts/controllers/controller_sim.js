@@ -333,21 +333,6 @@ function change_according_points(){
     Switches
 */
 
-function switch_change_ai(elem){
-    if (elem.checked){
-        send_message("controller", "ai-control-start")
-
-        //disable visibility on whole content
-        sg.get_elem("div#main-content").hide()
-    }
-    else{
-        send_message("controller", "ai-control-stop")
-
-        //enable visibility on whole content
-        sg.get_elem("div#main-content").show()
-    }
-}
-
 function switch_change_wind(elem){
     if (elem.checked){
         send_message("controller", "wind-control-start")
@@ -470,10 +455,6 @@ function onload_sim(){
 
     sg.get_elem(".randomize-but").on_click(() => {
         random_generate_names()
-    })
-
-    sg.get_elem("#ai-control-switch").on_change((event) => {
-        switch_change_ai(event.target)
     })
 
     sg.get_elem("#wind-control-switch").on_change((event) => {

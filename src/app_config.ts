@@ -123,8 +123,8 @@ export const worker_dict = {
     title: "SEDAS",
     resizable: false,
     icon: PATH_TO_ICON,
-    //frame: false, //TODO turn off when testing
-    //focusable: false, //same here
+    frame: false, //TODO turn off when testing
+    focusable: false, //same here
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }

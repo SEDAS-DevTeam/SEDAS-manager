@@ -4,7 +4,9 @@
 
 This project is a new concept of an **ATC simulator** for both beginners and advanced users. It utilizes neural networks to imitate real pilots and also functions as a personal trainer. The goal of this desktop application is to make ATC learning easier for hobbyists and beginner ATC students. The project is still in early development.
 
-To get started, you can read **SEDAS** documentation on: [sedas docs](https://sedas-docs.readthedocs.io/en/latest/)
+To get started, you can read **SEDAS** documentation on: 
+- **Czech version:** - [sedas docs CZ](https://sedas-docs.readthedocs.io/cs/latest/)
+- **English version:** - [sedas docs EN](https://sedas-docs.readthedocs.io/en/latest/)
 
 ## Technical
 

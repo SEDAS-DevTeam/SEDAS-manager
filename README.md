@@ -36,7 +36,7 @@ cd SEDAS-manager
 
 ``` shell
 virtualenv sedas_manager_env
-sedas_manager_env/bin/activate # To deactivate, use: deactivate
+source sedas_manager_env/bin/activate # To deactivate, use: deactivate
 pip install -r requirements.txt
 cd src # get to working directory
 ```

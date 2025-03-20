@@ -29,7 +29,7 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Two plugin paths
 - [x] Logs still showing SEDAC instead of SEDAS
 - [ ] Fix the build with electron-builder
-- [ ] Fix app publishing
+- [ ] Finish app publishing to github
 
 ### Upcoming versions
 

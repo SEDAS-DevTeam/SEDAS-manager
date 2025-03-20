@@ -12,7 +12,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "build": {
+  "build_deprecated": {
     "appId": "com.sedacmanager.app",
     "directories": {
       "output": "./src_build/",
@@ -30,11 +30,11 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "./res/img/sedac-manager-logo.ico"
+      "icon": "./res/img/sedas-manager-logo.ico"
     },
     "linux": {
       "target": "deb",
-      "icon": "./res/img/sedac-manager-logo.png"
+      "icon": "./res/img/sedas-manager-logo.png"
     }
   },
   "dependencies": {
@@ -54,6 +54,7 @@
     "@electron-forge/maker-zip": "^7.6.1",
     "@electron-forge/plugin-auto-unpack-natives": "^7.6.1",
     "@electron-forge/plugin-fuses": "^7.6.1",
+    "@electron-forge/publisher-github": "^7.7.0",
     "@electron/fuses": "^1.8.0",
     "electron": "^30.0.9",
     "typescript": "^5.7.3"

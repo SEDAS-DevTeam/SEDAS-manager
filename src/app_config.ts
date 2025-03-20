@@ -53,7 +53,14 @@ export const PATH_TO_DATABASE: string = join(ABS_PATH, "/src/res/data/tmp/backup
 
 //constants used in this app
 export const WIDGET_OFFSET = 50
+
+//constats in app build
 export const APP_NAME: string = "SEDAS-manager"
+export const APP_IDENTIFIER_BETA: string = "com.beta.sedasmanager.app"
+export const APP_IDENTIFIER_PROD: string = "com.sedasmanager.app"
+export const IS_PRERELEASE: boolean = true
+export const APP_TAG_BETA: string = "beta"
+export const APP_TAg_PROD: string = "prod"
 
 /*
     Window configs for electron

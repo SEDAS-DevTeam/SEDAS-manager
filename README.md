@@ -20,14 +20,16 @@ To get started, you can read **SEDAS** documentation:
 - [x] Logo loads are broken (init and outro)
 - [x] On level and speed change floats are showing
 - [ ] Settings not saving
-- [ ] Check logging
+- [x] Check logging
 - [ ] Fix settings message
 - [ ] Fix departure_arrival points selection
 - [ ] Dropdowns are broken
 - [ ] Plane info not dragging
 - [ ] Planes seem to not unregister properly
 - [ ] Two plugin paths
-- [ ] Logs still showing SEDAC instead of SEDAS
+- [x] Logs still showing SEDAC instead of SEDAS
+- [ ] Fix the build with electron-builder
+- [ ] Fix app publishing
 
 ### Upcoming versions
 
@@ -49,5 +51,4 @@ To get started, you can read **SEDAS** documentation:
 - [ ] When switching to SEDAS wiki, whole page scrolls down
 - [ ] Add plane path and spawn functionalities
 - [ ] Unify IPC
-- [ ] Fix the build with electron-builder
-- [ ] Fix app publishing
+- [ ] Use strict mode to enforce semicolons

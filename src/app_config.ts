@@ -29,7 +29,7 @@ export const PATH_TO_WEATHER_HTML = join(ABS_PATH, "./src/res/html/worker/weathe
 export const PATH_TO_WIDGET_HTML = join(ABS_PATH, "./src/res/html/widget/worker_widget.html")
 
 //paths for local storage
-export const PATH_TO_LOGS: string = join(ABS_PATH, "/src/logs/")
+export const PATH_TO_LOGS: string = join(ABS_PATH, "/src/res/data/tmp/")
 export const PATH_TO_MAPS: string = join(ABS_PATH, "/src/res/data/sim/maps/")
 export const PATH_TO_COMMANDS: string = join(ABS_PATH, "/src/res/data/sim/commands/")
 export const PATH_TO_AIRCRAFTS: string = join(ABS_PATH, "/src/res/data/sim/planes/")
@@ -53,6 +53,7 @@ export const PATH_TO_DATABASE: string = join(ABS_PATH, "/src/res/data/tmp/backup
 
 //constants used in this app
 export const WIDGET_OFFSET = 50
+export const APP_NAME: string = "SEDAS-manager"
 
 /*
     Window configs for electron
@@ -228,7 +229,6 @@ export class Window extends BaseWindow{
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
         
-       dev_panel = false; // TODO
         if (dev_panel){
             this.window.webContents.openDevTools()
         }

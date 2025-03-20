@@ -2,7 +2,8 @@ import { createWriteStream, WriteStream } from "fs"
 import path from "path"
 import os from "os"
 import {
-    ABS_PATH
+    PATH_TO_LOGS,
+    APP_NAME
 } from "./app_config"
 
 export class EventLogger{
@@ -17,18 +18,18 @@ export class EventLogger{
 
     private data = []
     private debug_mode: boolean = undefined
-    private LOG_PATH: string = ""
     public log_header: string = ""
     private app_version: string = ""
     private header_type: string = ""
+    private LOG_PATH: string = ""
     private stream: WriteStream;
 
     public constructor(debug: boolean, log_header: string, header_type: string, app_ver: string = ""){
         this.debug_mode = debug
-        this.LOG_PATH = path.join(ABS_PATH, `/src/logs/${log_header}.txt`)
         this.log_header = log_header
         this.app_version = app_ver
         this.header_type = header_type
+        this.LOG_PATH = path.join(PATH_TO_LOGS, `${log_header}.txt`)
     }
     public async init_logger(){
         if(this.debug_mode){
@@ -99,10 +100,10 @@ export class EventLogger{
                     let os_release: string = os.release()
                     let os_platform: string = os.platform()
 
-                    this.stream.write(`SEDAC manager ${this.app_version} ${os_type} ${os_platform} ${os_release}\n`)
+                    this.stream.write(`${APP_NAME} ${this.app_version} ${os_type} ${os_platform} ${os_release}\n`)
                     break
                 case "environment":
-                    this.stream.write("SEDAC environment\n")
+                    this.stream.write(`${APP_NAME} environment\n`)
                     break
             }
 

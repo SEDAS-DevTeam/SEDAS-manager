@@ -12,7 +12,7 @@
     "package": "electron-forge package",
     "make": "electron-forge make"
   },
-  "build_deprecated": {
+  "build_depr": {
     "appId": "com.sedacmanager.app",
     "directories": {
       "output": "./src_build/",

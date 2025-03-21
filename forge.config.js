@@ -54,11 +54,21 @@ switch (get_os()){
     maker_array = [
       {
         name: "@reforged/maker-appimage",
-        platforms: ["linux"]
+        platforms: ["linux"],
+        config: {
+          options: {
+            icon: PATH_TO_ICON
+          }
+        }
       },
       {
         name: "@electron-forge/maker-zip",
-        platforms: ["linux"]
+        platforms: ["linux"],
+        config: {
+          options: {
+            icon: PATH_TO_ICON
+          }
+        }
       }
     ]
     break
@@ -79,7 +89,6 @@ module.exports = {
     asar: true,
     osxSign: {},
     appBundleId: fromBuildIdentifier({ beta: APP_IDENTIFIER_BETA, prod: APP_IDENTIFIER_PROD }),
-    icon: PATH_TO_ICON,
     packageJson: PATH_TO_PACKAGE, 
     dir: PATH_TO_SRC,
     outDir: PATH_TO_OUT,

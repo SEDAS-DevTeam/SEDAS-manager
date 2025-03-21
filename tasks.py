@@ -1,8 +1,9 @@
 from invoke import task
 
-from os import path, makedirs, listdir, remove, chdir
+from os import path, makedirs, listdir, remove, chdir, environ
 from pathlib import Path
 import shutil
+import json
 
 DESCRIPTION = "SEDAS Manager project toolkit, run --list to get info about args"
 PATH = str(Path(__file__).parent)
@@ -132,12 +133,14 @@ def devel(ctx):
 
 
 @task
-def build(ctx):
+def build(ctx, verbose=False):
     """
         Create SEDAS executable
     """
     print_color(PURPLE, "Building app...")
-    ctx.run(f"DEBUG=electron-forge:* npx electron-forge --config=./forge.config.js make --verbose", pty=True)
+    if verbose: command = "npm run make-verbose"
+    else: command = "npm run make"
+    ctx.run(command, pty=True)
 
 
 @task
@@ -150,12 +153,27 @@ def update(ctx):
 
 
 @task
-def publish(ctx):
+def publish(ctx, verbose=False):
     """
         Publish SEDAS executable
     """
+    git_var = None
+    try:
+        git_var = environ["GITHUB_TOKEN"] # try to access token if available
+    except KeyError: # not defined yet
+        print_color(PURPLE, "Setting Token")
+        with open("./token.json", "r") as file:
+            data = json.load(file)
+            environ["GITHUB_TOKEN"] = data.get("token")
+    git_var = environ["GITHUB_TOKEN"]
+
+    print_color(PURPLE, f"Environment variable is: {git_var}")
     print_color(PURPLE, "Publishing app...")
-    ctx.run("npm run publish", pty=True) # TODO
+
+    if verbose: command = "npm run publish-verbose"
+    else: command = "npm run publish"
+
+    ctx.run(command, pty=True, env=environ)
 
 
 # runtime

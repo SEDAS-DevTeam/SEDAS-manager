@@ -3,17 +3,7 @@ const { utils: { fromBuildIdentifier } } = require('@electron-forge/core');
 const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 
 // other stuff
-const { execSync } = require('node:child_process')
-
-function get_os(){
-  let os_val = undefined
-  try {os_val = execSync(`grep '^NAME=' /etc/os-release | sed 's/^[^=]*="//;s/"$//'`).toString().trim()}
-  catch(err){
-      console.error("Error reading OS value:", err)
-      process.exit(1)
-  }
-  return os_val
-}
+const os = require('os');
 
 // build consts
 const {
@@ -41,6 +31,31 @@ const {
   PATH_TO_PACKAGE
 } = require("./src/app_config")
 // TODO: after some time, replace beta tags with prod tags
+
+function get_os() {
+  const platform = os.platform()
+  const release = os.release()
+
+  if (platform === 'linux') {
+      try {
+          const osInfo = require('fs')
+              .readFileSync('/etc/os-release', 'utf8')
+              .split('\n')
+              .find(line => line.startsWith('NAME='))
+              ?.split('=')[1]
+              ?.replace(/"/g, '')
+              .trim();
+          return "Linux"
+      } catch (err) {
+          return "Linux"
+      }
+  }
+
+  if (platform === 'darwin') return 'macOS'
+  if (platform === 'win32') return `Windows ${release}`
+
+  return "Unknown"
+}
 
 /*
 runtime definitions
@@ -72,6 +87,58 @@ switch (get_os()){
       }
     ]
     break
+  }
+  case "Ubuntu": {
+    maker_array = [
+      {
+        name: "@reforged/maker-appimage",
+        platforms: ["linux"],
+        config: {
+          options: {
+            icon: PATH_TO_ICON
+          }
+        }
+      },
+      {
+        name: "@electron-forge/maker-zip",
+        platforms: ["linux"],
+        config: {
+          options: {
+            icon: PATH_TO_ICON
+          }
+        }
+      },
+      {
+        name: "@electron-forge/maker-deb",
+        config: {
+          options: {
+            maintainer: "Daniel Pojhan", // TODO: maybe later change that
+            homepage: "https://github.com/SEDAS-DevTeam",
+            icon: PATH_TO_ICON,
+            description: "A versatile and scalable ATC simulator"
+          }
+        }
+      }
+    ]
+  }
+  case "Linux": {
+    // unspecified Linux distro
+    maker_array = [
+      {
+        name: "@electron-forge/maker-zip",
+        platforms: ["linux"],
+        config: {
+          options: {
+            icon: PATH_TO_ICON
+          }
+        }
+      }
+    ]
+  }
+  case "Unknown": {
+    // unspecified OS platform
+    console.error("Unknow OS platform, quitting...")
+    process.exit(1)
   }
   default: {
     maker_array = [

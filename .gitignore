@@ -6,8 +6,8 @@ package-lock.json
 /src/build/*
 !/src/build/.gitkeep
 
-/src_build/*
-!/src_build/.gitkeep
+/out/*
+!/out/.gitkeep
 
 /src/addons/modules/build/*
 !/src/addons/modules/build/.gitkeep

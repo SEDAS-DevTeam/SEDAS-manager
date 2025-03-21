@@ -137,7 +137,7 @@ def build(ctx):
         Create SEDAS executable
     """
     print_color(PURPLE, "Building app...")
-    ctx.run("npm run make", pty=True)
+    ctx.run(f"DEBUG=electron-forge:* npx electron-forge --config=./forge.config.js make --verbose", pty=True)
 
 
 @task

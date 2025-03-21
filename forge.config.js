@@ -22,7 +22,23 @@ const {
   APP_IDENTIFIER_PROD,
   APP_TAG_BETA,
   IS_PRERELEASE,
-  PATH_TO_ICON
+  PATH_TO_ICON,
+
+  // paths
+  PATH_TO_OUT,
+
+  // exclusions
+  PATH_EXC_ADDONS,
+  PATH_EXC_ENV,
+  PATH_EXC_DOC,
+  PATH_EXC_VSCODE,
+  PATH_EXC_GITIGNORE,
+  PATH_EXC_GITMODULES,
+  PATH_EXC_REQUIREMENTS,
+  PATH_EXC_INVOKE,
+  PATH_EXC_TSCONF,
+  PATH_TO_SRC,
+  PATH_TO_PACKAGE
 } = require("./src/app_config")
 // TODO: after some time, replace beta tags with prod tags
 
@@ -34,25 +50,28 @@ runtime definitions
 let maker_array = []
 switch (get_os()){
   case "Arch Linux": {
+    // in order for this to work, you need to have squashfs-tools and zip installed
     maker_array = [
       {
-        name: "@electron-forge/maker-appimage",
-        config: {}
+        name: "@reforged/maker-appimage",
+        platforms: ["linux"]
       },
       {
         name: "@electron-forge/maker-zip",
         platforms: ["linux"]
-      },
-      {
-        name: "@electron-forge/maker-tar",
-        config: {}
       }
     ]
     break
   }
+  default: {
+    maker_array = [
+      {
+        name: "@electron-forge/maker-zip",
+        platforms: ["linux", "darwin", "win32"]
+      }
+    ]
+  }
 }
-console.log(maker_array)
-
 
 module.exports = {
   packagerConfig: { // configurations for packagers
@@ -60,12 +79,28 @@ module.exports = {
     asar: true,
     osxSign: {},
     appBundleId: fromBuildIdentifier({ beta: APP_IDENTIFIER_BETA, prod: APP_IDENTIFIER_PROD }),
-    icon: PATH_TO_ICON
+    icon: PATH_TO_ICON,
+    packageJson: PATH_TO_PACKAGE, 
+    dir: PATH_TO_SRC,
+    outDir: PATH_TO_OUT,
+    ignore: [
+      new RegExp(`.*${PATH_EXC_ADDONS.replace('./', '').replace(/\//g, '\\/')}.*`),
+      new RegExp(`.*${PATH_EXC_ENV.replace('./', '').replace(/\//g, '\\/')}.*`),
+      new RegExp(`.*${PATH_EXC_DOC.replace('./', '').replace(/\//g, '\\/')}.*`),
+      new RegExp(`.*${PATH_EXC_VSCODE.replace('./', '').replace(/\//g, '\\/')}.*`),
+      new RegExp(`.*${PATH_EXC_GITIGNORE.replace('./', '').replace(/\//g, '\\/')}.*`),
+      new RegExp(`.*${PATH_EXC_GITMODULES.replace('./', '').replace(/\//g, '\\/')}.*`),
+      new RegExp(`.*${PATH_EXC_REQUIREMENTS.replace('./', '').replace(/\//g, '\\/')}.*`),
+      new RegExp(`.*${PATH_EXC_INVOKE.replace('./', '').replace(/\//g, '\\/')}.*`),
+      new RegExp(`.*${PATH_EXC_TSCONF.replace('./', '').replace(/\//g, '\\/')}.*`)
+    ],
+    quiet: false,
+    debug: true
   },
   rebuildConfig: { // rebuild configuration
     force: true
   },
-  makers: ,
+  makers: maker_array,
   publishers: [ // publishing to github (TODO)
     {
       name: '@electron-forge/publisher-github',

@@ -54,13 +54,29 @@ export const PATH_TO_DATABASE: string = join(ABS_PATH, "/src/res/data/tmp/backup
 //constants used in this app
 export const WIDGET_OFFSET = 50
 
-//constats in app build
-export const APP_NAME: string = "SEDAS-manager"
+//constants in app build
+export const APP_NAME: string = "sedasmanager"
 export const APP_IDENTIFIER_BETA: string = "com.beta.sedasmanager.app"
 export const APP_IDENTIFIER_PROD: string = "com.sedasmanager.app"
 export const IS_PRERELEASE: boolean = true
 export const APP_TAG_BETA: string = "beta"
-export const APP_TAg_PROD: string = "prod"
+export const APP_TAG_PROD: string = "prod"
+export const PATH_TO_OUT: string = join(ABS_PATH, "/out/")
+export const PATH_TO_SRC: string = join(ABS_PATH, "/src")
+export const PATH_TO_PACKAGE: string = join(ABS_PATH, "/package.json")
+
+//constants in build exclusions
+//TODO build some better exclusion based mechanism in forge.config!
+export const PATH_EXC_ADDONS: string = "./src/addons";
+export const PATH_EXC_ENV: string = "./sedas_manager_env";
+export const PATH_EXC_DOC: string = "./doc";
+export const PATH_EXC_VSCODE: string = "./.vscode";
+export const PATH_EXC_GITIGNORE: string = "./.gitignore";
+export const PATH_EXC_GITMODULES: string = "./.gitmodules";
+export const PATH_EXC_REQUIREMENTS: string = "./requirements.txt";
+export const PATH_EXC_INVOKE: string = "./tasks.py";
+export const PATH_EXC_TSCONF: string = "./tsconfig.json";
+
 
 /*
     Window configs for electron

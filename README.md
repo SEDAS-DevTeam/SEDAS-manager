@@ -28,8 +28,9 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Planes seem to not unregister properly
 - [ ] Two plugin paths
 - [x] Logs still showing SEDAC instead of SEDAS
-- [ ] Fix the build with electron-builder
+- [x] Fix the build with electron-forge
 - [ ] Finish app publishing to github
+- [ ] Make a small rework in forge.config.js (better os support + exclusion based mechanic)
 
 ### Upcoming versions
 
@@ -52,3 +53,4 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Add plane path and spawn functionalities
 - [ ] Unify IPC
 - [ ] Use strict mode to enforce semicolons
+- [ ] Make build configs look less janky

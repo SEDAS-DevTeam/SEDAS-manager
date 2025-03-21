@@ -3,7 +3,7 @@
   "productName": "SEDAS-manager",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "./src/main.js",
   "author": "Daniel Pojhan <danpojhan@gmail.com>",
   "homepage": "https://github.com/HelloWorld7894/SEDAC",
   "license": "GPL-3.0",
@@ -11,31 +11,6 @@
     "debug": "electron --inspect=9229 ./src/main.js",
     "package": "electron-forge package",
     "make": "electron-forge make"
-  },
-  "build_deprecated": {
-    "appId": "com.sedacmanager.app",
-    "directories": {
-      "output": "./src_build/",
-      "buildResources": "resources"
-    },
-    "extraResources": [
-      {
-        "from": "./res/img/",
-        "to": "img"
-      },
-      {
-        "from": "./res/data/",
-        "to": "data"
-      }
-    ],
-    "win": {
-      "target": "nsis",
-      "icon": "./res/img/sedas-manager-logo.ico"
-    },
-    "linux": {
-      "target": "deb",
-      "icon": "./res/img/sedas-manager-logo.png"
-    }
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.2",
@@ -56,6 +31,7 @@
     "@electron-forge/plugin-fuses": "^7.6.1",
     "@electron-forge/publisher-github": "^7.7.0",
     "@electron/fuses": "^1.8.0",
+    "@reforged/maker-appimage": "^5.0.0",
     "electron": "^30.0.9",
     "typescript": "^5.7.3"
   }

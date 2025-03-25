@@ -47,3 +47,6 @@ package-lock.json
 
 # hide secret files
 token.json
+
+# PyEnv generated
+.python-version

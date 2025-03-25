@@ -68,15 +68,6 @@ switch (get_os()){
     // in order for this to work, you need to have squashfs-tools and zip installed
     maker_array = [
       {
-        name: "@reforged/maker-appimage",
-        platforms: ["linux"],
-        config: {
-          options: {
-            icon: PATH_TO_ICON
-          }
-        }
-      },
-      {
         name: "@electron-forge/maker-zip",
         platforms: ["linux"],
         config: {
@@ -90,15 +81,6 @@ switch (get_os()){
   }
   case "Ubuntu": {
     maker_array = [
-      {
-        name: "@reforged/maker-appimage",
-        platforms: ["linux"],
-        config: {
-          options: {
-            icon: PATH_TO_ICON
-          }
-        }
-      },
       {
         name: "@electron-forge/maker-zip",
         platforms: ["linux"],

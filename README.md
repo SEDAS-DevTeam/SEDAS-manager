@@ -31,6 +31,7 @@ To get started, you can read **SEDAS** documentation:
 - [x] Fix the build with electron-forge
 - [ ] Finish app publishing to github
 - [ ] Make a small rework in forge.config.js (better os support + exclusion based mechanic)
+- [ ] START/STOP button sometimes rewrites itself in simulation running
 
 ### Upcoming versions
 

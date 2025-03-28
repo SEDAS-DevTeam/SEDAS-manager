@@ -12,11 +12,19 @@ PURPLE = '\033[0;35m'
 BLUE = '\033[0;34m'
 NC = '\033[0m'
 
+# TODO: add for windows also
+NVM_PREPEND_LINUX = "source $HOME/.nvm/nvm.sh && nvm use &&"
+
 
 # functions
 def makefile(path):
     with open(path, "w"):
         pass
+
+
+def openfile(path):
+    with open(path, "r") as file:
+        return file.read()
 
 
 def print_color(color, text):
@@ -83,12 +91,12 @@ def compile(ctx, only="none"):
     def compile_cpp():
         path_src = path.join(PATH, "src")
         chdir(path_src)
-        ctx.run("node-gyp configure build", pty=True)
+        ctx.run(f"{NVM_PREPEND_LINUX} node-gyp configure build", pty=True)
         print_color(PURPLE, "Built all C++ files")
 
     def compile_ts():
         chdir(PATH)
-        ctx.run("npx tsc --project ./tsconfig.json", pty=True)
+        ctx.run(f"{NVM_PREPEND_LINUX} npx tsc --project ./tsconfig.json", pty=True)
         print_color(PURPLE, "Compiled Typescript")
 
     def compile_modules():
@@ -127,9 +135,10 @@ def devel(ctx):
     """
         Run app in development mode
     """
+
     path_main = path.join(PATH, "src/main.js")
     print_color(PURPLE, "Running app in dev mode...")
-    ctx.run(f"{path.join(PATH, "node_modules/electron/dist/electron")} {path_main}", pty=True)
+    ctx.run(f"{NVM_PREPEND_LINUX} {path.join(PATH, 'node_modules/electron/dist/electron')} {path_main}", shell=environ["SHELL"], pty=True)
 
 
 @task
@@ -137,9 +146,10 @@ def build(ctx, verbose=False):
     """
         Create SEDAS executable
     """
+
     print_color(PURPLE, "Building app...")
-    if verbose: command = "npm run make-verbose"
-    else: command = "npm run make"
+    if verbose: command = f"{NVM_PREPEND_LINUX} npm run make-verbose"
+    else: command = f"{NVM_PREPEND_LINUX} npm run make"
     ctx.run(command, pty=True)
 
 
@@ -157,6 +167,7 @@ def publish(ctx, verbose=False):
     """
         Publish SEDAS executable
     """
+
     git_var = None
     try:
         git_var = environ["GITHUB_TOKEN"] # try to access token if available
@@ -170,8 +181,8 @@ def publish(ctx, verbose=False):
     print_color(PURPLE, f"Environment variable is: {git_var}")
     print_color(PURPLE, "Publishing app...")
 
-    if verbose: command = "npm run publish-verbose"
-    else: command = "npm run publish"
+    if verbose: command = f"{NVM_PREPEND_LINUX} npm run publish-verbose"
+    else: command = f"{NVM_PREPEND_LINUX} npm run publish"
 
     ctx.run(command, pty=True, env=environ)
 

@@ -51,7 +51,8 @@ import {
     PATH_TO_MODULES,
 
     ABS_PATH,
-    PATH_TO_MSC
+    PATH_TO_MSC,
+    PATH_TO_INSTALLER
 } from "./app_config"
 
 import { MainAppFunctions } from "./backend_functions"
@@ -746,6 +747,9 @@ const app_settings = JSON.parse(app_settings_raw);
 
 //app main code
 app.on("ready", async () => {
+    // run updater to check for any incoming updates
+    await utils.run_updater(PATH_TO_INSTALLER)
+
     //setup app event logger
     await utils.delete_logs()
     EvLogger = new EventLogger(app_settings["logging"], "app_log", "system", "v1.0.0")

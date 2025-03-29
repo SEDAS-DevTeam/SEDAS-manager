@@ -1,2 +1,4 @@
 invoke
 requests
+pyside6
+pyinstaller

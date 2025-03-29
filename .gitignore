@@ -50,3 +50,11 @@ token.json
 
 # PyEnv generated
 .python-version
+
+# updater
+/src/updater/__pycache__
+/src/updater/build/*
+!/src/updater/build/.gitkeep
+
+/src/updater/dist/*
+!/src/updater/dist/.gitkeep

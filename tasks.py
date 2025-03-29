@@ -86,7 +86,8 @@ def compile(ctx, only="none"):
         Compile target files
             1) TS -> JS
             2) C++ -> bind to TS part
-            3) Compile all modules and move them to the module build directory
+            3) Python updater to executable
+            4) Compile all modules and move them to the module build directory
     """
     def compile_cpp():
         path_src = path.join(PATH, "src")
@@ -99,7 +100,24 @@ def compile(ctx, only="none"):
         ctx.run(f"{NVM_PREPEND_LINUX} npx tsc --project ./tsconfig.json", pty=True)
         print_color(PURPLE, "Compiled Typescript")
 
+    def compile_updater():
+        path_updater = path.join(PATH, "src/updater")
+        path_build_install = path.join(path_updater, "build/install")
+        path_build_uninstall = path.join(path_updater, "build/uninstall")
+
+        chdir(path_updater)
+
+        # removing build dirs
+        shutil.rmtree(path_build_install)
+        shutil.rmtree(path_build_uninstall)
+
+        ctx.run("pyinstaller install.spec")
+        print_color(PURPLE, "Compiled Installer")
+        ctx.run("pyinstaller uninstall.spec")
+        print_color(PURPLE, "Compiled Uninstaller")
+
     def compile_modules():
+
         path_modules = path.join(PATH, "src/addons/modules/bin")
 
         # Compile SEDAS-AI-backend
@@ -123,11 +141,13 @@ def compile(ctx, only="none"):
         print_color(PURPLE, "Compiling target files...")
         compile_cpp()
         compile_ts()
+        compile_updater()
         compile_modules()
         print_color(PURPLE, "Compiled target files")
     elif only == "cpp": compile_cpp()
     elif only == "ts": compile_ts()
     elif only == "modules": compile_modules()
+    elif only == "updater": compile_updater()
 
 
 @task

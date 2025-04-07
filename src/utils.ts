@@ -27,6 +27,7 @@ import {
  } from "./app_config";
 import { desktopCapturer, ipcMain } from "electron";
 import { Worker } from "worker_threads";
+import { exec } from "child_process";
 // variables
 const alphabet: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
@@ -604,6 +605,16 @@ async function ping(address: string): Promise<boolean>{
     })
 }
 
+async function run_updater(path: string){
+    return new Promise<void>((resolve, reject) => {
+        let updater = exec(path)
+        updater.stdout.pipe(process.stdout)
+        updater.on("exit", () => {
+            resolve()
+        })
+    })    
+}
+
 // exports
 const utils = {
     read_file_content,
@@ -622,7 +633,8 @@ const utils = {
     create_popup_window,
     delete_logs,
     readJSON,
-    ping
+    ping,
+    run_updater
 }
 
 export default utils

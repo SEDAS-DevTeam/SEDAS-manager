@@ -1,3 +1,0 @@
-- [Skybrary aircraft types browser](https://skybrary.aero/aircraft-types)
-- [Airliners.net airplane database](https://www.airliners.net/aircraft-data)
-- Lukáš Musil: Encyklopedie dopravních letadel

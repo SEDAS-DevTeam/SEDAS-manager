@@ -41,6 +41,9 @@ export const PATH_TO_PLUGINS: string = join(ABS_PATH, "/src/res/data/app/config/
 export const PATH_TO_MODULES: string = join(ABS_PATH, "/src/res/data/app/config/modules_config.json")
 export const PATH_TO_ICON: string = join(ABS_PATH, "/src/res/img/sedas-manager-logo-rounded.png")
 
+//paths to updater
+export const PATH_TO_INSTALLER: string = join(ABS_PATH, "/src/updater/dist/install")
+
 //paths for workers
 export const PATH_TO_MSC: string = join(ABS_PATH, "/src/workers/backend.js")
 export const PATH_TO_BACKUP: string = join(ABS_PATH, "/src/workers/database.js")
@@ -147,8 +150,8 @@ export const worker_dict = {
     title: "SEDAS",
     resizable: false,
     icon: PATH_TO_ICON,
-    frame: false, //TODO turn off when testing
-    focusable: false, //same here
+    //frame: false, //TODO turn off when testing
+    //focusable: false, //same here
     webPreferences: {
         preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
     }

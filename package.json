@@ -7,13 +7,6 @@
   "author": "Daniel Pojhan <danpojhan@gmail.com>",
   "homepage": "https://github.com/HelloWorld7894/SEDAC",
   "license": "GPL-3.0",
-  "scripts": {
-    "debug": "electron --inspect=9229 ./src/main.js",
-    "make": "electron-forge make",
-    "make-verbose": "DEBUG=electron-forge:* npx electron-forge make --verbose",
-    "publish": "electron-forge publish",
-    "publish-verbose": "DEBUG=electron-forge:* npx electron-forge publish --verbose"
-  },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.2",
     "@types/uuid": "^9.0.8",
@@ -33,7 +26,6 @@
     "@electron-forge/plugin-fuses": "^7.6.1",
     "@electron-forge/publisher-github": "^7.7.0",
     "@electron/fuses": "^1.8.0",
-    "@reforged/maker-appimage": "^5.0.0",
     "electron": "^30.0.9",
     "typescript": "^5.7.3"
   }

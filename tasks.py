@@ -14,6 +14,9 @@ NC = '\033[0m'
 
 # TODO: add for windows also
 NVM_PREPEND_LINUX = "source $HOME/.nvm/nvm.sh && nvm use &&"
+ELECTRON_PATH = path.join(PATH, "node_modules/.bin/electron")
+FORGE_PATH = path.join(PATH, "node_modules/.bin/electron-forge")
+SET_PROJ_ROOT = f"cd {PATH} &&"
 
 
 # functions
@@ -39,7 +42,7 @@ def clean(ctx):
 
     path_src = path.join(PATH, "src")
     path_workers = path.join(PATH, "src/workers")
-    path_build = path.join(PATH, "src_build")
+    path_build = path.join(PATH, "out")
     path_cpp_build = path.join(PATH, "src/build")
     path_module_build = path.join(PATH, "src/addons/modules/build")
 
@@ -81,7 +84,7 @@ def clean(ctx):
 
 
 @task
-def compile(ctx, only="none"):
+def compile(ctx, only="none", refetch=False):
     """
         Compile target files
             1) TS -> JS
@@ -92,12 +95,12 @@ def compile(ctx, only="none"):
     def compile_cpp():
         path_src = path.join(PATH, "src")
         chdir(path_src)
-        ctx.run(f"{NVM_PREPEND_LINUX} node-gyp configure build", pty=True)
+        ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} node-gyp configure build", pty=True)
         print_color(PURPLE, "Built all C++ files")
 
     def compile_ts():
         chdir(PATH)
-        ctx.run(f"{NVM_PREPEND_LINUX} npx tsc --project ./tsconfig.json", pty=True)
+        ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} npx tsc --project ./tsconfig.json", pty=True)
         print_color(PURPLE, "Compiled Typescript")
 
     def compile_updater():
@@ -122,20 +125,32 @@ def compile(ctx, only="none"):
 
         # Compile SEDAS-AI-backend
         sedas_ai_backend = path.join(path_modules, "SEDAS-AI-backend/src")
-        sedas_ai_resources = path.join(path_modules, "SEDAS-AI-backend/src/PlaneResponse/models/tts/voices")
+        sedas_tts_resources = path.join(sedas_ai_backend, "PlaneResponse/models/tts/voices")
+        sedas_asr_resource = path.join(sedas_ai_backend, "PlaneResponse/models/asr/atc-whisper-ggml.bin")
 
         chdir(sedas_ai_backend)
-        if len(listdir(sedas_ai_resources)) == 1:
-            print_color(PURPLE, "Fetching TTS resources for SEDAS-AI-backend (this my take some while)")
-            ctx.run("invoke fetch-resources") # fetch resources if not fetched earlier
-        ctx.run("invoke build --DTESTING=OFF", pty=True)
-        print_color(PURPLE, "Compile SEDAS-AI-backend")
 
+        # check TTS resource fetching
+        if len(listdir(sedas_tts_resources)) == 1:
+            print_color(PURPLE, "Fetching TTS resources for SEDAS-AI-backend (this my take some while)")
+            ctx.run("invoke fetch-resources -t=tts") # fetch tts resources
+
+        # check ASR resource fetching
+        if not path.exists(sedas_asr_resource) or refetch: # or if the user enforced the refetch
+            ctx.run("invoke fetch-resources -t=asr") # fetch asr resources
+
+        ctx.run("invoke build-deps") # build the whisper.cpp runner
+        ctx.run("invoke build --DTESTING=OFF")
+        print_color(PURPLE, "Compiled SEDAS-AI-backend")
+
+        print_color(PURPLE, "Moving built files to /build directory...")
         sedas_ai_project_build = path.join(path_modules, "SEDAS-AI-backend/project_build")
         sedas_ai_global_build = path.join(PATH, "src/addons/modules/build/sedas_ai_backend")
         shutil.copytree(sedas_ai_project_build, sedas_ai_global_build, dirs_exist_ok=True)
 
         # TODO: maybe add more modules?
+
+        print_color(PURPLE, "Done!")
 
     if only == "none":
         print_color(PURPLE, "Compiling target files...")
@@ -158,7 +173,19 @@ def devel(ctx):
 
     path_main = path.join(PATH, "src/main.js")
     print_color(PURPLE, "Running app in dev mode...")
-    ctx.run(f"{NVM_PREPEND_LINUX} {path.join(PATH, 'node_modules/electron/dist/electron')} {path_main}", shell=environ["SHELL"], pty=True)
+    print(f"{ELECTRON_PATH} {path_main}")
+    ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {ELECTRON_PATH} {path_main}", pty=True)
+
+
+@task
+def debug(ctx):
+    """
+        Run app in debug mode
+    """
+
+    path_main = path.join(PATH, "src/main.js")
+    print_color(PURPLE, "Running app in debug mode...")
+    ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {ELECTRON_PATH} --inspect=9229 {path_main}", pty=True)
 
 
 @task
@@ -168,8 +195,8 @@ def build(ctx, verbose=False):
     """
 
     print_color(PURPLE, "Building app...")
-    if verbose: command = f"{NVM_PREPEND_LINUX} npm run make-verbose"
-    else: command = f"{NVM_PREPEND_LINUX} npm run make"
+    if verbose: command = f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} DEBUG=electron-forge:* {FORGE_PATH} make --verbose"
+    else: command = f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {FORGE_PATH} make"
     ctx.run(command, pty=True)
 
 
@@ -180,6 +207,13 @@ def update(ctx):
     """
     print_color(PURPLE, "Updating submodules...")
     ctx.run("git submodule update --remote --recursive", pty=True)
+
+    # reinstall SEDAS-AI-backend module requirements.txt if something was added
+    print_color(PURPLE, "Checking main tasks.py dependencies...")
+    sedas_ai_backend_requirements = path.join(PATH, "src/addons/modules/bin/SEDAS-AI-backend/requirements.txt")
+    ctx.run(f"pip install -r {sedas_ai_backend_requirements}")
+
+    print_color(PURPLE, "Done!")
 
 
 @task
@@ -201,8 +235,8 @@ def publish(ctx, verbose=False):
     print_color(PURPLE, f"Environment variable is: {git_var}")
     print_color(PURPLE, "Publishing app...")
 
-    if verbose: command = f"{NVM_PREPEND_LINUX} npm run publish-verbose"
-    else: command = f"{NVM_PREPEND_LINUX} npm run publish"
+    if verbose: command = f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} DEBUG=electron-forge:* {FORGE_PATH} publish --verbose"
+    else: command = f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {FORGE_PATH} publish"
 
     ctx.run(command, pty=True, env=environ)
 

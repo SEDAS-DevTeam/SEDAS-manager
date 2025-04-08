@@ -4,8 +4,10 @@
 
 This project is a new concept of an **ATC simulator** for both beginners and advanced users. It utilizes neural networks to imitate real pilots and also functions as a personal trainer. The goal of this desktop application is to make ATC learning easier for hobbyists and beginner ATC students. The project is still in early development.
 
-To get started, you can read **SEDAS** documentation: 
+To get started, you can read **SEDAS** documentation:
+
 - **Czech version:** - [sedas docs CZ](https://sedas-docs.readthedocs.io/cs/latest/)
+
 - **English version:** - [sedas docs EN](https://sedas-docs.readthedocs.io/en/latest/)
 
 ## Project TODO list
@@ -19,17 +21,15 @@ To get started, you can read **SEDAS** documentation:
 - [x] Log colors in invoke
 - [x] Logo loads are broken (init and outro)
 - [x] On level and speed change floats are showing
-- [ ] Settings not saving
 - [x] Check logging
-- [ ] Fix settings message
-- [ ] Fix departure_arrival points selection
-- [ ] Dropdowns are broken
+- [ ] Fix settings message (settings not saving)
 - [ ] Plane info not dragging
 - [ ] Planes seem to not unregister properly
-- [ ] Two plugin paths
+- [x] Two plugin paths
 - [x] Logs still showing SEDAC instead of SEDAS
 - [x] Fix the build with electron-forge
-- [ ] Finish app publishing to github
+- [x] Finish app publishing to github
+- [ ] Add the Climb/descend functionality
 - [ ] Make a small rework in forge.config.js (better os support + exclusion based mechanic)
 - [ ] START/STOP button sometimes rewrites itself in simulation running
 
@@ -55,3 +55,5 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Unify IPC
 - [ ] Use strict mode to enforce semicolons
 - [ ] Make build configs look less janky
+- [ ] Fix departure_arrival points selection
+- [ ] Dropdowns are broken

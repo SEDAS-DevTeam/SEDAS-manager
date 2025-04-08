@@ -606,11 +606,20 @@ async function ping(address: string): Promise<boolean>{
 }
 
 async function run_updater(path: string){
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<boolean>((resolve, reject) => {
         let updater = exec(path)
         updater.stdout.pipe(process.stdout)
-        updater.on("exit", () => {
-            resolve()
+        updater.on("exit", (code) => {
+            if (code == 0){
+                // internet is available
+                resolve(true)
+            }
+            else if (code == 1){
+                resolve(false)
+            }
+            else{
+                reject(new Error(`Updater failed with code ${code}`))
+            }
         })
     })    
 }

@@ -39,34 +39,29 @@ export class PlaneDB{
                 })
             },
             {
-                "comm": "speed-any",
-                "exec": ((plane: Plane, command: string, value: any) => {
-                    plane.change_speed(command, value)
-                })
-            },
-            {
-                "comm": "speed-accel"
-                // TODO
-            },
-            {
-                "comm": "speed-decel"
-                // TODO
-            },
-            {
-                "comm": "level-any",
-                "variations": ["expedite", "climb", "descend"],
+                "comm": "descend-fl",
                 "exec": ((plane: Plane, command: string, value: any) => {
                     plane.change_level(command, value)
                 })
             },
             {
-                "comm": "level-descend",
-                // TODO
+                "comm": "descend-feet",
+                "exec": ((plane: Plane, command: string, value: any) => {
+                    plane.change_level(command, value)
+                })
             },
             {
-                "comm": "level-climb"
-                // TODO
-            }
+                "comm": "climb-fl",
+                "exec": ((plane: Plane, command: string, value: any) => {
+                    plane.change_level(command, value)
+                })
+            },
+            {
+                "comm": "climb-feet",
+                "exec": ((plane: Plane, command: string, value: any) => {
+                    plane.change_level(command, value)
+                })
+            },
         ]
     }
 

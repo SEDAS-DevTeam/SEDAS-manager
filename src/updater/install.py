@@ -5,6 +5,15 @@ from PySide6.QtWidgets import QLabel, QProgressBar
 
 import time
 import sys
+import requests
+
+
+def check_internet():
+    try:
+        response = requests.get("https://www.google.com", timeout=5)
+        if response.status_code == 200: return True
+        else: return False
+    except requests.ConnectionError: return False
 
 
 class InstallThread(QThread):
@@ -21,13 +30,13 @@ class InstallThread(QThread):
 
     def run(self):
         self.progress_signal.emit(self.update_iter(), "Unpacking app")
-        time.sleep(2)
+        time.sleep(1)
 
         self.progress_signal.emit(self.update_iter(), "Deploying files")
-        time.sleep(2)
+        time.sleep(1)
 
         self.progress_signal.emit(self.update_iter(), "Gimme some rest")
-        time.sleep(3)
+        time.sleep(1)
 
         self.terminate_signal.emit()
 
@@ -36,6 +45,7 @@ class InstallGui(GuiApp):
     def __init__(self):
         super().__init__("SEDAS Installation")
 
+        self.internet_connection = False
         self.graceful_exit = False
         self.app.aboutToQuit.connect(self.postinst_cleanup)
 
@@ -51,6 +61,10 @@ class InstallGui(GuiApp):
 
         self.layout.addWidget(self.progress_bar)
         self.layout.addStretch(1)
+
+        # checking internet connection
+        self.internet_connection = check_internet()
+        if not self.internet_connection: sys.exit(1)
 
         # start app install
         print("Starting installation")
@@ -77,4 +91,5 @@ class InstallGui(GuiApp):
 if __name__ == "__main__":
     main_app = InstallGui()
     main_app.mainloop()
+
     sys.exit(0)

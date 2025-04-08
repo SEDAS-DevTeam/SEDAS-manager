@@ -494,7 +494,7 @@ class MainApp extends MainAppFunctions{
 
         // set progressive loader object on loaders
         this.loader = new ProgressiveLoader(app_settings, this.displays, load_dict, EvLogger)
-        this.loader.setup_loader(9, "SEDAS is loading, please wait...", "Initializing app")
+        this.loader.setup_loader(8, "SEDAS is loading, please wait...", "Initializing app")
 
         // set other important segments on MainApp
         this.widget_handler = new WidgetWindowHandler()
@@ -509,14 +509,6 @@ class MainApp extends MainAppFunctions{
         this.app_settings = JSON.parse(app_settings_raw);
 
         EvLogger.log("DEBUG", "APP-INIT")
-
-        /*
-            Loader segment 2
-        */
-        this.loader.send_progress("Checking internet connectivity")
-
-        //check internet connectivity
-        this.app_status["internet-connection"] = Boolean(await utils.checkInternet(EvLogger))
 
         /*
             Loader segment 7 (rest of segments are in update_all)
@@ -747,8 +739,6 @@ const app_settings = JSON.parse(app_settings_raw);
 
 //app main code
 app.on("ready", async () => {
-    // run updater to check for any incoming updates
-    await utils.run_updater(PATH_TO_INSTALLER)
 
     //setup app event logger
     await utils.delete_logs()
@@ -760,6 +750,9 @@ app.on("ready", async () => {
     EvLogger.log("DEBUG", "Addons loaded successfully")
 
     main_app = new MainApp(app_settings, EvLogger)
+
+    //check internet connectivity & run independent updater
+    main_app.app_status["internet-connection"] = await utils.run_updater(PATH_TO_INSTALLER)
 
     await main_app.init_app() //initializing backend for app
     

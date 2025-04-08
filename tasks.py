@@ -1,4 +1,4 @@
-from invoke import task
+from invoke import task, UnexpectedExit
 
 from os import path, makedirs, listdir, remove, chdir, environ
 from pathlib import Path
@@ -94,12 +94,11 @@ def compile(ctx, only="none", refetch=False):
     """
     def compile_cpp():
         path_src = path.join(PATH, "src")
-        chdir(path_src)
-        ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} node-gyp configure build", pty=True)
+        ctx.run(f"cd {path_src} && {NVM_PREPEND_LINUX} node-gyp configure build", pty=True)
+        chdir(PATH)
         print_color(PURPLE, "Built all C++ files")
 
     def compile_ts():
-        chdir(PATH)
         ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} npx tsc --project ./tsconfig.json", pty=True)
         print_color(PURPLE, "Compiled Typescript")
 
@@ -166,15 +165,28 @@ def compile(ctx, only="none", refetch=False):
 
 
 @task
-def devel(ctx):
+def devel(ctx, obj):
     """
         Run app in development mode
     """
 
-    path_main = path.join(PATH, "src/main.js")
-    print_color(PURPLE, "Running app in dev mode...")
-    print(f"{ELECTRON_PATH} {path_main}")
-    ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {ELECTRON_PATH} {path_main}", pty=True)
+    if obj == "app":
+        path_main = path.join(PATH, "src/main.js")
+        print_color(PURPLE, "Running app in dev mode...")
+        print(f"{ELECTRON_PATH} {path_main}")
+        ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {ELECTRON_PATH} {path_main}", pty=True)
+
+    elif obj == "install":
+        print_color(PURPLE, "Running installer in dev mode...")
+
+        try:
+            result = ctx.run("python ./src/updater/install.py")
+            print(f"App exited with code: {result.exited}")
+        except UnexpectedExit as e: print(f"App failed with code: {e.result.exited}")
+
+    elif obj == "uninstall":
+        print_color(PURPLE, "Running uninstaller in dev mode...")
+        ctx.run("python ./src/updater/uninstall.py")
 
 
 @task

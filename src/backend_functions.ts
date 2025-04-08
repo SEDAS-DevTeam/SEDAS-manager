@@ -502,7 +502,7 @@ export class MainAppFunctions{
         //TODO: add args to set command
         this.PlaneDatabase.set_command(data[2], data[0], data[1])      
         this.broadcast_planes(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
-        this.wrapper.send_message("controller", "terminal-add", data[1].slice(1))
+        this.wrapper.send_message("controller", "terminal-add", data)
     }
 
     public plane_delete_record(data: any[]){ // add MSC_wrapper here!

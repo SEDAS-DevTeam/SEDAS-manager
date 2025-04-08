@@ -30,13 +30,13 @@ class InstallThread(QThread):
 
     def run(self):
         self.progress_signal.emit(self.update_iter(), "Unpacking app")
-        time.sleep(1)
+        time.sleep(0.2)
 
         self.progress_signal.emit(self.update_iter(), "Deploying files")
-        time.sleep(1)
+        time.sleep(0.2)
 
         self.progress_signal.emit(self.update_iter(), "Gimme some rest")
-        time.sleep(1)
+        time.sleep(0.2)
 
         self.terminate_signal.emit()
 

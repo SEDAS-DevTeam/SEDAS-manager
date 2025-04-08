@@ -63,7 +63,7 @@ napi_value Calc_plane_level(napi_env env, napi_callback_info info){
 
     float climb_angle = get_variable<float>(env, get_dict_property(env, arg_dict, "climb_angle"));
     float descent_angle = get_variable<float>(env, get_dict_property(env, arg_dict, "descent_angle"));
-    float angles[2] = {climb_angle, descent_angle};
+    float angles[2] = {descent_angle, climb_angle};
 
     float scale = get_variable<float>(env, get_dict_property(env, arg_dict, "scale"));
     int level = get_variable<int>(env, get_dict_property(env, arg_dict, "level"));
@@ -80,14 +80,14 @@ napi_value Calc_plane_level(napi_env env, napi_callback_info info){
       // plane got update to new level
       continue_change = true;
       int k = (updated_level - level) / abs(updated_level - level);
-      float sel_angle = angles[(int) ceil(k / 2)];
+      float sel_angle = deg_to_rad(angles[(int) ceil(k / 2)]);
 
       // calculating updated level
-      float change = ((k * sin(sel_angle)) * refresh_rate) / scale;
-      new_level = level + change;
+      float change = (sin(sel_angle) * refresh_rate) / scale;
+      new_level = level + k * change;
 
       // calculating screen speed
-      screen_speed = cos(deg_to_rad(sel_angle)) * speed;
+      screen_speed = cos(sel_angle) * speed;
 
       // calculating if plane did converge to specified level
       if (abs(updated_level - level) < change) continue_change = false;

@@ -84,9 +84,9 @@ class MainApp extends MainAppFunctions{
         //everything is set up, time to load
         this.wrapper.broadcast("workers", "ask-for-render", []) //send workers command to fire "render-map" event
         
-        //registering & rendering widget workers
-        this.widget_handler.setup_all(this.worker_coords, EvLogger)
-        this.widget_handler.show_all()
+        //registering & rendering widget workers (TODO: disabling for now -> for demonstration purposes)
+        //this.widget_handler.setup_all(this.worker_coords, EvLogger)
+        //this.widget_handler.show_all()
     }
 
     private get_screen_info(){

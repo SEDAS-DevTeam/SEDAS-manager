@@ -23,15 +23,19 @@ To get started, you can read **SEDAS** documentation:
 - [x] On level and speed change floats are showing
 - [x] Check logging
 - [ ] Fix settings message (settings not saving)
-- [ ] Plane info not dragging
 - [ ] Planes seem to not unregister properly
+- [ ] Validate all the plane calculations (just to make sure)
+- [ ] When registering new plane, the SEDAS-AI synth just cannot see Model file (piper) - **URGENT**
+- [ ] When making climb/descend in turn, plane starts to change its rotation completely (but works when corrected in vectoring) - **URGENT**
 - [x] Two plugin paths
 - [x] Logs still showing SEDAC instead of SEDAS
 - [x] Fix the build with electron-forge
 - [x] Finish app publishing to github
-- [ ] Add the Climb/descend functionality
+- [x] Add the Climb/descend functionality
 - [ ] Make a small rework in forge.config.js (better os support + exclusion based mechanic)
 - [ ] START/STOP button sometimes rewrites itself in simulation running
+- [x] ECONNREFUSED on the first session start
+- [ ] make command restrictions so that controller cannot tell plane some obscure command - **URGENT**
 
 ### Upcoming versions
 
@@ -57,3 +61,4 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Make build configs look less janky
 - [ ] Fix departure_arrival points selection
 - [ ] Dropdowns are broken
+- [ ] Plane info not dragging

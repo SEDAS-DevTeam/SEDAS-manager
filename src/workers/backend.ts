@@ -2,6 +2,7 @@ import {parentPort} from "worker_threads"
 import net from "net"
 import path from "path"
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
+import utils from "../utils";
 
 // TODO: change from client to server
 
@@ -50,6 +51,8 @@ class ModuleRegistry{
     public registry: Module[] = [];
     public active_processes: object[] = [];
     private client_socket: net.Socket;
+
+    private connected: boolean = false; // TODO: rewrite
 
     constructor(configuration: object){
         for (let i = 0; i < configuration["modules"].length; i++){
@@ -140,8 +143,13 @@ class ModuleRegistry{
             let name: string = this.active_processes[i]["name"]
             let process: ChildProcessWithoutNullStreams = this.active_processes[i]["process_obj"]
 
-            process.stdout.on("data", (data) => {
+            process.stdout.on("data", (data: string) => {
                 console.log(`${name}: ${data}`);
+
+                if(!this.connected && data.includes("ready")){
+                    this.connect_to_server() // TODO: rewrite this so that client is server and vice versa
+                    this.connected = true;
+                }
             })
             process.stderr.on("data", (data) => {
                 console.log(`${name}: ${data}`);
@@ -222,7 +230,6 @@ parentPort.on("message", (message) => {
 
                     // running all modules
                     module_registry.deploy_modules()
-                    module_registry.connect_to_server()
                     break
             }
         }

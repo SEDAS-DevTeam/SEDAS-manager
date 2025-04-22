@@ -150,6 +150,9 @@ export class PlaneDB{
     }
 
     private update_plane_turns(){
+        // TODO
+        //console.log(this.plane_turn_DB)
+        //console.log(this.DB)
 
         //update plane turns
         for (let i = 0; i < this.plane_turn_DB.length; i++){

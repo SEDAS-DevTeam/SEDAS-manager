@@ -47,9 +47,15 @@ class Module{
     }
 }
 
+interface ActiveProcess {
+    name: string,
+    process_obj: ChildProcessWithoutNullStreams,
+    n_killed: number
+}
+
 class ModuleRegistry{
     public registry: Module[] = [];
-    public active_processes: object[] = [];
+    public active_processes: ActiveProcess[] = [];
     private client_socket: net.Socket;
 
     private connected: boolean = false; // TODO: rewrite
@@ -124,18 +130,89 @@ class ModuleRegistry{
         }
     }
 
+    public spawn_module(path: string, args: string[], name: string){
+        let process = spawn(path, args);
+        this.active_processes.push({
+            "name": name, 
+            "process_obj": process,
+            "n_killed": 0
+        })
+    }
+
+    public set_module_handlers(name: string, process: ChildProcessWithoutNullStreams){
+        const stdout_data_handler = (data: string, name: string) => {
+            console.log(`${name}: ${data}`);
+
+            if(!this.connected && data.includes("ready")){
+                this.connect_to_server() // TODO: rewrite this so that client is server and vice versa
+                this.connected = true;
+            }
+        }
+        const stderr_data_handler = (data: string, name: string) => {
+            // TODO: internal routing seems to be leading to the stderr (what?)
+            console.log(`[${name}] Error: `, data)
+        }
+        const close_handler = (code: number, signal: string, name: string) => {
+            console.log(`${name} process exited with code ${code} and signal ${signal}!`)
+
+            let error_signals: string[] = ["SIGBUS", "SIGSEGV", "SIGPIPE"] // TODO: change this to something better
+            if (code != 0 || error_signals.includes(signal)){
+                console.log("Ungraceful stop, resetting state and waking up...")
+
+                let module_n_killed: number = 0;
+
+                // after process cleanup
+                for (let i = 0; i < this.active_processes.length; i++){
+                    if (this.active_processes[i].name == name){
+                        module_n_killed = this.active_processes[i].n_killed
+                        module_n_killed += 1
+                        this.active_processes.splice(i, 1)
+                        break
+                    }
+                }
+                this.connected = false;
+                console.log("Cleaned up registry")
+
+                if (module_n_killed >= 3){
+                    // module was resetted more than 2 times (something bad is going on)
+                    console.log(`SEDAS wasn't able to reinitialize ${name}`)
+                    return // do not initialize the module
+                }
+
+                // spawn module (again)
+                for (let i = 0; i < this.registry.length; i++){
+                    if (this.registry[i].name == name){
+                        let path: string = this.registry[i].call_path;
+                        let args: string[] = this.registry[i].arguments;
+
+                        this.spawn_module(path, args, name);
+                    }
+                }
+                console.log(`Spawned ${name} module`)
+
+                // set handlers to the module / enable communication again
+                this.active_processes.forEach((elem: ActiveProcess) => {
+                    if (elem.name == name){
+                        this.set_module_handlers(elem.name, elem.process_obj) // set new module handlers
+                    }
+                })
+                console.log("Module communication active")
+            }
+        }
+
+        process.stdout.on("data", (data: Buffer) => stdout_data_handler(data.toString(), name))
+        process.stderr.on("data", (data: Buffer) => stderr_data_handler(data.toString(), name))
+        process.on("close", (code, signal) => close_handler(code, signal, name))
+    }
+
     public deploy_modules(){
         // modules deploy
         for (let i = 0; i < this.registry.length; i++){
             let path: string = this.registry[i].call_path;
             let args: string[] = this.registry[i].arguments;
             let name: string = this.registry[i].name;
-            
-            let process = spawn(path, args);
-            this.active_processes.push({
-                "name": name, 
-                "process_obj": process
-            })
+
+            this.spawn_module(path, args, name)
         }
 
         // modules stdout check
@@ -143,20 +220,7 @@ class ModuleRegistry{
             let name: string = this.active_processes[i]["name"]
             let process: ChildProcessWithoutNullStreams = this.active_processes[i]["process_obj"]
 
-            process.stdout.on("data", (data: string) => {
-                console.log(`${name}: ${data}`);
-
-                if(!this.connected && data.includes("ready")){
-                    this.connect_to_server() // TODO: rewrite this so that client is server and vice versa
-                    this.connected = true;
-                }
-            })
-            process.stderr.on("data", (data) => {
-                console.log(`${name}: ${data}`);
-            })
-            process.on("close", (code) => {
-                console.log(`${name} process exited!`)
-            })
+            this.set_module_handlers(name, process)
         }
     }
 

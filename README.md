@@ -24,8 +24,7 @@ To get started, you can read **SEDAS** documentation:
 - [x] Check logging
 - [ ] Fix settings message (settings not saving)
 - [ ] Planes seem to not unregister properly
-- [ ] Validate all the plane calculations (just to make sure)
-- [ ] When registering new plane, the SEDAS-AI synth just cannot see Model file (piper) - **URGENT**
+- [x] Validate all the plane calculations (just to make sure)
 - [ ] When making climb/descend in turn, plane starts to change its rotation completely (but works when corrected in vectoring) - **URGENT**
 - [x] Two plugin paths
 - [x] Logs still showing SEDAC instead of SEDAS
@@ -35,7 +34,10 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Make a small rework in forge.config.js (better os support + exclusion based mechanic)
 - [ ] START/STOP button sometimes rewrites itself in simulation running
 - [x] ECONNREFUSED on the first session start
-- [ ] make command restrictions so that controller cannot tell plane some obscure command - **URGENT**
+- [x] make command restrictions so that controller cannot tell plane some obscure command - **URGENT**
+- [ ] When setting up headings (specificaly when two plane have identical ones), sometimes two plane interchange them - **URGENT**
+- [x] Add module monitoring (so that when module breaks, it can easily initialize itself again)
+- [ ] Module routing seems to be done to stderr
 
 ### Upcoming versions
 
@@ -62,3 +64,4 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Fix departure_arrival points selection
 - [ ] Dropdowns are broken
 - [ ] Plane info not dragging
+- [ ] Join logging sources from all the backends

@@ -34,7 +34,7 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Make a small rework in forge.config.js (better os support + exclusion based mechanic)
 - [ ] START/STOP button sometimes rewrites itself in simulation running
 - [x] ECONNREFUSED on the first session start
-- [x] make command restrictions so that controller cannot tell plane some obscure command - **URGENT**
+- [x] make command restrictions so that controller cannot tell plane some obscure command
 - [ ] When setting up headings (specificaly when two plane have identical ones), sometimes two plane interchange them - **URGENT**
 - [x] Add module monitoring (so that when module breaks, it can easily initialize itself again)
 - [ ] Module routing seems to be done to stderr

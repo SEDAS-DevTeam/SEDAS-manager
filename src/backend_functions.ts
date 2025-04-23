@@ -490,8 +490,11 @@ export class MainAppFunctions{
         this.PlaneDatabase.add_record(plane, plane_data["monitor"])
 
         if(this.app_status["turn-on-backend"]){
+            let voice_upper_cap: number = 1.0
+            let voice_lower_cap: number = 0.4
+
             // register plane on ai
-            let voice_intensity: string = ((Math.random() * 0.9) + 0.1).toFixed(2) // generate random voice intensity from range 0.1 to 0.9
+            let voice_intensity: string = ((Math.random() * (voice_upper_cap - voice_lower_cap)) + voice_lower_cap).toFixed(2) // generate random voice intensity from range 0.1 to 1.0
             this.msc_wrapper.send_message("module", "ai_backend", "register", plane_data["name"], voice_intensity)
         }
 

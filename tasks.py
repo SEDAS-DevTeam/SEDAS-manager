@@ -34,6 +34,42 @@ def print_color(color, text):
     print(color + text + NC)
 
 
+def fetch(ctx, only="none"):
+
+    # TODO: add a way to do this in multiple modules
+    path_modules = path.join(PATH, "src/addons/modules/bin")
+
+    # SEDAS-AI-backend
+    sedas_ai_backend = path.join(path_modules, "SEDAS-AI-backend/src")
+
+    def fetch_tts():
+        sedas_tts_resources = path.join(sedas_ai_backend, "PlaneResponse/models/tts/voices")
+
+        # delete existing models in the means of overwriting them
+        shutil.rmtree(sedas_tts_resources)
+        makedirs(sedas_tts_resources)
+        makefile(path.join(sedas_tts_resources, ".gitkeep"))
+
+        print_color(PURPLE, "Fetching TTS resources for SEDAS-AI-backend... (this my take a while)")
+
+        chdir(sedas_ai_backend)
+        ctx.run("invoke fetch-resources -t=tts", pty=True) # fetch tts resources
+
+    def fetch_asr():
+        print_color(PURPLE, "Fetching ASR resources for SEDAS-AI-backend...")
+
+        chdir(sedas_ai_backend)
+        ctx.run("invoke fetch-resources -t=asr", pty=True) # fetch asr resources
+
+    if only == "none":
+        fetch_tts()
+        fetch_asr()
+    elif only == "tts":
+        fetch_tts()
+    elif only == "asr":
+        fetch_asr()
+
+
 @task
 def clean(ctx):
     """
@@ -127,22 +163,22 @@ def compile(ctx, only="none", refetch=False):
         sedas_tts_resources = path.join(sedas_ai_backend, "PlaneResponse/models/tts/voices")
         sedas_asr_resource = path.join(sedas_ai_backend, "PlaneResponse/models/asr/atc-whisper-ggml.bin")
 
-        chdir(sedas_ai_backend)
-
         # check TTS resource fetching
-        if len(listdir(sedas_tts_resources)) == 1:
-            print_color(PURPLE, "Fetching TTS resources for SEDAS-AI-backend (this my take some while)")
-            ctx.run("invoke fetch-resources -t=tts") # fetch tts resources
+        if len(listdir(sedas_tts_resources)) == 1 or refetch: fetch(ctx, "tts")
 
         # check ASR resource fetching
-        if not path.exists(sedas_asr_resource) or refetch: # or if the user enforced the refetch
-            ctx.run("invoke fetch-resources -t=asr") # fetch asr resources
+        if not path.exists(sedas_asr_resource) or refetch: fetch(ctx, "asr")
+
+        chdir(sedas_ai_backend)
 
         ctx.run("invoke build-deps") # build the whisper.cpp runner
-        ctx.run("invoke build --DTESTING=OFF")
+
+        # build the SEDAS-AI-backend runner
+        if refetch: ctx.run("invoke build --DTESTING=OFF --rewrite")
+        else: ctx.run("invoke build --DTESTING=OFF")
         print_color(PURPLE, "Compiled SEDAS-AI-backend")
 
-        print_color(PURPLE, "Moving built files to /build directory...")
+        print_color(PURPLE, "Moving built files from /project_build to /build directory...")
         sedas_ai_project_build = path.join(path_modules, "SEDAS-AI-backend/project_build")
         sedas_ai_global_build = path.join(PATH, "src/addons/modules/build/sedas_ai_backend")
         shutil.copytree(sedas_ai_project_build, sedas_ai_global_build, dirs_exist_ok=True)

@@ -1,6 +1,7 @@
 import {parentPort} from "worker_threads"
 import net from "net"
 import path from "path"
+import fs from "fs"
 import { ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import utils from "../utils";
 
@@ -154,16 +155,22 @@ class ModuleRegistry{
         }
         const close_handler = (code: number, signal: string, name: string) => {
             console.log(`${name} process exited with code ${code} and signal ${signal}!`)
-
-            let error_signals: string[] = ["SIGBUS", "SIGSEGV", "SIGPIPE"] // TODO: change this to something better
+            
+            // TODO: rewrite this for more modules than just SEDAS-AI-backend
+            let error_signals: string[] = ["SIGBUS", "SIGSEGV", "SIGPIPE", "SIGTERM"] // TODO: change this to something better
             if (code != 0 || error_signals.includes(signal)){
                 console.log("Ungraceful stop, resetting state and waking up...")
 
                 let module_n_killed: number = 0;
+                let call_path: string;
+                let args: string[];
 
                 // after process cleanup
                 for (let i = 0; i < this.active_processes.length; i++){
                     if (this.active_processes[i].name == name){
+                        call_path = this.registry[i].call_path;
+                        args = this.registry[i].arguments;
+
                         module_n_killed = this.active_processes[i].n_killed
                         module_n_killed += 1
                         this.active_processes.splice(i, 1)
@@ -171,29 +178,33 @@ class ModuleRegistry{
                     }
                 }
                 this.connected = false;
-                console.log("Cleaned up registry")
+                console.log(`Cleaned up, n_killed: ${module_n_killed}`)
+
+                // two-step module reinitialization...
+                let temp_controller_wav_path: string = path.join(call_path.replace("main", "temp/controller.wav"))
+                let temo_controller_unproc_wav_path: string = path.join(call_path.replace("main", "temp/controller_unproc.wav"))
+                if (module_n_killed >= 2 && fs.existsSync(temp_controller_wav_path)){
+                    // module was resetted more than 2 times with controller.wav file -> transcription not working on that file
+                    fs.unlinkSync(temp_controller_wav_path)
+                    fs.unlinkSync(temo_controller_unproc_wav_path)
+                    console.log(`removed controller.wav file in ${name}`)
+                }
 
                 if (module_n_killed >= 3){
-                    // module was resetted more than 2 times (something bad is going on)
+                    // module was resetted more than 3 times -> transcription not working completely
                     console.log(`SEDAS wasn't able to reinitialize ${name}`)
                     return // do not initialize the module
                 }
 
                 // spawn module (again)
-                for (let i = 0; i < this.registry.length; i++){
-                    if (this.registry[i].name == name){
-                        let path: string = this.registry[i].call_path;
-                        let args: string[] = this.registry[i].arguments;
-
-                        this.spawn_module(path, args, name);
-                    }
-                }
+                this.spawn_module(call_path, args, name);
                 console.log(`Spawned ${name} module`)
 
                 // set handlers to the module / enable communication again
                 this.active_processes.forEach((elem: ActiveProcess) => {
                     if (elem.name == name){
                         this.set_module_handlers(elem.name, elem.process_obj) // set new module handlers
+                        elem.n_killed = module_n_killed
                     }
                 })
                 console.log("Module communication active")
@@ -228,13 +239,20 @@ class ModuleRegistry{
         // connect to SEDAS-AI-Backend
         this.client_socket = new net.Socket();
         this.client_socket.connect(PORT, HOST, () => {
-            console.log("Connected to sedas_ai_backend!")
+            console.log("Connected to SEDAS-AI-backend!")
         })
         this.client_socket.on("data", (data) => {
-            // TODO: just done for parsing SEDAS-AI-backend
+            // TODO: do parsing also for other modules than just SEDAS-AI-backend
             let comm_args: string[] = data.toString().split(" ")
             comm_args.unshift("sedas_ai")
             send_message("module", comm_args)
+
+            // transcription was successful (hence the socket data stream) -> resetting module_n_killed
+            this.active_processes.forEach((elem: ActiveProcess) => {
+                if (elem.name == "SEDAS-AI-backend"){
+                    elem.n_killed = 0
+                }
+            })
         })
         this.client_socket.on("close", () => {
             console.log("Connection closed")

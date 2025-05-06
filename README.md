@@ -25,7 +25,7 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Fix settings message (settings not saving)
 - [ ] Planes seem to not unregister properly
 - [x] Validate all the plane calculations (just to make sure)
-- [ ] When making climb/descend in turn, plane starts to change its rotation completely (but works when corrected in vectoring) - **URGENT**
+- [ ] When making climb/descend in turn, plane starts to change its rotation completely, this only happens on the initial turn of the plane, after that, it never is an issue again - **URGENT**
 - [x] Two plugin paths
 - [x] Logs still showing SEDAC instead of SEDAS
 - [x] Fix the build with electron-forge

@@ -198,7 +198,8 @@ napi_value Calc_plane_heading(napi_env env, napi_callback_info info){
       new_heading = turn_right ? fmod(heading + delta, 360.0) : fmod(heading - delta, 360);
 
       // calculating if plane did converge to specified heading
-      if (abs(updated_heading - heading) < rate_of_turn * refresh_rate) continue_change = false;
+      float remaining_angle = turn_right ? d_cw : d_ccw;
+      if (remaining_angle <= delta) continue_change = false;
     }
 
     napi_value result = create_empty_array(env, 2);

@@ -151,8 +151,8 @@ export class PlaneDB{
 
     private update_plane_turns(){
         // TODO
-        //console.log(this.plane_turn_DB)
-        //console.log(this.DB)
+        console.log(this.plane_turn_DB)
+        console.log(this.DB)
 
         //update plane turns
         for (let i = 0; i < this.plane_turn_DB.length; i++){
@@ -182,7 +182,8 @@ export class PlaneDB{
                         }
                         else{
                             // Heading change is done
-                            this.DB[i_plane].heading = this.DB[i].updated_heading
+                            this.DB[i_plane].heading = this.DB[i_plane].updated_heading
+                            this.plane_turn_DB.splice(i, 1)
                         }
                     }
                     catch(error){
@@ -218,6 +219,7 @@ export class PlaneDB{
 
         //update all planes
         for (let i = 0; i < this.DB.length; i++){
+
             //save current location to plane path history
             this.add_path_record(this.DB[i].id, [this.DB[i].x, this.DB[i].y])
 

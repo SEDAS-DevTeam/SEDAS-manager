@@ -35,7 +35,7 @@ To get started, you can read **SEDAS** documentation:
 - [ ] START/STOP button sometimes rewrites itself in simulation running
 - [x] ECONNREFUSED on the first session start
 - [x] make command restrictions so that controller cannot tell plane some obscure command
-- [ ] When setting up headings (specificaly when two plane have identical ones), sometimes two plane interchange them - **URGENT**
+- [x] When setting up headings (specificaly when two plane have identical ones), sometimes two plane interchange them
 - [x] Add module monitoring (so that when module breaks, it can easily initialize itself again)
 - [ ] Module routing seems to be done to stderr
 
@@ -65,3 +65,7 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Dropdowns are broken
 - [ ] Plane info not dragging
 - [ ] Join logging sources from all the backends
+- [ ] Window assignments are sometimes dislocated from different window resolutions
+- [ ] Map is weirdly resized when different resolutions
+- [ ] Heading selections on the controller size are not so clickable - CSS issue
+- [ ] Merge plane_turn_DB with DB (much more easier to implement)

@@ -150,9 +150,6 @@ export class PlaneDB{
     }
 
     private update_plane_turns(){
-        // TODO
-        console.log(this.plane_turn_DB)
-        console.log(this.DB)
 
         //update plane turns
         for (let i = 0; i < this.plane_turn_DB.length; i++){
@@ -167,7 +164,7 @@ export class PlaneDB{
                             "updated_heading": this.DB[i_plane].updated_heading,
                             "rate_of_turn": this.plane_turn_DB[i]["rate_of_turn"],
                             "refresh_rate": 1,
-                            "command": this.DB[i_plane].current_command
+                            "command": this.DB[i_plane].current_command_heading
                         }
     
                         let [new_heading, continue_change] = plane_calculations.calc_plane_heading(napi_arguments)
@@ -261,7 +258,10 @@ export class Plane{
     public x: number;
     public y: number;
 
-    public current_command: string = "";
+    // in-use command registers
+    public current_command_level: string = "";
+    public current_command_speed: string = "";
+    public current_command_heading: string = "";
 
     //special args that represent subcommand for command
     public special_comm: string[] = []
@@ -400,17 +400,17 @@ export class Plane{
     */
     public change_heading(command: string, value: any){
         this.updated_heading = parseInt(value)
-        this.current_command = command
+        this.current_command_heading = command
 
     }
 
     public change_speed(command: string, value: any){
         this.updated_speed = parseInt(value)
-        this.current_command = command
+        this.current_command_speed = command
     }
 
     public change_level(command: string, value: any){
         this.updated_level = parseInt(value)
-        this.current_command = command
+        this.current_command_level = command
     }
 }

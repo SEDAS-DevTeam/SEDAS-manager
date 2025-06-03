@@ -399,11 +399,12 @@ class MainApp extends MainAppFunctions{
 
     // TODO: solve for multi-session (multiple ATCos)
     private start_mic_record(){
-        if (this.msc_wrapper) this.msc_wrapper.send_message("module", "ai_backend", "start-mic")
+        console.log(this.app_status["sim-running"])
+        if (this.msc_wrapper && this.app_status["sim-running"]) this.msc_wrapper.send_message("module", "ai_backend", "start-mic")
     }
 
-    private async stop_mic_record(){
-        if (this.msc_wrapper) this.msc_wrapper.send_message("module", "ai_backend", "stop-mic")
+    private stop_mic_record(){
+        if (this.msc_wrapper && this.app_status["sim-running"]) this.msc_wrapper.send_message("module", "ai_backend", "stop-mic")
     }
 
     private restore_sim(){

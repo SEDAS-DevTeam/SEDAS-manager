@@ -38,6 +38,9 @@ To get started, you can read **SEDAS** documentation:
 - [x] When setting up headings (specificaly when two plane have identical ones), sometimes two plane interchange them
 - [x] Add module monitoring (so that when module breaks, it can easily initialize itself again)
 - [ ] Module routing seems to be done to stderr
+- [ ] SEDAS-AI-backend crashixng after heavy use (repeatedly) - **URGENT**
+- [x] Mic available when simulation turned off (doesnt really make a sense)
+- [ ] Say again? sometimes even after literally understanding the command correctly - **URGENT**
 
 ### Upcoming versions
 
@@ -69,3 +72,6 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Map is weirdly resized when different resolutions
 - [ ] Heading selections on the controller size are not so clickable - CSS issue
 - [ ] Merge plane_turn_DB with DB (much more easier to implement)
+- [ ] Make repository contributor/fork friendly (copyright notice, solve all the legislative stuff)
+- [ ] Rework transition altitude
+- [ ] Rework settings so that the changes can be activated on-run

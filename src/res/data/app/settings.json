@@ -6,7 +6,7 @@
     "plane_path_limit": "15",
     "logging": true,
     "debug_panel": false,
-    "backend_init": false,
+    "backend_init": true,
     "fetch_alg": true,
     "max_monitor_col": "4",
     "max_monitor_row": "3",

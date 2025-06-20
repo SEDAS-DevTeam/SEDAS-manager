@@ -41,6 +41,8 @@ To get started, you can read **SEDAS** documentation:
 - [ ] SEDAS-AI-backend crashixng after heavy use (repeatedly) - **URGENT**
 - [x] Mic available when simulation turned off (doesnt really make a sense)
 - [ ] Say again? sometimes even after literally understanding the command correctly - **URGENT**
+- [x] Add typing in tasks.py
+- [ ] Make DEV and PROD modes more distinguishable
 
 ### Upcoming versions
 
@@ -75,3 +77,5 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Make repository contributor/fork friendly (copyright notice, solve all the legislative stuff)
 - [ ] Rework transition altitude
 - [ ] Rework settings so that the changes can be activated on-run
+- [x] Wayland does not respect custom QT widget placement :( (short term fix mby?)
+- [ ] Find a way to remove the XWayland dependency on the whole platform

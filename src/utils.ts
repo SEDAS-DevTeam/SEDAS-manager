@@ -27,7 +27,7 @@ import {
  } from "./app_config";
 import { desktopCapturer, ipcMain } from "electron";
 import { Worker } from "worker_threads";
-import { exec } from "child_process";
+import { spawn } from "child_process";
 // variables
 const alphabet: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
@@ -581,6 +581,23 @@ async function delete_logs(){
     })
 }
 
+function parse_args(){
+    let proc_args: string[] = process.argv
+    let args: string[] = []
+    if (proc_args[0].includes("electron")) args = proc_args.slice(2) // Development mode
+    else args = proc_args.slice(1) // Production
+
+    let processed_args: Record<string, string> = {}
+    args.forEach(elem => {
+        let name = elem.split("=")[0].substring(2)
+        let value = elem.split("=")[1]
+
+        processed_args[name] = value
+    })
+    
+    return processed_args
+}
+
 function readJSON(path: string){
     let file_raw = fs.readFileSync(path, "utf-8")
     let file_content = JSON.parse(file_raw)
@@ -605,11 +622,20 @@ async function ping(address: string): Promise<boolean>{
     })
 }
 
-async function run_updater(path: string){
+async function run_updater(path: string, app_abs_path: string){
     return new Promise<boolean>((resolve, reject) => {
-        let updater = exec(path)
+        let updater = spawn(path, [app_abs_path], { shell: true })
         updater.stdout.pipe(process.stdout)
-        updater.on("exit", (code) => {
+
+        updater.stdout.on("data", (data) => {
+            process.stdout.write(data);
+        });
+
+        updater.stderr.on("data", (data) => {
+            process.stderr.write(data); // this helps with debugging!
+        });
+
+        updater.on("close", (code) => {
             if (code == 0){
                 // internet is available
                 resolve(true)
@@ -621,6 +647,10 @@ async function run_updater(path: string){
                 reject(new Error(`Updater failed with code ${code}`))
             }
         })
+
+        updater.on("error", (err) => {
+            reject(err);
+        });
     })    
 }
 
@@ -639,6 +669,7 @@ const utils = {
     get_window_info,
     sleep,
     parse_scale,
+    parse_args,
     create_popup_window,
     delete_logs,
     readJSON,

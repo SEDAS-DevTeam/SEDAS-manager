@@ -8,8 +8,11 @@ import { BrowserWindow, ipcMain, screen, Tray, nativeImage, Menu } from "electro
 import { EventLogger } from "./logger"
 import utils from "./utils"
 
-//init vars
-export const ABS_PATH = resolve("")
+// read CLI arguments
+const runtime_args: Record<string, string> = utils.parse_args()
+
+// set app main path
+export const ABS_PATH: string = (runtime_args["devel_path"] != undefined) ? runtime_args["devel_path"] : resolve("")
 
 //paths for main html files
 export const PATH_TO_MAIN_HTML = join(ABS_PATH, "./src/res/html/other/main.html")

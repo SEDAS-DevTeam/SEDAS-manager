@@ -83,7 +83,7 @@ napi_value Calc_plane_level(napi_env env, napi_callback_info info){
       float sel_angle = deg_to_rad(angles[(int) ceil(k / 2)]);
 
       // calculating updated level
-      float change = (sin(sel_angle) refresh_rate * speed) / scale;
+      float change = (sin(sel_angle) * refresh_rate * speed) / scale;
       new_level = level + k * change;
 
       // calculating screen speed

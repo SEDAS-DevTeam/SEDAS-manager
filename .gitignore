@@ -44,6 +44,7 @@ package-lock.json
 #locally generated settings files
 /src/res/data/app/in_device_list.json
 /src/res/data/app/out_device_list.json
+/src/res/data/app/geometry.json
 
 # hide secret files
 token.json

@@ -1,4 +1,4 @@
-from utils import GuiApp
+from utils import GuiApp, parse_args
 
 from PySide6.QtCore import Qt, Signal, QThread
 from PySide6.QtWidgets import QLabel, QProgressBar
@@ -42,8 +42,8 @@ class InstallThread(QThread):
 
 
 class InstallGui(GuiApp):
-    def __init__(self):
-        super().__init__("SEDAS Installation")
+    def __init__(self, args: list[str]):
+        super().__init__("SEDAS Installation", args[0])
 
         self.internet_connection = False
         self.graceful_exit = False
@@ -78,7 +78,7 @@ class InstallGui(GuiApp):
         self.graceful_exit = True
         self.main_window.close()
 
-    def update_progress_bar(self, value, text):
+    def update_progress_bar(self, value: int, text: str):
         self.progress_bar.setValue(value)
         self.progress_label.setText(text)
 
@@ -89,7 +89,9 @@ class InstallGui(GuiApp):
 
 
 if __name__ == "__main__":
-    main_app = InstallGui()
+    args: list[str] = parse_args()
+
+    main_app = InstallGui(args)
     main_app.mainloop()
 
     sys.exit(0)

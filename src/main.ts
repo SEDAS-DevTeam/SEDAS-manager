@@ -15,6 +15,7 @@ import { EventLogger } from "./logger"
 import utils, {ProgressiveLoader, IPCwrapper, MSCwrapper} from "./utils"
 import {PluginRegister} from "./plugin_register" // TODO
 
+// responsible for reading CLI arguments and setting all the variables accordingly
 import {
     //window configs
     main_menu_dict,
@@ -52,7 +53,8 @@ import {
 
     ABS_PATH,
     PATH_TO_MSC,
-    PATH_TO_INSTALLER
+    PATH_TO_INSTALLER,
+    PATH_TO_SETTINGS
 } from "./app_config"
 
 import { MainAppFunctions } from "./backend_functions"
@@ -734,14 +736,13 @@ class MainApp extends MainAppFunctions{
 var EvLogger: EventLogger;
 var main_app: MainApp;
 
-//read JSON
-const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
-const app_settings = JSON.parse(app_settings_raw);
+//read app settings
+const app_settings = utils.readJSON(PATH_TO_SETTINGS)
 
 //app main code
 app.on("ready", async () => {
 
-    //setup app event logger
+    // setup app event logger
     await utils.delete_logs()
     EvLogger = new EventLogger(app_settings["logging"], "app_log", "system", "v1.0.0")
     await EvLogger.init_logger()
@@ -753,7 +754,7 @@ app.on("ready", async () => {
     main_app = new MainApp(app_settings, EvLogger)
 
     //check internet connectivity & run independent updater
-    main_app.app_status["internet-connection"] = await utils.run_updater(PATH_TO_INSTALLER)
+    main_app.app_status["internet-connection"] = await utils.run_updater(PATH_TO_INSTALLER, ABS_PATH)
 
     await main_app.init_app() //initializing backend for app
     

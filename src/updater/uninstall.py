@@ -1,6 +1,6 @@
-from utils import GuiApp, setup_layout
+from utils import GuiApp, setup_layout, parse_args
 
-from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtCore import Qt, QThread, Signal, QEvent
 from PySide6.QtWidgets import QLabel, QHBoxLayout, QPushButton, QPlainTextEdit
 
 import sys
@@ -21,8 +21,8 @@ class UninstallThread(QThread):
 
 
 class UninstallGui(GuiApp):
-    def __init__(self):
-        super().__init__("SEDAS Uninstallation")
+    def __init__(self, args: list[str]):
+        super().__init__("SEDAS Uninstallation", args[0])
 
         self.graceful_exit = False
         self.app.aboutToQuit.connect(self.postuninst_cleanup)
@@ -49,7 +49,7 @@ class UninstallGui(GuiApp):
 
         self.layout.addStretch(1)
 
-    def disable_button(self, button_obj):
+    def disable_button(self, button_obj: QPushButton):
         button_obj.setEnabled(False)
         button_obj.setStyleSheet("""
             QPushButton:disabled {
@@ -58,16 +58,18 @@ class UninstallGui(GuiApp):
             }
         """)
 
-    def add_progress(self, text):
+    def add_progress(self, text: str):
         self.terminal_output.appendPlainText(text)
 
-    def forced_exit(self, event):
+    def forced_exit(self, event: QEvent):
         self.exit_app()
 
     def after_uninstall_callback(self):
-        self.info_window, self.central_widget, self.layout = setup_layout("Installation progress", (400, 100))
+        coords: list[int] | None = self.get_location()
+        self.info_window, self.central_widget, self.layout = setup_layout("Installation progress", [400, 100], coords)
 
-        self.info_label = QLabel("SEDAS uninstalled successfully, It was nice flying with you!", self.central_widget, alignment=Qt.AlignmentFlag.AlignCenter)
+        goodbye_text = "SEDAS uninstalled successfully, It was nice flying with you!" # :(
+        self.info_label = QLabel(goodbye_text, self.central_widget, alignment=Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.info_label)
 
         self.button_ok = QPushButton("Ok", self.central_widget)
@@ -84,7 +86,8 @@ class UninstallGui(GuiApp):
     def uninstall_yes(self):
         self.main_window.close()
 
-        self.uninstall_window, self.central_widget, self.layout = setup_layout("Installation progress", (300, 250))
+        coords: list[int] | None = self.get_location()
+        self.uninstall_window, self.central_widget, self.layout = setup_layout("Installation progress", [300, 250], coords)
         self.main_label = QLabel("Uninstalling SEDAS...", self.central_widget, alignment=Qt.AlignmentFlag.AlignCenter)
         self.layout.addWidget(self.main_label)
 
@@ -125,6 +128,8 @@ class UninstallGui(GuiApp):
 
 
 if __name__ == "__main__":
-    main_app = UninstallGui()
+    args: list[str] = parse_args()
+
+    main_app = UninstallGui(args)
     main_app.mainloop()
     sys.exit(0)

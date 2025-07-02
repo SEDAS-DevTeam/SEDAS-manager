@@ -3,59 +3,56 @@
     while running the program
 */
 
-import { join, resolve } from "path"
+import { join } from "path"
 import { BrowserWindow, ipcMain, screen, Tray, nativeImage, Menu } from "electron";
 import { EventLogger } from "./logger"
 import utils from "./utils"
 
-// read CLI arguments
-const runtime_args: Record<string, string> = utils.parse_args()
-
-// set app main path
-export const ABS_PATH: string = (runtime_args["devel_path"] != undefined) ? runtime_args["devel_path"] : resolve("")
-
 //paths for main html files
-export const PATH_TO_MAIN_HTML = join(ABS_PATH, "./src/res/html/other/main.html")
-export const PATH_TO_SETTINGS_HTML = join(ABS_PATH, "./src/res/html/controller/settings.html")
-export const PATH_TO_CONTROLLER_HTML = join(ABS_PATH, "./src/res/html/controller/controller_set.html")
-export const PATH_TO_EXIT_HTML = join(ABS_PATH, "./src/res/html/other/exit.html")
-export const PATH_TO_POPUP_HTML = join(ABS_PATH, "./src/res/html/other/popup.html")
-export const PATH_TO_LOADER_HTML = join(ABS_PATH, "./src/res/html/other/load.html")
+export const PATH_TO_MAIN_HTML = join(process.env.ABS_PATH, "./src/res/html/other/main.html")
+export const PATH_TO_SETTINGS_HTML = join(process.env.ABS_PATH, "./src/res/html/controller/settings.html")
+export const PATH_TO_CONTROLLER_HTML = join(process.env.ABS_PATH, "./src/res/html/controller/controller_set.html")
+export const PATH_TO_EXIT_HTML = join(process.env.ABS_PATH, "./src/res/html/other/exit.html")
+export const PATH_TO_POPUP_HTML = join(process.env.ABS_PATH, "./src/res/html/other/popup.html")
+export const PATH_TO_LOADER_HTML = join(process.env.ABS_PATH, "./src/res/html/other/load.html")
 
 //paths to worker html files
-export const PATH_TO_WORKER_HTML = join(ABS_PATH, "./src/res/html/worker/worker.html")
-export const PATH_TO_DEP_ARR_HTML = join(ABS_PATH, "./src/res/html/worker/dep_arr.html")
-export const PATH_TO_EMBED_HTML = join(ABS_PATH, "./src/res/html/worker/embed.html")
-export const PATH_TO_WEATHER_HTML = join(ABS_PATH, "./src/res/html/worker/weather.html")
+export const PATH_TO_WORKER_HTML = join(process.env.ABS_PATH, "./src/res/html/worker/worker.html")
+export const PATH_TO_DEP_ARR_HTML = join(process.env.ABS_PATH, "./src/res/html/worker/dep_arr.html")
+export const PATH_TO_EMBED_HTML = join(process.env.ABS_PATH, "./src/res/html/worker/embed.html")
+export const PATH_TO_WEATHER_HTML = join(process.env.ABS_PATH, "./src/res/html/worker/weather.html")
 
 //paths to widget html files
-export const PATH_TO_WIDGET_HTML = join(ABS_PATH, "./src/res/html/widget/worker_widget.html")
+export const PATH_TO_WIDGET_HTML = join(process.env.ABS_PATH, "./src/res/html/widget/worker_widget.html")
 
 //paths for local storage
-export const PATH_TO_LOGS: string = join(ABS_PATH, "/src/res/data/tmp/")
-export const PATH_TO_MAPS: string = join(ABS_PATH, "/src/res/data/sim/maps/")
-export const PATH_TO_COMMANDS: string = join(ABS_PATH, "/src/res/data/sim/commands/")
-export const PATH_TO_AIRCRAFTS: string = join(ABS_PATH, "/src/res/data/sim/planes/")
-export const PATH_TO_AIRLINES: string = join(ABS_PATH, "/src/res/data/sim/airlines/")
-export const PATH_TO_CACHE: string = join(ABS_PATH, "/src/res/neural/alg_cache")
-export const PATH_TO_CONFIG: string = join(ABS_PATH, "/src/res/data/alg/")
-export const PATH_TO_SETTINGS: string = join(ABS_PATH, "/src/res/data/app/settings.json")
-export const PATH_TO_PLUGINS: string = join(ABS_PATH, "/src/res/data/app/config/plugins_config.json")
-export const PATH_TO_MODULES: string = join(ABS_PATH, "/src/res/data/app/config/modules_config.json")
-export const PATH_TO_ICON: string = join(ABS_PATH, "/src/res/img/sedas-manager-logo-rounded.png")
+export const PATH_TO_LOGS: string = join(process.env.ABS_PATH, "/src/res/data/tmp/")
+export const PATH_TO_MAPS: string = join(process.env.ABS_PATH, "/src/res/data/sim/maps/")
+export const PATH_TO_COMMANDS: string = join(process.env.ABS_PATH, "/src/res/data/sim/commands/")
+export const PATH_TO_AIRCRAFTS: string = join(process.env.ABS_PATH, "/src/res/data/sim/planes/")
+export const PATH_TO_AIRLINES: string = join(process.env.ABS_PATH, "/src/res/data/sim/airlines/")
+export const PATH_TO_CACHE: string = join(process.env.ABS_PATH, "/src/res/neural/alg_cache")
+export const PATH_TO_CONFIG: string = join(process.env.ABS_PATH, "/src/res/data/alg/")
+export const PATH_TO_SETTINGS: string = join(process.env.ABS_PATH, "/src/res/data/app/settings.json")
+export const PATH_TO_PLUGINS: string = join(process.env.ABS_PATH, "/src/res/data/app/config/plugins_config.json")
+export const PATH_TO_MODULES: string = join(process.env.ABS_PATH, "/src/res/data/app/config/modules_config.json")
+export const PATH_TO_ICON: string = join(process.env.ABS_PATH, "/src/res/img/sedas-manager-logo-rounded.png")
 
 //paths to updater
-export const PATH_TO_INSTALLER: string = join(ABS_PATH, "/src/updater/dist/install")
+export const PATH_TO_INSTALLER: string = join(process.env.ABS_PATH, "/src/updater/dist/install")
 
 //paths for workers
-export const PATH_TO_MSC: string = join(ABS_PATH, "/src/workers/backend.js")
-export const PATH_TO_BACKUP: string = join(ABS_PATH, "/src/workers/database.js")
+export const PATH_TO_MSC: string = join(process.env.ABS_PATH, "/src/workers/backend.js")
+export const PATH_TO_BACKUP: string = join(process.env.ABS_PATH, "/src/workers/database.js")
 
 //paths for gui layouts
-export const PATH_TO_SETTINGS_LAYOUT: string = join(ABS_PATH, "/src/res/data/app/gui/settings_layout.json")
+export const PATH_TO_SETTINGS_LAYOUT: string = join(process.env.ABS_PATH, "/src/res/data/app/gui/settings_layout.json")
 
 //paths for backup
-export const PATH_TO_DATABASE: string = join(ABS_PATH, "/src/res/data/tmp/backup.json")
+export const PATH_TO_DATABASE: string = join(process.env.ABS_PATH, "/src/res/data/tmp/backup.json")
+
+//path for monitor geometry
+export const PATH_TO_MONITOR_CONFIGURATION: string = join(process.env.ABS_PATH, "/src/res/data/app/geometry.json")
 
 //constants used in this app
 export const WIDGET_OFFSET = 50
@@ -67,9 +64,9 @@ export const APP_IDENTIFIER_PROD: string = "com.sedasmanager.app"
 export const IS_PRERELEASE: boolean = true
 export const APP_TAG_BETA: string = "beta"
 export const APP_TAG_PROD: string = "prod"
-export const PATH_TO_OUT: string = join(ABS_PATH, "/out/")
-export const PATH_TO_SRC: string = join(ABS_PATH, "/src")
-export const PATH_TO_PACKAGE: string = join(ABS_PATH, "/package.json")
+export const PATH_TO_OUT: string = join(process.env.ABS_PATH, "/out/")
+export const PATH_TO_SRC: string = join(process.env.ABS_PATH, "/src")
+export const PATH_TO_PACKAGE: string = join(process.env.ABS_PATH, "/package.json")
 
 //constants in build exclusions
 //TODO build some better exclusion based mechanism in forge.config!
@@ -94,7 +91,7 @@ export const main_menu_dict = {
     resizable: false,
     icon: PATH_TO_ICON,
     webPreferences: {
-        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(process.env.ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -106,7 +103,7 @@ export const load_dict = {
     icon: PATH_TO_ICON,
     frame: false,
     webPreferences: {
-        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(process.env.ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -118,7 +115,7 @@ export const settings_dict = {
     resizable: true,
     icon: PATH_TO_ICON,
     webPreferences: {
-        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(process.env.ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -130,33 +127,29 @@ export const exit_dict = {
     icon: PATH_TO_ICON,
     frame: false,
     webPreferences: {
-        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(process.env.ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
 export const controller_dict = {
-    width: 1920,
-    height: 1080,
     title: "SEDAS manager - control",
     resizable: true,
     icon: PATH_TO_ICON,
     frame: true,
     //focusable: true,
     webPreferences: {
-        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(process.env.ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
 export const worker_dict = {
-    width: 1920,
-    height: 1080,
     title: "SEDAS",
     resizable: false,
     icon: PATH_TO_ICON,
     //frame: false, //TODO turn off when testing
     //focusable: false, //same here
     webPreferences: {
-        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(process.env.ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -168,7 +161,7 @@ export const basic_worker_widget_dict = {
     icon: PATH_TO_ICON,
     frame: false,
     webPreferences: {
-        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(process.env.ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -180,7 +173,7 @@ export const popup_widget_dict = {
     icon: PATH_TO_ICON,
     frame: false,
     webPreferences: {
-        preload: join(ABS_PATH, "src/res/scripts/utils/preload.js")
+        preload: join(process.env.ABS_PATH, "src/res/scripts/utils/preload.js")
     }
 }
 
@@ -197,6 +190,7 @@ class BaseWindow{
     public localConfig: any = {}; //contains local config of window
     public window_id: string;
     public event_logger: EventLogger;
+    public display_resolution: number[];
 
     public close(){
         if (!this.isClosed){
@@ -213,6 +207,7 @@ class BaseWindow{
 
         this.isClosed = false
         this.window.loadFile(this.path_load);
+        this.window.show()
     }
 
     public send_message(channel: string, message: any){
@@ -230,30 +225,36 @@ export class Window extends BaseWindow{
         })
     }
 
-    public constructor(app_status: Record<string, boolean>, dev_panel: boolean = false,
-        config: any, path: string, coords: number[],
-        ev_logger: EventLogger, main_app: any, window_type: string = "none", display_res: number[] = []){
+    public constructor(app_status: Record<string, boolean>, 
+        dev_panel: boolean = false,
+        config: any, 
+        path: string, 
+        coords: number[],
+        ev_logger: EventLogger, 
+        main_app: any, 
+        window_type: string = "none", 
+        display_res: number[] = []){
         
         super();
 
         //generate id for window
         this.window_id = utils.generate_win_id()
 
-        this.win_coordinates = coords //store to use later
+        this.win_coordinates = coords
         this.event_logger = ev_logger
 
         //retype window_type
         this.win_type = window_type
+        this.display_resolution = display_res
 
         Object.assign(this.localConfig, config)
-        if (display_res.length > 0 && !display_res.includes(undefined)){
-            //set resolution according to display resolution
-            this.localConfig.width = display_res[0]
-            this.localConfig.height = display_res[1]
-        }
 
         this.localConfig.x = coords[0]
         this.localConfig.y = coords[1]
+        if (display_res.length > 0){
+            this.localConfig.width = display_res[0]
+            this.localConfig.height = display_res[1]
+        }
 
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
@@ -276,6 +277,55 @@ export class Window extends BaseWindow{
 
         this.event_logger.log("DEBUG", `Created window object(win_type=${this.win_type},path_load=${this.path_load}, coords=${coords})`)
     }
+}
+
+export class WorkerWindow extends Window{
+
+    public title_bar_height: number;
+
+    public constructor(app_status: Record<string, boolean>, 
+        dev_panel: boolean = false,
+        config: any, 
+        path: string, 
+        coords: number[],
+        ev_logger: EventLogger, 
+        main_app: any,
+        window_type: string = "none",
+        title_height: number, 
+        display_res: number[] = []){
+
+            super(app_status,
+                dev_panel,
+                config,
+                path,
+                coords,
+                ev_logger,
+                main_app,
+                window_type,
+                display_res
+            );
+
+            this.title_bar_height = title_height
+        }
+
+    public show(path: string = ""){
+        if (path.length != 0){
+            //rewrite path_load (used for controller window_manipulation
+            this.path_load = path
+        }
+
+        this.isClosed = false
+        this.window.loadFile(this.path_load);
+
+        this.window.once("ready-to-show", () => {
+            if (this.display_resolution.length > 0 && this.win_coordinates.length > 0){
+                this.window.setContentSize(this.display_resolution[0], this.display_resolution[1] - this.title_bar_height)
+                this.window.setPosition(this.win_coordinates[0], this.win_coordinates[1] + this.title_bar_height)
+                this.window.show()
+            }
+        })
+    }
+
 }
 
 export class LoaderWindow extends BaseWindow{
@@ -474,11 +524,5 @@ export class WidgetWindowHandler{
             "id": datetime_id,
             "win": datetimeWidgetWindow
         })
-    }
-}
-
-export class WorkerWindowHandler{
-    public constructor(){
-
     }
 }

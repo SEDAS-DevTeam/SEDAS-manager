@@ -3,7 +3,7 @@
 */
 
 import { EventLogger } from "./logger"
-import utils, {ProgressiveLoader, IPCwrapper, MSCwrapper} from "./utils"
+import utils, {ProgressiveLoader, IPCwrapper, MSCwrapper, PyMonitor_object} from "./utils"
 import {PluginRegister} from "./plugin_register"
 import { Plane, PlaneDB } from "./plane_functions"
 import { Worker } from "worker_threads"
@@ -16,22 +16,22 @@ import {
 
     //window classes
     Window,
+    WorkerWindow,
     WidgetWindow,
     PopupWindow,
 
     //window handler classes
     WidgetWindowHandler,
-    WorkerWindowHandler,
 
     //all init vars
     PATH_TO_MAIN_HTML,
     PATH_TO_SETTINGS_HTML,
 
-    ABS_PATH,
     PATH_TO_MAPS,
     PATH_TO_COMMANDS,
     PATH_TO_AIRCRAFTS,
     PATH_TO_AIRLINES,
+    PATH_TO_SETTINGS,
 
     PATH_TO_SETTINGS_LAYOUT
 } from "./app_config"
@@ -60,7 +60,6 @@ export class MainAppFunctions{
     public msc_wrapper: MSCwrapper;
     public ev_logger: EventLogger;
     public widget_handler: WidgetWindowHandler;
-    public worker_handler: WorkerWindowHandler;
 
     //all variables related to frontend
     public frontend_vars = {
@@ -78,6 +77,8 @@ export class MainAppFunctions{
     public scenario_presets_list: object[] = []
     public scenario_data: object = undefined;
     public scenario_name: string = "None"
+
+    public monitor_configuration: PyMonitor_object[]
 
     public enviro_logger: EventLogger;
 
@@ -213,7 +214,7 @@ export class MainAppFunctions{
         //save settings
         this.ev_logger.log("DEBUG", "saving settings")
 
-        fs.writeFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), data[0])
+        fs.writeFileSync(PATH_TO_SETTINGS, data[0])
         
         //inform user that settings are loaded only after restart
         this.current_popup_window = utils.create_popup_window(this.app_settings, this.ev_logger, this.displays,
@@ -376,7 +377,7 @@ export class MainAppFunctions{
         }
 
         this.loader.send_progress("Setting up environment")
-        this.enviro = new Environment(this.ev_logger, this, ABS_PATH, this.PlaneDatabase,
+        this.enviro = new Environment(this.ev_logger, this, process.env.ABS_PATH, this.PlaneDatabase,
             this.command_preset_data,
             this.aircraft_preset_data,
             this.map_data, 

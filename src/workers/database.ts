@@ -2,8 +2,7 @@ import {parentPort} from "worker_threads"
 import path from "path"
 import fs from "fs"
 import {
-    PATH_TO_DATABASE,
-    ABS_PATH
+    PATH_TO_DATABASE
 } from "../app_config"
 
 //

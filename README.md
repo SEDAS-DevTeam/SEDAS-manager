@@ -43,10 +43,12 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Say again? sometimes even after literally understanding the command correctly - **URGENT**
 - [x] Add typing in tasks.py
 - [ ] Make DEV and PROD modes more distinguishable
+- [ ] Completely rework the frontend (big mess)
+- [ ] Switch from javascript to typescript on frontend
 
 ### Upcoming versions
 
-- [ ] Rework WebGL rendering
+- [ ] Add WebGL rendering
 - [ ] Rework CSS/JS
 - [ ] Better time
 - [ ] Finish PluginRegister

@@ -16,6 +16,7 @@ import {
     WidgetWindow,
     PopupWindow,
     Window,
+    WorkerWindow,
 
     popup_widget_dict,
     basic_worker_widget_dict,
@@ -23,13 +24,43 @@ import {
     //paths
     PATH_TO_LOADER_HTML,
     PATH_TO_POPUP_HTML,
-    PATH_TO_LOGS
+    PATH_TO_LOGS,
+    worker_dict,
+    PATH_TO_WORKER_HTML,
+    controller_dict,
+    PATH_TO_CONTROLLER_HTML
  } from "./app_config";
-import { desktopCapturer, ipcMain } from "electron";
+import { desktopCapturer, ipcMain, screen } from "electron";
 import { Worker } from "worker_threads";
 import { spawn } from "child_process";
 // variables
 const alphabet: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
+export interface PyMonitor_object { // Python output
+    name: string
+    width: number,
+    height: number,
+    pos_x: number,
+    pos_y: number
+}
+
+export interface ElMonitor_object { // Electron output
+    x: number,
+    y: number,
+    width: number,
+    height: number
+}
+
+export type JsonData = { [key: string ]: any}
+
+interface MainApp {
+    app_status: Record<string, boolean>
+    dev_panel: boolean,
+    wrapper: IPCwrapper,
+    worker_coords: object[],
+    workers: object[]
+    controllerWindow: Window
+    exit_app(): void
+}
 
 /*
     Wrapper for IPC communication between frontend and backend
@@ -406,6 +437,101 @@ function checkInternet(EvLogger: EventLogger){
     })
 }
 
+function align_windows(
+                // actual variables used for alignment
+                monitor_objects_1: PyMonitor_object[], // output from python updater script
+                monitor_objects_2: ElMonitor_object[], // output from electron screen utility
+                environment_config: JsonData,
+                controller_loc: string,
+                
+                // rest of variables used for monitor spawning
+                app_object: MainApp,
+                EvLogger: EventLogger
+
+            ){
+    
+    function set_win_position_vars(i: number){
+        let coords: number[] = [monitor_objects_1[i].pos_x, monitor_objects_1[i].pos_y]
+        let display_res: number[] = [monitor_objects_1[i].width, monitor_objects_1[i].height]
+
+        return [display_res, coords]
+    }
+    
+
+    // sort by pos_x and x
+    monitor_objects_1.sort((a, b) => a.pos_x - b.pos_x)
+    monitor_objects_2.sort((a, b) => a.x - b.x)
+
+    for (let i = 0; i < monitor_objects_1.length; i++){
+        // rewrite according to electron so that the script will be following electron screen.getAllDisplays (this sucks)
+
+        monitor_objects_1[i].width = monitor_objects_2[i].width
+        monitor_objects_1[i].height = monitor_objects_2[i].height
+        monitor_objects_1[i].pos_x = monitor_objects_2[i].x
+        monitor_objects_1[i].pos_y = monitor_objects_2[i].y
+    }
+
+    for (let i = 0; i < monitor_objects_1.length; i++){
+        // iterating from left to right
+        if ((i == 0 && controller_loc == "leftmost") || (i == monitor_objects_1.length - 1 && controller_loc == "rightmost")){
+            // spawn controller window on the left or on the right
+            const [display_res, coords] = set_win_position_vars(i)
+
+            EvLogger.log("DEBUG", "controller show")
+            app_object.controllerWindow = new Window(
+                app_object.app_status,
+                app_object.dev_panel,
+                controller_dict,
+                PATH_TO_CONTROLLER_HTML,
+                coords,
+                EvLogger,
+                app_object,
+                "controller",
+                display_res
+            )
+            app_object.wrapper.register_window(app_object.controllerWindow, "controller")
+
+            app_object.controllerWindow.checkClose(() => {
+                if (app_object.app_status["app-running"] && app_object.app_status["redir-to-main"]){
+                    //app is running and is redirected to main => close by tray button
+                    app_object.exit_app()
+                }
+            })
+
+        }
+        else {
+            // just spawn a worker window with ACC mode on
+            let win_type: string = "ACC" // default option when spawning windows
+            const [display_res, coords] = set_win_position_vars(i)
+            
+            EvLogger.log("DEBUG", "worker show")
+            let workerWindow = new WorkerWindow(
+                app_object.app_status,
+                app_object.dev_panel,
+                worker_dict,
+                PATH_TO_WORKER_HTML,
+                coords,
+                EvLogger,
+                app_object,
+                win_type,
+                environment_config["bar_height"],
+                display_res
+            )
+            app_object.wrapper.register_window(workerWindow, "worker-" + win_type)
+            app_object.worker_coords.push(coords)
+
+            let worker_id = generate_id()
+            app_object.workers.push({
+                "id": worker_id,
+                "win": workerWindow
+            })
+        }
+
+    }
+
+    return monitor_objects_1
+}
+
 function calculate_window_info(app_settings: object, 
                                displays: any[], 
                                idx: number, 
@@ -581,23 +707,6 @@ async function delete_logs(){
     })
 }
 
-function parse_args(){
-    let proc_args: string[] = process.argv
-    let args: string[] = []
-    if (proc_args[0].includes("electron")) args = proc_args.slice(2) // Development mode
-    else args = proc_args.slice(1) // Production
-
-    let processed_args: Record<string, string> = {}
-    args.forEach(elem => {
-        let name = elem.split("=")[0].substring(2)
-        let value = elem.split("=")[1]
-
-        processed_args[name] = value
-    })
-    
-    return processed_args
-}
-
 function readJSON(path: string){
     let file_raw = fs.readFileSync(path, "utf-8")
     let file_content = JSON.parse(file_raw)
@@ -669,12 +778,12 @@ const utils = {
     get_window_info,
     sleep,
     parse_scale,
-    parse_args,
     create_popup_window,
     delete_logs,
     readJSON,
     ping,
-    run_updater
+    run_updater,
+    align_windows
 }
 
 export default utils

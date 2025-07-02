@@ -1,9 +1,14 @@
 /*
-    Main file for SEDAC app
+    Main file for SEDAS app
 */
+
+//read runtime args + settings ABS_PATH (first thing that needs to be done on app start)
+const runtime_args: Record<string, string> = parse_args()
+process.env.ABS_PATH = (runtime_args["devel_path"] != undefined) ? runtime_args["devel_path"] : resolve("")
 
 //glob imports
 import fs from "fs";
+import { resolve } from "path";
 import { Worker } from "worker_threads"
 import path from "path"
 import { app, screen } from "electron";
@@ -12,7 +17,7 @@ import { app, screen } from "electron";
 import { Plane, PlaneDB } from "./plane_functions"
 import { EventLogger } from "./logger"
 
-import utils, {ProgressiveLoader, IPCwrapper, MSCwrapper} from "./utils"
+import utils, {ProgressiveLoader, IPCwrapper, MSCwrapper, ElMonitor_object, PyMonitor_object, JsonData} from "./utils"
 import {PluginRegister} from "./plugin_register" // TODO
 
 // responsible for reading CLI arguments and setting all the variables accordingly
@@ -30,10 +35,10 @@ import {
     Window,
     WidgetWindow,
     PopupWindow,
+    WorkerWindow,
 
     //window handler classes
     WidgetWindowHandler,
-    WorkerWindowHandler,
 
     //html resource paths
     PATH_TO_MAIN_HTML,
@@ -51,10 +56,11 @@ import {
     PATH_TO_PLUGINS,
     PATH_TO_MODULES,
 
-    ABS_PATH,
     PATH_TO_MSC,
     PATH_TO_INSTALLER,
-    PATH_TO_SETTINGS
+    PATH_TO_SETTINGS,
+    PATH_TO_MONITOR_CONFIGURATION,
+    PATH_TO_BACKUP
 } from "./app_config"
 
 import { MainAppFunctions } from "./backend_functions"
@@ -508,7 +514,7 @@ class MainApp extends MainAppFunctions{
         this.loader.send_progress("Reading app configuration")
 
         //read JSON
-        const app_settings_raw = fs.readFileSync(path.join(ABS_PATH, "/src/res/data/app/settings.json"), "utf-8")
+        const app_settings_raw = fs.readFileSync(PATH_TO_SETTINGS, "utf-8")
         this.app_settings = JSON.parse(app_settings_raw);
 
         EvLogger.log("DEBUG", "APP-INIT")
@@ -524,7 +530,7 @@ class MainApp extends MainAppFunctions{
 
             var backend_settings = { // settings only to be passed to backend
                 "noise": this.app_settings["noise"],
-                "abs_path": ABS_PATH
+                "abs_path": process.env.ABS_PATH
             }
 
             this.msc_wrapper = new MSCwrapper(PATH_TO_MSC, backend_settings, PATH_TO_MODULES)
@@ -533,7 +539,7 @@ class MainApp extends MainAppFunctions{
             this.app_status["turn-on-backend"] = false
             EvLogger.log("DEBUG", "Not starting Backend because flag backend_init is false")
         }
-        this.backup_worker = new Worker(path.join(ABS_PATH, "/src/workers/database.js"))
+        this.backup_worker = new Worker(PATH_TO_BACKUP)
         
         //backup saving frequency
         if (this.app_settings["saving_frequency"].includes("min")){
@@ -592,56 +598,21 @@ class MainApp extends MainAppFunctions{
 
         this.workers = []
 
-        //calculate x, y
-        //leftmost or rightmost tactic
-        //spawning worker windows
-        for(let i = 0; i < this.displays.length; i++){
-            const [coords, display_info] = utils.get_window_info(this.app_settings, this.displays, i, "normal")
-            
-            //stop sequence (display limit reached)
-            if (coords[0] == -2){
-                break
-            }
-            if (coords[0] == -3){
-                continue
-            }
-            
-            EvLogger.log("DEBUG", "worker show")
-            if (backup_db){
-                //backup was created, reload workers
-                workerWindow = new Window(this.app_status, this.dev_panel, worker_dict, backup_db["monitor-data"][i]["path_load"], backup_db["monitor-data"][i]["win_coordinates"], backup_db["monitor-data"][i]["win_type"], display_info)
-                workerWindow.isClosed = backup_db["monitor-planes"][i]["isClosed"]
-            }
-            else{
-                //backup was not created, create new workers
-                let win_type: string = "ACC" //default option when spawing windows
-                workerWindow = new Window(this.app_status, this.dev_panel, worker_dict, PATH_TO_WORKER_HTML, coords, EvLogger, main_app, win_type, display_info)
-                this.wrapper.register_window(workerWindow, "worker-" + win_type)
-                this.worker_coords.push(coords)
-            }
+        // reading monitor geometry configuration
+        let geometry_config: JsonData = utils.readJSON(PATH_TO_MONITOR_CONFIGURATION)
+        let python_monitor_config: PyMonitor_object[] = geometry_config["configuration"]
+        let environment_config: JsonData = geometry_config["env_configuration"]
+        let monitor_config: ElMonitor_object[] = screen.getAllDisplays().map(display => display.bounds)
 
-            let worker_id = utils.generate_id()
-            this.workers.push({
-                "id": worker_id,
-                "win": workerWindow
-            })
-        }
-
-        //spawning controller window
-        const [coords, display_info] = utils.get_window_info(this.app_settings, this.displays, -1, "normal")
-
-        EvLogger.log("DEBUG", "controller show")
-        this.controllerWindow = new Window(this.app_status, this.dev_panel, controller_dict, PATH_TO_CONTROLLER_HTML, coords, EvLogger, main_app, "controller", display_info)
-        this.wrapper.register_window(this.controllerWindow, "controller")
-
-        this.controllerWindow.checkClose(() => {
-            if (this.app_status["app-running"] && this.app_status["redir-to-main"]){
-                //app is running and is redirected to main => close by tray button
-                this.exit_app()
-            }
-        })
+        // spawning worker & controller windows
+        this.monitor_configuration = utils.align_windows(python_monitor_config,
+            monitor_config,
+            environment_config,
+            app_settings["controller_loc"], 
+            this, 
+            EvLogger)
         
-        //setting up workers
+        //setting all windows to show()
         for (let i = 0; i < this.workers.length; i++){
             this.workers[i]["win"].show()
             this.workers[i]["win"].checkClose()
@@ -649,6 +620,7 @@ class MainApp extends MainAppFunctions{
 
         this.controllerWindow.show()
 
+        // other modules (backup, backend) check
         if (this.app_status["turn-on-backend"]){
             //setup voice recognition and ACAI backend
             this.msc_wrapper.send_message("action", "debug", app_settings["logging"])
@@ -732,6 +704,23 @@ class MainApp extends MainAppFunctions{
     }
 }
 
+function parse_args(){
+    let proc_args: string[] = process.argv
+    let args: string[] = []
+    if (proc_args[0].includes("electron")) args = proc_args.slice(2) // Development mode
+    else args = proc_args.slice(1) // Production
+
+    let processed_args: Record<string, string> = {}
+    args.forEach(elem => {
+        let name = elem.split("=")[0].substring(2)
+        let value = elem.split("=")[1]
+
+        processed_args[name] = value
+    })
+    
+    return processed_args
+}
+
 //app predef
 var EvLogger: EventLogger;
 var main_app: MainApp;
@@ -754,7 +743,7 @@ app.on("ready", async () => {
     main_app = new MainApp(app_settings, EvLogger)
 
     //check internet connectivity & run independent updater
-    main_app.app_status["internet-connection"] = await utils.run_updater(PATH_TO_INSTALLER, ABS_PATH)
+    main_app.app_status["internet-connection"] = await utils.run_updater(PATH_TO_INSTALLER, process.env.ABS_PATH)
 
     await main_app.init_app() //initializing backend for app
     

@@ -1,6 +1,5 @@
 #generic node.js config
 node_modules
-package-lock.json
 
 #build files
 /src/build/*
@@ -48,9 +47,6 @@ package-lock.json
 
 # hide secret files
 token.json
-
-# PyEnv generated
-.python-version
 
 # updater
 /src/updater/__pycache__

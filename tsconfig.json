@@ -1,14 +1,7 @@
-{ 
+/*Configuration unification for whole vite stack*/
+{
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "sourceMap": true,
-    "esModuleInterop": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "removeComments": false,
-    "noImplicitAny": false
+    "esModuleInterop": true
   },
   "exclude": [ "node_modules" ],
   "files": [
@@ -25,5 +18,9 @@
     "./src/workers/sim_time.ts",
     "./src/workers/backend.ts",
     "./src/workers/database.ts"
+  ],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
   ]
 }

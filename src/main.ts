@@ -10,7 +10,6 @@ process.env.ABS_PATH = (runtime_args["devel_path"] != undefined) ? runtime_args[
 import fs from "fs";
 import { resolve } from "path";
 import { Worker } from "worker_threads"
-import path from "path"
 import { app, screen } from "electron";
 
 //relative imports

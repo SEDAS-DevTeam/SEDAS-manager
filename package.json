@@ -3,18 +3,27 @@
   "productName": "SEDAS-manager",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/main.js",
+  "type": "module",
+  "main": "./src/main/main_dev.js",
   "author": "Daniel Pojhan <danpojhan@gmail.com>",
   "homepage": "https://github.com/HelloWorld7894/SEDAC",
   "license": "GPL-3.0",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.5.2",
+    "@tailwindcss/vite": "^4.1.11",
     "@types/uuid": "^9.0.8",
     "electron-squirrel-startup": "^1.0.1",
     "leaflet": "^1.9.4",
     "md5": "^2.3.0",
     "node-addon-api": "^8.0.0",
+    "solid-js": "^1.9.8",
+    "tailwindcss": "^4.1.11",
     "uuid": "^9.0.1"
+  },
+  "scripts": {
+    "dev": "npx tsc -p ./tsconfig.electron.json && concurrently 'vite' 'wait-on http://localhost:5173 && electron .'",
+    "build:": "vite build",
+    "start": "electron ."
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.6.1",
@@ -26,7 +35,12 @@
     "@electron-forge/plugin-fuses": "^7.6.1",
     "@electron-forge/publisher-github": "^7.7.0",
     "@electron/fuses": "^1.8.0",
+    "concurrently": "^9.2.0",
     "electron": "^30.0.9",
-    "typescript": "^5.7.3"
+    "node-gyp": "^11.3.0",
+    "typescript": "^5.7.3",
+    "vite": "^7.1.0",
+    "vite-plugin-solid": "^2.11.8",
+    "wait-on": "^8.0.4"
   }
 }

@@ -1,5 +1,7 @@
 # SEDAS - manager
 
+## NOTE: Currently, the SEDAS-manager wont work in your environment. I am rewriting all the project helper mechanics for a better transition to the new tech stack (Vite + SolidJS + TailwindCSS + Typescript). So there will be a lot of clutter in the `main` branch. In order to use SEDAS in the last functional version, clone from the `last-working-ver` branch instead
+
 ## About
 
 This project is a new concept of an **ATC simulator** for both beginners and advanced users. It utilizes neural networks to imitate real pilots and also functions as a personal trainer. The goal of this desktop application is to make ATC learning easier for hobbyists and beginner ATC students. The project is still in early development.
@@ -81,3 +83,5 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Rework settings so that the changes can be activated on-run
 - [x] Wayland does not respect custom QT widget placement :( (short term fix mby?)
 - [ ] Find a way to remove the XWayland dependency on the whole platform
+- [ ] Update read the docs new build instructions (.python-version file)
+- [ ] Completely rework the tasks.py (Maybe more OOP oriented?)

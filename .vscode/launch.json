@@ -2,7 +2,7 @@
     "version": "2.0.0",
     "configurations": [
       {
-        "name": "Debug SEDAS",
+        "name": "Debug SEDAS: main",
         "type": "node",
         "request": "launch",
         "cwd": "${workspaceFolder}",
@@ -11,8 +11,38 @@
         "windows": {
           "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
         },
-        "args" : ["./src/main.js"],
-        "outputCapture": "std"
+        "args" : ["./src/main/main_dev.js", "--devel_path=${workspaceFolder}"],
+        "outputCapture": "std",
+        "console": "integratedTerminal",
+        "postDebugTask": "terminate-vite"
+      },
+      {
+        "name": "Debug SEDAS: renderer",
+        "type": "chrome",
+        "request": "attach",
+        "port": 9223,
+        "webRoot": "${workspaceFolder}",
+        "timeout": 30000,
+        "url": "http://localhost:5173"
+      },
+      {
+        "name": "Debug SEDAS: Vite",
+        "type": "node",
+        "request": "launch",
+        "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/vite",
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "port": 5173
+      }
+    ],
+    "compounds": [
+      {
+        "name": "Debug SEDAS",
+        "configurations": [
+          "Debug SEDAS: Vite",
+          "Debug SEDAS: main",
+          "Debug SEDAS: renderer"
+        ]
       }
     ]
   }

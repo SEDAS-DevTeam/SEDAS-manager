@@ -5,14 +5,19 @@ from invoke.runners import Result
 
 from os import path, makedirs, listdir, remove, chdir, environ
 from pathlib import Path
+from tabulate import tabulate
+
 import shutil
 import json
+import sys
 
 DESCRIPTION = "SEDAS Manager project toolkit, run --list to get info about args"
 PATH = str(Path(__file__).parent)
 
 PURPLE = '\033[0;35m'
 BLUE = '\033[0;34m'
+BOLD = "\033[1m"
+ITALIC = "\033[3m"
 NC = '\033[0m'
 
 # TODO: add for windows also
@@ -138,7 +143,7 @@ def compile(ctx: Context, only: str = "none", refetch: bool = False):
         print_color(PURPLE, "Built all C++ files")
 
     def compile_ts():
-        ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} npx tsc --project ./tsconfig.json", pty=True)
+        ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} npx tsc --project ./tsconfig.electron.json", pty=True)
         print_color(PURPLE, "Compiled Typescript")
 
     def compile_updater():
@@ -209,11 +214,37 @@ def devel(ctx: Context, obj: str):
         Run app in development mode
     """
 
+    class StreamCapturer:
+        def __init__(self):
+            self.output: str = ""
+            self.exited = False
+        def write(self, data: str):
+            if not self.exited:
+                sys.stdout.write(data)
+                sys.stdout.flush()
+            self.output += data
+            if "exited with code 0" in data and "wait-on" in data:
+                self.exited = True
+                sys.exit(0)
+        def flush(self):
+            pass
+
     if obj == "app":
-        path_main = path.join(PATH, "src/main.js")
+        path_main = path.join(PATH, "src/main/main_dev.js")
         print_color(PURPLE, "Running app in dev mode...")
         print(f"{ELECTRON_PATH} {path_main}")
-        ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {ELECTRON_PATH} {path_main} --devel_path={PATH}", pty=True)
+        stream_capturer = StreamCapturer()
+        try:
+            ctx.run(
+                f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} npx concurrently 'vite' 'wait-on http://localhost:5173 && {ELECTRON_PATH} {path_main} --devel_path={PATH}'",
+                pty=True,
+                out_stream=stream_capturer,
+            )
+        except Exception as e:
+            if not stream_capturer.exited:
+                raise e  # Re-raise if the exception was not due to our intended exit
+
+            print_color(PURPLE, "Exited dev server")
 
     elif obj == "install":
         print_color(PURPLE, "Running installer in dev mode...")
@@ -232,12 +263,14 @@ def devel(ctx: Context, obj: str):
 @task
 def debug(ctx: Context):
     """
-        Run app in debug mode
+        Show how to run app in debug mode in different IDEs
     """
-
-    path_main = path.join(PATH, "src/main.js")
-    print_color(PURPLE, "Running app in debug mode...")
-    ctx.run(f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {ELECTRON_PATH} --inspect=9229 {path_main}", pty=True)
+    print("This table will show you how to debug SEDAS in different IDEs/Editors.")
+    print(tabulate([
+        ["VSCode", f"{BOLD}.vscode{NC} files are defined in the project root. So the only thing needed is just to run {BOLD}Debug SEDAS{NC} task in the {BOLD}Run and Debug{NC} panel"],
+        ["Zed editor", f"{BOLD}TODO{NC}"]],
+        [f"{ITALIC}IDE/Editor{NC}", f"{ITALIC}Howto{NC}"],
+        tablefmt="grid"))
 
 
 @task

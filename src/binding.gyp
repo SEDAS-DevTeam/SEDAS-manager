@@ -13,4 +13,4 @@
             "cflags_cc": ["-fexceptions", "-frtti"]
         }
     ]
-}
+} # pyright: ignore[reportUnusedExpression]

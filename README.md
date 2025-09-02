@@ -12,6 +12,20 @@ To get started, you can read **SEDAS** documentation:
 
 - **English version:** - [sedas docs EN](https://sedas-docs.readthedocs.io/en/latest/)
 
+
+## Tech stack
+
+![Solid](https://img.shields.io/badge/Solid-2C4F7C.svg?style=for-the-badge&logo=solid&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![NodeJS](https://img.shields.io/badge/Node.js-6DA55F.svg?style=for-the-badge&logo=node.js&logoColor=white)
+![Electron](https://img.shields.io/badge/Electron-2B2E3A.svg?style=for-the-badge&logo=electron&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![C++](https://img.shields.io/badge/C++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
+![NodeAddonAPI](https://img.shields.io/badge/Node%20addon%20API-green?logo=node.js&logoColor=white&style=for-the-badge)
+
+
 ## Project TODO list
 
 ### Current version
@@ -85,3 +99,5 @@ To get started, you can read **SEDAS** documentation:
 - [ ] Find a way to remove the XWayland dependency on the whole platform
 - [ ] Update read the docs new build instructions (.python-version file)
 - [ ] Completely rework the tasks.py (Maybe more OOP oriented?)
+- [ ] Rework exception handling in StreamCapturer -> has evil output
+- [ ] Completely overhaul the whole project structure

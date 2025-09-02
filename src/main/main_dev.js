@@ -11,3 +11,5 @@ function create_window() {
 app.on("ready", () => {
     create_window();
 });
+app.commandLine.appendSwitch('remote-debugging-port', '9223');
+app.commandLine.appendSwitch('remote-debugging-address', '127.0.0.1');

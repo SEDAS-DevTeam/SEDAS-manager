@@ -34,7 +34,7 @@
     "@electron-forge/publisher-github": "^7.7.0",
     "@electron/fuses": "^1.8.0",
     "concurrently": "^9.2.0",
-    "electron": "^30.0.9",
+    "electron": "^35.7.5",
     "kill-port": "^2.0.1",
     "node-gyp": "^11.3.0",
     "typescript": "^5.7.3",

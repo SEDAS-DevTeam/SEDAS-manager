@@ -7,7 +7,7 @@ import { join } from "path"
 import { v4 } from "uuid"
 import md5 from "md5"
 import http from "http"
-import { EventLogger } from "./logger"
+import { EventLogger } from "./logger.js"
 import path from "path"
 import dns from "dns"
 import { 
@@ -29,7 +29,7 @@ import {
     PATH_TO_WORKER_HTML,
     controller_dict,
     PATH_TO_CONTROLLER_HTML
- } from "./app_config";
+ } from "./app_config.js";
 import { desktopCapturer, ipcMain, screen } from "electron";
 import { Worker } from "worker_threads";
 import { spawn } from "child_process";
@@ -69,8 +69,8 @@ export class IPCwrapper{
     /*
         Class that handles the IPC communication
     */
-    public window_communication_configuration: object[] = [];
-    private channel_communication_configuration: object[] = [];
+    public window_communication_configuration: any[] = [];
+    private channel_communication_configuration: any[] = [];
     private open: boolean = true;
     
     private hash_message(message: any[] | string){
@@ -270,7 +270,7 @@ export class ProgressiveLoader{
             const [coords, display_info] = get_window_info(this.app_settings, this.displays, i, "load", this.load_dict)
 
             //creating loading window
-            let LoadingWindow = new LoaderWindow(this.load_dict, PATH_TO_LOADER_HTML, coords, this.ev_logger, display_info)
+            let LoadingWindow = new LoaderWindow(this.load_dict, PATH_TO_LOADER_HTML, coords!, this.ev_logger, display_info)
             this.loaders.push(LoadingWindow)
         }
     }
@@ -365,7 +365,7 @@ function generateRandomInteger(min: number, max: number) {
     return Math.random() * (max - min) + min;
 }
 
-function generate_name(airline_names: object[], type: string): string{
+function generate_name(airline_names: any[], type: string): string{
     /*
     CALLSIGN GENERATION RULES & RECOMMENDATIONS (TODO: Validate)
     * must not exceed 7 characters (by FAA)
@@ -532,15 +532,15 @@ function align_windows(
     return monitor_objects_1
 }
 
-function calculate_window_info(app_settings: object, 
+function calculate_window_info(app_settings: any, 
                                displays: any[], 
                                idx: number, 
                                mode: string, 
-                               window_dict: any = undefined){
-    let x: number;
-    let y: number;
-    let width: number;
-    let height: number;
+                               window_dict: any = undefined): (number | undefined)[]{
+    let x: number | undefined = undefined;
+    let y: number | undefined = undefined;
+    let width: number | undefined = undefined;
+    let height: number | undefined = undefined;
 
     let last_display: any;
 
@@ -572,8 +572,8 @@ function calculate_window_info(app_settings: object,
             last_display = displays[0]
     
             if (window_dict){
-                x = x + (last_display.width / 2) - (window_dict.width / 2)
-                y = y + (last_display.height / 2) - (window_dict.height / 2)
+                x = x! + (last_display.width / 2) - (window_dict.width / 2)
+                y = y! + (last_display.height / 2) - (window_dict.height / 2)
             }
             return [x, y, width, height]
         }
@@ -630,8 +630,8 @@ function calculate_window_info(app_settings: object,
         }
         //align to center on some windows
         if (window_dict){
-            x = x + (last_display.width / 2) - (window_dict.width / 2)
-            y = y + (last_display.height / 2) - (window_dict.height / 2)
+            x = x! + (last_display.width / 2) - (window_dict.width / 2)
+            y = y! + (last_display.height / 2) - (window_dict.height / 2)
         }
     }
 
@@ -642,22 +642,28 @@ function get_window_info(app_settings: object,
                          displays: any[], 
                          idx: number, 
                          mode: string, 
-                         window_dict: any = undefined){
+                         window_dict: any = undefined): [number[], number[]]{
     let win_info = calculate_window_info(app_settings,
                                          displays,
                                          idx,
                                          mode,
                                          window_dict)
-    let coords = win_info.slice(0, 2)
-    let display_info = win_info.slice(2, 4)
-    return [coords, display_info]
+    let coords: [number, number] = [
+        win_info[0] ?? 0,
+        win_info[1] ?? 0
+    ];
+    let display_info: [number, number] = [
+        win_info[2] ?? 800,
+        win_info[3] ?? 600
+    ];
+    return [coords, display_info];
 }
 
 function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function parse_scale(scale){
+function parse_scale(scale: string){
     //parse scale (constant, that describes how many units is one pixel)
     let val: number = 0
     if(scale.includes("m")){
@@ -715,7 +721,7 @@ function readJSON(path: string){
 
 async function ping(address: string): Promise<boolean>{
     return new Promise((resolve, reject) => {
-        let url: URL;
+        let url!: URL;
         try{
             url = new URL(address)
         }

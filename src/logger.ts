@@ -4,7 +4,7 @@ import os from "os"
 import {
     PATH_TO_LOGS,
     APP_NAME
-} from "./app_config"
+} from "./app_config.js"
 
 export class EventLogger{
     /*
@@ -16,13 +16,13 @@ export class EventLogger{
     }]
     */
 
-    private data = []
-    private debug_mode: boolean = undefined
+    private data: any = []
+    private debug_mode: boolean | undefined = undefined
     public log_header: string = ""
     private app_version: string = ""
     private header_type: string = ""
     private LOG_PATH: string = ""
-    private stream: WriteStream;
+    private stream!: WriteStream;
 
     public constructor(debug: boolean, log_header: string, header_type: string, app_ver: string = ""){
         this.debug_mode = debug

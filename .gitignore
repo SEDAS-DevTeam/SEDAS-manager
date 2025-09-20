@@ -18,6 +18,8 @@ node_modules
 /src/workers/*.js.map
 /src/main/*.js
 /src/main/*.js.map
+/src/res/components/preload.js
+/src/res/components/preload.d.ts
 
 #pycache files
 /src/res/neural/cache/__pycache__/

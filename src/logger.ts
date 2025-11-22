@@ -3,10 +3,12 @@ import path from "path"
 import os from "os"
 import {
     PATH_TO_LOGS,
-    APP_NAME
-} from "./app_config.js"
+    APP_NAME,
+    
+    EventLoggerInterface
+} from "./app_config"
 
-export class EventLogger{
+export class EventLogger implements EventLoggerInterface {
     /*
     data will be processed in format:
     data = [{

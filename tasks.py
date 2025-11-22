@@ -326,5 +326,14 @@ def publish(ctx: Context, verbose: bool = False):
     ctx.run(command, pty=True, env=environ)
 
 
+@task
+def check_structure(ctx: Context):
+    """
+    Check for project internal structure and linkages in .JS files
+    """
+    command = "npx madge --exclude '^src\/addons\/' --image ./extra/js_structure.svg --extensions ts ."
+    ctx.run(command, pty=True, env=environ)
+    print_color(PURPLE, "Generated project_structure SVG is in ./extra directory (if you see any warnings generated, it possibly means that there are some circular dependencies)")
+
 # runtime
 print_color(PURPLE, DESCRIPTION)

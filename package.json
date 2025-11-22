@@ -38,6 +38,7 @@
     "concurrently": "^9.2.0",
     "electron": "^38.1.2",
     "kill-port": "^2.0.1",
+    "madge": "^8.0.0",
     "node-gyp": "^11.3.0",
     "typescript": "^5.7.3",
     "vite": "^7.1.11",

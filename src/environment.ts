@@ -1,13 +1,18 @@
 import { EventLogger } from "./logger"
 import { Worker } from 'worker_threads';
 import path from "path"
-import utils, { ProgressiveLoader, MSCwrapper } from "./utils";
+import utils, { ProgressiveLoader, MSCwrapper, IPCwrapper } from "./app_utils";
 
 //C++ (N-API) imports
 import { enviro_calculations } from "./bind";
 import { Plane, PlaneDB } from "./plane_functions";
 
-export class Environment {
+import {
+  EnvironmentInterface,
+  Window
+} from "./app_config"
+
+export class Environment implements EnvironmentInterface{
     private logger: EventLogger;
     private abs_path: string;
     private sim_time_worker: Worker;
@@ -102,10 +107,10 @@ export class Environment {
     }
 
     /*
-        Private enviro functions
+    Evironment/planes modifier functions
     */
     public set_plane_schedules(){
-        let n_unused_schedules = 0
+        let n_unused_schedules: number = 0
 
         this.plane_schedules = this.map_data["scenarios"][0]["flight_schedules"]
 
@@ -150,6 +155,38 @@ export class Environment {
             let plane_trajectory: any[] = enviro_calculations.compute_plane_trajectory(napi_arguments)
             this.plane_objects[i]["trajectory"] = plane_trajectory
         }
+    }
+    
+    public broadcast_planes(planes: object[],
+                            plane_monitor_data: object[],
+                            plane_paths_data: object[],
+                            controller_window: undefined | Window,
+                            workers: object[],
+                            wrapper: IPCwrapper){
+      if (controller_window != undefined && workers.length != 0){
+        //update planes on controller window
+        wrapper.send_message("controller", "update-plane-db", planes)
+
+        for (let i = 0; i < plane_monitor_data.length; i++){
+          let temp_planes = []
+
+          for (let i_plane = 0; i_plane < plane_monitor_data[i]["planes_id"].length; i_plane++){
+            //loop through all planes on specific monitor
+
+            //retrieve specific plane by id
+            for (let i2_plane = 0; i2_plane < planes.length; i2_plane++){
+              if (planes[i2_plane]["id"] == plane_monitor_data[i]["planes_id"][i_plane]){
+                temp_planes.push(planes[i2_plane])
+              }
+            }
+          }
+
+          //send updated data to all workers
+          workers[i]["win"].send_message("update-plane-db", temp_planes)
+          //send path data to all workers
+          workers[i]["win"].send_message("update-paths", plane_paths_data)
+        }
+      }
     }
 
     /*Inner functions*/
@@ -341,4 +378,53 @@ export class Environment {
             //TODO: Finish plane commander
         }
     }
+}
+
+// Upper-level function definitions used to manage environment calls from main_lib
+// TODO: solve for multi-session (mutiple ATCos)
+
+export function start_sim(){
+    this.app_status["sim-running"] = true
+
+    //send stop event to all workers
+    this.wrapper.broadcast("workers", "sim-event", "startsim")
+    this.wrapper.send_message("controller", "sim-event", "startsim")
+}
+
+export function stop_sim(){
+    this.app_status["sim-running"] = false
+
+    //send stop event to all workers
+    this.wrapper.broadcast("workers", "sim-event", "stopsim")
+    this.wrapper.send_message("controller", "sim-event", "stopsim")
+}
+
+export function start_mic_record(){
+    console.log(this.app_status["sim-running"])
+    if (this.msc_wrapper && this.app_status["sim-running"]) this.msc_wrapper.send_message("module", "ai_backend", "start-mic")
+}
+
+export function stop_mic_record(){
+    if (this.msc_wrapper && this.app_status["sim-running"]) this.msc_wrapper.send_message("module", "ai_backend", "stop-mic")
+}
+
+export function restore_sim(){
+    this.backup_worker.postMessage(["read-db"])
+}
+
+export function regenerate_map(){
+    if (this.app_status["turn-on-backend"]){
+        console.log("Terrain generation not done yet :)")
+        //this.backend_worker.postMessage(["action", "terrain"])
+    }
+}
+
+export function parse_scale(scale: string){
+    //parse scale (constant, that describes how many units is one pixel)
+    let val: number = 0
+    if(scale.includes("m")){
+        val = parseFloat(scale.substring(0, scale.indexOf("m"))) //value is in nautical miles
+    }
+
+    return val
 }

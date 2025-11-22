@@ -4,9 +4,10 @@
 */
 
 import { join } from "path"
-import { BrowserWindow, ipcMain, screen, Tray, nativeImage, Menu } from "electron";
+import { BrowserWindow, ipcMain, screen, Tray, nativeImage, Menu, App, Rectangle } from "electron";
 import { EventLogger } from "./logger.js"
-import utils from "./utils.js"
+import { Worker } from "worker_threads"
+import utils from "./app_utils.js"
 
 //paths for main html files
 export const PATH_TO_MAIN_HTML = join(process.env.ABS_PATH!, "./src/res/html/other/main.html")
@@ -83,6 +84,187 @@ export const PATH_EXC_REQUIREMENTS: string = "./requirements.txt";
 export const PATH_EXC_INVOKE: string = "./tasks.py";
 export const PATH_EXC_TSCONF: string = "./tsconfig.json";
 
+/*
+    Main app interface definiton (used in parameter passing - trying to avoid circual imports)
+*/
+
+export interface IPCwrapperInterface {
+  window_communication_configuration: any[]
+  register_window(window: Window, window_name: string): void,
+  unregister_window(window_id: string): void,
+  register_channel(channel_name: string, sender: string[], type: string, callback: Function): void,
+  set_all_listeners(): void,
+  open_channels(): void,
+  close_channels(): void,
+  send_message(destination: string, channel: string, data: any): void,
+  broadcast(type: string, channel: string, data: any): void,
+}
+
+export interface MSCwrapperInterface {
+  worker: Worker,
+  enabled_channels: string[],
+  send_message(...message: any[]): void,
+  set_listener(callback: Function): void,
+  terminate(): void
+}
+
+export interface ProgressiveLoaderInterface {
+  num_segments: number,
+  curr_n_segments: number,
+  setup_loader(n_segments: number, loader_header: string, first_message: string): void,
+  send_progress(message: string): void,
+  destroy_loaders(): void
+}
+
+export interface EventLoggerInterface {
+  log_header: string,
+  init_logger(): void,
+  log(cat_name: string, message: string): void,
+  end(): void
+}
+
+export interface PluginRegisterInterface {}
+
+export interface EnvironmentInterface {
+  current_time: Date,
+  start_time: Date,
+  
+  plane_schedules: any,
+  plane_objects: object[],
+  plane_conditions: object,
+  
+  setup_enviro(loader: ProgressiveLoaderInterface, logger: EventLoggerInterface): void,
+  kill_enviro(): void,
+  set_plane_schedules(): number,
+  set_plane_trajectories(): void,
+  broadcast_planes(planes: object[], plane_monitor_data: object[], plane_paths_data: object[], controller_window: undefined | Window, workers: object[], wrapper: IPCwrapperInterface): void,
+}
+
+export interface PlaneInterface {
+  id: string,
+  callsign: string,
+  
+  heading: number,
+  updated_heading: number,
+  
+  level: number,
+  updated_level: number,
+  
+  speed: number,
+  screen_speed: number,
+  updated_speed: number,
+  
+  departure: string,
+  arrival: string,
+  arrival_time: string,
+  x: number,
+  y: number,
+  
+  current_command_level: string,
+  current_command_speed: string,
+  current_command_heading: string
+  
+  special_comm: string[],
+  
+  forward(scale: number): void,
+  check_heading(std_bank_angle: number, plane_turn_DB: object[]): void,
+  check_level(std_climb_angle: number, std_descent_angle: number, scale: number): void,
+  check_speed(std_accel: number): void,
+  change_heading(command: string, value: any): void,
+  change_speed(command: string, value: any): void,
+  change_level(command: string, value: any): void,
+}
+
+export interface PlaneDBInterface {
+  DB: PlaneInterface[],
+  monitor_DB: any[],
+  plane_paths_DB: any[],
+  plane_turn_DB: object[],
+  command_config: Record<string, any>,
+  
+  set_command(callsign: string, command: string, value: any): void,
+  update_worker_data(monitor_data: any): void,
+  add_record(plane_obj: any, monitor_spawn: string): void,
+  add_path_record(id: string, coords: any): void,
+  find_record(id: string): PlaneInterface,
+  delete_record(id: string): void,
+  delete_all(): void,
+  update_planes(scale: number, std_bank_angle: number, std_climb_angle: number, std_descent_angle: number, std_accel: number, path_limit: number): void
+}
+
+export interface MainAppInterface {
+  app_instance: App,
+  displays: Rectangle[],
+  app_abs_path: string,
+  wrapper: IPCwrapperInterface,
+  loader: ProgressiveLoaderInterface | undefined,
+  logger: EventLoggerInterface,
+  widget_handler: WidgetWindowHandler,
+  msc_wrapper: MSCwrapperInterface,
+  plugin_register: PluginRegisterInterface,
+  
+  mainMenuWindow: Window,
+  settingsWindow: Window,
+  controllerWindow: Window,
+  exitWindow: Window,
+  enviro: EnvironmentInterface,
+  enviro_logger: EventLoggerInterface,
+  app_status: Record<string, boolean>,
+  frontend_vars: object,
+  app_settings: Record<string, any>,
+  backup_worker: Worker,
+  
+  dev_panel: boolean | undefined,
+  workers: object[],
+  worker_coords: object[],
+  monitor_configuration: PyMonitor_object,
+  selected_plugin_id: string,
+  current_popup_window: PopupWindow,
+  backupdb_saving_frequency: number,
+  local_plugin_list: object[],
+  
+  map_configs_list: object[],
+  map_data: object,
+  map_name: string,
+  scenario_presets_list: object[],
+  scenario_data: any,
+  scenario_name: string,
+  
+  scale: number,
+  longitude: number | undefined,
+  latitude: number | undefined,
+  zoom: number | undefined,
+  
+  aircraft_presets_list: object[],
+  aircraft_preset_data: object | undefined,
+  aircraft_preset_name: string,
+  PlaneDatabase: PlaneDBInterface,
+  
+  main_menu_config: object,
+  exit_config: object,
+  popup_widget_config: object,
+  load_config: object,
+  settings_config: object,
+  
+  create_popup_window(app_settings: any, event_logger: EventLoggerInterface, displays: any[], type: string, channel: string, header: string, text: string): PopupWindow,
+  delete_logs(): Promise<void>,
+  run_updater(path: string, app_abs_path: string): Promise<boolean>,
+  setup_environment(): void,
+  
+  init_app(): void,
+  init_gui(): void,
+  main_app(backup_db: object | undefined): void,
+  exit_app(): void
+}
+
+export interface PyMonitor_object { // Python output
+    name: string
+    width: number,
+    height: number,
+    pos_x: number,
+    pos_y: number
+}
+export type JsonData = { [key: string ]: any}
 
 /*
     Window configs for electron

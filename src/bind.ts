@@ -12,9 +12,6 @@ catch (err){
     process.exit(0)
 }
 
-// utils library
-import utils from "./utils"
-
 function handle_exception_js(error: Error){
     /* Function for handling error on javascript side
     */

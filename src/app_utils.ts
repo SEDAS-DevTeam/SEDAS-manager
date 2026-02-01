@@ -9,32 +9,35 @@ import http from "http"
 import { EventLogger } from "./logger.js"
 import dns from "dns"
 import { 
-    Window,
-    WorkerWindow,
-    worker_dict,
-    PATH_TO_WORKER_HTML,
-    controller_dict,
-    PATH_TO_CONTROLLER_HTML,
+  Window,
+  WorkerWindow,
+  worker_dict,
+  PATH_TO_WORKER_HTML,
+  controller_dict,
+  PATH_TO_CONTROLLER_HTML,
+  
+  Coords,
+  DisplayObject,
+  MainAppInterface,
+  EventLoggerInterface,
+  MonitorInfo,
     
-    PyMonitor_object,
-    JsonData
- } from "./app_config.js";
-import { desktopCapturer, ipcMain, screen, Display } from "electron";
+  generate_id,
+  generate_win_id
+} from "./app_config.js";
+import { screen, Display } from "electron";
 import { Rectangle } from "electron";
-
-//
-// Variables & Variable types
-// 
-
-const alphabet: string[] = 'abcdefghijklmnopqrstuvwxyz'.split(''); // TODO: Check usage and move to atc_config.ts
 
 //
 // File manipulation
 // 
 
-function read_file_content(path: string){
-    let map_raw = fs.readFileSync(join(path), "utf-8")
-    return JSON.parse(map_raw);
+function read_file_content(path: string, path2: string | undefined = undefined) {
+  let fin_path: string;
+  if (path2 === undefined) fin_path = path
+  else fin_path = join(path, path2)
+  let map_raw = fs.readFileSync(fin_path, "utf-8")
+  return JSON.parse(map_raw);
 }
 
 function list_files(path: string){
@@ -53,35 +56,6 @@ function list_files(path: string){
 
 function generate_hash(){
     return v4()
-}
-
-function generate_win_id(){
-    var res_str: string = "win-"
-    var n_pos: number = 4;
-
-
-    for (let i = 0; i < n_pos; i++){
-        res_str += Math.floor(Math.random() * 9).toString()
-    }
-    return res_str
-}
-
-function generate_id(){
-    var n_pos: number = 5;
-    var res_str: string = ""
-
-    for (let i = 0; i < n_pos; i++){
-        let rand_choice = Math.random() < 0.5;
-        let elem: string;
-        if (rand_choice){ //alphabet
-            elem = alphabet[(Math.floor(Math.random() * alphabet.length))]
-        }
-        else{ //number
-            elem = Math.floor(Math.random() * 11).toString()
-        }
-        res_str += elem
-    }
-    return res_str
 }
 
 function generateRandomInteger(min: number, max: number) {
@@ -181,252 +155,104 @@ async function ping(address: string): Promise<boolean>{
     })
 }
 
-//
-// TODO: this absolutely does not work, it is combined Python monitor config + electron monitor config and both of them do not work the way I would like to
-// 
+// Getting system monitor info
+function get_monitor_info(controller_loc: string) {
+  function display_sort(a: DisplayObject, b: DisplayObject) {
+    if (a.center[0] == b.center[0]) return 0;
+    else return (a.center[0] < b.center[0]) ? -1 : 1;
+  }
+  
+  // Getting display data
+  let displays: Display[] | Rectangle[] = screen.getAllDisplays()
+  displays = displays.map((display) => display.bounds)
+  
+  // Transforming display data
+  let display_bounds: DisplayObject[] = []
+  displays.forEach((display) => {
+    display_bounds.push({
+      center: [display.x + Math.round(display.width / 2), display.y + Math.round(display.height / 2)],
+      size: [display.width, display.height]
+    })
+  })
+  
+  // Sorting
+  display_bounds.sort(display_sort)
+  
+  let main_monitor: DisplayObject;
+  if (controller_loc == "leftmost") main_monitor = display_bounds[0];
+  else if (controller_loc == "rightmost") main_monitor = display_bounds[display_bounds.length - 1]
+  
+  let monitor_info: MonitorInfo<DisplayObject[], DisplayObject> = [display_bounds, main_monitor]
+  return monitor_info
+}
+
+// Helper func to calculate widget coord on monitor
+function calculate_center(w: number, h: number, x: number, y: number) {
+  let coords: Coords<number, number> = [x - Math.round(w / 2), y - Math.round(h / 2)]
+  return coords
+}
 
 function align_windows(
-                // actual variables used for alignment
-                monitor_objects_1: PyMonitor_object[], // output from python updater script
-                monitor_objects_2: Rectangle[], // output from electron screen utility
-                environment_config: JsonData,
-                controller_loc: string,
-                
-                // rest of variables used for monitor spawning
-                app_object: MainApp,
-                EvLogger: EventLogger
-            ){
+  monitor_info: MonitorInfo<DisplayObject[], DisplayObject>,
+  app_object: MainAppInterface,
+  event_logger: EventLoggerInterface,
+  controller_loc: string,
+) {
+  
+  let monitors: DisplayObject[] = monitor_info[0]
+  for (let i = 0; i < monitors.length; i++){
+    let bound = monitors[i]
+    let coords: Coords<number, number> = calculate_center(...bound.size, ...bound.center)
     
-    function set_win_position_vars(i: number){
-        let coords: number[] = [monitor_objects_1[i].pos_x, monitor_objects_1[i].pos_y]
-        let display_res: number[] = [monitor_objects_1[i].width, monitor_objects_1[i].height]
-
-        return [display_res, coords]
+    if ((controller_loc == "leftmost" && i == 0) ||
+        (controller_loc == "rightmost" && i == monitors.length - 1)) {
+      
+      event_logger.log("DEBUG", "controller show")
+      app_object.controllerWindow = new Window(
+        app_object.app_status,
+        app_object.dev_panel,
+        controller_dict,
+        PATH_TO_CONTROLLER_HTML,
+        coords,
+        event_logger,
+        app_object,
+        "controller",
+        bound.size
+      )
+      app_object.wrapper.register_window(app_object.controllerWindow, "controller")
+      app_object.controllerWindow.checkClose(() => {
+          if (app_object.app_status["app-running"] && app_object.app_status["redir-to-main"]){
+              //app is running and is redirected to main => close by tray button
+              app_object.exit_app()
+          }
+      })
     }
-    
-
-    // sort by pos_x and x
-    monitor_objects_1.sort((a, b) => a.pos_x - b.pos_x)
-    monitor_objects_2.sort((a, b) => a.x - b.x)
-
-    for (let i = 0; i < monitor_objects_1.length; i++){
-        // rewrite according to electron so that the script will be following electron screen.getAllDisplays (this sucks)
-
-        monitor_objects_1[i].width = monitor_objects_2[i].width
-        monitor_objects_1[i].height = monitor_objects_2[i].height
-        monitor_objects_1[i].pos_x = monitor_objects_2[i].x
-        monitor_objects_1[i].pos_y = monitor_objects_2[i].y
+    else {
+      // just spawn a worker window with ACC mode on
+      let win_type: string = "ACC" // default option when spawning windows (TODO)
+      event_logger.log("DEBUG", "worker show")
+      let workerWindow = new WorkerWindow(
+          app_object.app_status,
+          app_object.dev_panel,
+          worker_dict,
+          PATH_TO_WORKER_HTML,
+          coords,
+          event_logger,
+          app_object,
+          win_type,
+          bound.size
+      )
+      app_object.wrapper.register_window(workerWindow, "worker-" + win_type)
+      app_object.worker_coords.push(coords)
+      
+      // ID generation to identify workers better
+      let worker_id = generate_id()
+      app_object.workers.push({
+          "id": worker_id,
+          "win": workerWindow
+      })
     }
-
-    for (let i = 0; i < monitor_objects_1.length; i++){
-        // iterating from left to right
-        if ((i == 0 && controller_loc == "leftmost") || (i == monitor_objects_1.length - 1 && controller_loc == "rightmost")){
-            // spawn controller window on the left or on the right
-            const [display_res, coords] = set_win_position_vars(i)
-
-            EvLogger.log("DEBUG", "controller show")
-            app_object.controllerWindow = new Window(
-                app_object.app_status,
-                app_object.dev_panel,
-                controller_dict,
-                PATH_TO_CONTROLLER_HTML,
-                coords,
-                EvLogger,
-                app_object,
-                "controller",
-                display_res
-            )
-            app_object.wrapper.register_window(app_object.controllerWindow, "controller")
-
-            app_object.controllerWindow.checkClose(() => {
-                if (app_object.app_status["app-running"] && app_object.app_status["redir-to-main"]){
-                    //app is running and is redirected to main => close by tray button
-                    app_object.exit_app()
-                }
-            })
-
-        }
-        else {
-            // just spawn a worker window with ACC mode on
-            let win_type: string = "ACC" // default option when spawning windows
-            const [display_res, coords] = set_win_position_vars(i)
-            
-            EvLogger.log("DEBUG", "worker show")
-            let workerWindow = new WorkerWindow(
-                app_object.app_status,
-                app_object.dev_panel,
-                worker_dict,
-                PATH_TO_WORKER_HTML,
-                coords,
-                EvLogger,
-                app_object,
-                win_type,
-                environment_config["bar_height"],
-                display_res
-            )
-            app_object.wrapper.register_window(workerWindow, "worker-" + win_type)
-            app_object.worker_coords.push(coords)
-
-            let worker_id = generate_id()
-            app_object.workers.push({
-                "id": worker_id,
-                "win": workerWindow
-            })
-        }
-
-    }
-
-    return monitor_objects_1
-}
-
-//
-// TODO: same here lol
-// 
-
-function calculate_window_info(app_settings: any, 
-                               displays: any[], 
-                               idx: number, 
-                               mode: string, 
-                               window_dict: any = undefined): (number | undefined)[]{
-    let x: number | undefined = undefined;
-    let y: number | undefined = undefined;
-    let width: number | undefined = undefined;
-    let height: number | undefined = undefined;
-
-    let last_display: any;
-
-    //for loader just center
-    if (mode == "load"){
-        let display = displays[idx]
-
-        x = display.x + (display.width / 2) - (window_dict.width / 2)
-        y = display.y + (display.height / 2) - (window_dict.height / 2)
-    }
-    //for every other window
-    else if (mode == "normal"){
-        if (app_settings["alignment"] == "free"){
-            x = undefined
-            y = undefined
-            width = undefined
-            height = undefined
-    
-            return [x, y, width, height]
-        }
-    
-        if (displays.length == 1){
-            x = displays[0].x
-            y = displays[0].y
-    
-            width = displays[0].width
-            height = displays[0].height
-    
-            last_display = displays[0]
-    
-            if (window_dict){
-                x = x! + (last_display.width / 2) - (window_dict.width / 2)
-                y = y! + (last_display.height / 2) - (window_dict.height / 2)
-            }
-            return [x, y, width, height]
-        }
-    
-        if (idx == -1){
-            if (app_settings["controller_loc"] == "leftmost"){
-                x = displays[0].x
-                y = displays[0].y
-    
-                width = displays[0].width
-                height = displays[0].height
-    
-                last_display = displays[0]
-            }
-            else if (app_settings["controller_loc"] == "rightmost"){
-                x = displays[displays.length - 1].x
-                y = displays[displays.length - 1].y
-    
-                width = displays[displays.length - 1].width
-                height = displays[displays.length - 1].height
-    
-                last_display = displays[displays.length - 1]
-            }
-        }
-        else{ //idx != -1: other worker windows
-            if (app_settings["controller_loc"] == "leftmost"){
-                if (displays.length == idx + 1){
-                    return [-2, -2] //signalizes "break"
-                }
-                x = displays[idx + 1].x
-                y = displays[idx + 1].y
-    
-                width = displays[idx + 1].width
-                height = displays[idx + 1].height
-    
-                last_display = displays[idx + 1]
-            }
-            else if (app_settings["controller_loc"] == "rightmost"){
-                if (displays.length == idx){
-                    return [-2, -2] //signalizes "break"
-                }
-                if(idx == 0){
-                    return [-3, -3] //signalizes "skip"
-                }
-    
-                x = displays[idx - 1].x
-                y = displays[idx - 1].y
-    
-                x = displays[idx - 1].x
-                y = displays[idx - 1].y
-    
-                last_display = displays[idx - 1]
-            }
-        }
-        //align to center on some windows
-        if (window_dict){
-            x = x! + (last_display.width / 2) - (window_dict.width / 2)
-            y = y! + (last_display.height / 2) - (window_dict.height / 2)
-        }
-    }
-
-    return [x, y, width, height]
-}
-
-//
-// TODO: I really do not know why i needed 3 functions for this...
-// 
-
-function get_window_info(app_settings: object, 
-                         displays: any[], 
-                         idx: number, 
-                         mode: string, 
-                         window_dict: any = undefined): [number[], number[]]{
-    let win_info = calculate_window_info(app_settings,
-                                         displays,
-                                         idx,
-                                         mode,
-                                         window_dict)
-    let coords: [number, number] = [
-        win_info[0] ?? 0,
-        win_info[1] ?? 0
-    ];
-    let display_info: [number, number] = [
-        win_info[2] ?? 800,
-        win_info[3] ?? 600
-    ];
-    return [coords, display_info];
-}
-
-//
-// TODO: Nice, fourth one right now :D.
-// 
-
-function get_screen_info(){
-    //get screen info
-    var displays_info: Display[] = screen.getAllDisplays()
-    var displays_mod = []
-    for(let i: number = 0; i < displays_info.length; i++){
-        displays_mod.push(displays_info[i].bounds)
-    }
-    displays_mod.sort((a, b) => a.x - b.x);
-    return displays_mod
+  }
 }
 
 //
@@ -439,21 +265,17 @@ function sleep(ms: number) {
 
 // exports
 const utils = {
-  alphabet,
   read_file_content,
   list_files,
   generate_hash,
-  generate_win_id,
-  generate_id,
   generateRandomInteger,
   generate_name,
   get_random_element,
   checkInternet,
   ping,
+  calculate_center,
+  get_monitor_info,
   align_windows,
-  calculate_window_info,
-  get_window_info,
-  get_screen_info,
   sleep
 }
 

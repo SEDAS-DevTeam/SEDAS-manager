@@ -1,7 +1,7 @@
 {
     "plugins": [
         {
-            "plugin": "SEDAC MapBuilder",
+            "plugin": "SEDAS MapBuilder",
             "version": "ver 1.0.0",
             "last-updated": "Last week",
             "installed": true

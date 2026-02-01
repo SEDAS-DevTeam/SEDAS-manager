@@ -43,7 +43,6 @@ class GuiApp:
         self.app.setPalette(palette)
 
         self.settings_path = os.path.join(abs_path, 'src/res/data/app/settings.json')
-        self.monitor_config_path = os.path.join(abs_path, 'src/res/data/app/geometry.json')
         self.settings = read_json(self.settings_path)
         self.monitor_configuration = self.settings["controller_loc"]
 
@@ -58,8 +57,6 @@ class GuiApp:
         self.out_config["env_configuration"] = {
             "bar_height": self.bar_height
         }
-
-        write_json(self.out_config, self.monitor_config_path) # write into configuration so that it is readable for upcoming SEDAS processes
 
     def get_location(self) -> list[int] | None:
         self.win_config: dict[str, list[ScreenConfig]] = get_win_geometry()

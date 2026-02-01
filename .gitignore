@@ -59,3 +59,8 @@ token.json
 
 /src/updater/dist/*
 !/src/updater/dist/.gitkeep
+
+# Emerge configuration + generated files
+/extra/typescript-template.yaml
+/extra/emerge/*
+!/extra/emerge/.gitkeep

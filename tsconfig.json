@@ -5,19 +5,34 @@
   },
   "exclude": [ "node_modules" ],
   "files": [
-    "./src/main.ts",
-    "./src/utils.ts",
-    "./src/plane_functions.ts",
-    "./src/logger.ts",
-    "./src/app_config.ts",
-    "./src/environment.ts",
-    "./src/bind.ts",
-    "./src/plugin_register.ts",
-    "./src/backend_functions.ts",
+    // Main
+    "./src/main/main_dev.ts", // <- Dev executable
+    "./src/main/main_prod.ts", // <- Prod executable
+    "./src/main/main_lib.ts", // <- Unifying lib
+    
+    // Libs
+    "./src/app_utils.ts", // <- Low-level app utilities
+    "./src/app_config.ts", // <- App first-state configuration (unchangeable by user)
+    "./src/app_state.ts", // <- App state handling (frontend routing, progressive loading, etc.)
+    "./src/app_comm.ts", // <- App communication protocols (IPC, MSC)
+    
+    // Fallback logger mechanism
+    "./src/logger.ts", // <- Procedurally saving all the logs when things go wrong
+    
+    // C++ binding
+    "./src/bind.ts", // <- Binds C++ files so that program can execute them using N-API
+    
+    // Plugins
+    "./src/plugin_register.ts", // <- Managing all the plugins user adds to the system
+    
+    // Environment/Planes
+    "./src/environment.ts", // <- Environment handling
+    "./src/plane_functions.ts", // <- Plane calculations
+    
     //Workers
-    "./src/workers/sim_time.ts",
-    "./src/workers/backend.ts",
-    "./src/workers/database.ts"
+    "./src/workers/sim_time.ts", // <- Independent simulation time
+    "./src/workers/backend.ts", // <- Neural backend responsible for executing AI models
+    "./src/workers/database.ts" // <- TODO: Rename to file saving or something like that, database is no longer used
   ],
   "references": [
     { "path": "./tsconfig.app.json" },

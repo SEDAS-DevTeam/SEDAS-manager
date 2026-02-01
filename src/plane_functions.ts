@@ -2,7 +2,8 @@
 import { plane_calculations } from "./bind";
 import {
   PlaneInterface,
-  PlaneDBInterface
+  PlaneDBInterface,
+  MainAppInterface
 } from "./app_config"
 import utils from "./app_utils"
 
@@ -421,64 +422,86 @@ export class Plane implements PlaneInterface{
 }
 
 // Upper-level (managed in main_lib calls) plane-management
-export function spawn_plane(data: any[]){
-    let plane_data = data[0]
+export function spawn_plane(main_app: MainAppInterface, data: any[]){
+  let plane_data = data[0]
 
-    //get current x, y coordinates according to selected points
-    let x = 0
-    let y = 0
-    //get according map data
-    let point_data = this.map_data[plane_data["monitor"].substring(plane_data["monitor"].length - 3, plane_data["monitor"].length)]
-    
-    //get departure point (ARP/POINTS/SID/STAR)
-    let corresponding_points = plane_data["departure"].split("_")
-    let point_name = corresponding_points[0]
-    let point_group = corresponding_points[1]
+  //get current x, y coordinates according to selected points
+  let x = 0
+  let y = 0
+  //get according map data
+  let point_data = main_app.map_data[plane_data["monitor"].substring(plane_data["monitor"].length - 3, plane_data["monitor"].length)]
+  
+  //get departure point (ARP/POINTS/SID/STAR)
+  let corresponding_points = plane_data["departure"].split("_")
+  let point_name = corresponding_points[0]
+  let point_group = corresponding_points[1]
 
 
 
-    for (let i = 0; i < point_data[point_group].length; i++){
-        if (point_name == point_data[point_group][i].name){
-            //found corresponding point - set initial point
-            x = point_data[point_group][i].x
-            y = point_data[point_group][i].y
-        }
-    }
-    
-    let curr_plane_id = utils.generate_hash()
-    let plane = new Plane(curr_plane_id, plane_data["name"], 
-                    plane_data["heading"], plane_data["heading"],
-                    plane_data["level"], plane_data["level"],
-                    plane_data["speed"], plane_data["speed"],
-                    plane_data["departure"], plane_data["arrival"], 
-                    plane_data["arrival_time"],
-                    x, y)
-    this.PlaneDatabase.add_record(plane, plane_data["monitor"])
+  for (let i = 0; i < point_data[point_group].length; i++){
+      if (point_name == point_data[point_group][i].name){
+          //found corresponding point - set initial point
+          x = point_data[point_group][i].x
+          y = point_data[point_group][i].y
+      }
+  }
+  
+  let curr_plane_id = utils.generate_hash()
+  let plane = new Plane(curr_plane_id, plane_data["name"], 
+                  plane_data["heading"], plane_data["heading"],
+                  plane_data["level"], plane_data["level"],
+                  plane_data["speed"], plane_data["speed"],
+                  plane_data["departure"], plane_data["arrival"], 
+                  plane_data["arrival_time"],
+                  x, y)
+  main_app.PlaneDatabase.add_record(plane, plane_data["monitor"])
 
-    if(this.app_status["turn-on-backend"]){
-        let voice_upper_cap: number = 1.0
-        let voice_lower_cap: number = 0.4
+  if(main_app.app_status["turn-on-backend"]){
+      let voice_upper_cap: number = 1.0
+      let voice_lower_cap: number = 0.4
 
-        // register plane on ai
-        let voice_intensity: string = ((Math.random() * (voice_upper_cap - voice_lower_cap)) + voice_lower_cap).toFixed(2) // generate random voice intensity from range 0.1 to 1.0
-        this.msc_wrapper.send_message("module", "ai_backend", "register", plane_data["name"], voice_intensity)
-    }
+      // register plane on ai
+      let voice_intensity: string = ((Math.random() * (voice_upper_cap - voice_lower_cap)) + voice_lower_cap).toFixed(2) // generate random voice intensity from range 0.1 to 1.0
+      main_app.msc_wrapper.send_message("module", "ai_backend", "register", plane_data["name"], voice_intensity)
+  }
 
-    this.broadcast_planes(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
+  main_app.enviro.broadcast_planes(
+    main_app.PlaneDatabase.DB,
+    main_app.PlaneDatabase.monitor_DB,
+    main_app.PlaneDatabase.plane_paths_DB,
+    main_app.controllerWindow,
+    main_app.workers,
+    main_app.wrapper
+  )
 }
 
-export function plane_value_change(data: any[]){
-    //TODO: add args to set command
-    this.PlaneDatabase.set_command(data[2], data[0], data[1])      
-    this.broadcast_planes(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
-    this.wrapper.send_message("controller", "terminal-add", data)
+// Upper-level function definitions used to manage plane calls from main_lib
+
+export function plane_value_change(main_app: MainAppInterface, data: any[]){
+  main_app.PlaneDatabase.set_command(data[2], data[0], data[1])      
+  main_app.enviro.broadcast_planes(
+    main_app.PlaneDatabase.DB,
+    main_app.PlaneDatabase.monitor_DB,
+    main_app.PlaneDatabase.plane_paths_DB,
+    main_app.controllerWindow,
+    main_app.workers,
+    main_app.wrapper
+  )
+  this.wrapper.send_message("controller", "terminal-add", data)
 }
 
-export function plane_delete_record(data: any[]){ // add MSC_wrapper here!
-    this.PlaneDatabase.delete_record(data[0])
-    this.broadcast_planes(this.PlaneDatabase.DB, this.PlaneDatabase.monitor_DB, this.PlaneDatabase.plane_paths_DB)
+export function plane_delete_record(main_app: MainAppInterface, data: any[]){ // add MSC_wrapper here!
+  main_app.PlaneDatabase.delete_record(data[0])
+  main_app.enviro.broadcast_planes(
+    main_app.PlaneDatabase.DB,
+    main_app.PlaneDatabase.monitor_DB,
+    main_app.PlaneDatabase.plane_paths_DB,
+    main_app.controllerWindow,
+    main_app.workers,
+    main_app.wrapper
+  )
 }
 
-export function send_plane_data(){
-    this.wrapper.broadcast("workers", "update-plane-db", this.PlaneDatabase.DB)
+export function send_plane_data(main_app: MainAppInterface){
+  main_app.wrapper.broadcast("workers", "update-plane-db", main_app.PlaneDatabase.DB)
 }

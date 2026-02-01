@@ -1,5 +1,4 @@
 import {parentPort} from "worker_threads"
-import path from "path"
 import fs from "fs"
 import {
     PATH_TO_DATABASE

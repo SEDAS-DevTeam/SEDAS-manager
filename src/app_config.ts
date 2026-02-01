@@ -4,10 +4,8 @@
 */
 
 import { join } from "path"
-import { BrowserWindow, ipcMain, screen, Tray, nativeImage, Menu, App, Rectangle } from "electron";
-import { EventLogger } from "./logger.js"
+import { BrowserWindow, App } from "electron";
 import { Worker } from "worker_threads"
-import utils from "./app_utils.js"
 
 //paths for main html files
 export const PATH_TO_MAIN_HTML = join(process.env.ABS_PATH!, "./src/res/html/other/main.html")
@@ -52,11 +50,10 @@ export const PATH_TO_SETTINGS_LAYOUT: string = join(process.env.ABS_PATH!, "/src
 //paths for backup
 export const PATH_TO_DATABASE: string = join(process.env.ABS_PATH!, "/src/res/data/tmp/backup.json")
 
-//path for monitor geometry
-export const PATH_TO_MONITOR_CONFIGURATION: string = join(process.env.ABS_PATH!, "/src/res/data/app/geometry.json")
-
 //constants used in this app
 export const WIDGET_OFFSET = 50
+export const ALPHABET: string[] = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
 
 // other paths
 export const PATH_TO_PRELOAD: string = join(process.env.ABS_PATH!, "src/res/components/preload.js")
@@ -83,6 +80,39 @@ export const PATH_EXC_GITMODULES: string = "./.gitmodules";
 export const PATH_EXC_REQUIREMENTS: string = "./requirements.txt";
 export const PATH_EXC_INVOKE: string = "./tasks.py";
 export const PATH_EXC_TSCONF: string = "./tsconfig.json";
+
+/*
+    Two unfortunate functions that I have to export here otherwise the whole codebase would fall on my head
+*/
+
+export function generate_id(){
+    var n_pos: number = 5;
+    var res_str: string = ""
+
+    for (let i = 0; i < n_pos; i++){
+        let rand_choice = Math.random() < 0.5;
+        let elem: string;
+        if (rand_choice){ //alphabet
+            elem = ALPHABET[(Math.floor(Math.random() * ALPHABET.length))]
+        }
+        else{ //number
+            elem = Math.floor(Math.random() * 11).toString()
+        }
+        res_str += elem
+    }
+    return res_str
+}
+
+export function generate_win_id(){
+    var res_str: string = "win-"
+    var n_pos: number = 4;
+
+
+    for (let i = 0; i < n_pos; i++){
+        res_str += Math.floor(Math.random() * 9).toString()
+    }
+    return res_str
+}
 
 /*
     Main app interface definiton (used in parameter passing - trying to avoid circual imports)
@@ -120,7 +150,43 @@ export interface EventLoggerInterface {
   log_header: string,
   init_logger(): void,
   log(cat_name: string, message: string): void,
-  end(): void
+  end(): void,
+}
+
+export interface ListenerSetupInterface {
+  add_listener_backend(): void,
+  add_listener_backup(): void,
+  add_listener_IPC(): void,
+  add_listener_intervals(): void
+}
+
+export interface FrontendRouterInterface {
+  redirect_to_menu(window_type: string): void,
+  redirect_to_settings(): void,
+  redirect_to_main(): void
+}
+
+export interface OSBridgeInterface {
+  get_info(): Record<string, any>,
+  check_env(): string[],
+  
+}
+
+export interface FrontendHandlersInterface {
+  save_settings(data: any[]): void,
+  send_info(window_type: string): void,
+  send_scenario_list(data: any[]): void,
+  set_environment(data: any[]): void,
+  render_map(): void,
+  get_points(data: any[]): void,
+  monitor_change_info(data: any[]): void,
+  rewrite_frontend_vars(data: any[]): void,
+  confirm_settings(): void,
+  confirm_schedules(): void,
+  ping(data: any[]): void,
+  json_description(data: any[]): void,
+  map_check(): void,
+  send_location_data(): void
 }
 
 export interface PluginRegisterInterface {}
@@ -128,44 +194,44 @@ export interface PluginRegisterInterface {}
 export interface EnvironmentInterface {
   current_time: Date,
   start_time: Date,
-  
+
   plane_schedules: any,
   plane_objects: object[],
   plane_conditions: object,
-  
+
   setup_enviro(loader: ProgressiveLoaderInterface, logger: EventLoggerInterface): void,
   kill_enviro(): void,
   set_plane_schedules(): number,
   set_plane_trajectories(): void,
-  broadcast_planes(planes: object[], plane_monitor_data: object[], plane_paths_data: object[], controller_window: undefined | Window, workers: object[], wrapper: IPCwrapperInterface): void,
+  broadcast_planes(planes: object[], plane_monitor_data: object[], plane_paths_data: object[]): void,
 }
 
 export interface PlaneInterface {
   id: string,
   callsign: string,
-  
+
   heading: number,
   updated_heading: number,
-  
+
   level: number,
   updated_level: number,
-  
+
   speed: number,
   screen_speed: number,
   updated_speed: number,
-  
+
   departure: string,
   arrival: string,
   arrival_time: string,
   x: number,
   y: number,
-  
+
   current_command_level: string,
   current_command_speed: string,
   current_command_heading: string
-  
+
   special_comm: string[],
-  
+
   forward(scale: number): void,
   check_heading(std_bank_angle: number, plane_turn_DB: object[]): void,
   check_level(std_climb_angle: number, std_descent_angle: number, scale: number): void,
@@ -181,7 +247,7 @@ export interface PlaneDBInterface {
   plane_paths_DB: any[],
   plane_turn_DB: object[],
   command_config: Record<string, any>,
-  
+
   set_command(callsign: string, command: string, value: any): void,
   update_worker_data(monitor_data: any): void,
   add_record(plane_obj: any, monitor_spawn: string): void,
@@ -194,77 +260,83 @@ export interface PlaneDBInterface {
 
 export interface MainAppInterface {
   app_instance: App,
-  displays: Rectangle[],
   app_abs_path: string,
+  os_bridge: OSBridgeInterface,
+  os_info: Record<string, string>,
+  
   wrapper: IPCwrapperInterface,
   loader: ProgressiveLoaderInterface | undefined,
   logger: EventLoggerInterface,
   widget_handler: WidgetWindowHandler,
   msc_wrapper: MSCwrapperInterface,
   plugin_register: PluginRegisterInterface,
-  
+  listeners: ListenerSetupInterface,
+  frontend_router: FrontendRouterInterface,
+  frontend_handlers: FrontendHandlersInterface
+
   mainMenuWindow: Window,
   settingsWindow: Window,
   controllerWindow: Window,
   exitWindow: Window,
+  
   enviro: EnvironmentInterface,
   enviro_logger: EventLoggerInterface,
+  
   app_status: Record<string, boolean>,
   frontend_vars: object,
   app_settings: Record<string, any>,
   backup_worker: Worker,
-  
+
   dev_panel: boolean | undefined,
   workers: object[],
   worker_coords: object[],
-  monitor_configuration: PyMonitor_object,
   selected_plugin_id: string,
   current_popup_window: PopupWindow,
   backupdb_saving_frequency: number,
   local_plugin_list: object[],
-  
+  monitor_info: MonitorInfo<DisplayObject[], DisplayObject>,
+
   map_configs_list: object[],
   map_data: object,
   map_name: string,
   scenario_presets_list: object[],
   scenario_data: any,
   scenario_name: string,
-  
+
   scale: number,
   longitude: number | undefined,
   latitude: number | undefined,
   zoom: number | undefined,
+
+  command_presets_list: object[]
+  command_preset_data: object | undefined,
+  command_preset_name: string,
   
   aircraft_presets_list: object[],
   aircraft_preset_data: object | undefined,
   aircraft_preset_name: string,
   PlaneDatabase: PlaneDBInterface,
-  
+
   main_menu_config: object,
   exit_config: object,
   popup_widget_config: object,
   load_config: object,
   settings_config: object,
-  
-  create_popup_window(app_settings: any, event_logger: EventLoggerInterface, displays: any[], type: string, channel: string, header: string, text: string): PopupWindow,
-  delete_logs(): Promise<void>,
+
+  create_popup_window(event_logger: EventLoggerInterface, type: string, channel: string, header: string, text: string): PopupWindow,
   run_updater(path: string, app_abs_path: string): Promise<boolean>,
   setup_environment(): void,
-  
+
   init_app(): void,
   init_gui(): void,
   main_app(backup_db: object | undefined): void,
   exit_app(): void
 }
 
-export interface PyMonitor_object { // Python output
-    name: string
-    width: number,
-    height: number,
-    pos_x: number,
-    pos_y: number
-}
-export type JsonData = { [key: string ]: any}
+export type JsonData = { [key: string]: any }
+export type DisplayObject = { center: [number, number], size: [number, number] }
+export type MonitorInfo<Disp_A, Disp> = [Disp_A, Disp]
+export type Coords<x, y> = [x, y]
 
 /*
     Window configs for electron
@@ -374,7 +446,7 @@ class BaseWindow{
     public path_load!: string;
     public localConfig: any = {}; //contains local config of window
     public window_id!: string;
-    public event_logger!: EventLogger;
+    public event_logger!: EventLoggerInterface;
     public display_resolution!: number[];
 
     public close(){
@@ -410,20 +482,20 @@ export class Window extends BaseWindow{
         })
     }
 
-    public constructor(app_status: Record<string, boolean>, 
+    public constructor(app_status: Record<string, boolean>,
         dev_panel: boolean = false,
-        config: any, 
-        path: string, 
-        coords: number[],
-        ev_logger: EventLogger, 
-        main_app: any, 
-        window_type: string = "none", 
+        config: any,
+        path: string,
+        coords: Coords<number, number>,
+        ev_logger: EventLoggerInterface,
+        main_app: any,
+        window_type: string = "none",
         display_res: number[] = []){
-        
+
         super();
 
         //generate id for window
-        this.window_id = utils.generate_win_id()
+        this.window_id = generate_win_id()
 
         this.win_coordinates = coords
         this.event_logger = ev_logger
@@ -443,14 +515,14 @@ export class Window extends BaseWindow{
 
         this.window = new BrowserWindow(this.localConfig);
         this.window.setMenu(null);
-        
+
         if (dev_panel){
             this.window.webContents.openDevTools()
         }
 
         this.path_load = path
         this.window.maximize()
-        
+
         if (path.includes("main")){
             this.checkClose(() => {
                 if (!app_status["redir-to-main"]){
@@ -468,15 +540,14 @@ export class WorkerWindow extends Window{
 
     public title_bar_height: number;
 
-    public constructor(app_status: Record<string, boolean>, 
+    public constructor(app_status: Record<string, boolean>,
         dev_panel: boolean = false,
-        config: any, 
-        path: string, 
-        coords: number[],
-        ev_logger: EventLogger, 
+        config: any,
+        path: string,
+        coords: Coords<number, number>,
+        ev_logger: EventLoggerInterface,
         main_app: any,
         window_type: string = "none",
-        title_height: number, 
         display_res: number[] = []){
 
             super(app_status,
@@ -490,7 +561,8 @@ export class WorkerWindow extends Window{
                 display_res
             );
 
-            this.title_bar_height = title_height
+            // Getting title bar height to offset the content and position of the window
+            this.title_bar_height = this.window.getBounds().height - this.window.getContentBounds().height
         }
 
     public show(path: string = ""){
@@ -524,7 +596,7 @@ export class LoaderWindow extends BaseWindow{
     }
 
     public constructor(config: any, path: string, coords: number[],
-        ev_logger: EventLogger, display_res: (number | undefined)[] = []){
+        ev_logger: EventLoggerInterface, display_res: (number | undefined)[] = []){
 
         super()
 
@@ -566,17 +638,17 @@ export class WidgetWindow extends BaseWindow{
         this.window.setSize(this.localConfig.width, this.localConfig.height)
     }
 
-    public constructor(config: any, path: string, coords: number[], 
-                        ev_logger: EventLogger){
+    public constructor(config: any, path: string, coords: number[],
+                        ev_logger: EventLoggerInterface){
 
         super()
 
         //generate id for window
-        this.window_id = utils.generate_win_id()
+        this.window_id = generate_win_id()
 
         this.event_logger = ev_logger
         Object.assign(this.localConfig, config)
-        
+
         this.localConfig.x = coords[0]
         this.localConfig.y = coords[1]
 
@@ -594,14 +666,14 @@ export class PopupWindow extends BaseWindow{
     public popup_type: string;
     private comm_channel: string;
 
-    public constructor(config: any, 
-                        path: string, 
-                        coords: number[], 
-                        ev_logger: EventLogger,
+    public constructor(config: any,
+                        path: string,
+                        coords: number[],
+                        ev_logger: EventLoggerInterface,
                         type: string,
                         channel: string){
         super()
-        
+
         this.event_logger = ev_logger
         Object.assign(this.localConfig, config)
 
@@ -652,10 +724,10 @@ export class WidgetWindowHandler{
         }
     }
 
-    public setup_all(worker_coords: any[], EvLogger: EventLogger){
+    public setup_all(worker_coords: any[], EvLogger: EventLoggerInterface){
         for (let i = 0; i < worker_coords.length; i++){
             //setting up all layer widgets (overlaying whole map) TODO
-            
+
             // add offset to coord spawn
             let coords = [worker_coords[i][0] + WIDGET_OFFSET, worker_coords[i][1] + WIDGET_OFFSET]
 
@@ -698,13 +770,13 @@ export class WidgetWindowHandler{
         }
     }
 
-    
-    public create_widget_window(widget_dict: object, path_load: string, 
-                                        event_logger: EventLogger, 
+
+    public create_widget_window(widget_dict: object, path_load: string,
+                                        event_logger: EventLoggerInterface,
                                         coords: number[]){
         let datetimeWidgetWindow = new WidgetWindow(widget_dict, path_load, coords, event_logger)
-        let datetime_id = utils.generate_id()
-        
+        let datetime_id = generate_id()
+
         this.widget_workers.push({
             "id": datetime_id,
             "win": datetimeWidgetWindow

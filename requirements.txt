@@ -3,4 +3,3 @@ requests
 pyside6
 pyinstaller
 tabulate
-emerge-viz

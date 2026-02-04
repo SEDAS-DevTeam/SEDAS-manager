@@ -197,7 +197,7 @@ export interface EnvironmentInterface {
 
   plane_schedules: any,
   plane_objects: object[],
-  plane_conditions: object,
+  plane_conditions: PlaneConditions,
 
   setup_enviro(loader: ProgressiveLoaderInterface, logger: EventLoggerInterface): void,
   kill_enviro(): void,
@@ -243,16 +243,16 @@ export interface PlaneInterface {
 
 export interface PlaneDBInterface {
   DB: PlaneInterface[],
-  monitor_DB: any[],
+  monitor_DB: PlaneLocObject[],
   plane_paths_DB: any[],
-  plane_turn_DB: object[],
+  plane_turn_DB: PlaneTurnObject[],
   command_config: Record<string, any>,
 
   set_command(callsign: string, command: string, value: any): void,
   update_worker_data(monitor_data: any): void,
   add_record(plane_obj: any, monitor_spawn: string): void,
   add_path_record(id: string, coords: any): void,
-  find_record(id: string): PlaneInterface,
+  find_record(id: string): PlaneInterface | undefined,
   delete_record(id: string): void,
   delete_all(): void,
   update_planes(scale: number, std_bank_angle: number, std_climb_angle: number, std_descent_angle: number, std_accel: number, path_limit: number): void
@@ -274,10 +274,10 @@ export interface MainAppInterface {
   frontend_router: FrontendRouterInterface,
   frontend_handlers: FrontendHandlersInterface
 
-  mainMenuWindow: Window,
-  settingsWindow: Window,
-  controllerWindow: Window,
-  exitWindow: Window,
+  mainMenuWindow: Window | undefined,
+  settingsWindow: Window | undefined,
+  controllerWindow: Window | undefined,
+  exitWindow: Window | undefined,
   
   enviro: EnvironmentInterface,
   enviro_logger: EventLoggerInterface,
@@ -288,18 +288,18 @@ export interface MainAppInterface {
   backup_worker: Worker,
 
   dev_panel: boolean | undefined,
-  workers: object[],
+  workers: WorkerType[],
   worker_coords: object[],
   selected_plugin_id: string,
-  current_popup_window: PopupWindow,
+  current_popup_window: PopupWindow | undefined,
   backupdb_saving_frequency: number,
   local_plugin_list: object[],
   monitor_info: MonitorInfo<DisplayObject[], DisplayObject>,
 
   map_configs_list: object[],
-  map_data: object,
+  map_data: MapPreset,
   map_name: string,
-  scenario_presets_list: object[],
+  scenario_presets_list: ScenarioPreset[],
   scenario_data: any,
   scenario_name: string,
 
@@ -308,14 +308,14 @@ export interface MainAppInterface {
   latitude: number | undefined,
   zoom: number | undefined,
 
-  command_presets_list: object[]
-  command_preset_data: object | undefined,
+  command_presets_list: PresetList
+  command_preset_data: CommandPreset | undefined,
   command_preset_name: string,
   
-  aircraft_presets_list: object[],
-  aircraft_preset_data: object | undefined,
+  aircraft_presets_list: PresetList,
+  aircraft_preset_data: AircraftPreset | undefined,
   aircraft_preset_name: string,
-  PlaneDatabase: PlaneDBInterface,
+  PlaneDatabase: PlaneDBInterface | undefined,
 
   main_menu_config: object,
   exit_config: object,
@@ -337,6 +337,86 @@ export type JsonData = { [key: string]: any }
 export type DisplayObject = { center: [number, number], size: [number, number] }
 export type MonitorInfo<Disp_A, Disp> = [Disp_A, Disp]
 export type Coords<x, y> = [x, y]
+export type WorkerType = {
+  win: WorkerWindow,
+  id: string
+}
+export type PlaneObject = {
+  properties: {
+    min_kias: number
+  }
+  name: string,
+  hash: string,
+  schedule: JsonData,
+  trajectory: any[]
+}
+export type PlaneLocObject = {
+  type: string,
+  planes_id: string[]
+}
+export type PlaneConditions = {
+  category: string,
+  wtc_category: string
+}
+export type PlaneTurnObject = {
+  id: string,
+  rate_of_turn: any
+}
+
+export type PlaneSpawnerConfiguration = {
+  id: string,
+  time: Date
+}[]
+export type PlaneCommanderConfiguration = {
+  id: string,
+  content: any[] // similar to trajectory
+}[]
+
+// Types for maps/scenarios/aircraft/command configurations
+export type MapPreset = {
+  CONFIG: string,
+  ACC: JsonData,
+  APP: JsonData,
+  TWR: JsonData,
+  long: number,
+  lat: number,
+  zoom: number,
+  scale: string,
+  scenarios: JsonData
+}
+
+export type MapPresetConfig = {
+  FILENAME: string,
+  AIRPORT_NAME: string,
+  TYPE: string,
+  CODE: string,
+  COUNTRY: string,
+  CITY: string,
+  DESC: string
+}
+
+export type ScenarioPreset = {
+  hash: string,
+  content: JsonData,
+  name: string
+}
+
+export type PresetList = {
+  path: string,
+  hash: string,
+  name: string,
+  content: string
+}[]
+
+export type AircraftPreset = {
+  info: Record<string, string>,
+  all_planes: JsonData[]
+}
+export type CommandPreset = {
+  info: Record<string, string>,
+  commands: JsonData
+}
+
 
 /*
     Window configs for electron

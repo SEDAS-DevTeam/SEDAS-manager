@@ -52,7 +52,10 @@ import {
   DisplayObject,
   MonitorInfo,
   ListenerSetupInterface,
-  FrontendHandlersInterface
+  FrontendHandlersInterface,
+  CommandPreset,
+  AircraftPreset,
+  JsonData
 } from "./app_config"
 
 import {
@@ -181,11 +184,11 @@ export class FrontendRouter implements FrontendRouterInterface{
     //message call to redirect to main menu
     this.main_app.logger.log("DEBUG", "redirect-to-menu event")
   
-    if (window_type == "settings"){
+    if (window_type == "settings" && this.main_app.settingsWindow != undefined){
       this.main_app.settingsWindow.close()
       this.main_app.wrapper.unregister_window(this.main_app.settingsWindow.window_id)
     }
-    else if (window_type == "controller"){
+    else if (window_type == "controller" && this.main_app.controllerWindow != undefined){
       this.main_app.controllerWindow.close()
       this.main_app.wrapper.unregister_window(this.main_app.controllerWindow.window_id)
   
@@ -225,6 +228,7 @@ export class FrontendRouter implements FrontendRouterInterface{
   }
   
   public redirect_to_settings(){
+    if (this.main_app.mainMenuWindow === undefined) return
     //message call to redirect to settings
     this.main_app.app_status["redir-to-main"] = true
   
@@ -336,12 +340,12 @@ export class ListenerSetup implements ListenerSetupInterface{
     this.main_app.wrapper.register_channel("send-info", ["settings"], "bidirectional", () => this.main_app.frontend_handlers.send_info("settings"))
   
     //environment invokes
-    this.main_app.wrapper.register_channel("start-sim", ["controller", "worker"], "unidirectional", () => start_sim())
-    this.main_app.wrapper.register_channel("stop-sim", ["controller", "worker"], "unidirectional", () => stop_sim())
-    this.main_app.wrapper.register_channel("start-mic", ["worker"], "unidirectional", () => start_mic_record())
-    this.main_app.wrapper.register_channel("stop-mic", ["worker"], "unidirectional", () => stop_mic_record())
-    this.main_app.wrapper.register_channel("restore-sim", ["controller"], "unidirectional", () => restore_sim())
-    this.main_app.wrapper.register_channel("regenerate-map", ["controller"], "unidirectional", () => regenerate_map())
+    this.main_app.wrapper.register_channel("start-sim", ["controller", "worker"], "unidirectional", () => start_sim(this.main_app))
+    this.main_app.wrapper.register_channel("stop-sim", ["controller", "worker"], "unidirectional", () => stop_sim(this.main_app))
+    this.main_app.wrapper.register_channel("start-mic", ["worker"], "unidirectional", () => start_mic_record(this.main_app))
+    this.main_app.wrapper.register_channel("stop-mic", ["worker"], "unidirectional", () => stop_mic_record(this.main_app))
+    this.main_app.wrapper.register_channel("restore-sim", ["controller"], "unidirectional", () => restore_sim(this.main_app))
+    this.main_app.wrapper.register_channel("regenerate-map", ["controller"], "unidirectional", () => regenerate_map(this.main_app))
   
     this.main_app.wrapper.register_channel("set-environment", ["controller"], "unidirectional", (data: any[]) => this.main_app.frontend_handlers.set_environment(data))
     this.main_app.wrapper.register_channel("json-description", ["controller"], "bidirectional", (data: any[]) => this.main_app.frontend_handlers.json_description(data))
@@ -445,7 +449,7 @@ export class ListenerSetup implements ListenerSetupInterface{
       }
       catch(error){
           this.main_app.logger.log("ERROR", "An error happened, written down below")
-          this.main_app.logger.log("", error)
+          this.main_app.logger.log("", String(error))
       }
   }
   
@@ -572,7 +576,7 @@ export class FrontendHandlers implements FrontendHandlersInterface{
       let filename_map = data[0]
                   
       //map addons
-      let scenario_hash = data[3]
+      let scenario_hash: string = data[3]
   
       let filename_command = data[1]
       let filename_aircraft = data[2]
@@ -592,10 +596,10 @@ export class FrontendHandlers implements FrontendHandlersInterface{
       let map_config = utils.read_file_content(PATH_TO_MAPS, this.main_app.map_data["CONFIG"])
       this.main_app.map_name = map_config["AIRPORT_NAME"]
   
-      this.main_app.command_preset_data = utils.read_file_content(PATH_TO_COMMANDS, filename_command)
+      this.main_app.command_preset_data = utils.read_file_content(PATH_TO_COMMANDS, filename_command) as CommandPreset
       this.main_app.command_preset_name = this.main_app.command_preset_data["info"]["name"]
   
-      this.main_app.aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft)
+      this.main_app.aircraft_preset_data = utils.read_file_content(PATH_TO_AIRCRAFTS, filename_aircraft) as AircraftPreset
       this.main_app.aircraft_preset_name = this.main_app.aircraft_preset_data["info"]["name"]
   
       //read scale
@@ -633,8 +637,8 @@ export class FrontendHandlers implements FrontendHandlersInterface{
       this.main_app.enviro = new Environment(
         this.main_app.logger,
         this.main_app,
-        process.env.ABS_PATH,
-        this.main_app.PlaneDatabase,
+        process.env.ABS_PATH!,
+        this.main_app.PlaneDatabase!,
         this.main_app.command_preset_data,
         this.main_app.aircraft_preset_data,
         this.main_app.map_data, 
@@ -673,7 +677,7 @@ export class FrontendHandlers implements FrontendHandlersInterface{
   }
   
   public get_points(data: any[]){
-      let spec_data: object;
+      let spec_data: JsonData;
       if (data[0].includes("ACC")){
           //selected monitor is in ACC mode
           spec_data = this.main_app.map_data["ACC"]
@@ -686,7 +690,11 @@ export class FrontendHandlers implements FrontendHandlersInterface{
           //selected monitor is in TWR mode
           spec_data = this.main_app.map_data["TWR"]
       }
-      let out_data = {}
+      else {
+        // Idk I did not account for this one yet :D (TODO)
+        return
+      }
+      let out_data: JsonData = {}
       for (const [key, value] of Object.entries(spec_data)) {
           if (key == "POINTS" || key == "ARP" || key == "SID" || key == "STAR" || key == "RUNWAY"){
               out_data[key] = value
@@ -739,6 +747,9 @@ export class FrontendHandlers implements FrontendHandlersInterface{
   
           }
           //change worker data in monitor_data DB
+          if (this.main_app.PlaneDatabase === undefined) {
+            return
+          }
           this.main_app.PlaneDatabase.update_worker_data(this.main_app.workers)
       }
   }
@@ -748,22 +759,24 @@ export class FrontendHandlers implements FrontendHandlersInterface{
       console.log(this.main_app.frontend_vars)
   }
   
-  public confirm_settings(){
-      this.main_app.current_popup_window.close()
-      this.main_app.current_popup_window = undefined
+  public confirm_settings() {
+  if (this.main_app.current_popup_window === undefined) return
+  this.main_app.current_popup_window.close()
+  this.main_app.current_popup_window = undefined
   }
   
-  public confirm_schedules(){
-      this.main_app.setup_environment()
-  
-      this.main_app.current_popup_window.close()
-      this.main_app.current_popup_window = undefined
+  public confirm_schedules() {
+    if (this.main_app.current_popup_window === undefined) return
+    this.main_app.setup_environment()
+
+    this.main_app.current_popup_window.close()
+    this.main_app.current_popup_window = undefined
   }
   
   public async ping(data: any[]){
       let status: boolean = await utils.ping(data[0])
       for (let i = 0; i < this.main_app.workers.length; i++){
-          this.main_app.wrapper.send_message(this.main_app.workers[i]["win-name"], "ping-status", status)
+          this.main_app.wrapper.send_message(this.main_app.workers[i].id, "ping-status", status)
       }
   }
   

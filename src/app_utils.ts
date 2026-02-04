@@ -178,9 +178,10 @@ function get_monitor_info(controller_loc: string) {
   // Sorting
   display_bounds.sort(display_sort)
   
-  let main_monitor: DisplayObject;
+  let main_monitor!: DisplayObject;
   if (controller_loc == "leftmost") main_monitor = display_bounds[0];
   else if (controller_loc == "rightmost") main_monitor = display_bounds[display_bounds.length - 1]
+  else return // If this happens, the settings are invalid anyways ...
   
   let monitor_info: MonitorInfo<DisplayObject[], DisplayObject> = [display_bounds, main_monitor]
   return monitor_info

@@ -7,7 +7,7 @@ try {
 }
 catch (err){
     console.log("Problem registering functions")
-    console.log(err.message)
+    console.log((err as Error).message)
     console.log("Quitting program...")
     process.exit(0)
 }
@@ -31,7 +31,7 @@ export namespace plane_calculations{
                 updated_level)
         }
         catch(err){
-            handle_exception_js(err)
+            handle_exception_js(err as Error)
         }
     }
     /*
@@ -46,7 +46,7 @@ export namespace plane_calculations{
                 updated_level)
         }
         catch(err){
-            handle_exception_js(err)
+            handle_exception_js(err as Error)
         }
     }
 
@@ -69,7 +69,7 @@ export namespace plane_calculations{
             return plane_import.calc_plane_level(arg)
         }
         catch(err){
-            handle_exception_js(err)
+            handle_exception_js(err as Error)
         }
     }
 
@@ -87,7 +87,7 @@ export namespace plane_calculations{
             return plane_import.calc_rate_of_turn(bank_angle, speed)
         }
         catch(err){
-            handle_exception_js(err)
+            handle_exception_js(err as Error)
         }
     }
 
@@ -109,7 +109,7 @@ export namespace plane_calculations{
             return plane_import.calc_plane_forward(arg)
         }
         catch(err){
-            handle_exception_js(err)
+            handle_exception_js(err as Error)
         }
     }
 
@@ -127,7 +127,7 @@ export namespace plane_calculations{
             return plane_import.calc_plane_speed(arg)
         }
         catch(err){
-            handle_exception_js(err)
+            handle_exception_js(err as Error)
         }
     }
 
@@ -144,7 +144,7 @@ export namespace plane_calculations{
             return plane_import.calc_plane_heading(arg)
         }
         catch(err){
-            handle_exception_js(err)
+            handle_exception_js(err as Error)
         }
     }
 }
@@ -153,12 +153,12 @@ export namespace enviro_calculations{
     /*
         Function that calculates all headings and timestamps a plane has to do to follow designated route
     */
-    export function compute_plane_trajectory(arg: object): any[]{
+    export function compute_plane_trajectory(arg: object): any[] | undefined{
         try{
             return enviro_import.compute_plane_trajectory(arg)
         }
         catch(err){
-            handle_exception_js(err)
+            handle_exception_js(err as Error)
         }
     }
 }
@@ -180,7 +180,7 @@ export namespace main{
             load_check(enviro_import.test_addon, "environment")
         }
         catch(err){
-            handle_exception_js(err)
+            handle_exception_js(err as Error)
         }
     }
 }

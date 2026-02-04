@@ -3,10 +3,18 @@ import { Worker } from 'worker_threads';
 import path from "path"
 import utils from "./app_utils";
 import {
+  AircraftPreset,
+  CommandPreset,
   IPCwrapperInterface,
   MainAppInterface,
+  MapPreset,
   MSCwrapperInterface,
+  PlaneConditions,
   PlaneDBInterface,
+  PlaneLocObject,
+  PlaneObject,
+  PlaneSpawnerConfiguration,
+  PlaneCommanderConfiguration,
   ProgressiveLoaderInterface
 } from "./app_config"
 
@@ -29,11 +37,11 @@ export class Environment implements EnvironmentInterface{
   private loader: ProgressiveLoaderInterface
 
   // time variables
-  public current_time: Date;
-  public start_time: Date;
+  public current_time!: Date;
+  public start_time!: Date;
 
   public plane_schedules: any;
-  public plane_objects: object[] = [];
+  public plane_objects: PlaneObject[] = [];
 
   private command_data: any;
   private aircraft_data: any;
@@ -43,19 +51,19 @@ export class Environment implements EnvironmentInterface{
   private std_bank_angle: number;
 
   private plane_database: PlaneDBInterface;
-  private plane_spawner_config: object[] = [];
-  private plane_commander_config: object[] = []
+  private plane_spawner_config: PlaneSpawnerConfiguration = [];
+  private plane_commander_config: PlaneCommanderConfiguration = [];
   
-  public plane_conditions: object;
+  public plane_conditions!: PlaneConditions;
 
   public constructor(
     logger: EventLoggerInterface,
     app: MainAppInterface,
     abs_path: string,
     plane_database: PlaneDBInterface,
-    command_data: object, 
-    aircraft_data: object, 
-    map_data: object, 
+    command_data: CommandPreset, 
+    aircraft_data: AircraftPreset, 
+    map_data: MapPreset, 
     scenario_data: object,
     std_bank_angle: number,
     msc_wrapper: MSCwrapperInterface,
@@ -168,14 +176,15 @@ export class Environment implements EnvironmentInterface{
         "bank_angle": this.std_bank_angle
       }
       
-      let plane_trajectory: any[] = enviro_calculations.compute_plane_trajectory(napi_arguments)
+      let plane_trajectory: any[] | undefined = enviro_calculations.compute_plane_trajectory(napi_arguments)
+      if (plane_trajectory === undefined) return // Trajectory computation fai
       this.plane_objects[i]["trajectory"] = plane_trajectory
     }
   }
     
   public broadcast_planes(
-    planes: object[],
-    plane_monitor_data: object[],
+    planes: Plane[],
+    plane_monitor_data: PlaneLocObject[],
     plane_paths_data: object[]
   ) {
     if (this.main_app.controllerWindow != undefined && this.main_app.workers.length != 0) {
@@ -205,21 +214,23 @@ export class Environment implements EnvironmentInterface{
   }
 
     /*Inner functions*/
-    private get_processed_plane_list(conditions: object, aircraft_data: any[]){
+    private get_processed_plane_list(conditions: PlaneConditions, aircraft_data: any[]){
 
       let accepted_planes: any[] = []
       for (let i = 0; i < aircraft_data.length; i++){
         for(let i_man = 0; i_man < aircraft_data[i]["planes"].length; i_man++){
           let spec_plane = aircraft_data[i]["planes"][i_man]
 
-          let plane_args: object = {
+          let plane_args: PlaneConditions = {
             "wtc_category": spec_plane["wtc_category"], 
             "category": spec_plane["category"]
           }
 
           let passing: boolean = true
           for (let key in conditions) {
-            if (!conditions[key].includes(plane_args[key])){
+            const k = key as keyof PlaneConditions
+            
+            if (!conditions[k].includes(plane_args[k])){
               passing = false
               break
             }
@@ -237,15 +248,14 @@ export class Environment implements EnvironmentInterface{
     }
 
     private get_conditions(){
-      let condition_list = {}
-      
-      //TODO: rework with frontend (+ add APC) (WHAT IS APC???)
+      //TODO: rework with frontend (+ add APC - approach category)
       let weight_conditions = this.scenario_data["wtc_category"]
       let cat_conditions = this.scenario_data["category"]
 
-      condition_list["wtc_category"] = weight_conditions
-      condition_list["category"] = cat_conditions
-
+      let condition_list: PlaneConditions = {
+        wtc_category: weight_conditions,
+        category: cat_conditions
+      }
       return condition_list
     }
 
@@ -253,14 +263,18 @@ export class Environment implements EnvironmentInterface{
       //perform final selection to get right plane type
       let category = plane_schedule["category"]
       let wtc_category = plane_schedule["wtc"]
-      let spec_condition_list = {"wtc_category": wtc_category, "category": category}
+      let spec_condition_list: PlaneConditions = {
+        "wtc_category": wtc_category,
+        "category": category
+      }
 
       let final_plane_list: any[] = []
       for (let i_plane = 0; i_plane < plane_list.length; i_plane++){
 
           let passing: boolean = true
           for (let key in spec_condition_list) {
-              if (plane_list[i_plane]["properties"][key] != spec_condition_list[key]){
+              const k = key as keyof PlaneConditions
+              if (plane_list[i_plane]["properties"][k] != spec_condition_list[k]){
                   passing = false
                   break
               }
@@ -315,7 +329,7 @@ export class Environment implements EnvironmentInterface{
             return `${time_obj.getHours()}:${time_obj.getMinutes()}`
         }
 
-        if (!this.main_app.app_status["sim-running"]){
+        if (!this.main_app.app_status["sim-running"] || this.main_app.PlaneDatabase === undefined){
             return;
         }
 
@@ -327,15 +341,16 @@ export class Environment implements EnvironmentInterface{
                 console.log("Time to spawn!")
                 
                 //Spawn plane
-                let plane_data: object;
+                let plane_data: PlaneObject | undefined;
                 for (let i_plane = 0; i_plane < this.plane_objects.length; i_plane++){
                     if (this.plane_objects[i_plane]["hash"] == this.plane_spawner_config[i]["id"]){
                         plane_data = this.plane_objects[i_plane]
                     }
                 }
+                if (plane_data === undefined) return
 
                 let id = utils.generate_hash()
-                let name: string = plane_data["properties"]["name"]
+                let name: string = plane_data["name"]
                 let heading: number = plane_data["trajectory"][0][1]
                 let heading_up: number = heading
                 let level: number = 1000 // TODO
@@ -402,37 +417,37 @@ export class Environment implements EnvironmentInterface{
 // Upper-level function definitions used to manage environment calls from main_lib
 // TODO: solve for multi-session (mutiple ATCos)
 
-export function start_sim(){
-  this.app_status["sim-running"] = true
+export function start_sim(main_app: MainAppInterface){
+  main_app.app_status["sim-running"] = true
 
   //send stop event to all workers
-  this.wrapper.broadcast("workers", "sim-event", "startsim")
-  this.wrapper.send_message("controller", "sim-event", "startsim")
+  main_app.wrapper.broadcast("workers", "sim-event", "startsim")
+  main_app.wrapper.send_message("controller", "sim-event", "startsim")
 }
 
-export function stop_sim(){
-    this.app_status["sim-running"] = false
+export function stop_sim(main_app: MainAppInterface){
+    main_app.app_status["sim-running"] = false
 
     //send stop event to all workers
-    this.wrapper.broadcast("workers", "sim-event", "stopsim")
-    this.wrapper.send_message("controller", "sim-event", "stopsim")
+    main_app.wrapper.broadcast("workers", "sim-event", "stopsim")
+    main_app.wrapper.send_message("controller", "sim-event", "stopsim")
 }
 
-export function start_mic_record(){
-    console.log(this.app_status["sim-running"])
-    if (this.msc_wrapper && this.app_status["sim-running"]) this.msc_wrapper.send_message("module", "ai_backend", "start-mic")
+export function start_mic_record(main_app: MainAppInterface){
+    console.log(main_app.app_status["sim-running"])
+    if (main_app.msc_wrapper && main_app.app_status["sim-running"]) main_app.msc_wrapper.send_message("module", "ai_backend", "start-mic")
 }
 
-export function stop_mic_record(){
-    if (this.msc_wrapper && this.app_status["sim-running"]) this.msc_wrapper.send_message("module", "ai_backend", "stop-mic")
+export function stop_mic_record(main_app: MainAppInterface){
+    if (main_app.msc_wrapper && main_app.app_status["sim-running"]) main_app.msc_wrapper.send_message("module", "ai_backend", "stop-mic")
 }
 
-export function restore_sim(){
-    this.backup_worker.postMessage(["read-db"])
+export function restore_sim(main_app: MainAppInterface){
+    main_app.backup_worker.postMessage(["read-db"])
 }
 
-export function regenerate_map(){
-    if (this.app_status["turn-on-backend"]){
+export function regenerate_map(main_app: MainAppInterface){
+    if (main_app.app_status["turn-on-backend"]){
         console.log("Terrain generation not done yet :)")
         //this.backend_worker.postMessage(["action", "terrain"])
     }

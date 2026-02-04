@@ -70,7 +70,13 @@ import {
   DisplayObject,
   MonitorInfo,
   Coords,
-  OSBridgeInterface
+  OSBridgeInterface,
+  WorkerType,
+  ScenarioPreset,
+  MapPreset,
+  CommandPreset,
+  AircraftPreset,
+  PresetList
 } from "../app_config"
 
 import {
@@ -92,13 +98,13 @@ import { env } from "node:process"
 // Basically another abstraction to handle OS-level stuff
 class OSBridge implements OSBridgeInterface { // TODO: Currently only working for linux X11 or Wayland
   private platform: string = process.platform
-  private os_info: Record<string, any>
+  private os_info: Record<string, any> | undefined = undefined
   
   /*
   OS-specific vars
   */
   // Linux
-  private session_type: string = process.env.XDG_SESSION_TYPE
+  private session_type: string | undefined = process.env.XDG_SESSION_TYPE
   private compatibility_layer: string = (process.argv.includes("--ozone-platform=x11") ? "xwayland" : "")
   
   public get_info() {
@@ -133,8 +139,8 @@ export class MainApp implements MainAppInterface{
   */
   public app_instance: App = app; // Electron app object
   public app_abs_path: string = ""; // App absolute path in the system
-  public os_bridge: OSBridge
-  public os_info: Record<string, string>;
+  public os_bridge!: OSBridge
+  public os_info!: Record<string, string>;
 
   // App internal mechanisms
   public wrapper!: IPCwrapper; // IPC wrapper (wrapping all the Inter-Process-Communication in the app)
@@ -142,19 +148,19 @@ export class MainApp implements MainAppInterface{
   public logger!: EventLogger; // Event logger to log everything possible about app running
   public widget_handler!: WidgetWindowHandler; // Handles all the widget windows that do get spawned along the simulation
   public msc_wrapper!: MSCwrapper; // Wrapper handling Module-Socket-Communication in the app
-  public plugin_register: PluginRegister;
-  public listeners: ListenerSetup;
-  public frontend_router: FrontendRouter;
-  public frontend_handlers: FrontendHandlers;
+  public plugin_register!: PluginRegister;
+  public listeners!: ListenerSetup;
+  public frontend_router!: FrontendRouter;
+  public frontend_handlers!: FrontendHandlers;
   
   // Window instances
-  public mainMenuWindow!: Window;
-  public settingsWindow!: Window;
-  public controllerWindow!: Window;
-  public exitWindow!: Window;
+  public mainMenuWindow: Window | undefined = undefined;
+  public settingsWindow: Window | undefined = undefined;
+  public controllerWindow: Window | undefined = undefined;
+  public exitWindow: Window | undefined = undefined;
   
-  public enviro: Environment
-  public enviro_logger: EventLogger;
+  public enviro!: Environment
+  public enviro_logger!: EventLogger;
 
   //app status (consists of switches/booleans for different functions 
   //  => written in dict for better arg passing to funcs + better readibility
@@ -175,41 +181,41 @@ export class MainApp implements MainAppInterface{
       "glob": {} //variables used across windows
   } //used to save variables that are then used on redirect between windows
   public app_settings: Record<string, any> = {}; // settings object that is later used when App reads from user settings
-  public backup_worker: Worker;
+  public backup_worker!: Worker;
   
   // variables containing "low-level" functionalities
   public dev_panel: boolean | undefined = undefined;
-  public workers: object[] = [];
+  public workers: WorkerType[] = [];
   public worker_coords: object[] = [];
-  public selected_plugin_id: string;
-  public current_popup_window: PopupWindow; //For now, app only permits one popup window at the time (TODO)
+  public selected_plugin_id!: string;
+  public current_popup_window: PopupWindow | undefined; //For now, app only permits one popup window at the time (TODO)
   public backupdb_saving_frequency: number = 1000; //set to 1 second by default (what, why TODO)
-  public local_plugin_list: object[];
-  public monitor_info: MonitorInfo<DisplayObject[], DisplayObject>;
+  public local_plugin_list!: object[];
+  public monitor_info!: MonitorInfo<DisplayObject[], DisplayObject>;
   
   //environment/map variables
   public map_configs_list: object[] = [];
-  public map_data: object;
+  public map_data!: MapPreset;
   public map_name: string = "None";
-  public scenario_presets_list: object[] = []
+  public scenario_presets_list: ScenarioPreset[] = []
   public scenario_data: any = undefined;
   public scenario_name: string = "None";
   
-  public scale: number;
+  public scale!: number;
   public longitude: number | undefined = undefined;
   public latitude: number | undefined = undefined;
   public zoom: number | undefined = undefined;
   
   //all variables related to commands
-  public command_presets_list: object[] = []
-  public command_preset_data: object | undefined = undefined;
+  public command_presets_list: PresetList = []
+  public command_preset_data: CommandPreset | undefined = undefined;
   public command_preset_name: string = "None"
   
   //all variables related to aircrafts
-  public aircraft_presets_list: object[] = []
-  public aircraft_preset_data: object | undefined = undefined;
+  public aircraft_presets_list: PresetList = []
+  public aircraft_preset_data: AircraftPreset | undefined = undefined;
   public aircraft_preset_name: string = "None";
-  public PlaneDatabase: PlaneDB;
+  public PlaneDatabase: PlaneDB | undefined = undefined;
   
   // assigning all imported dict templates to MainApp class
   public main_menu_config: object = main_menu_dict
@@ -388,7 +394,9 @@ export class MainApp implements MainAppInterface{
     this.mainMenuWindow.show()
   }
   
-  public async main_app(backup_db: object | undefined = undefined){
+  public async main_app(backup_db: object | undefined = undefined) {
+    if (this.mainMenuWindow === undefined || this.controllerWindow === undefined) return
+    
     this.mainMenuWindow.close()
     this.wrapper.unregister_window(this.mainMenuWindow.window_id)
 
@@ -403,7 +411,7 @@ export class MainApp implements MainAppInterface{
     )
     
     //setting all windows to show()
-    for (let i = 0; i < this.workers.length; i++){
+    for (let i = 0; i < this.workers.length; i++) {
       this.workers[i]["win"].show()
       this.workers[i]["win"].checkClose()
     }
@@ -411,21 +419,24 @@ export class MainApp implements MainAppInterface{
     this.controllerWindow.show()
 
     // other modules (backup, backend) check
-    if (this.app_status["turn-on-backend"]){
+    if (this.app_status["turn-on-backend"]) {
       //setup voice recognition and ACAI backend
       this.msc_wrapper.send_message("action", "debug", this.app_settings["logging"])
     }
 
-    if (backup_db){
+    if (backup_db) {
+      /*
       //set scale of map
       this.scale = parse_scale(backup_db["map"]["scale"])
 
       this.map_name = backup_db["map-name"]
+       */
     }
 
     //run local plane DB
     this.PlaneDatabase = new PlaneDB(this.workers);
-    if (backup_db){
+    if (backup_db) {
+      /*
       //run if backup db is avaliable
       this.app_status["redir-to-main"] = true
 
@@ -457,6 +468,7 @@ export class MainApp implements MainAppInterface{
         this.PlaneDatabase.monitor_DB,
         this.PlaneDatabase.plane_paths_DB)
       //controllerWindow.send_message("init-info", ["window-info", map_name, JSON.stringify(workers), map_config, JSON.stringify(app_settings)])
+    */
     }
   }
   
@@ -464,7 +476,7 @@ export class MainApp implements MainAppInterface{
   public reload(env_arg: string[]) {
     if (env_arg.length != 0) {
       let default_args = process.argv.slice(1)
-      let additional_args = []
+      let additional_args: string[] = []
       
       env_arg.forEach((arg) => {
         switch (arg) {
@@ -553,8 +565,10 @@ export class MainApp implements MainAppInterface{
       await this.logger.init_logger()
       
       // Get monitor info
-      this.monitor_info = utils.get_monitor_info(this.app_settings["controller_loc"])
-
+      let retrieved_monit_info: MonitorInfo<DisplayObject[], DisplayObject> | undefined = utils.get_monitor_info(this.app_settings["controller_loc"])
+      if (retrieved_monit_info === undefined) return // invalid settings // TODO
+      this.monitor_info = retrieved_monit_info
+      
       // test that C++ addons loaded successfully
       main.test_modules()
       this.logger.log("DEBUG", "Addons loaded successfully")

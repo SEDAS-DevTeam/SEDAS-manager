@@ -3,18 +3,21 @@ import { plane_calculations } from "./bind";
 import {
   PlaneInterface,
   PlaneDBInterface,
-  MainAppInterface
+  MainAppInterface,
+  PlaneLocObject,
+  PlaneTurnObject,
+  MapPreset
 } from "./app_config"
 import utils from "./app_utils"
 
 export class PlaneDB implements PlaneDBInterface{
     /*Just an array with methods - for storing planes*/
     public DB: Plane[] = [] //storing planes
-    public monitor_DB: any[] = [] //storing where are planes rendered
+    public monitor_DB: PlaneLocObject[] = [] //storing where are planes rendered
     public plane_paths_DB: any[] = []
 
     //temporary databases for plane movement
-    public plane_turn_DB: object[] = []
+    public plane_turn_DB: PlaneTurnObject[] = []
 
     /*
         Plane command config (used for gui but also for backend)
@@ -66,7 +69,7 @@ export class PlaneDB implements PlaneDBInterface{
         for(let i = 0; i < this.DB.length; i++){
             if (callsign == this.DB[i].callsign){
                 //find specific command context
-                this.command_config.commands.forEach(command_elem => {
+                this.command_config.commands.forEach((command_elem: Record<string, any>) => {
                     if (command == command_elem["comm"]){
                         console.log(command, command_elem)
                         command_elem["exec"](this.DB[i], command, value)
@@ -191,7 +194,7 @@ export class PlaneDB implements PlaneDBInterface{
                     }
                     catch(error){
                         console.log("Could not set plane heading! See error below")
-                        console.log(error.message)
+                        console.log((error as Error).message)
                     }
                 }
             }
@@ -323,7 +326,7 @@ export class Plane implements PlaneInterface{
         this.y = vals[1]
     }
 
-    public check_heading(std_bank_angle: number, plane_turn_DB: object[]){ //TODO: rewrite
+    public check_heading(std_bank_angle: number, plane_turn_DB: PlaneTurnObject[]){ //TODO: rewrite
         if (this.updated_heading != this.heading){
             //make turn
 
@@ -429,22 +432,26 @@ export function spawn_plane(main_app: MainAppInterface, data: any[]){
   let x = 0
   let y = 0
   //get according map data
-  let point_data = main_app.map_data[plane_data["monitor"].substring(plane_data["monitor"].length - 3, plane_data["monitor"].length)]
+  let point_data = main_app.map_data[(plane_data["monitor"].substring(plane_data["monitor"].length - 3, plane_data["monitor"].length) as keyof MapPreset)]
   
   //get departure point (ARP/POINTS/SID/STAR)
   let corresponding_points = plane_data["departure"].split("_")
   let point_name = corresponding_points[0]
   let point_group = corresponding_points[1]
 
-
-
-  for (let i = 0; i < point_data[point_group].length; i++){
-      if (point_name == point_data[point_group][i].name){
-          //found corresponding point - set initial point
-          x = point_data[point_group][i].x
-          y = point_data[point_group][i].y
+  // This is a war crime, TODO
+  const group = point_data[point_group as keyof typeof point_data] as unknown as any[];
+  
+  if (group && Array.isArray(group)) {
+      for (let i = 0; i < group.length; i++) {
+          if (point_name === group[i].name) {
+              x = group[i].x;
+              y = group[i].y;
+          }
       }
   }
+  
+  if (main_app.PlaneDatabase === undefined) return
   
   let curr_plane_id = utils.generate_hash()
   let plane = new Plane(curr_plane_id, plane_data["name"], 
@@ -468,40 +475,37 @@ export function spawn_plane(main_app: MainAppInterface, data: any[]){
   main_app.enviro.broadcast_planes(
     main_app.PlaneDatabase.DB,
     main_app.PlaneDatabase.monitor_DB,
-    main_app.PlaneDatabase.plane_paths_DB,
-    main_app.controllerWindow,
-    main_app.workers,
-    main_app.wrapper
+    main_app.PlaneDatabase.plane_paths_DB
   )
 }
 
 // Upper-level function definitions used to manage plane calls from main_lib
 
 export function plane_value_change(main_app: MainAppInterface, data: any[]){
+  if (main_app.PlaneDatabase === undefined || main_app.wrapper === undefined) return
+  
   main_app.PlaneDatabase.set_command(data[2], data[0], data[1])      
   main_app.enviro.broadcast_planes(
     main_app.PlaneDatabase.DB,
     main_app.PlaneDatabase.monitor_DB,
-    main_app.PlaneDatabase.plane_paths_DB,
-    main_app.controllerWindow,
-    main_app.workers,
-    main_app.wrapper
+    main_app.PlaneDatabase.plane_paths_DB
   )
-  this.wrapper.send_message("controller", "terminal-add", data)
+  main_app.wrapper.send_message("controller", "terminal-add", data)
 }
 
-export function plane_delete_record(main_app: MainAppInterface, data: any[]){ // add MSC_wrapper here!
+export function plane_delete_record(main_app: MainAppInterface, data: any[]) { // add MSC_wrapper here!
+  if (main_app.PlaneDatabase === undefined) return
+  
   main_app.PlaneDatabase.delete_record(data[0])
   main_app.enviro.broadcast_planes(
     main_app.PlaneDatabase.DB,
     main_app.PlaneDatabase.monitor_DB,
-    main_app.PlaneDatabase.plane_paths_DB,
-    main_app.controllerWindow,
-    main_app.workers,
-    main_app.wrapper
+    main_app.PlaneDatabase.plane_paths_DB
   )
 }
 
-export function send_plane_data(main_app: MainAppInterface){
+export function send_plane_data(main_app: MainAppInterface) {
+  if (main_app.PlaneDatabase === undefined) return
+  
   main_app.wrapper.broadcast("workers", "update-plane-db", main_app.PlaneDatabase.DB)
 }

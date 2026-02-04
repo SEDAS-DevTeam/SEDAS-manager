@@ -40,29 +40,31 @@ export function install_plugin(main_app: MainAppInterface, data: any[]){
       main_app.monitor_info[1].center[0],
       main_app.monitor_info[1].center[1]
     )
-    this.current_popup_window = new PopupWindow(popup_widget_dict, 
+    main_app.current_popup_window = new PopupWindow(popup_widget_dict, 
                                                 PATH_TO_POPUP_HTML, 
                                                 coords, 
                                                 main_app.logger,  
                                                 "confirm",
                                                 "confirm-install")
     
-    this.current_popup_window.load_popup(`Do you want to install plugin: ${plugin_name}?`, "Proceed?")
+    main_app.current_popup_window.load_popup(`Do you want to install plugin: ${plugin_name}?`, "Proceed?")
 }
 
 export function get_plugin_list(main_app: MainAppInterface){
-    main_app.wrapper.send_message("controller", "plugin-list", this.local_plugin_list)
+    main_app.wrapper.send_message("controller", "plugin-list", main_app.local_plugin_list)
 }
 
-export function confirm_install(main_app: MainAppInterface, data: any[]){
-    if (data[0]){
-        main_app.logger.log("DEBUG", "Installing plugin")
-        console.log(this.selected_plugin_id)
-        //TODO
-    }
-    else{
-        main_app.logger.log("DEBUG", "Plugin install aborted by user")
-    }
-    this.current_popup_window.close()
-    this.current_popup_window = undefined
+export function confirm_install(main_app: MainAppInterface, data: any[]) {
+  if (main_app.current_popup_window === undefined) return
+
+  if (data[0]){
+      main_app.logger.log("DEBUG", "Installing plugin")
+      console.log(main_app.selected_plugin_id)
+      //TODO
+  }
+  else{
+      main_app.logger.log("DEBUG", "Plugin install aborted by user")
+  }
+  main_app.current_popup_window.close()
+  main_app.current_popup_window = undefined
 }

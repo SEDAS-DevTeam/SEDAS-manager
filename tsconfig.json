@@ -9,6 +9,7 @@
     "./src/main/main_dev.ts", // <- Dev executable
     "./src/main/main_prod.ts", // <- Prod executable
     "./src/main/main_lib.ts", // <- Unifying lib
+    "./src/main/main_preload.ts", // <- Main app preload
     
     // Libs
     "./src/app_utils.ts", // <- Low-level app utilities

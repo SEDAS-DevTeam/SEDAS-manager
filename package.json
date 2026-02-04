@@ -3,7 +3,6 @@
   "productName": "SEDAS-manager",
   "version": "1.0.0",
   "description": "",
-  "type": "module",
   "main": "./src/main/main_dev.js",
   "author": "Daniel Pojhan <danpojhan@gmail.com>",
   "homepage": "https://github.com/HelloWorld7894/SEDAC",

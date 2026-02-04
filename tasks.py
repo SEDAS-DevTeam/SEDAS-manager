@@ -153,9 +153,13 @@ def compile(ctx: Context, only: str = "none", refetch: bool = False):
 
         chdir(path_updater)
 
-        # removing build dirs
-        shutil.rmtree(path_build_install)
-        shutil.rmtree(path_build_uninstall)
+        if path.isdir(path_build_install) and path.isdir(path_build_uninstall):
+            # removing build dirs
+            shutil.rmtree(path_build_install)
+            shutil.rmtree(path_build_uninstall)
+
+        makedirs(path_build_install)
+        makedirs(path_build_uninstall)
 
         ctx.run("pyinstaller install.spec")
         print_color(PURPLE, "Compiled Installer")
@@ -258,6 +262,10 @@ def devel(ctx: Context, obj: str):
     elif obj == "uninstall":
         print_color(PURPLE, "Running uninstaller in dev mode...")
         ctx.run(f"python ./src/updater/uninstall.py {PATH}")
+    
+    elif obj == "frontend":
+        print_color(PURPLE, "Running frontend in dev mode...")
+        ctx.run(f"npx vite serve --config vite.config.mts")
 
 
 @task

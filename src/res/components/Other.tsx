@@ -1,53 +1,46 @@
-import { createSignal } from 'solid-js'
-import { Vars, IPCWrapper } from './utils'
+import { useLocation } from "@solidjs/router";
 
-function Main() {
-  const menu_onclick = () => IPCWrapper.send_message("menu", "redirect-to-main")
+export function Header() {
+    const PATHS = [
+        "/controller/setup",
+        "/controller/monitors",
+        "/controller/simulation",
+        "/controller/plugins",
+        "/controller/wiki"
+    ]
+    const location = useLocation();
 
-  const settings_onclick = () => IPCWrapper.send_message("menu", "redirect-to-settings")
-
-  const restore_sim = () => IPCWrapper.send_message("menu", "restore-sim")
-
-
-  let path_to_sedas_icon = `${Vars.PATH_TO_ICNS}/sedas-manager-logo.png`
-
-  return (
-      <>
-        <div class="flex items-center justify-center">
-          <div>
-            <img src={path_to_sedas_icon} class="img-resource w-full mx-auto block"></img>
-            <h2 class="l-header text-center">SEDAS manager</h2>
-            <p class="text text-center">An out-of-the-box ATC simulator</p>
-            <button class="btn-primary me-1" onclick={menu_onclick}>Start</button>
-            <button class="btn-primary me-1" onclick={settings_onclick}>Settings</button>
-            <button class="btn-primary disabled" onclick={restore_sim}>Reload last session</button>
-          </div>
-        </div>
-      </>
-  )
-}
-
-function Exit() {
-  return (
-    <></>
-  )
-}
-
-function Load() {
-  return (
-    <></>
-  )
-}
-
-function Popup() {
-  return (
-    <></>
-  )
-}
-
-export { 
-  Main,
-  Exit,
-  Load,
-  Popup
+    return (
+        <header class="bg-white border-b border-gray-200 shadow-sm">
+            <div class="flex justify-between items-center">
+                <nav class="flex">
+                    <a href={PATHS[0]}
+                        class="btn-primary s-header"
+                        classList={{ 'btn-active': location.pathname === PATHS[0] }}
+                        >Setup
+                    </a>
+                    <a href={PATHS[1]}
+                        class="btn-primary s-header"
+                        classList={{ 'btn-active': location.pathname === PATHS[1] }}
+                        >Monitors
+                    </a>
+                    <a href={PATHS[2]} 
+                        class="btn-primary s-header"
+                        classList={{ 'btn-active': location.pathname === PATHS[2] }}
+                        >Simulation
+                    </a>
+                    <a href={PATHS[3]} 
+                        class="btn-primary s-header"
+                        classList={{ 'btn-active': location.pathname === PATHS[3] }}
+                        >Plugins
+                    </a>
+                    <a href={PATHS[4]} 
+                        class="btn-primary s-header"
+                        classList={{ 'btn-active': location.pathname === PATHS[4] }}
+                        >Wiki
+                    </a>
+                </nav>
+            </div>
+        </header>
+    )
 }

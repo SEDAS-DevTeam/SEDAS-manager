@@ -7,14 +7,22 @@
 /*
     Buttons
 */
-.btn-primary { @apply bg-white inline-block text-primary-blue border border-solid border-primary-blue border-2 rounded-xs cursor-pointer text-2xl text-center px-3 py-1 }
-.disabled { @apply bg-gray-400 text-gray-500 border-gray-500 cursor-not-allowed }
+.btn-primary { @apply bg-white inline-block text-primary-blue border border-solid border-primary-blue rounded-xs cursor-pointer text-2xl text-center px-3 py-1.5 relative border-2}
+.btn-primary:hover { @apply bg-[#dad7d7] text-black }
+.btn-active { @apply !bg-primary-blue !text-white }
+.btn-disabled { @apply bg-[#cccccc] text-[#666666] border-[#999999] cursor-not-allowed }
+
+.btn-primary + .btn-primary {
+    @apply -ml-[2px]
+}
 
 /*
     Text
 */
 
-.l-header { @apply text-primary-blue text-2xl font-medium }
+.l-header { @apply text-primary-blue text-2xl font-normal }
+.la-header { @apply text-primary-blue text-4xl font-normal }
+.s-header { @apply text-primary-blue text-xl font-normal }
 .text { @apply text-primary-blue text-base }
 
 /*
@@ -22,3 +30,4 @@
 */
 
 .img-resource { @apply pointer-events-none w-1/2 }
+hr { @apply border-primary-blue }

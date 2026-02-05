@@ -3,7 +3,7 @@ import { render } from 'solid-js/web'
 import { Router, Route, type RouteSectionProps } from "@solidjs/router";
 
 import { Main, Exit, Popup, Load } from './components/External'
-import { Header } from './components/Other';
+import { ControllerHeader, Header } from './components/Other';
 import { Settings, Wiki, Plugins } from './components/Controller'
 
 function ExternalLayout(props: RouteSectionProps) {
@@ -13,6 +13,7 @@ function ExternalLayout(props: RouteSectionProps) {
 function ControllerLayout(props: RouteSectionProps) {
     return (
         <div class="flex flex-col h-screen">
+            <ControllerHeader />
             <Header />
             <div class="flex-grow overflow-hidden">
                 {props.children}

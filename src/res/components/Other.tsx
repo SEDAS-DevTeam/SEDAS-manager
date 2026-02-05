@@ -1,4 +1,5 @@
 import { useLocation } from "@solidjs/router";
+import { IPCWrapper } from "./utils";
 
 export function Header() {
     const PATHS = [
@@ -42,5 +43,18 @@ export function Header() {
                 </nav>
             </div>
         </header>
+    )
+}
+
+export function ControllerHeader() {
+    const redirect_onclick = () => IPCWrapper.send_message("controller", "redirect-to-menu")
+    const exit_onclick = () => IPCWrapper.send_message("controller", "exit")
+
+    return (
+        <nav class="flex gap-3 p-2">
+            <h2 class="la-header">SEDAS Manager Controller</h2>
+            <button class="btn-primary s-header" onclick={exit_onclick}>Exit</button>
+            <button class="btn-primary s-header" onclick={redirect_onclick}>Back to menu</button>
+        </nav>
     )
 }

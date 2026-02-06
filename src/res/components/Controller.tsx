@@ -1,48 +1,73 @@
 import { createSignal } from 'solid-js'
 import { Vars, IPCWrapper } from './utils'
 
-function Settings() {
+
+function Setup(){
     return (
         <>
-            <div class="flex h-full">
-                <div class="w-[60%] p-3">
-                    <h2 class="la-header">SEDAS manager settings</h2>
-                    <p class="text mt-1">NOTE: Changes will be activated after restart</p>
-                    <div id="settings-content" class="ml-4 mt-3">
-                        <h2 class="l-header mb-1">General Settings</h2>
-                        <hr></hr>
-                        <p>TODO</p>
+            <div class="h-full p-2">
+                <h2 class="l-header">Simulation setup</h2>
 
-                        <h2 class="l-header mb-1">Controller Settings</h2>
-                        <hr></hr>
-                        <div id="controller-settings-content" class="ml-4 mt-2">
-                            <h2 class="s-header mb-1">Monitors setup</h2>
-                            <p>TODO</p>
-                            <h2 class="s-header mb-1">Simulation setup</h2>
-                            <p>TODO</p>
-                            <h2 class="s-header mb-1">Simulation control</h2>
-                            <p>TODO</p>
-                            <h2 class="s-header mb-1">Plugins</h2>
-                            <p>TODO</p>
-                        </div>
+                <hr class="mt-1"></hr>
 
-                        <h2 class="l-header mb-1">Simulation Settings</h2>
-                        <hr></hr>
-                        <p>TODO</p>
+                
+            </div>
+        </>
+    )
+}
 
-                        <h2 class="l-header mb-1">Plane Settings</h2>
-                        <hr></hr>
-                        <p>TODO</p>
-
-                        <h2 class="l-header mb-1">Environment Settings</h2>
-                        <hr></hr>
-                        <p>TODO</p>
-                    </div>
-                </div>
-                <div class="w-[40%]">
-                    <iframe class="w-full h-full border-0" allowfullscreen src="https://sedas-docs.readthedocs.io/en/latest/"></iframe>
+function Monitors(){
+    return (
+        <>
+            <div class="h-full p-2">
+                <h2 class="l-header">Monitors setup</h2>
+                <table class="table-fixed w-full">
+                    <tbody>
+                        <tr>
+                            <td class="relative p-2">
+                                <div class="h-full w-full bg-blue-500 shadow-sm flex items-center text-white flex flex-col justify-center">
+                                    <div class="w-full h-8/9 flex flex-col justify-center">
+                                        <p class="font-bold text-sm text-center">
+                                            Header Info
+                                        </p>
+                                    </div>
+                                    <select class="w-full text-black bg-white p-1 text-xs border-1">
+                                        <option value="TWR">TWR</option>
+                                        <option value="APP">APP</option>
+                                        <option value="ACC">ACC</option>
+                                        <option value="weather">Weather</option>
+                                        <option value="dep_arr">Dep./Arr.</option>
+                                        <option value="embed">Embed</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="mt-2 flex gap-2">
+                    <button class="btn-primary">Reset to default</button>
+                    <button class="btn-primary">Apply</button>
                 </div>
             </div>
+        </>
+    )
+}
+
+function Simulation(){
+    return (
+        <>
         </>
     )
 }
@@ -89,7 +114,9 @@ function Wiki(){
 }
 
 export {
-    Settings,
+    Setup,
+    Monitors,
+    Simulation,
     Plugins,
     Wiki
 }

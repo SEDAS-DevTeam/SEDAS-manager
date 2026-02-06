@@ -1,5 +1,57 @@
 import { createSignal } from 'solid-js'
 import { Vars, IPCWrapper } from './utils'
+import { AccordionContent } from './Other'
+
+function Settings() {
+    return (
+        <>
+            <div class="flex h-full">
+                <div class="w-[60%] p-3">
+                    <h2 class="la-header">SEDAS manager settings</h2>
+                    <p class="text mt-1">NOTE: Changes will be activated after restart</p>
+                    <div id="settings-content" class="ml-4 mt-3 flex flex-col gap-2">
+                        <AccordionContent title="General Settings" class="l-header mb-1">
+                          <hr></hr>
+                          <p>TODO</p>
+                        </AccordionContent>
+
+                        <AccordionContent title="Controller Settings" class="l-header mb-1">
+                          <hr></hr>
+                          <div id="controller-settings-content" class="ml-4 mt-2">
+                            <h2 class="s-header mb-1">Monitors setup</h2>
+                            <p>TODO</p>
+                            <h2 class="s-header mb-1">Simulation setup</h2>
+                            <p>TODO</p>
+                            <h2 class="s-header mb-1">Simulation control</h2>
+                            <p>TODO</p>
+                            <h2 class="s-header mb-1">Plugins</h2>
+                            <p>TODO</p>
+                          </div>
+                        </AccordionContent>
+
+                        <AccordionContent title="Simulation Settings" class="l-header mb-1">
+                          <hr></hr>
+                          <p>TODO</p>
+                        </AccordionContent>
+
+                        <AccordionContent title="Plane Settings" class="l-header mb-1">
+                          <hr></hr>
+                          <p>TODO</p>
+                        </AccordionContent>
+
+                        <AccordionContent title="Environment Settings" class="l-header mb-1">
+                          <hr></hr>
+                          <p>TODO</p>
+                        </AccordionContent>
+                    </div>
+                </div>
+                <div class="w-[40%]">
+                    <iframe class="w-full h-full border-0" allowfullscreen src="https://sedas-docs.readthedocs.io/en/latest/"></iframe>
+                </div>
+            </div>
+        </>
+    )
+}
 
 function Main() {
   const menu_onclick = () => IPCWrapper.send_message("menu", "redirect-to-main")
@@ -78,5 +130,6 @@ export {
   Main,
   Exit,
   Load,
-  Popup
+  Popup,
+  Settings
 }

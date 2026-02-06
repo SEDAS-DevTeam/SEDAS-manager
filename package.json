@@ -8,7 +8,6 @@
   "homepage": "https://github.com/HelloWorld7894/SEDAC",
   "license": "GPL-3.0",
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.5.2",
     "@solidjs/router": "^0.15.3",
     "@tailwindcss/vite": "^4.1.11",
     "@types/uuid": "^9.0.8",

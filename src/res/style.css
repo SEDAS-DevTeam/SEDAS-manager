@@ -31,3 +31,4 @@
 
 .img-resource { @apply pointer-events-none w-1/2 }
 hr { @apply border-primary-blue }
+table td { @apply border-2 border-primary-blue h-30}

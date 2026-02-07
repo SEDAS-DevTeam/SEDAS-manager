@@ -14,6 +14,14 @@ interface ChevronProps {
     class: string
 }
 
+interface SearchProps {
+    onclick: JSX.EventHandlerUnion<SVGSVGElement, MouseEvent, JSX.EventHandler<SVGSVGElement, MouseEvent>>
+}
+
+interface WarnTextProps {
+    children: JSX.Element
+}
+
 export function Header() {
     const PATHS = [
         "/controller/setup",
@@ -72,11 +80,34 @@ export function ControllerHeader() {
     )
 }
 
-function ChevronDown(props: ChevronProps){
+function ChevronDown(props: ChevronProps) {
     return (
         <div onclick={props.onclick} class={`cursor-pointer mr-2 flex translate-y-[4px] items-center${props.class ?? ""}`}>
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 512 512"><path fill="#5271ff" d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7L86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"/></svg>
         </div>
+    )
+}
+
+export function SearchIcon(props: SearchProps) {
+    return (
+        <div class="flex items-center justify-center">
+            <svg class="cursor-pointer" onclick={props.onclick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#5271ff" d="m19.6 21l-6.3-6.3q-.75.6-1.725.95T9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l6.3 6.3zM9.5 14q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14"/></svg>
+        </div>
+    )
+}
+
+export function WarnText(props: WarnTextProps) {
+    return (
+        <p class="warn-text"><b>NOTE:</b> {props.children}</p>
+    )
+}
+
+export function BinarySelector() {
+    return (
+        <select class="w-full bg-[#949494] text-white">
+            <option>True</option>
+            <option>False</option>
+        </select>
     )
 }
 

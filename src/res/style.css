@@ -32,3 +32,22 @@
 .img-resource { @apply pointer-events-none w-1/2 }
 hr { @apply border-primary-blue }
 table td { @apply border-2 border-primary-blue h-30}
+.warn-text { @apply w-full text-red-500 text-center }
+
+/*
+    Domain specific modifiers
+*/
+table.setup-table th, td { @apply !border-1 !border-black text-center}
+table.setup-table td { @apply h-auto py-2 }
+table.setup-table thead { @apply bg-[#dddddd]}
+
+.table-button { @apply border-2 py-1 px-4 cursor-pointer w-95/100 }
+.table-button:hover { @apply bg-[#dad7d7] }
+
+.table-tag { @apply bg-primary-blue text-white rounded-sm px-1.5 py-1 }
+
+table.category-table { @apply grow }
+table.category-table th, td { @apply !border-1 !border-black }
+table.category-table td { @apply h-auto }
+table.category-table thead { @apply bg-[#dddddd]}
+table.category-table tbody td:first-child { @apply font-bold }

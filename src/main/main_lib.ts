@@ -76,7 +76,6 @@ import {
 
 //C++ (N-API) imports
 import { main } from "../bind";
-import { env } from "node:process"
 
 // Basically another abstraction to handle OS-level stuff
 class OSBridge implements OSBridgeInterface { // TODO: Currently only working for linux X11 or Wayland

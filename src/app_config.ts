@@ -7,13 +7,17 @@ import { join } from "path"
 import { BrowserWindow, App } from "electron";
 import { Worker } from "worker_threads"
 
+let default_path: string;
+if (process.env.DEV_MODE === "true") default_path = "http://localhost:5173"
+else default_path = process.env.ABS_PATH!
+
 //paths for main html files
-export const PATH_TO_MAIN_HTML = join(process.env.ABS_PATH!, "./src/res/html/other/main.html")
-export const PATH_TO_SETTINGS_HTML = join(process.env.ABS_PATH!, "./src/res/html/controller/settings.html")
-export const PATH_TO_CONTROLLER_HTML = join(process.env.ABS_PATH!, "./src/res/html/controller/controller_set.html")
-export const PATH_TO_EXIT_HTML = join(process.env.ABS_PATH!, "./src/res/html/other/exit.html")
-export const PATH_TO_POPUP_HTML = join(process.env.ABS_PATH!, "./src/res/html/other/popup.html")
-export const PATH_TO_LOADER_HTML = join(process.env.ABS_PATH!, "./src/res/html/other/load.html")
+export const PATH_TO_MAIN_HTML = default_path + "/external/main"//join(process.env.ABS_PATH!, "./src/res/html/other/main.html")
+export const PATH_TO_SETTINGS_HTML = default_path + "/external/settings"//join(process.env.ABS_PATH!, "./src/res/html/controller/settings.html")
+export const PATH_TO_CONTROLLER_HTML = default_path + "/controller/setup"//join(process.env.ABS_PATH!, "./src/res/html/controller/controller_set.html")
+export const PATH_TO_EXIT_HTML = default_path + "/external/exit"//join(process.env.ABS_PATH!, "./src/res/html/other/exit.html")
+export const PATH_TO_POPUP_HTML = default_path + "/external/popup"//join(process.env.ABS_PATH!, "./src/res/html/other/popup.html")
+export const PATH_TO_LOADER_HTML = default_path + "/external/load"//join(process.env.ABS_PATH!, "./src/res/html/other/load.html")
 
 //paths to worker html files
 export const PATH_TO_WORKER_HTML = join(process.env.ABS_PATH!, "./src/res/html/worker/worker.html")
@@ -113,6 +117,7 @@ export function generate_win_id(){
     }
     return res_str
 }
+
 
 /*
     Main app interface definiton (used in parameter passing - trying to avoid circual imports)
@@ -543,12 +548,17 @@ class BaseWindow{
         }
 
         this.isClosed = false
-        this.window.loadFile(this.path_load);
+        this.load(this.path_load)
+        //this.window.loadFile(this.path_load);
         this.window.show()
     }
 
     public send_message(channel: string, message: any){
         this.window.webContents.postMessage(channel, message)
+    }
+
+    public load(dest: string){
+        // TODO
     }
 }
 

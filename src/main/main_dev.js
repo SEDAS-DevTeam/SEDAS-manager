@@ -7,6 +7,7 @@ const main_preload_1 = require("./main_preload");
 //read runtime args (first thing that needs to be done on app start)
 const runtime_args = (0, main_preload_1.parse_args)();
 process.env.ABS_PATH = runtime_args["devel_path"];
+process.env.DEV_MODE = "true";
 const main_lib_1 = require("./main_lib");
 console.log(process.env.ABS_PATH);
 var main_app = new main_lib_1.MainApp(process.env.ABS_PATH);

@@ -2,7 +2,7 @@
 import { render } from 'solid-js/web'
 import { Router, Route, type RouteSectionProps } from "@solidjs/router";
 
-import { Settings, Main, Exit, Popup, Load } from './components/External'
+import { Settings, Main, Exit, Popup, Load, Warn } from './components/External'
 import { ControllerHeader, Header } from './components/Other';
 import { Setup, Monitors, Simulation, Wiki, Plugins } from './components/Controller'
 
@@ -33,6 +33,7 @@ render(() => (
                 <Route path="/popup" component={Popup} />
                 <Route path="/load" component={Load} />
                 <Route path="/settings" component={Settings} />
+                <Route path="/warn" component={Warn} />
             </Route>
             <Route path="/controller" component={ControllerLayout}>
                 <Route path="/setup" component={Setup} />

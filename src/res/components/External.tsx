@@ -1,6 +1,22 @@
 import { createSignal } from 'solid-js'
 import { Vars, IPCWrapper } from './utils'
 import { AccordionContent } from './Other'
+import {
+  controller_settings_Open,
+  controller_settings_setOpen,
+
+  env_settings_Open,
+  env_settings_setOpen,
+
+  general_settings_Open, 
+  general_settings_setOpen, 
+
+  plane_settings_Open, 
+  plane_settings_setOpen, 
+
+  simulation_settings_Open,
+  simulation_settings_setOpen
+} from './Storage'
 
 function Settings() {
     return (
@@ -8,14 +24,14 @@ function Settings() {
             <div class="flex h-full">
                 <div class="w-[60%] p-3">
                     <h2 class="la-header">SEDAS manager settings</h2>
-                    <p class="text mt-1">NOTE: Changes will be activated after restart</p>
+                    <p class="text mt-1">NOTE: anges will be activated after restart</p>
                     <div id="settings-content" class="ml-4 mt-3 flex flex-col gap-2">
-                        <AccordionContent title="General Settings" class="l-header mb-1">
+                        <AccordionContent title="General Settings" class="l-header mb-1" data={[general_settings_Open, general_settings_setOpen]}>
                           <hr></hr>
                           <p>TODO</p>
                         </AccordionContent>
 
-                        <AccordionContent title="Controller Settings" class="l-header mb-1">
+                        <AccordionContent title="Controller Settings" class="l-header mb-1" data={[controller_settings_Open, controller_settings_setOpen]}>
                           <hr></hr>
                           <div id="controller-settings-content" class="ml-4 mt-2">
                             <h2 class="s-header mb-1">Monitors setup</h2>
@@ -29,17 +45,17 @@ function Settings() {
                           </div>
                         </AccordionContent>
 
-                        <AccordionContent title="Simulation Settings" class="l-header mb-1">
+                        <AccordionContent title="Simulation Settings" class="l-header mb-1" data={[simulation_settings_Open, simulation_settings_setOpen]}>
                           <hr></hr>
                           <p>TODO</p>
                         </AccordionContent>
 
-                        <AccordionContent title="Plane Settings" class="l-header mb-1">
+                        <AccordionContent title="Plane Settings" class="l-header mb-1" data={[plane_settings_Open, plane_settings_setOpen]}>
                           <hr></hr>
                           <p>TODO</p>
                         </AccordionContent>
 
-                        <AccordionContent title="Environment Settings" class="l-header mb-1">
+                        <AccordionContent title="Environment Settings" class="l-header mb-1" data={[env_settings_Open, env_settings_setOpen]}>
                           <hr></hr>
                           <p>TODO</p>
                         </AccordionContent>
@@ -117,9 +133,32 @@ function Popup() {
     <>
       <div class="flex h-full items-center justify-center">
         <div>
-          <h2 class="s-header text-center mb-1">Popup header</h2>
+          <h2 class="s-header text-center mb-1">INFO: Popup header</h2>
+          <div id="popup-content">
+            <p class="text text-center mb-1">More text i guess...</p>
+          </div>
           <p class="text text-center mb-1">Proceed?</p>
+          <div class="flex gap-2 mt-5">
+            <button class="btn-primary !h-10 !text-lg !w-25">Yes</button>
+            <button class="btn-primary !h-10 !text-lg !w-25">No</button>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+function Warn() {
+  return (
+    <>
+      <div class="flex h-full items-center justify-center">
+        <div>
+          <h2 class="s-header text-center mb-1">INFO: Popup header</h2>
           <div id="popup-content"></div>
+          <p class="text text-center mb-1">Some sample text</p>
+          <div class="flex gap-2 mt-5 justify-center">
+            <button class="btn-primary !h-10 !text-lg !w-25">Ok</button>
+          </div>
         </div>
       </div>
     </>
@@ -131,5 +170,6 @@ export {
   Exit,
   Load,
   Popup,
-  Settings
+  Settings,
+  Warn
 }

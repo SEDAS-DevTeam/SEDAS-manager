@@ -2,6 +2,30 @@ import { createSignal, Show } from 'solid-js'
 import { Vars, IPCWrapper } from './utils'
 import { AccordionContent, SearchIcon, WarnText, BinarySelector, TrashcanIcon, TabularSelector, Slider } from './Other'
 
+// Inter-Page-data import
+import {
+    aircraft_Open,
+    aircraft_setOpen,
+
+    command_Open,
+    command_setOpen,
+
+    control_panel_Open,
+    control_panel_setOpen,
+
+    map_scenario_Open,
+    map_scenario_setOpen,
+
+    plane_control_Open,
+    plane_control_setOpen,
+
+    plane_spawn_Open,
+    plane_spawn_setOpen,
+
+    plane_terminal_Open,
+    plane_terminal_setOpen
+} from "./Storage"
+
 function ScenarioTimeSelector() {
     const [selection, setSelection] = createSignal("random")
 
@@ -29,7 +53,7 @@ function Setup(){
 
                 <hr class="mt-1 mb-2"></hr>
 
-                <AccordionContent title="Map & Scenario selection" class="l-header mb-1">
+                <AccordionContent title="Map & Scenario selection" class="l-header mb-1" data={[map_scenario_Open, map_scenario_setOpen]}>
                     <div class="pl-3 pt-1">
                         <h2 class="s-header">Map Selection</h2>
                         <table class="table-fixed w-full setup-table">
@@ -186,7 +210,7 @@ function Setup(){
                     </div>
                 </AccordionContent>
 
-                <AccordionContent title="Aircraft preset selection" class="l-header mb-2">
+                <AccordionContent title="Aircraft preset selection" class="l-header mb-2" data={[aircraft_Open, aircraft_setOpen]}>
                     <table class="setup-table w-full">
                         <thead>
                             <tr>
@@ -205,7 +229,7 @@ function Setup(){
                     </table>
                 </AccordionContent>
 
-                <AccordionContent title="Command preset selection" class="l-header mb-2">
+                <AccordionContent title="Command preset selection" class="l-header mb-2" data={[command_Open, command_setOpen]}>
                     <table class="setup-table w-full">
                         <thead>
                             <tr>
@@ -309,7 +333,7 @@ function Simulation(){
             <div class="h-full p-2 overflow-auto">
                 <h2 class="la-header">Simulation control</h2>
                 <hr class="mt-1 mb-2"></hr>
-                <AccordionContent title="Control panel" class="l-header mb-1">
+                <AccordionContent title="Control panel" class="l-header mb-1" data={[control_panel_Open, control_panel_setOpen]}>
                     <div class="flex p-2 gap-2">
                         <button class="btn-primary !text-lg !p-1">START SIM</button>
                         <button class="btn-primary !text-lg !p-1" onClick={() => {
@@ -326,7 +350,7 @@ function Simulation(){
                     </Show>
                 </AccordionContent>
 
-                <AccordionContent title="Plane spawn" class="l-header mb-1">
+                <AccordionContent title="Plane spawn" class="l-header mb-1" data={[plane_spawn_Open, plane_spawn_setOpen]}>
                     <div class="m-2 p-2 border-primary-blue border-2">
                         <p class="text">NAME:</p>
                         <div class="flex gap-1">
@@ -378,7 +402,7 @@ function Simulation(){
                     </div>
                 </AccordionContent>
 
-                <AccordionContent title="Plane control" class="l-header mb-1">
+                <AccordionContent title="Plane control" class="l-header mb-1" data={[plane_control_Open, plane_control_setOpen]}>
                     <WarnText>First start the simulation to change plane values</WarnText>
                     <div class="m-2">
                         <input type="text" placeholder="Search for aircraft name ..." name="time" class="w-full border-2 p-1 border-primary-blue"></input>
@@ -411,7 +435,7 @@ function Simulation(){
                     </div>
                 </AccordionContent>
 
-                <AccordionContent title="Plane terminal" class="l-header mb-1">
+                <AccordionContent title="Plane terminal" class="l-header mb-1" data={[plane_terminal_Open, plane_terminal_setOpen]}>
                     <div class="p-2">
                         <div class="bg-[#ccc] w-full h-150 border-2 border-primary-blue px-2 py-1 overflow-auto">
                             <p>TEST1</p>

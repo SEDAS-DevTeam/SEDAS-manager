@@ -1,12 +1,15 @@
 import { useLocation } from "@solidjs/router";
 import { createSignal, For } from 'solid-js'
 import { IPCWrapper } from "./utils";
-import type { JSX } from "solid-js";
+import type { Accessor, JSX, Setter } from "solid-js";
+
+type Pair<T1, T2> = [T1, T2]
 
 interface AccordionProps {
     title: string,
     children: JSX.Element,
-    class: string
+    class: string,
+    data: Pair<Accessor<boolean>, Setter<boolean>>
 }
 
 interface ChevronProps {
@@ -175,19 +178,17 @@ export function Slider(props: SliderProps) {
 }
 
 export function AccordionContent(props: AccordionProps) {
-    const [isOpen, setIsOpen] = createSignal(true)
-
     return (
         <div>
             <div class="flex">
-                <ChevronDown onclick={() => setIsOpen(!isOpen())} class={`w-4 h-4 transition-transform duration-200 ${
-                isOpen() ? "rotate-0" : "-rotate-90"}`}>
+                <ChevronDown onclick={() => props.data[1](!props.data[0]())} class={`w-4 h-4 transition-transform duration-200 ${
+                props.data[0]() ? "rotate-0" : "-rotate-90"}`}>
                 </ChevronDown>
                 <h2 class={`leading-none ${props.class}`}>{props.title}</h2>
             </div>
             <div
                 class={`grid transition-all duration-300 ease-in-out ${
-                isOpen() ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                props.data[0]() ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
                 }`}
             >
                 <div class="overflow-hidden">

@@ -1,5 +1,5 @@
 import { useLocation } from "@solidjs/router";
-import { createSignal } from 'solid-js'
+import { createSignal, For } from 'solid-js'
 import { IPCWrapper } from "./utils";
 import type { JSX } from "solid-js";
 
@@ -14,12 +14,19 @@ interface ChevronProps {
     class: string
 }
 
-interface SearchProps {
+interface ClickableIconProps {
     onclick: JSX.EventHandlerUnion<SVGSVGElement, MouseEvent, JSX.EventHandler<SVGSVGElement, MouseEvent>>
 }
 
 interface WarnTextProps {
     children: JSX.Element
+}
+
+interface TabularProps {
+    name: string,
+    start: string,
+    step: string,
+    stop: string
 }
 
 export function Header() {
@@ -88,11 +95,17 @@ function ChevronDown(props: ChevronProps) {
     )
 }
 
-export function SearchIcon(props: SearchProps) {
+export function SearchIcon(props: ClickableIconProps) {
     return (
         <div class="flex items-center justify-center">
             <svg class="cursor-pointer" onclick={props.onclick} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#5271ff" d="m19.6 21l-6.3-6.3q-.75.6-1.725.95T9.5 16q-2.725 0-4.612-1.888T3 9.5t1.888-4.612T9.5 3t4.613 1.888T16 9.5q0 1.1-.35 2.075T14.7 13.3l6.3 6.3zM9.5 14q1.875 0 3.188-1.312T14 9.5t-1.312-3.187T9.5 5T6.313 6.313T5 9.5t1.313 3.188T9.5 14"/></svg>
         </div>
+    )
+}
+
+export function TrashcanIcon(props: ClickableIconProps) {
+    return (
+        <svg class="cursor-pointer fill-gray-600 hover:fill-primary-blue" xmlns="http://www.w3.org/2000/svg" onclick={props.onclick} width="24" fill="currentColor" height="24" viewBox="0 0 24 24"><path d="M19 4h-3.5l-1-1h-5l-1 1H5v2h14M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6z"/></svg>
     )
 }
 
@@ -108,6 +121,37 @@ export function BinarySelector() {
             <option>True</option>
             <option>False</option>
         </select>
+    )
+}
+
+export function TabularSelector(props: TabularProps) {
+    const [selection, setSelection] = createSignal(props.start)
+
+    const generate_range = (start: number, step: number, end: number) => Array.from({ length: (end - start) / step + 1 }, (_, i) => (start + i * step).toString())
+
+    const range = generate_range(
+        Number(props.start),
+        Number(props.step),
+        Number(props.stop)
+    )
+
+    return (
+        <section>
+            <div class="bg-white py-2 text-primary-blue flex text-xl w-32 font-bold">
+                {props.name}
+            </div>
+            <div class="grid grid-cols-11 border-t border-l">
+                <For each={range}>{(val) => (
+                    <button
+                    onClick={() => setSelection(val)}
+                    class={`cursor-pointer border-r border-b py-2 text-xl
+                        ${selection() === val ? 'bg-primary-blue text-white' : 'hover:bg-[#dad7d7] hover:text-black'}`}
+                    >
+                    {val}
+                    </button>
+                )}</For>
+            </div>
+        </section>
     )
 }
 

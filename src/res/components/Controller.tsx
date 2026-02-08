@@ -1,6 +1,6 @@
 import { createSignal, Show } from 'solid-js'
 import { Vars, IPCWrapper } from './utils'
-import { AccordionContent, SearchIcon, WarnText, BinarySelector } from './Other'
+import { AccordionContent, SearchIcon, WarnText, BinarySelector, TrashcanIcon, TabularSelector } from './Other'
 
 function ScenarioTimeSelector() {
     const [selection, setSelection] = createSignal("random")
@@ -253,7 +253,7 @@ function Setup(){
 function Monitors(){
     return (
         <>
-            <div class="h-full p-2">
+            <div class="h-full p-2 overflow-auto">
                 <h2 class="la-header">Monitors setup</h2>
                 <hr class="mt-1 mb-2"></hr>
                 <table class="table-fixed w-full">
@@ -303,6 +303,114 @@ function Monitors(){
 function Simulation(){
     return (
         <>
+            <div class="h-full p-2 overflow-auto">
+                <h2 class="la-header">Simulation control</h2>
+                <hr class="mt-1 mb-2"></hr>
+                <AccordionContent title="Control panel" class="l-header mb-1">
+                    <div class="flex p-2 gap-2">
+                        <button class="btn-primary !text-lg !p-1">START SIM</button>
+                        <button class="btn-primary !text-lg !p-1">ENABLE WIND CONTROL</button>
+                    </div>
+                </AccordionContent>
+
+                <AccordionContent title="Plane spawn" class="l-header mb-1">
+                    <div class="m-2 p-2 border-primary-blue border-2">
+                        <p class="text">NAME:</p>
+                        <div class="flex gap-1">
+                            <button class="btn-primary !text-lg !p-1">TEST1</button>
+                            <button class="btn-primary !text-lg !p-1">TEST1</button>
+                            <button class="btn-primary !text-lg !p-1">TEST1</button>
+                            <button class="btn-primary !text-lg !p-1">TEST1</button>
+                            <input type="text" placeholder="Type custom callsign..." name="callsign" class="border-2 border-primary-blue px-1"></input>
+                        </div>
+                        <p class="text mt-2">HEADING: <span>0</span></p>
+                        <input type="range" class="w-full accent-primary-blue" min="0" max="350" step="10"></input>
+                        <p class="text mt-2">LEVEL <span>0</span></p>
+                        <input type="range" class="w-full accent-primary-blue" min="500" max="41000" step="500"></input>
+                        <p class="text mt-2">SPEED: <span>0</span></p>
+                        <input type="range" class="w-full accent-primary-blue" min="130" max="440" step="10"></input>
+                        <div class="flex gap-2">
+                            <div class="grow">
+                                <p class="text mt-2">MONITOR:</p>
+                                <select class="w-full text-black bg-white p-1 text-xs border-1">
+                                    <option value="monitor_0">monitor 0 (ACC)</option>
+                                    <option value="monitor_1">monitor 1 (ACC)</option>
+                                    <option value="monitor_2">monitor 2 (ACC)</option>
+                                </select>
+                            </div>
+                            <div class="grow">
+                                <p class="text mt-2">PLANE TYPE:</p>
+                                <select class="w-full text-black bg-white p-1 text-xs border-1">
+                                    <option value="monitor_0">TODO 0</option>
+                                    <option value="monitor_1">TODO 1</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="grow">
+                                <p class="text mt-2">DEPARTURE POINT:</p>
+                                <select class="w-full text-black bg-white p-1 text-xs border-1">
+                                    <option value="monitor_0">TODO 0</option>
+                                    <option value="monitor_1">TODO 1</option>
+                                </select>
+                            </div>
+                            <div class="grow">
+                                <p class="text mt-2">ARRIVAL POINT:</p>
+                                <select class="w-full text-black bg-white p-1 text-xs border-1">
+                                    <option value="monitor_0">TODO 0</option>
+                                    <option value="monitor_1">TODO 1</option>
+                                </select>
+                            </div>
+                        </div>
+                        <p class="text mt-2">ARRIVAL TIME:</p>
+                        <input type="text" placeholder="Type time in notation 00:00:00" name="time" class="w-full border-1 p-1"></input>
+                        <button class="btn-primary !text-lg !p-1 mt-2 w-full">Confirm</button>
+                    </div>
+                </AccordionContent>
+
+                <AccordionContent title="Plane control" class="l-header mb-1">
+                    <WarnText>First start the simulation to change plane values</WarnText>
+                    <div class="m-2">
+                        <input type="text" placeholder="Search for aircraft name ..." name="time" class="w-full border-2 p-1 border-primary-blue"></input>
+                        <div class="w-full p-2 border-2 border-primary-blue translate-y-[-2px]">
+                            <div class="w-full border-1 border-primary-blue p-2">
+                                <div class="flex">
+                                    <p>IJP954 (from LKPD_ARP to LKPD) </p>
+                                    <TrashcanIcon onclick={() => console.log("TODO onclick")}></TrashcanIcon>
+                                </div>
+                                <TabularSelector
+                                    name="Heading"
+                                    start="0"
+                                    step="10"
+                                    stop="350"
+                                ></TabularSelector>
+                                <TabularSelector
+                                    name="Level"
+                                    start="500"
+                                    step="500"
+                                    stop="41000"
+                                ></TabularSelector>
+                                <TabularSelector
+                                    name="Speed"
+                                    start="130"
+                                    step="10"
+                                    stop="440"
+                                ></TabularSelector>
+                            </div>
+                        </div>
+                    </div>
+                </AccordionContent>
+
+                <AccordionContent title="Plane terminal" class="l-header mb-1">
+                    <div class="p-2">
+                        <div class="bg-[#ccc] w-full h-150 border-2 border-primary-blue p-2 gap-2 overflow-auto">
+                            <p>SDASDADS</p>
+                            <p>SDASDADS</p>
+                            <p>SDASDADS</p>
+                        </div>
+                    </div>
+                </AccordionContent>
+            </div>
         </>
     )
 }

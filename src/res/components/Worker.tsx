@@ -1,5 +1,9 @@
-import { onMount } from "solid-js"
+import { onMount, For } from "solid-js"
 
+interface DepArrTableProps {
+    traversal_point_type: string,
+    edge_point_type: string
+}
 
 function WorkerCanvas(){
     let canvas_ref!: HTMLCanvasElement;
@@ -19,6 +23,30 @@ function WorkerCanvas(){
                 ref={canvas_ref}
             ></canvas>
         </div>
+    )
+}
+
+function DepArrTable(props: DepArrTableProps) {
+    const rows = Array.from({ length: 6 }, (_, i) => i)
+
+    return (
+        <table class="dep_arr-table border-r-2">
+            <tbody>
+                <tr>
+                    <td>ETA</td>
+                    <td>CALLSIGN</td>
+                    <td>{props.traversal_point_type}</td>
+                    <td>{props.edge_point_type}</td>
+                </tr>
+                <For each={rows}>
+                    {() => (
+                        <tr>
+                            <td colspan="4"></td>
+                        </tr>
+                    )}
+                </For>
+            </tbody>
+        </table>
     )
 }
 
@@ -45,6 +73,30 @@ function Map(){
     )
 }
 
+function DepArr(){
+    return (
+        <div class="bg-black text-white w-full h-full">
+            <h2 class="w-full flex items-center justify-center py-4 font-bold text-2xl">Time (TODO)</h2>
+            <div class="mt-2">
+                <h2 class="text-lg px-4 font-bold pb-2">Arrivals</h2>
+                <div class="flex flex-row">
+                    <DepArrTable traversal_point_type="STAR" edge_point_type="ARR POINT"></DepArrTable>
+                    <DepArrTable traversal_point_type="STAR" edge_point_type="ARR POINT"></DepArrTable>
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <h2 class="text-lg px-4 font-bold pb-2">Departures</h2>
+                <div class="flex flex-row">
+                    <DepArrTable traversal_point_type="SID" edge_point_type="DEST POINT"></DepArrTable>
+                    <DepArrTable traversal_point_type="SID" edge_point_type="DEST POINT"></DepArrTable>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export {
-    Map
+    Map,
+    DepArr
 }

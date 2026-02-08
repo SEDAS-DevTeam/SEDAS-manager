@@ -51,3 +51,6 @@ table.category-table th, td { @apply !border-1 !border-black }
 table.category-table td { @apply h-auto }
 table.category-table thead { @apply bg-[#dddddd]}
 table.category-table tbody td:first-child { @apply font-bold }
+
+table.dep_arr-table { @apply grow }
+table.dep_arr-table td { @apply !border-[#999999] !border-1 h-10 py-1}

@@ -29,6 +29,13 @@ interface TabularProps {
     stop: string
 }
 
+interface SliderProps {
+    header: string,
+    start: string,
+    step: string,
+    stop: string
+}
+
 export function Header() {
     const PATHS = [
         "/controller/setup",
@@ -152,6 +159,18 @@ export function TabularSelector(props: TabularProps) {
                 )}</For>
             </div>
         </section>
+    )
+}
+
+export function Slider(props: SliderProps) {
+    const [sliderVal, setSliderVal] = createSignal(props.start)
+
+    return (
+        <>
+            <p class="text mt-2">{props.header}: <span>{sliderVal()}</span></p>
+            <input type="range" class="w-full accent-primary-blue" min={props.start} max={props.stop} step={props.step} value={props.start}
+            onInput={(e) => setSliderVal(e.currentTarget.value.toString())}></input>
+        </>
     )
 }
 

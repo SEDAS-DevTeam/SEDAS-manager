@@ -1,6 +1,6 @@
 import { createSignal, Show } from 'solid-js'
 import { Vars, IPCWrapper } from './utils'
-import { AccordionContent, SearchIcon, WarnText, BinarySelector, TrashcanIcon, TabularSelector } from './Other'
+import { AccordionContent, SearchIcon, WarnText, BinarySelector, TrashcanIcon, TabularSelector, Slider } from './Other'
 
 function ScenarioTimeSelector() {
     const [selection, setSelection] = createSignal("random")
@@ -301,6 +301,9 @@ function Monitors(){
 }
 
 function Simulation(){
+    const [wind_control, set_wind_control] = createSignal(false)
+    const [wind_control_header, set_header] = createSignal("ENABLE WIND CONTROL")
+
     return (
         <>
             <div class="h-full p-2 overflow-auto">
@@ -309,8 +312,18 @@ function Simulation(){
                 <AccordionContent title="Control panel" class="l-header mb-1">
                     <div class="flex p-2 gap-2">
                         <button class="btn-primary !text-lg !p-1">START SIM</button>
-                        <button class="btn-primary !text-lg !p-1">ENABLE WIND CONTROL</button>
+                        <button class="btn-primary !text-lg !p-1" onClick={() => {
+                            set_wind_control(!wind_control())
+                            if (wind_control_header() === "ENABLE WIND CONTROL") set_header("DISABLE WIND CONTROL")
+                            else set_header("ENABLE WIND CONTROL")
+                        }
+                        }>{wind_control_header()}</button>
                     </div>
+                    <Show when={wind_control()}>
+                        <div class="px-2">
+                            <p>Wind control TODO</p>
+                        </div>
+                    </Show>
                 </AccordionContent>
 
                 <AccordionContent title="Plane spawn" class="l-header mb-1">
@@ -323,12 +336,9 @@ function Simulation(){
                             <button class="btn-primary !text-lg !p-1">TEST1</button>
                             <input type="text" placeholder="Type custom callsign..." name="callsign" class="border-2 border-primary-blue px-1"></input>
                         </div>
-                        <p class="text mt-2">HEADING: <span>0</span></p>
-                        <input type="range" class="w-full accent-primary-blue" min="0" max="350" step="10"></input>
-                        <p class="text mt-2">LEVEL <span>0</span></p>
-                        <input type="range" class="w-full accent-primary-blue" min="500" max="41000" step="500"></input>
-                        <p class="text mt-2">SPEED: <span>0</span></p>
-                        <input type="range" class="w-full accent-primary-blue" min="130" max="440" step="10"></input>
+                        <Slider header="HEADING" start="0" step="10" stop="350"></Slider>
+                        <Slider header="LEVEL" start="500" step="500" stop="41000"></Slider>
+                        <Slider header="SPEED" start="130" step="10" stop="440"></Slider>
                         <div class="flex gap-2">
                             <div class="grow">
                                 <p class="text mt-2">MONITOR:</p>
@@ -403,10 +413,10 @@ function Simulation(){
 
                 <AccordionContent title="Plane terminal" class="l-header mb-1">
                     <div class="p-2">
-                        <div class="bg-[#ccc] w-full h-150 border-2 border-primary-blue p-2 gap-2 overflow-auto">
-                            <p>SDASDADS</p>
-                            <p>SDASDADS</p>
-                            <p>SDASDADS</p>
+                        <div class="bg-[#ccc] w-full h-150 border-2 border-primary-blue px-2 py-1 overflow-auto">
+                            <p>TEST1</p>
+                            <p>TEST2</p>
+                            <p>TEST3</p>
                         </div>
                     </div>
                 </AccordionContent>

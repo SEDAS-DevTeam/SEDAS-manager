@@ -5,10 +5,10 @@ import { Router, Route, type RouteSectionProps } from "@solidjs/router";
 import { Settings, Main, Exit, Popup, Load, Warn } from './components/External'
 import { ControllerHeader, Header } from './components/Other';
 import { Setup, Monitors, Simulation, Wiki, Plugins } from './components/Controller'
-import { Map, DepArr } from "./components/Worker"
+import { Map, DepArr, Embed } from "./components/Worker"
 
 function ExternalLayout(props: RouteSectionProps) {
-    return <div class="h-screen w-screen">{props.children}</div>
+    return <div class="w-screen h-screen">{props.children}</div>
 }
 
 function ControllerLayout(props: RouteSectionProps) {
@@ -46,6 +46,7 @@ render(() => (
             <Route path="/worker" component={ExternalLayout}>
                 <Route path="/map" component={Map}></Route>
                 <Route path="/dep_arr" component={DepArr}></Route>
+                <Route path="/embed" component={Embed}></Route>
             </Route>
         </Router>
     ),

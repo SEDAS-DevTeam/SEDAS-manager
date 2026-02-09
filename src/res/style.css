@@ -7,7 +7,7 @@
 /*
     Buttons
 */
-.btn-primary { @apply bg-white inline-block text-primary-blue border border-solid border-primary-blue rounded-xs cursor-pointer text-2xl text-center px-3 py-1.5 relative border-2}
+.btn-primary { @apply bg-white inline-block text-primary-blue border border-solid border-primary-blue rounded-xs cursor-pointer text-2xl text-center px-3 py-1.5 relative border-2 }
 .btn-primary:hover { @apply bg-[#dad7d7] text-black }
 .btn-active { @apply !bg-primary-blue !text-white }
 .btn-disabled { @apply bg-[#cccccc] text-[#666666] border-[#999999] cursor-not-allowed }

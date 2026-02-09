@@ -75,7 +75,7 @@ function Map(){
 
 function DepArr(){
     return (
-        <div class="bg-black text-white w-full h-full">
+        <div class="bg-black text-white w-full h-screen">
             <h2 class="w-full flex items-center justify-center py-4 font-bold text-2xl">Time (TODO)</h2>
             <div class="mt-2">
                 <h2 class="text-lg px-4 font-bold pb-2">Arrivals</h2>
@@ -96,7 +96,38 @@ function DepArr(){
     )
 }
 
+function Embed() {
+    let iframe_elem!: HTMLIFrameElement;
+    let input_elem!: HTMLInputElement
+
+    return (
+        <>
+            <div class="flex flex-col h-screen overflow-auto">
+                <header class="bg-[#c9c9c9]">
+                    <div class="flex items-center">
+                        <nav class="flex justify-between w-full">
+                            <div class="flex gap-2">
+                                <input type="text" placeholder="Place embed URL here ..." class="px-2 border-1 h-full bg-[#dddddd]" ref={input_elem}></input>
+                                <button class="bg-[#dddddd] border-1 border-black p-2 text-black cursor-pointer hover:bg-white" onclick={() => {
+                                    if (input_elem.value.length != 0) {
+                                        iframe_elem.src = input_elem.value
+                                    }
+                                }}>Confirm</button>
+                                <button class="bg-[#dddddd] border-1 border-black p-2 text-black cursor-pointer hover:bg-white" onclick={() => {
+                                    iframe_elem.src = ""
+                                }}>Reset</button>
+                            </div>
+                        </nav>
+                    </div>
+                </header>
+                <iframe class="flex-1 w-full border-none bg-black" id="iframe-content" ref={iframe_elem}></iframe>
+            </div>
+        </>
+    )
+}
+
 export {
     Map,
-    DepArr
+    DepArr,
+    Embed
 }

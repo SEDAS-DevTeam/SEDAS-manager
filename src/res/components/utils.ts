@@ -1,3 +1,6 @@
+import { Map, TileLayer } from "leaflet";
+import L from "leaflet"
+
 const PATH_TO_ICNS = "../data/img"
 
 /*
@@ -64,4 +67,94 @@ export const IPCWrapper = {
             callback(data)
         })
     }
-}  
+}
+
+interface ApiData {
+    host?: string
+    radar?: {
+        past?: any
+    }
+}
+
+interface FrameObject {
+    time: number,
+    path: string
+}
+
+interface LayerObject {
+    layer: TileLayer,
+    time: string
+}
+
+export class LeafletWrapper {
+    private readonly TILE_SIZE = window.devicePixelRatio >= 2 ? 512 : 256
+    private readonly RADAR_OPACITY = 0.8
+    private readonly ANIM_DELAY = 1000
+    private readonly API_URL = "https://api.rainviewer.com/public/weather-maps.json"
+
+    private map_obj!: Map
+    private api_data: ApiData = {}
+    private map_frames: FrameObject[] = []
+    private map_data: LayerObject[] = []
+    private anim_position = 0
+    private anim_timer = false
+    private current_layer = null
+    private is_loading = false
+
+    private create_radar_layer(frame: FrameObject) {
+        return new L.TileLayer(this.api_data.host + frame.path + "/" + this.TILE_SIZE + "/{z}/{x}/{y}/2/1_1.png", {
+            tileSize: 256,
+            opacity: 0.001,
+            maxNativeZoom: 7,
+            maxZoom: 12
+        })
+    }
+
+    private render_frame(curr_anim_pos: number) {
+        console.log(this.map_frames[curr_anim_pos])
+    }
+
+    public stop() {
+
+    }
+
+    private initialize() {
+        this.current_layer = null
+        this.map_frames = []
+        this.anim_position = 0
+
+        if (!this.api_data || !this.api_data.radar || !this.api_data.radar.past){
+            return;
+        }
+
+        this.map_frames = this.api_data.radar.past
+        this.map_frames.forEach((elem: FrameObject) => {
+            this.map_data.push({
+                layer: this.create_radar_layer(elem),
+                time: new Date(elem.time * 1000).toLocaleTimeString("en-GB", {
+                    hour12: false,
+                    hour: "2-digit",
+                    minute: "2-digit"
+                })
+            })
+        })
+        console.log(this.map_data)
+        // Initialize data to initial position
+        document.getElementById("frame-time-field")!.innerHTML = this.map_data[this.anim_position].time
+        //this.render_frame(this.anim_position)
+    }
+    
+    public load_api_data() {
+        var api_request = new XMLHttpRequest()
+        api_request.open("GET", this.API_URL, true)
+        api_request.onload = () => {
+            this.api_data = JSON.parse(api_request.response)
+            this.initialize()
+        }
+        api_request.send()
+    }
+
+    constructor(map_obj: Map) {
+        this.map_obj = map_obj
+    }
+}

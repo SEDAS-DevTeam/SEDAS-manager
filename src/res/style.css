@@ -54,3 +54,5 @@ table.category-table tbody td:first-child { @apply font-bold }
 
 table.dep_arr-table { @apply grow }
 table.dep_arr-table td { @apply !border-[#999999] !border-1 h-10 py-1}
+
+button.min-icon { @apply flex items-center justify-center m-2 border-2 border-primary-blue rounded-sm cursor-pointer hover:bg-white }

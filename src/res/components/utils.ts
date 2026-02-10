@@ -1,5 +1,6 @@
 import { Map, TileLayer } from "leaflet";
 import L from "leaflet"
+import { leaflet_weather_running, leaflet_weather_running_Set } from "./Storage";
 
 const PATH_TO_ICNS = "../data/img"
 
@@ -91,33 +92,46 @@ export class LeafletWrapper {
     private readonly RADAR_OPACITY = 0.8
     private readonly ANIM_DELAY = 1000
     private readonly API_URL = "https://api.rainviewer.com/public/weather-maps.json"
+    private readonly REFETCH_DELAY = 10 * 60 * 1000
 
     private map_obj!: Map
     private api_data: ApiData = {}
     private map_frames: FrameObject[] = []
     private map_data: LayerObject[] = []
+    private frame_buffer: TileLayer[] = []
     private anim_position = 0
-    private anim_timer = false
-    private current_layer = null
-    private is_loading = false
+    private run_animation: boolean = false
+    private user_dragging_on_anim: boolean = false
 
     private create_radar_layer(frame: FrameObject) {
         return new L.TileLayer(this.api_data.host + frame.path + "/" + this.TILE_SIZE + "/{z}/{x}/{y}/2/1_1.png", {
             tileSize: 256,
-            opacity: 0.001,
+            opacity: 0,
             maxNativeZoom: 7,
-            maxZoom: 12
+            maxZoom: 12,
+            crossOrigin: true
         })
     }
 
-    private render_frame(curr_anim_pos: number) {
-        let start_layer: TileLayer = this.map_data[curr_anim_pos].layer
-        start_layer.setOpacity(this.RADAR_OPACITY)
-        start_layer.addTo(this.map_obj)
+    private clear_frame(layer: TileLayer) {
+        if (layer) {
+            this.map_obj.removeLayer(layer)
+        }
+    }
+
+    private render_frame() {
+        //this.clear_frame()
+
+        this.map_data.forEach((item, idx) => {
+            if (idx === this.anim_position) {
+                item.layer.setOpacity(this.RADAR_OPACITY)
+                document.getElementById("frame-time-field")!.innerHTML = item.time
+            }
+            else item.layer.setOpacity(0)
+        })
     }
 
     private initialize() {
-        this.current_layer = null
         this.map_frames = []
         this.anim_position = 0
 
@@ -127,19 +141,52 @@ export class LeafletWrapper {
 
         this.map_frames = this.api_data.radar.past
         this.map_frames.forEach((elem: FrameObject) => {
+            let current_layer: TileLayer = this.create_radar_layer(elem)
             this.map_data.push({
-                layer: this.create_radar_layer(elem),
+                layer: current_layer,
                 time: new Date(elem.time * 1000).toLocaleTimeString("en-GB", {
                     hour12: false,
                     hour: "2-digit",
                     minute: "2-digit"
                 })
             })
+            this.frame_buffer.push(current_layer)
+            current_layer.addTo(this.map_obj)
         })
 
         // Initialize data to initial position
         document.getElementById("frame-time-field")!.innerHTML = this.map_data[this.anim_position].time
-        this.render_frame(this.anim_position)
+        this.render_frame()
+
+        // Set interval for updating layer data
+        setInterval(() => {
+            if(this.run_animation){
+                this.move_right()
+            }
+        }, this.ANIM_DELAY)
+
+        // Event-driven optimization
+        this.map_obj.on("movestart zoomstart", () => {
+            if (this.run_animation) {
+                leaflet_weather_running_Set(!leaflet_weather_running())
+                this.user_dragging_on_anim = true
+                this.toggle()
+            }
+        })
+        this.map_obj.on("moveend zoomend", () => {
+            setTimeout(() => {
+                if (this.user_dragging_on_anim) {
+                    leaflet_weather_running_Set(!leaflet_weather_running())
+                    this.toggle()
+                    this.user_dragging_on_anim = false
+                }
+            }, 250)
+        })
+
+        // Refetching layers every 10 mins
+        setInterval(() => {
+            this.load_api_data()
+        }, this.REFETCH_DELAY)
     }
     
     public load_api_data() {
@@ -153,15 +200,19 @@ export class LeafletWrapper {
     }
 
     public move_right() {
-        console.log("move right")
+        this.anim_position = (this.anim_position + 1) % this.map_frames.length
+        this.render_frame()
     }
 
     public move_left() {
-        console.log("move left")
+        this.anim_position -= 1
+        if (this.anim_position < 0) this.anim_position = this.map_frames.length - 1
+        this.render_frame()
     }
 
     public toggle() {
-        console.log("epic toggel")
+        if (!this.run_animation) this.run_animation = true
+        else this.run_animation = false
     }
 
     constructor(map_obj: Map) {

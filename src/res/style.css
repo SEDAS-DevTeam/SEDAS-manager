@@ -56,3 +56,6 @@ table.dep_arr-table { @apply grow }
 table.dep_arr-table td { @apply !border-[#999999] !border-1 h-10 py-1}
 
 button.min-icon { @apply flex items-center justify-center m-2 border-2 border-primary-blue rounded-sm cursor-pointer hover:bg-white }
+
+button.header-icon { @apply border-primary-blue border-2 p-1 rounded-lg cursor-pointer hover:bg-gray-400 }
+div.widget-container button { @apply bg-[#b1b1b1] border-2 border-primary-blue text-primary-blue px-3 py-1.5 text-xl }

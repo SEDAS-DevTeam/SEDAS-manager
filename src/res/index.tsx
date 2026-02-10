@@ -6,6 +6,7 @@ import { Settings, Main, Exit, Popup, Load, Warn } from './components/External'
 import { ControllerHeader, Header } from './components/Other';
 import { Setup, Monitors, Simulation, Wiki, Plugins } from './components/Controller'
 import { MapUI, DepArr, Embed, Weather } from "./components/Worker"
+import { Widget } from './components/WorkerWidgets';
 
 function ExternalLayout(props: RouteSectionProps) {
     return <div class="w-screen h-screen">{props.children}</div>
@@ -49,6 +50,7 @@ render(() => (
                 <Route path="/embed" component={Embed}></Route>
                 <Route path="/weather" component={Weather}></Route>
             </Route>
+            <Route path="/widget" component={Widget}></Route>
         </Router>
     ),
     document.getElementById('root')!);

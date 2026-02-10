@@ -27,3 +27,6 @@ export const [controller_settings_Open, controller_settings_setOpen] = createSig
 export const [simulation_settings_Open, simulation_settings_setOpen] = createSignal(true)
 export const [plane_settings_Open, plane_settings_setOpen] = createSignal(true)
 export const [env_settings_Open, env_settings_setOpen] = createSignal(true)
+
+// Worker
+export const [leaflet_weather_running, leaflet_weather_running_Set] = createSignal(false)

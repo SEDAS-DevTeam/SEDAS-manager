@@ -111,11 +111,9 @@ export class LeafletWrapper {
     }
 
     private render_frame(curr_anim_pos: number) {
-        console.log(this.map_frames[curr_anim_pos])
-    }
-
-    public stop() {
-
+        let start_layer: TileLayer = this.map_data[curr_anim_pos].layer
+        start_layer.setOpacity(this.RADAR_OPACITY)
+        start_layer.addTo(this.map_obj)
     }
 
     private initialize() {
@@ -138,10 +136,10 @@ export class LeafletWrapper {
                 })
             })
         })
-        console.log(this.map_data)
+
         // Initialize data to initial position
         document.getElementById("frame-time-field")!.innerHTML = this.map_data[this.anim_position].time
-        //this.render_frame(this.anim_position)
+        this.render_frame(this.anim_position)
     }
     
     public load_api_data() {
@@ -152,6 +150,18 @@ export class LeafletWrapper {
             this.initialize()
         }
         api_request.send()
+    }
+
+    public move_right() {
+        console.log("move right")
+    }
+
+    public move_left() {
+        console.log("move left")
+    }
+
+    public toggle() {
+        console.log("epic toggel")
     }
 
     constructor(map_obj: Map) {

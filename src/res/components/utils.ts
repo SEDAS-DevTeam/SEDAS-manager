@@ -104,8 +104,8 @@ export class LeafletWrapper {
     private user_dragging_on_anim: boolean = false
 
     private create_radar_layer(frame: FrameObject) {
-        return new L.TileLayer(this.api_data.host + frame.path + "/" + this.TILE_SIZE + "/{z}/{x}/{y}/2/1_1.png", {
-            tileSize: 256,
+        return new L.TileLayer(`${this.api_data.host}${frame.path}/${this.TILE_SIZE}/{z}/{x}/{y}/2/1_1.png`, {
+            tileSize: this.TILE_SIZE,
             opacity: 0,
             maxNativeZoom: 7,
             maxZoom: 12,
@@ -113,15 +113,18 @@ export class LeafletWrapper {
         })
     }
 
-    private clear_frame(layer: TileLayer) {
-        if (layer) {
-            this.map_obj.removeLayer(layer)
-        }
+    private clean() {
+        this.map_data.forEach((elem: LayerObject) => {
+            this.map_obj.removeLayer(elem.layer)
+        })
+
+        this.map_frames = []
+        this.anim_position = 0
+        this.map_data = []
+        this.frame_buffer = []
     }
 
     private render_frame() {
-        //this.clear_frame()
-
         this.map_data.forEach((item, idx) => {
             if (idx === this.anim_position) {
                 item.layer.setOpacity(this.RADAR_OPACITY)
@@ -132,12 +135,11 @@ export class LeafletWrapper {
     }
 
     private initialize() {
-        this.map_frames = []
-        this.anim_position = 0
-
         if (!this.api_data || !this.api_data.radar || !this.api_data.radar.past){
             return;
         }
+
+        this.clean()
 
         this.map_frames = this.api_data.radar.past
         this.map_frames.forEach((elem: FrameObject) => {

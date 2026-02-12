@@ -24,6 +24,7 @@ NC = '\033[0m'
 NVM_PREPEND_LINUX = "source $HOME/.nvm/nvm.sh && nvm use &&"
 ELECTRON_PATH = path.join(PATH, "node_modules/.bin/electron")
 FORGE_PATH = path.join(PATH, "node_modules/.bin/electron-forge")
+VITE_PATH = path.join(PATH, "node_modules/.bin/vite")
 SET_PROJ_ROOT = f"cd {PATH} &&"
 
 
@@ -281,16 +282,43 @@ def debug(ctx: Context):
         tablefmt="grid"))
 
 
+def build_frontend(ctx: Context):
+    print_color(PURPLE, "Building frontend...")
+    command_frontend = f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {VITE_PATH} build"
+    ctx.run(command_frontend, pty=True)
+
+    makefile(path.join(PATH, "src/res/dist/.gitkeep"))
+
+
+def build_backend(ctx: Context, verbose: bool):
+    print_color(PURPLE, "Building app...")
+    if verbose: command_backend = f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} DEBUG=electron-forge:* {FORGE_PATH} make --verbose"
+    else: command_backend = f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {FORGE_PATH} make"
+    ctx.run(command_backend, pty=True)
+
 @task
 def build(ctx: Context, verbose: bool = False):
     """
         Create SEDAS executable
     """
 
-    print_color(PURPLE, "Building app...")
-    if verbose: command = f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} DEBUG=electron-forge:* {FORGE_PATH} make --verbose"
-    else: command = f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {FORGE_PATH} make"
-    ctx.run(command, pty=True)
+    # Building frontend
+    build_frontend(ctx)
+
+
+    # Building backend
+    #build_backend(ctx, verbose)
+
+@task
+def preview_frontend(ctx: Context):
+    """
+        Build app frontend using Vite and preview in the browser
+    """
+
+    build_frontend(ctx) # Build frontend to keep it up to date
+    command_preview = f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} {VITE_PATH} preview"
+    print_color(PURPLE, "Running Vite preview...")
+    ctx.run(command_preview, pty=True)
 
 
 @task

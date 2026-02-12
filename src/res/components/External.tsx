@@ -1,5 +1,5 @@
 import { createSignal } from 'solid-js'
-import { Vars, IPCWrapper } from './utils'
+import { IPCWrapper } from './utils'
 import { AccordionContent } from './Other'
 import {
   controller_settings_Open,
@@ -17,6 +17,8 @@ import {
   simulation_settings_Open,
   simulation_settings_setOpen
 } from './Storage'
+
+import logo from "@assets/sedas-manager-logo.png"
 
 function Settings() {
     return (
@@ -74,14 +76,11 @@ function Main() {
   const settings_onclick = () => IPCWrapper.send_message("menu", "redirect-to-settings")
   const restore_sim = () => IPCWrapper.send_message("menu", "restore-sim")
 
-
-  let path_to_sedas_icon = `${Vars.PATH_TO_ICNS}/sedas-manager-logo.png`
-
   return (
       <>
         <div class="flex h-full items-center justify-center">
           <div>
-            <img src={path_to_sedas_icon} class="img-resource w-full mx-auto block"></img>
+            <img src={logo} class="img-resource w-full mx-auto block"></img>
             <h2 class="l-header text-center">SEDAS manager</h2>
             <p class="text text-center mb-1">An out-of-the-box ATC simulator</p>
             <button class="btn-primary me-1" onclick={menu_onclick}>Start</button>
@@ -94,13 +93,11 @@ function Main() {
 }
 
 function Exit() {
-  let path_to_sedas_icon = `${Vars.PATH_TO_ICNS}/sedas-manager-logo.png`
-
   return (
     <>
       <div class="flex h-full items-center justify-center">
         <div>
-          <img src={path_to_sedas_icon} class="img-resource w-full mx-auto block"></img>
+          <img src={logo} class="img-resource w-full mx-auto block"></img>
           <h2 class="l-header text-center">Exiting App, please wait ...</h2>
         </div>
       </div>
@@ -109,13 +106,11 @@ function Exit() {
 }
 
 function Load() {
-  let path_to_sedas_icon = `${Vars.PATH_TO_ICNS}/sedas-manager-logo.png`
-
   return (
     <>
       <div class="flex h-full items-center justify-center">
         <div>
-          <img src={path_to_sedas_icon} class="img-resource w-full mx-auto block"></img>
+          <img src={logo} class="img-resource w-full mx-auto block"></img>
           <div class="w-full grid place-items-center">
             <div class="w-48 h-4 border-1 border-black rounded-sm overflow-hidden">
               <div class="h-full bg-primary-blue w-1/2 rounded-sm "></div>

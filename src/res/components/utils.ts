@@ -2,8 +2,6 @@ import { Map, TileLayer } from "leaflet";
 import L from "leaflet"
 import { leaflet_weather_running, leaflet_weather_running_Set } from "./Storage";
 
-const PATH_TO_ICNS = "../data/img"
-
 /*
     Functions not designated for export
 */
@@ -17,10 +15,6 @@ function md5_hash(value: any){
 }
 
 var n_ack_channels: string[] = []
-
-export const Vars = {
-    PATH_TO_ICNS
-}
 
 export const IPCWrapper = {
     send_message: (sender: string, channel: string, data: any[] = []) => {

@@ -1,5 +1,5 @@
 import { createSignal, Show } from 'solid-js'
-import { Vars, IPCWrapper } from './utils'
+import { IPCWrapper } from './utils'
 import { AccordionContent, SearchIcon, WarnText, BinarySelector, TrashcanIcon, TabularSelector, Slider } from './Other'
 
 // Inter-Page-data import

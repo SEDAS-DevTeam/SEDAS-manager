@@ -1,12 +1,14 @@
 /* @refresh reload */
 import { render } from 'solid-js/web'
-import { Router, Route, type RouteSectionProps } from "@solidjs/router";
+import { HashRouter, Route, type RouteSectionProps } from "@solidjs/router";
 
 import { Settings, Main, Exit, Popup, Load, Warn } from './components/External'
 import { ControllerHeader, Header } from './components/Other';
 import { Setup, Monitors, Simulation, Wiki, Plugins } from './components/Controller'
 import { MapUI, DepArr, Embed, Weather } from "./components/Worker"
 import { Widget } from './components/WorkerWidgets';
+
+import "./style.css"
 
 function ExternalLayout(props: RouteSectionProps) {
     return <div class="w-screen h-screen">{props.children}</div>
@@ -28,7 +30,7 @@ function ControllerLayout(props: RouteSectionProps) {
     Acts as a router to all SEDAS windows
 */
 render(() => (
-        <Router>
+        <HashRouter>
             <Route path="/external" component={ExternalLayout}>
                 <Route path="/main" component={Main} />
                 <Route path="/exit" component={Exit} />
@@ -51,6 +53,6 @@ render(() => (
                 <Route path="/weather" component={Weather}></Route>
             </Route>
             <Route path="/widget" component={Widget}></Route>
-        </Router>
+        </HashRouter>
     ),
     document.getElementById('root')!);

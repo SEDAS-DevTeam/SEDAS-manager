@@ -270,7 +270,7 @@ def devel(ctx: Context, obj: str):
 
 
 @task
-def debug(ctx: Context):
+def debug_info(ctx: Context):
     """
         Show how to run app in debug mode in different IDEs
     """

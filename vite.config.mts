@@ -6,10 +6,10 @@ import path from 'path'
 export default defineConfig({
     resolve: {
         alias: {
-            "@assets": path.resolve(__dirname, "./src/res/data/img")
+            "@assets": "../data/img/"
         }
     },
-    base: "/",
+    base: "./",
     root: "./src/res",
     plugins: [
         solid(),
@@ -26,8 +26,8 @@ export default defineConfig({
             },
             output: {
                 format: 'cjs', // Force CJS for preload
-                entryFileNames: (chunk) => chunk.name === 'preload' ? 'preload.js' : 'assets/[name]-[hash].js',
-                assetFileNames: 'assets/[name]-[hash][extname]'
+                entryFileNames: (chunk) => chunk.name === 'preload' ? 'preload.js' : '[name]-[hash].js',
+                assetFileNames: '[name]-[hash][extname]'
             },
         }
     }

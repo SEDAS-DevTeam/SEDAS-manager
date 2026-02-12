@@ -8,25 +8,27 @@ import { BrowserWindow, App } from "electron";
 import { Worker } from "worker_threads"
 
 let default_path: string;
-if (process.env.DEV_MODE === "true") default_path = "http://localhost:5173"
-else default_path = process.env.ABS_PATH!
+//if (process.env.DEV_MODE === "true") default_path = "http://localhost:5173"
+//else default_path = `file://${join(process.env.ABS_PATH!, "/src/res/dist/index.html")}`
+default_path = `file://${join(process.env.ABS_PATH!, "/src/res/dist/index.html")}`
+console.log(default_path)
 
 //paths for main html files
-export const PATH_TO_MAIN_HTML = default_path + "/external/main"//join(process.env.ABS_PATH!, "./src/res/html/other/main.html")
-export const PATH_TO_SETTINGS_HTML = default_path + "/external/settings"//join(process.env.ABS_PATH!, "./src/res/html/controller/settings.html")
-export const PATH_TO_CONTROLLER_HTML = default_path + "/controller/setup"//join(process.env.ABS_PATH!, "./src/res/html/controller/controller_set.html")
-export const PATH_TO_EXIT_HTML = default_path + "/external/exit"//join(process.env.ABS_PATH!, "./src/res/html/other/exit.html")
-export const PATH_TO_POPUP_HTML = default_path + "/external/popup"//join(process.env.ABS_PATH!, "./src/res/html/other/popup.html")
-export const PATH_TO_LOADER_HTML = default_path + "/external/load"//join(process.env.ABS_PATH!, "./src/res/html/other/load.html")
+export const PATH_TO_MAIN_HTML = default_path + "#/external/main"//join(process.env.ABS_PATH!, "./src/res/html/other/main.html")
+export const PATH_TO_SETTINGS_HTML = default_path + "#/external/settings"//join(process.env.ABS_PATH!, "./src/res/html/controller/settings.html")
+export const PATH_TO_CONTROLLER_HTML = default_path + "#/controller/setup"//join(process.env.ABS_PATH!, "./src/res/html/controller/controller_set.html")
+export const PATH_TO_EXIT_HTML = default_path + "#/external/exit"//join(process.env.ABS_PATH!, "./src/res/html/other/exit.html")
+export const PATH_TO_POPUP_HTML = default_path + "#/external/popup"//join(process.env.ABS_PATH!, "./src/res/html/other/popup.html")
+export const PATH_TO_LOADER_HTML = default_path + "#/external/load"//join(process.env.ABS_PATH!, "./src/res/html/other/load.html")
 
 //paths to worker html files
-export const PATH_TO_WORKER_HTML = default_path + "/worker/map"//join(process.env.ABS_PATH!, "./src/res/html/worker/worker.html")
-export const PATH_TO_DEP_ARR_HTML = default_path + "/worker/dep_arr"//join(process.env.ABS_PATH!, "./src/res/html/worker/dep_arr.html")
-export const PATH_TO_EMBED_HTML = default_path + "/worker/embed"//join(process.env.ABS_PATH!, "./src/res/html/worker/embed.html")
-export const PATH_TO_WEATHER_HTML = default_path + "/worker/weather"//join(process.env.ABS_PATH!, "./src/res/html/worker/weather.html")
+export const PATH_TO_WORKER_HTML = default_path + "#/worker/map"//join(process.env.ABS_PATH!, "./src/res/html/worker/worker.html")
+export const PATH_TO_DEP_ARR_HTML = default_path + "#/worker/dep_arr"//join(process.env.ABS_PATH!, "./src/res/html/worker/dep_arr.html")
+export const PATH_TO_EMBED_HTML = default_path + "#/worker/embed"//join(process.env.ABS_PATH!, "./src/res/html/worker/embed.html")
+export const PATH_TO_WEATHER_HTML = default_path + "#/worker/weather"//join(process.env.ABS_PATH!, "./src/res/html/worker/weather.html")
 
 //paths to widget html files
-export const PATH_TO_WIDGET_HTML = default_path + "/widget"//join(process.env.ABS_PATH!, "./src/res/html/widget/worker_widget.html")
+export const PATH_TO_WIDGET_HTML = default_path + "#/widget"//join(process.env.ABS_PATH!, "./src/res/html/widget/worker_widget.html")
 
 //paths for local storage
 export const PATH_TO_LOGS: string = join(process.env.ABS_PATH!, "/src/res/data/tmp/")
@@ -548,17 +550,12 @@ class BaseWindow{
         }
 
         this.isClosed = false
-        this.load(this.path_load)
-        //this.window.loadFile(this.path_load);
+        this.window.loadURL(this.path_load)
         this.window.show()
     }
 
     public send_message(channel: string, message: any){
         this.window.webContents.postMessage(channel, message)
-    }
-
-    public load(dest: string){
-        // TODO
     }
 }
 

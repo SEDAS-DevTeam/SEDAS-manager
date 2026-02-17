@@ -1,6 +1,6 @@
 import { createSignal } from 'solid-js'
 import { IPCWrapper } from './utils'
-import { AccordionContent } from './Other'
+import { AccordionContent, LeftArrowIcon } from './Other'
 import {
   controller_settings_Open,
   controller_settings_setOpen,
@@ -25,6 +25,12 @@ function Settings() {
         <>
             <div class="flex h-full">
                 <div class="w-[60%] p-3">
+                    <div class="inline-flex gap-2 mb-2">
+                      <button class="btn-primary inline-flex items-center">
+                        <LeftArrowIcon></LeftArrowIcon><span class="ms-1 inline-block translate-y-[-3px]">Back to menu</span>
+                      </button>
+                      <button class="btn-primary">Save</button>
+                    </div>
                     <h2 class="la-header">SEDAS manager settings</h2>
                     <p class="text mt-1">NOTE: anges will be activated after restart</p>
                     <div id="settings-content" class="ml-4 mt-3 flex flex-col gap-2">

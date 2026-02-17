@@ -8,10 +8,8 @@ import { BrowserWindow, App } from "electron";
 import { Worker } from "worker_threads"
 
 let default_path: string;
-//if (process.env.DEV_MODE === "true") default_path = "http://localhost:5173"
-//else default_path = `file://${join(process.env.ABS_PATH!, "/src/res/dist/index.html")}`
-default_path = `file://${join(process.env.ABS_PATH!, "/src/res/dist/index.html")}`
-console.log(default_path)
+if (process.env.DEV_MODE === "true") default_path = "http://localhost:5173"
+else default_path = `file://${join(process.env.ABS_PATH!, "/src/res/dist/index.html")}`
 
 //paths for main html files
 export const PATH_TO_MAIN_HTML = default_path + "#/external/main"//join(process.env.ABS_PATH!, "./src/res/html/other/main.html")
@@ -612,10 +610,7 @@ export class Window extends BaseWindow{
 
         if (path.includes("main")){
             this.checkClose(() => {
-                if (!app_status["redir-to-main"]){
-                    this.event_logger.log("DEBUG", "Closing app... Bye Bye")
-                    main_app.exit_app()
-                }
+                if (!app_status["redir-to-main"]) main_app.exit_app()
             })
         }
 

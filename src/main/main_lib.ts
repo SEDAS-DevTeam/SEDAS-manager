@@ -527,6 +527,9 @@ export class MainApp implements MainAppInterface{
     this.app_abs_path = app_abs_path
 
     app.on("ready", async () => {
+      //read app settings
+      this.app_settings = utils.read_file_content(PATH_TO_SETTINGS)
+
       // Initialize OS-Bridge to set-up OS-specific settings
       this.os_bridge = new OSBridge()
       let env_fixes = this.os_bridge.check_env() // Check if everything is set-up correctly on OS-level
@@ -534,9 +537,6 @@ export class MainApp implements MainAppInterface{
       
       // Proceed with OS info collection (for additional tweaking)
       this.os_info = this.os_bridge.get_info()
-  
-      //read app settings
-      this.app_settings = utils.read_file_content(PATH_TO_SETTINGS)
       
       // set dev_panel inner state variable
       this.dev_panel = this.app_settings["debug_panel"] as boolean

@@ -239,9 +239,14 @@ def devel(ctx: Context, obj: str):
         print_color(PURPLE, "Running app in dev mode...")
         print(f"{ELECTRON_PATH} {path_main}")
         stream_capturer = StreamCapturer()
+
+        # Reading development arguments to inject on runtime
+        with open("./devel_args.json", "r") as file: data = json.load(file)
+        devel_args_str = " ".join([f"--{arg_key}={data[arg_key]}" for arg_key in data])
+
         try:
             ctx.run(
-                f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} npx concurrently 'vite' 'wait-on http://localhost:5173 && {ELECTRON_PATH} {path_main} --devel_path={PATH}'",
+                f"{SET_PROJ_ROOT} {NVM_PREPEND_LINUX} npx concurrently 'vite' 'wait-on http://localhost:5173 && {ELECTRON_PATH} {path_main} --devel-path={PATH} {devel_args_str}'",
                 pty=True,
                 out_stream=stream_capturer,
             )
@@ -301,13 +306,11 @@ def build(ctx: Context, verbose: bool = False):
     """
         Create SEDAS executable
     """
-
     # Building frontend
     build_frontend(ctx)
 
-
     # Building backend
-    #build_backend(ctx, verbose)
+    build_backend(ctx, verbose)
 
 @task
 def preview_frontend(ctx: Context):

@@ -427,27 +427,18 @@ export class MainApp implements MainAppInterface{
   // Reload wrapper (used when needed to respawn process for OS compatibility)
   public reload(env_arg: string[]) {
     if (env_arg.length != 0) {
-      let default_args = process.argv.slice(1)
-      let additional_args: string[] = []
+      let args = process.argv.slice(1)
       
       env_arg.forEach((arg) => {
         switch (arg) {
           case "reload-with-x11":
-            additional_args.push("--ozone-platform=x11")
+            args.push("--ozone-platform=x11")
             break
         }
       })
       
-      const child = spawn(process.execPath, [
-        ...default_args,
-        ...additional_args
-      ], {
-        detached: true,
-        stdio: "inherit"
-      })
-      
-      child.unref()
-      this.exit_app()
+      app.relaunch({ args })
+      app.exit(0)
     }
   }
   
@@ -508,25 +499,26 @@ export class MainApp implements MainAppInterface{
       // Initialize OS-Bridge to set-up OS-specific settings
       this.os_bridge = new OSBridge()
       let env_fixes = this.os_bridge.check_env() // Check if everything is set-up correctly on OS-level
-      if (this.os_bridge_suppressed){
+      console.log(this.os_bridge_suppressed)
+      if (!this.os_bridge_suppressed){
         this.reload(env_fixes) // Reload app if needed
       }
-      
-      // Proceed with OS info collection (for additional tweaking)
-      this.os_info = this.os_bridge.get_info()
-      
-      // set dev_panel inner state variable
-      this.dev_panel = this.app_settings["debug_panel"] as boolean
+
+      // Get monitor info
+      let retrieved_monit_info: MonitorInfo<DisplayObject[], DisplayObject> | undefined = utils.get_monitor_info(this.app_settings["controller_loc"])
+      if (retrieved_monit_info === undefined) return // invalid settings // TODO
+      this.monitor_info = retrieved_monit_info
 
       // setup app event logger
       this.logger = new EventLogger(this.app_settings["logging"], "app_log", "system", "v1.0.0")
       await this.logger.delete_logs() // delete any previously created logs
       await this.logger.init_logger()
       
-      // Get monitor info
-      let retrieved_monit_info: MonitorInfo<DisplayObject[], DisplayObject> | undefined = utils.get_monitor_info(this.app_settings["controller_loc"])
-      if (retrieved_monit_info === undefined) return // invalid settings // TODO
-      this.monitor_info = retrieved_monit_info
+      // Proceed with OS info collection (for additional tweaking)
+      this.os_info = this.os_bridge.get_info()
+      
+      // set dev_panel inner state variable
+      this.dev_panel = this.app_settings["debug_panel"] as boolean
       
       // test that C++ addons loaded successfully
       main.test_modules()

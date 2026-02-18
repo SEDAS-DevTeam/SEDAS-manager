@@ -101,9 +101,9 @@ class OSBridge implements OSBridgeInterface { // TODO: Currently only working fo
     let env_fixes: string[] = []
     
     // Check for wayland (if yes, reload to XWayland compatibility layer - TODO: Change later on)
-    if (this.platform == "linux" &&
-        this.session_type == "wayland" &&
-        this.compatibility_layer == "xwayland") {
+    if (this.platform === "linux" &&
+        this.session_type === "wayland" &&
+        this.compatibility_layer !== "xwayland") {
           env_fixes.push("reload-with-x11")
     }
     // TODO: more things later on
@@ -117,10 +117,15 @@ class OSBridge implements OSBridgeInterface { // TODO: Currently only working fo
 export class MainApp implements MainAppInterface{
 
   /*
+      Only readonly variables
+  */
+  public app_abs_path!: string; // App absolute path in the system
+  public os_bridge_suppressed!: boolean
+
+  /*
       Variables + app internal states
   */
   public app_instance: App = app; // Electron app object
-  public app_abs_path: string = ""; // App absolute path in the system
   public os_bridge!: OSBridge
   public os_info!: Record<string, string>;
 
@@ -417,41 +422,6 @@ export class MainApp implements MainAppInterface{
 
     //run local plane DB
     this.PlaneDatabase = new PlaneDB(this.workers);
-    if (backup_db) {
-      /*
-      //run if backup db is avaliable
-      this.app_status["redir-to-main"] = true
-
-      for (let i = 0; i < backup_db["planes"].length; i++){
-        //get monitor-type spawn
-        let monit_type: string = "";
-        for (let i2 = 0; i2 < backup_db["monitor-planes"].length; i2++){
-          if (backup_db["monitor-planes"][i2]["planes_id"].includes(backup_db["planes"][i2]["id"])){
-            monit_type = backup_db["monitor-planes"][i2]["type"]
-            break
-          }
-        }
-
-        let curr_plane_id = utils.generate_hash()
-        let plane = new Plane(curr_plane_id, backup_db["planes"][i]["callsign"], 
-                backup_db["planes"][i]["heading"], backup_db["planes"][i]["updated_heading"],
-                backup_db["planes"][i]["level"], backup_db["planes"][i]["updated_level"],
-                backup_db["planes"][i]["speed"], backup_db["planes"][i]["updated_speed"],
-                backup_db["planes"][i]["departure"], backup_db["planes"][i]["arrival"], 
-                backup_db["planes"][i]["arrival_time"],
-                backup_db["planes"][i]["x"], backup_db["planes"][i]["y"])
-
-        this.PlaneDatabase.add_record(plane, monit_type)
-      }
-
-      //send reloaded plane database to all windows
-      this.enviro.broadcast_planes(
-        this.PlaneDatabase.DB,
-        this.PlaneDatabase.monitor_DB,
-        this.PlaneDatabase.plane_paths_DB)
-      //controllerWindow.send_message("init-info", ["window-info", map_name, JSON.stringify(workers), map_config, JSON.stringify(app_settings)])
-    */
-    }
   }
   
   // Reload wrapper (used when needed to respawn process for OS compatibility)
@@ -523,8 +493,13 @@ export class MainApp implements MainAppInterface{
     app.exit(0)
   }
 
-  public constructor(app_abs_path: string){
+  // All the process.env constants passed to MainApp to be released to broader-context
+  public constructor(
+    app_abs_path: string,
+    os_bridge_suppressed: string = "false"
+  ){
     this.app_abs_path = app_abs_path
+    this.os_bridge_suppressed = (os_bridge_suppressed === "true")
 
     app.on("ready", async () => {
       //read app settings
@@ -533,7 +508,9 @@ export class MainApp implements MainAppInterface{
       // Initialize OS-Bridge to set-up OS-specific settings
       this.os_bridge = new OSBridge()
       let env_fixes = this.os_bridge.check_env() // Check if everything is set-up correctly on OS-level
-      this.reload(env_fixes) // Reload app if needed
+      if (this.os_bridge_suppressed){
+        this.reload(env_fixes) // Reload app if needed
+      }
       
       // Proceed with OS info collection (for additional tweaking)
       this.os_info = this.os_bridge.get_info()

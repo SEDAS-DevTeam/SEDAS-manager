@@ -11,7 +11,7 @@
         "windows": {
           "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron.cmd"
         },
-        "args" : ["./src/main/main_dev.js", "--devel_path=${workspaceFolder}"],
+        "args" : ["./src/main/main_dev.js", "--devel-path=${workspaceFolder}", "suppress-os-bridge=true"],
         "outputCapture": "std",
         "console": "integratedTerminal",
         "postDebugTask": "terminate-vite"

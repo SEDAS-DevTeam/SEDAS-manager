@@ -21,7 +21,10 @@ console.log(`
 
 import { MainApp } from "./main_lib";
 
-var main_app = new MainApp(process.env.ABS_PATH)
+var main_app = new MainApp(
+    process.env.ABS_PATH,
+    process.env.SUPPRESS_OS_BRIDGE
+)
 
 main_app.app_instance.commandLine.appendSwitch('remote-debugging-port', '9223');
 main_app.app_instance.commandLine.appendSwitch('remote-debugging-address', '127.0.0.1');

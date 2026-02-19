@@ -1,6 +1,6 @@
 import { onMount, onCleanup, For, Show, createSignal } from "solid-js"
 import { LeafletWrapper } from "./utils";
-
+import { IPCWrapper } from './utils'
 import { leaflet_weather_running, leaflet_weather_running_Set } from "./Storage";
 
 import L from "leaflet"
@@ -102,6 +102,8 @@ function MoveLeftIcon() {
 }
 
 function MapUI(){
+    const exit_onclick = () => IPCWrapper.send_message("worker", "exit")
+
     return (
         <div class="flex flex-col h-screen">
             <header class="bg-[#c9c9c9]">
@@ -114,7 +116,7 @@ function MapUI(){
 
                         <div class="flex">
                             <button class="bg-green-600 border-2 border-primary-blue p-2 font-semibold cursor-pointer hover:bg-white">RUN</button>
-                            <button class="border-2 border-primary-blue p-2 text-primary-blue font-semibold cursor-pointer hover:bg-white translate-x-[-1px] mr-[-1px]">EXIT</button>
+                            <button class="border-2 border-primary-blue p-2 text-primary-blue font-semibold cursor-pointer hover:bg-white translate-x-[-1px] mr-[-1px]" onclick={exit_onclick}>EXIT</button>
                         </div>
                     </nav>
                 </div>

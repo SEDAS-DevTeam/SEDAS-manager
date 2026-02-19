@@ -17,19 +17,35 @@ import {
   simulation_settings_Open,
   simulation_settings_setOpen
 } from './Storage'
+import { onMount } from "solid-js"
 
 import logo from "@assets/sedas-manager-logo.png"
 
 function Settings() {
+    const redirect_onclick = () => IPCWrapper.send_message("settings", "redirect-to-menu")
+    const save_settings = () => {
+      let data = [{}]; // TODO: add some data load from frontend later on
+      IPCWrapper.send_message("settings", "save-settings", data)
+    }
+
+    onMount(() => {
+      IPCWrapper.send_message("settings", "send-info") // Send-info request
+    })
+
+    IPCWrapper.on_message("app-data", (data) => {
+      // TODO: Write setting processing
+      console.log(data)
+    })
+
     return (
         <>
             <div class="flex h-full">
                 <div class="w-[60%] p-3">
                     <div class="inline-flex gap-2 mb-2">
                       <button class="btn-primary inline-flex items-center">
-                        <LeftArrowIcon></LeftArrowIcon><span class="ms-1 inline-block translate-y-[-3px]">Back to menu</span>
+                        <LeftArrowIcon></LeftArrowIcon><span class="ms-1 inline-block translate-y-[-3px]" onclick={redirect_onclick}>Back to menu</span>
                       </button>
-                      <button class="btn-primary">Save</button>
+                      <button class="btn-primary" onclick={save_settings}>Save</button>
                     </div>
                     <h2 class="la-header">SEDAS manager settings</h2>
                     <p class="text mt-1">NOTE: anges will be activated after restart</p>

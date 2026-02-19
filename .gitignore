@@ -20,6 +20,8 @@ node_modules
 /src/main/*.js.map
 /src/res/components/preload.js
 /src/res/components/preload.d.ts
+/src/res/components/ipc_types.js
+/src/res/components/ipc_types.js.map
 
 #pycache files
 /src/res/neural/cache/__pycache__/

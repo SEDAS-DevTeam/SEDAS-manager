@@ -48,9 +48,6 @@ export const PATH_TO_INSTALLER: string = join(process.env.ABS_PATH!, "/src/updat
 export const PATH_TO_MSC: string = join(process.env.ABS_PATH!, "/src/workers/backend.js")
 export const PATH_TO_BACKUP: string = join(process.env.ABS_PATH!, "/src/workers/database.js")
 
-//paths for gui layouts
-export const PATH_TO_SETTINGS_LAYOUT: string = join(process.env.ABS_PATH!, "/src/res/data/app/gui/settings_layout.json")
-
 //paths for backup
 export const PATH_TO_DATABASE: string = join(process.env.ABS_PATH!, "/src/res/data/tmp/backup.json")
 

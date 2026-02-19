@@ -12,7 +12,7 @@ import {
   IPCwrapperInterface,
   MSCwrapperInterface
 } from "./app_config"
-
+import {IPCMessage} from "./res/components/ipc_types"
 
 //
 // Wrapper for IPC communication between frontend and backend
@@ -30,7 +30,11 @@ export class IPCwrapper implements IPCwrapperInterface{
         return md5(JSON.stringify(message))
     }
 
-    private send_message_to_window(destination: string, channel: string, data: any){
+    private send_message_to_window<K extends keyof IPCMessage>(
+        destination: string, 
+        channel: string, 
+        data: IPCMessage[K]
+    ){
         for (let i = 0; i < this.window_communication_configuration.length; i++){
             if (destination == this.window_communication_configuration[i]["win_name"]){
                 this.window_communication_configuration[i]["win"].send_message(channel, data)
@@ -119,7 +123,10 @@ export class IPCwrapper implements IPCwrapperInterface{
     public open_channels(){this.open = true}
     public close_channels(){this.open = false}
 
-    public send_message(destination: string, channel: string, data: any){
+    public send_message<K extends keyof IPCMessage>(
+        destination: K, 
+        channel: string, 
+        data: IPCMessage[K]){
         this.send_message_to_window(destination, channel, data)
     }
 

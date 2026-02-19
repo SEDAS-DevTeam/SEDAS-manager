@@ -1,6 +1,7 @@
 import { Map, TileLayer } from "leaflet";
 import L from "leaflet"
 import { leaflet_weather_running, leaflet_weather_running_Set } from "./Storage";
+import type { IPCMessage } from "./ipc_types";
 
 /*
     Functions not designated for export
@@ -17,9 +18,13 @@ function md5_hash(value: any){
 var n_ack_channels: string[] = []
 
 export const IPCWrapper = {
-    send_message: (sender: string, channel: string, data: any[] = []) => {
-        let message_content = []
-        if (data.length == 0){
+    send_message: <K extends keyof IPCMessage>(
+        sender: string,
+        channel: string,
+        data: IPCMessage[K] | undefined = undefined
+    ) => {
+        let message_content: unknown[] = []
+        if (data === undefined){
             //message does not have a content
             message_content.push(channel)
             message_content.push(md5_hash(channel))
@@ -30,6 +35,9 @@ export const IPCWrapper = {
             message_content.push(...data)
             message_content.push(md5_hash(data))
         }
+
+        // @ts-ignore
+        if (window.electronAPI === undefined) return
         
         // @ts-ignore
         window.electronAPI.send_message(sender, message_content)
@@ -41,7 +49,9 @@ export const IPCWrapper = {
                 return;
             }
         }
-        //ack channel not registered
+
+        // @ts-ignore
+        if (window.electronAPI === undefined) return
 
         // @ts-ignore
         window.electronAPI.on_message(channel + "-ack", (data: string[]) => {
@@ -56,9 +66,15 @@ export const IPCWrapper = {
             n_ack_channels.push(channel + "-ack")
         })
     },
-    on_message: (channel: string, callback: (data: any) => void) => {
+    on_message: <K extends keyof IPCMessage>(
+        channel: K,
+        callback: (data?: IPCMessage[K]) => void
+    ) => {
         // @ts-ignore
-        window.electronAPI.on_message(channel, (data: any) => {
+        if (window.electronAPI === undefined) return
+
+        // @ts-ignore
+        window.electronAPI.on_message(channel, (data?: IPCMEssage[K]) => {
             callback(data)
         })
     }

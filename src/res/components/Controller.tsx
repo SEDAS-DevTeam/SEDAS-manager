@@ -1,4 +1,4 @@
-import { createSignal, Show } from 'solid-js'
+import { createSignal, Show, onMount } from 'solid-js'
 import { IPCWrapper } from './utils'
 import { AccordionContent, SearchIcon, WarnText, BinarySelector, TrashcanIcon, TabularSelector, Slider } from './Other'
 
@@ -25,6 +25,7 @@ import {
     plane_terminal_Open,
     plane_terminal_setOpen
 } from "./Storage"
+import type { IPCMessage } from './ipc_types'
 
 function ScenarioTimeSelector() {
     const [selection, setSelection] = createSignal("random")
@@ -275,6 +276,12 @@ function Setup(){
 }
 
 function Monitors(){
+    const apply_monitor_changes = () => {
+        let data = [{}]
+
+        //IPCWrapper.send_message("controller", "monitor-change-info", data)
+    }
+
     return (
         <>
             <div class="h-full p-2 overflow-auto">
@@ -317,7 +324,7 @@ function Monitors(){
                 </table>
                 <div class="mt-2 flex gap-2">
                     <button class="btn-primary">Reset to default</button>
-                    <button class="btn-primary">Apply</button>
+                    <button class="btn-primary" onclick={apply_monitor_changes}>Apply</button>
                 </div>
             </div>
         </>
@@ -328,8 +335,26 @@ function Simulation(){
     const [wind_control, set_wind_control] = createSignal(false)
     const [wind_control_header, set_header] = createSignal("ENABLE WIND CONTROL")
 
+    const [isVisible, setIsVisible] = createSignal(true)
+
+    IPCWrapper.on_message("map-checked", (data) => {
+        if (data![0]["user-check"]) setIsVisible(false);
+        else setIsVisible(true);
+
+        IPCWrapper.send_message("controller", "send-info")
+    })
+
+    onMount(() => {
+        // TODO: fill this
+    })
+
     return (
         <>
+            <Show when={isVisible()}>
+                <div class="z-5 h-full w-full flex items-center justify-center">
+                    <h2 class="warn-text font-bold text-2xl">No map was selected to be rendered, simulation control disabled</h2>
+                </div>
+            </Show>
             <div class="h-full p-2 overflow-auto">
                 <h2 class="la-header">Simulation control</h2>
                 <hr class="mt-1 mb-2"></hr>

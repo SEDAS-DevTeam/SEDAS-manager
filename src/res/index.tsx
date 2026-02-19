@@ -1,6 +1,8 @@
 /* @refresh reload */
 import { render } from 'solid-js/web'
 import { HashRouter, Route, type RouteSectionProps } from "@solidjs/router";
+import { onMount } from "solid-js"
+import { IPCWrapper } from "./components/utils";
 
 import { Settings, Main, Exit, Popup, Load, Warn } from './components/External'
 import { ControllerHeader, Header } from './components/Other';
@@ -11,6 +13,18 @@ import { Widget } from './components/WorkerWidgets';
 import "./style.css"
 
 function ExternalLayout(props: RouteSectionProps) {
+    return <div class="w-screen h-screen">{props.children}</div>
+}
+
+function WorkerLayout(props: RouteSectionProps) {
+    onMount(() => {
+        IPCWrapper.send_message("worker", "render-map") // Ask for map data
+        IPCWrapper.send_message("worker", "send-info") // Ask for app info
+        IPCWrapper.send_message("worker", "send-plane-data") // Ask for initial plane data
+
+        // TODO: Add rendering and other stuff!
+    })
+
     return <div class="w-screen h-screen">{props.children}</div>
 }
 
@@ -46,7 +60,7 @@ render(() => (
                 <Route path="/plugins" component={Plugins} />
                 <Route path="/wiki" component={Wiki} />
             </Route>
-            <Route path="/worker" component={ExternalLayout}>
+            <Route path="/worker" component={WorkerLayout}>
                 <Route path="/map" component={MapUI}></Route>
                 <Route path="/dep_arr" component={DepArr}></Route>
                 <Route path="/embed" component={Embed}></Route>

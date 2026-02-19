@@ -45,7 +45,6 @@ import {
   PATH_TO_MSC,
   PATH_TO_INSTALLER,
   PATH_TO_SETTINGS,
-  PATH_TO_SETTINGS_LAYOUT,
   PATH_TO_BACKUP,
   
   Coords,
@@ -323,21 +322,21 @@ export class ListenerSetup implements ListenerSetupInterface{
   public add_listener_IPC(){
     //IPC listeners
   
-    this.main_app.wrapper.register_channel("redirect-to-menu", ["controller"], "unidirectional", () => this.main_app.frontend_router.redirect_to_menu("controller"))
-    this.main_app.wrapper.register_channel("redirect-to-menu", ["settings"], "unidirectional", () => this.main_app.frontend_router.redirect_to_menu("settings"))
-    this.main_app.wrapper.register_channel("redirect-to-settings", ["menu"], "unidirectional", () => this.main_app.frontend_router.redirect_to_settings())
-    this.main_app.wrapper.register_channel("redirect-to-main", ["menu"], "unidirectional", () => this.main_app.frontend_router.redirect_to_main())
+    this.main_app.wrapper.register_channel("redirect-to-menu", ["controller"], "unidirectional", () => this.main_app.frontend_router.redirect_to_menu("controller")) // Handling redirection to menu from Controller
+    this.main_app.wrapper.register_channel("redirect-to-menu", ["settings"], "unidirectional", () => this.main_app.frontend_router.redirect_to_menu("settings")) // Handling redirection to menu from Settings
+    this.main_app.wrapper.register_channel("redirect-to-settings", ["menu"], "unidirectional", () => this.main_app.frontend_router.redirect_to_settings()) // Handling redirection to settings
+    this.main_app.wrapper.register_channel("redirect-to-main", ["menu"], "unidirectional", () => this.main_app.frontend_router.redirect_to_main()) // Handling redirection to main
   
-    this.main_app.wrapper.register_channel("save-settings", ["menu"], "unidirectional", (data: any[]) => this.main_app.frontend_handlers.save_settings(data))
-    this.main_app.wrapper.register_channel("monitor-change-info", ["controller"], "unidirectional", (data: any[]) => this.main_app.frontend_handlers.monitor_change_info(data))
-    this.main_app.wrapper.register_channel("exit", ["worker", "controller"], "unidirectional", () => this.main_app.exit_app())
+    this.main_app.wrapper.register_channel("save-settings", ["settings"], "unidirectional", (data: any[]) => this.main_app.frontend_handlers.save_settings(data)) // Settings save
+    this.main_app.wrapper.register_channel("monitor-change-info", ["controller"], "unidirectional", (data: any[]) => this.main_app.frontend_handlers.monitor_change_info(data)) // Changing monitor type
+    this.main_app.wrapper.register_channel("exit", ["worker", "controller"], "unidirectional", () => this.main_app.exit_app()) // Exit app from GUI
     
-    this.main_app.wrapper.register_channel("ping", ["controller", "settings", "embed"], "bidirectional", (data: any[]) => this.main_app.frontend_handlers.ping(data))
+    this.main_app.wrapper.register_channel("ping", ["controller", "settings", "embed"], "bidirectional", (data: any[]) => this.main_app.frontend_handlers.ping(data)) // Pinging every IPC component (TODO: start using)
     
     //send app configuration to controller
-    this.main_app.wrapper.register_channel("send-info", ["controller"], "bidirectional", () => this.main_app.frontend_handlers.send_info("controller"))
-    this.main_app.wrapper.register_channel("send-info", ["worker"], "bidirectional", () => this.main_app.frontend_handlers.send_info("worker"))
-    this.main_app.wrapper.register_channel("send-info", ["settings"], "bidirectional", () => this.main_app.frontend_handlers.send_info("settings"))
+    this.main_app.wrapper.register_channel("send-info", ["controller"], "bidirectional", () => this.main_app.frontend_handlers.send_info("controller")) // Send-info request for Controller window
+    this.main_app.wrapper.register_channel("send-info", ["worker"], "bidirectional", () => this.main_app.frontend_handlers.send_info("worker")) // Send-info request for Worker window
+    this.main_app.wrapper.register_channel("send-info", ["settings"], "bidirectional", () => this.main_app.frontend_handlers.send_info("settings")) // Send-info request for Settings window
   
     //environment invokes
     this.main_app.wrapper.register_channel("start-sim", ["controller", "worker"], "unidirectional", () => start_sim(this.main_app))
@@ -482,14 +481,10 @@ export class FrontendHandlers implements FrontendHandlersInterface{
   
   public send_info(window_type: string){
       if (window_type == "settings"){
-  
-          //reading settings gui layouts
-          let settings_layout = utils.read_file_content(PATH_TO_SETTINGS_LAYOUT)
-  
           //sending app data and alg configs
           console.log("sending app data")
           //TODO: rework this...
-          this.main_app.wrapper.send_message("settings", "app-data", [this.main_app.app_settings, settings_layout])
+          this.main_app.wrapper.send_message("settings", "app-data", [this.main_app.app_settings])
       }
       else if (window_type == "controller"){
           //sending monitor data
@@ -792,11 +787,11 @@ export class FrontendHandlers implements FrontendHandlersInterface{
   public map_check(){
       if (this.main_app.map_data == undefined){
           this.main_app.logger.log("WARN", "user did not check any map")
-          this.main_app.wrapper.send_message("controller", "map-checked", JSON.stringify({"user-check": false}))
+          this.main_app.wrapper.send_message("controller", "map-checked", {"user-check": false})
       }
       else {
           this.main_app.logger.log("DEBUG", "user checked a map")
-          this.main_app.wrapper.send_message("controller", "map-checked", JSON.stringify({"user-check": true}))
+          this.main_app.wrapper.send_message("controller", "map-checked", {"user-check": true})
       }
   }
   

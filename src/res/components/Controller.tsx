@@ -336,6 +336,13 @@ function Simulation(){
     const [wind_control_header, set_header] = createSignal("ENABLE WIND CONTROL")
 
     const [isVisible, setIsVisible] = createSignal(true)
+    const [sim_running, set_sim_running] = createSignal(false)
+
+    const sim_toggle_onclick = () => {
+        set_sim_running(!sim_running())
+        if (sim_running()) IPCWrapper.send_message("controller", "stop-sim")
+        else IPCWrapper.send_message("controller", "start-sim")
+    }
 
     IPCWrapper.on_message("map-checked", (data) => {
         if (data![0]["user-check"]) setIsVisible(false);
@@ -360,7 +367,9 @@ function Simulation(){
                 <hr class="mt-1 mb-2"></hr>
                 <AccordionContent title="Control panel" class="l-header mb-1" data={[control_panel_Open, control_panel_setOpen]}>
                     <div class="flex p-2 gap-2">
-                        <button class="btn-primary !text-lg !p-1">START SIM</button>
+                        <button class="btn-primary !text-lg !p-1" onClick={sim_toggle_onclick}>
+                            {sim_running() ? "STOP SIM" : "START SIM"}
+                        </button>
                         <button class="btn-primary !text-lg !p-1" onClick={() => {
                             set_wind_control(!wind_control())
                             if (wind_control_header() === "ENABLE WIND CONTROL") set_header("DISABLE WIND CONTROL")

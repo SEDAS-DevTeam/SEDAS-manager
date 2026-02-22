@@ -3,6 +3,14 @@ import L from "leaflet"
 import { leaflet_weather_running, leaflet_weather_running_Set } from "./Storage";
 import type { IPCMessage } from "./ipc_types";
 
+// Route for electron backend mock-up
+// @ts-ignore
+if (window.electronAPI === undefined) {
+    const { MockElectronAPI } = await import("./comm_mock_up")
+    // @ts-ignore
+    window.electronAPI = new MockElectronAPI() // substitute missing electronAPI
+}
+
 /*
     Functions not designated for export
 */
@@ -35,9 +43,6 @@ export const IPCWrapper = {
             message_content.push(...data)
             message_content.push(md5_hash(data))
         }
-
-        // @ts-ignore
-        if (window.electronAPI === undefined) return
         
         // @ts-ignore
         window.electronAPI.send_message(sender, message_content)
@@ -49,9 +54,6 @@ export const IPCWrapper = {
                 return;
             }
         }
-
-        // @ts-ignore
-        if (window.electronAPI === undefined) return
 
         // @ts-ignore
         window.electronAPI.on_message(channel + "-ack", (data: string[]) => {
@@ -70,9 +72,6 @@ export const IPCWrapper = {
         channel: K,
         callback: (data?: IPCMessage[K]) => void
     ) => {
-        // @ts-ignore
-        if (window.electronAPI === undefined) return
-
         // @ts-ignore
         window.electronAPI.on_message(channel, (data?: IPCMEssage[K]) => {
             callback(data)

@@ -1,0 +1,61 @@
+// App settings mock-up
+export const app_settings = {
+    "_meta": {
+        "groups": {
+            "General Settings": {
+                "controller_loc": "Controller window location",
+                "worker_spawn": "Worker window spawn limit",
+                "saving_frequency": "Backup saving frequency",
+                "plane_path_limit": "Maximum plane path particles limit",
+                "logging": "Debug logging",
+                "backend_init": "Initialize AI backend",
+                "fetch_alg": "Fetch newest algorithms on app startup",
+                "debug_panel": "Debug panel (NOTE: use only for development)"
+            },
+            "Controller Settings": {
+                "max_monitor_col": "Maximum number of monitor-instance columns",
+                "max_monitor_row": "Maximum number of monitor-instance rows"
+            },
+            "Simulation Settings": {
+                "ai_aggression": "AI aggression",
+                "results": "Show stats at the end of sim session",
+                "noise": "Noise from Pseudopilot mic (Recommended for improved realism)"
+            },
+            "Plane Settings": {
+                "std_bank_angle": "Standard bank angle",
+                "min_speed": "Minimum aircraft speed",
+                "max_speed": "Maximum aircraft speed",
+                "min_alt": "Minimal allowed aircraft cruise altitude",
+                "max_alt": "Maximal allowed aircraft cruise altitude",
+                "standard_pitch_up": "Standard pitch-up angle",
+                "standard_pitch_down": "Standard pitch-down angle",
+                "standard_accel": "Standard aircraft acceleration"
+            },
+            "Environment Settings": {
+                "transition_altitude": "Transition altitude"
+            }
+        }
+    },
+    "controller_loc": "leftmost",
+    "worker_spawn": "2",
+    "saving_frequency": "1min",
+    "plane_path_limit": "15",
+    "logging": true,
+    "debug_panel": true,
+    "backend_init": false,
+    "fetch_alg": true,
+    "max_monitor_col": "4",
+    "max_monitor_row": "3",
+    "ai_aggression": "medium",
+    "results": true,
+    "noise": true,
+    "std_bank_angle": "25",
+    "min_speed": "130",
+    "max_speed": "450",
+    "min_alt": "500",
+    "max_alt": "41000",
+    "standard_pitch_up": "4",
+    "standard_pitch_down": "7",
+    "standard_accel": "4.18",
+    "transition_altitude": "1000"
+}

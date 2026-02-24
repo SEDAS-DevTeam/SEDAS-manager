@@ -1,8 +1,46 @@
 // App settings mock-up
 export const app_settings = {
     "_meta": {
+        "allowed_values": {
+            "controller_loc": [
+                ["leftmost", "leftmost"],
+                ["rightmost", "rightmost"]
+            ],
+            "worker_spawn": "num",
+            "saving_frequency": [
+                ["1 minute", "1min"],
+                ["5 minutes", "5min"],
+                ["10 minutes", "10min"],
+                ["30 minutes", "30min"],
+                ["1 hour", "1hour"],
+                ["never", "never"]
+            ],
+            "plane_path_limit": "num",
+            "logging": "bool",
+            "backend_init": "bool",
+            "fetch_alg": "bool",
+            "debug_panel": "bool",
+            "max_monitor_col": "num",
+            "max_monitor_row": "num",
+            "ai_aggression": [
+                ["high", "high"],
+                ["medium", "medium"],
+                ["low", "low"]
+            ],
+            "results": "bool",
+            "noise": "bool",
+            "std_bank_angle": "num",
+            "min_speed": "num",
+            "max_speed": "num",
+            "min_alt": "num",
+            "max_alt": "num",
+            "standard_pitch_up": "num",
+            "standard_pitch_down": "num",
+            "standard_accel": "num",
+            "transition_altitude": "num"
+        },
         "groups": {
-            "General Settings": {
+            "general-settings": {
                 "controller_loc": "Controller window location",
                 "worker_spawn": "Worker window spawn limit",
                 "saving_frequency": "Backup saving frequency",
@@ -12,16 +50,27 @@ export const app_settings = {
                 "fetch_alg": "Fetch newest algorithms on app startup",
                 "debug_panel": "Debug panel (NOTE: use only for development)"
             },
-            "Controller Settings": {
-                "max_monitor_col": "Maximum number of monitor-instance columns",
-                "max_monitor_row": "Maximum number of monitor-instance rows"
+            "controller-settings": {
+                "monitors-setup": {
+                    "max_monitor_col": "Maximum number of monitor-instance columns",
+                    "max_monitor_row": "Maximum number of monitor-instance rows"
+                },
+                "simulation-setup": {
+
+                },
+                "simulation-control": {
+
+                },
+                "plugins-control": {
+                    
+                }
             },
-            "Simulation Settings": {
+            "simulation-settings": {
                 "ai_aggression": "AI aggression",
                 "results": "Show stats at the end of sim session",
                 "noise": "Noise from Pseudopilot mic (Recommended for improved realism)"
             },
-            "Plane Settings": {
+            "plane-settings": {
                 "std_bank_angle": "Standard bank angle",
                 "min_speed": "Minimum aircraft speed",
                 "max_speed": "Maximum aircraft speed",
@@ -31,7 +80,7 @@ export const app_settings = {
                 "standard_pitch_down": "Standard pitch-down angle",
                 "standard_accel": "Standard aircraft acceleration"
             },
-            "Environment Settings": {
+            "environment-settings": {
                 "transition_altitude": "Transition altitude"
             }
         }

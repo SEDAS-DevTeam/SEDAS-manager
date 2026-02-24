@@ -22,10 +22,33 @@ import { onMount } from "solid-js"
 import logo from "@assets/sedas-manager-logo.png"
 
 function Settings() {
+    let setting_containers: Record<string, (typeof AccordionContent | HTMLDivElement)> = {}
+
     const redirect_onclick = () => IPCWrapper.send_message("settings", "redirect-to-menu")
     const save_settings = () => {
       let data = [{}]; // TODO: add some data load from frontend later on
-      IPCWrapper.send_message("settings", "save-settings", data)
+      //IPCWrapper.send_message("settings", "save-settings", data)
+    }
+    const assign_to_containers = (elem_id: string, elem: HTMLDivElement) => {setting_containers[elem_id] = elem}
+    const loop_layout_config = (
+      dict: Record<string, any>,
+      app_settings: Record<string, any>,
+      parent_key: string = "root"
+    ) => {
+      for (const [key, value] of Object.entries(dict)) {
+        if (value !== null && typeof value === "object") {
+          loop_layout_config(value, app_settings, key)
+        }
+        else {
+          // Assigning setting value to the main settings box
+          let description: string = value
+          let setting: string | number | boolean = app_settings[key]
+          let elem: (typeof AccordionContent | HTMLDivElement) = setting_containers[parent_key]
+          console.log(description)
+          console.log(setting)
+          console.log(elem)
+        }
+      }
     }
 
     onMount(() => {
@@ -34,7 +57,17 @@ function Settings() {
 
     IPCWrapper.on_message("app-data", (data) => {
       // TODO: Write setting processing
-      console.log(data)
+      let app_config: Record<string, string | boolean | number> = {}
+      let settings_layout!: Record<string, any>
+      for (let key in data![0]){
+        if (key !== "_meta") app_config[key] = data![0][key]
+        else settings_layout = data![0][key]
+      }
+
+      console.log(app_config)
+      console.log("settings layout")
+
+      loop_layout_config(settings_layout["groups"], app_config)
     })
 
     return (
@@ -50,38 +83,58 @@ function Settings() {
                     <h2 class="la-header">SEDAS manager settings</h2>
                     <p class="text mt-1">NOTE: anges will be activated after restart</p>
                     <div id="settings-content" class="ml-4 mt-3 flex flex-col gap-2">
-                        <AccordionContent title="General Settings" class="l-header mb-1" data={[general_settings_Open, general_settings_setOpen]}>
+                        <AccordionContent 
+                          title="General Settings"
+                          class="l-header mb-1"
+                          ref={(elem: HTMLDivElement) => {assign_to_containers("general-settings", elem)}}
+                          data={[general_settings_Open, general_settings_setOpen]}>
                           <hr></hr>
-                          <p>TODO</p>
                         </AccordionContent>
 
-                        <AccordionContent title="Controller Settings" class="l-header mb-1" data={[controller_settings_Open, controller_settings_setOpen]}>
+                        <AccordionContent
+                          title="Controller Settings"
+                          class="l-header mb-1"
+                          ref={(elem: HTMLDivElement) => assign_to_containers("controller-settings", elem)}
+                          data={[controller_settings_Open, controller_settings_setOpen]}>
                           <hr></hr>
                           <div id="controller-settings-content" class="ml-4 mt-2">
                             <h2 class="s-header mb-1">Monitors setup</h2>
-                            <p>TODO</p>
+                            <div ref={(elem: HTMLDivElement) => assign_to_containers("monitors-setup", elem)}>
+                            </div>
                             <h2 class="s-header mb-1">Simulation setup</h2>
-                            <p>TODO</p>
+                            <div ref={(elem: HTMLDivElement) => assign_to_containers("simulation-setup", elem)}>
+                            </div>
                             <h2 class="s-header mb-1">Simulation control</h2>
-                            <p>TODO</p>
+                            <div ref={(elem: HTMLDivElement) => assign_to_containers("simulation-control", elem)}>
+                            </div>
                             <h2 class="s-header mb-1">Plugins</h2>
-                            <p>TODO</p>
+                            <div ref={(elem: HTMLDivElement) => assign_to_containers("plugins-control", elem)}>
+                            </div>
                           </div>
                         </AccordionContent>
 
-                        <AccordionContent title="Simulation Settings" class="l-header mb-1" data={[simulation_settings_Open, simulation_settings_setOpen]}>
+                        <AccordionContent 
+                          title="Simulation Settings" 
+                          class="l-header mb-1"
+                          ref={(elem: HTMLDivElement) => assign_to_containers("simulation-settings", elem)}
+                          data={[simulation_settings_Open, simulation_settings_setOpen]}>
                           <hr></hr>
-                          <p>TODO</p>
                         </AccordionContent>
 
-                        <AccordionContent title="Plane Settings" class="l-header mb-1" data={[plane_settings_Open, plane_settings_setOpen]}>
+                        <AccordionContent 
+                          title="Plane Settings" 
+                          class="l-header mb-1"
+                          ref={(elem: HTMLDivElement) => assign_to_containers("plane-settings", elem)}
+                          data={[plane_settings_Open, plane_settings_setOpen]}>
                           <hr></hr>
-                          <p>TODO</p>
                         </AccordionContent>
 
-                        <AccordionContent title="Environment Settings" class="l-header mb-1" data={[env_settings_Open, env_settings_setOpen]}>
+                        <AccordionContent 
+                          title="Environment Settings" 
+                          class="l-header mb-1"
+                          ref={(elem: HTMLDivElement) => assign_to_containers("environment-settings", elem)}
+                          data={[env_settings_Open, env_settings_setOpen]}>
                           <hr></hr>
-                          <p>TODO</p>
                         </AccordionContent>
                     </div>
                 </div>

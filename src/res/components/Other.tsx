@@ -9,7 +9,8 @@ interface AccordionProps {
     title: string,
     children: JSX.Element,
     class: string,
-    data: Pair<Accessor<boolean>, Setter<boolean>>
+    data: Pair<Accessor<boolean>, Setter<boolean>>,
+    ref?: (elem: HTMLDivElement) => void
 }
 
 interface ChevronProps {
@@ -187,7 +188,7 @@ export function Slider(props: SliderProps) {
 
 export function AccordionContent(props: AccordionProps) {
     return (
-        <div>
+        <div ref={props.ref}>
             <div class="flex">
                 <ChevronDown onclick={() => props.data[1](!props.data[0]())} class={`w-4 h-4 transition-transform duration-200 ${
                 props.data[0]() ? "rotate-0" : "-rotate-90"}`}>

@@ -59,3 +59,7 @@ button.min-icon { @apply flex items-center justify-center m-2 border-2 border-pr
 
 button.header-icon { @apply border-primary-blue border-2 p-1 rounded-lg cursor-pointer hover:bg-gray-400 }
 div.widget-container button { @apply bg-[#b1b1b1] border-2 border-primary-blue text-primary-blue px-3 py-1.5 text-xl }
+
+.select-elem select { @apply mt-1 border-1 rounded-sm ms-2 px-1 border-[#b1b1b1] }
+.input-elem input { @apply mt-1 border-1 rounded-sm ms-2 border-[#b1b1b1] h-6 px-1 }
+.checkbox-elem input { @apply ms-2 scale-120 accent-primary-blue }

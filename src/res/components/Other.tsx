@@ -7,9 +7,9 @@ type Pair<T1, T2> = [T1, T2]
 
 interface AccordionProps {
     title: string,
-    children: JSX.Element,
     class: string,
     data: Pair<Accessor<boolean>, Setter<boolean>>,
+    children?: JSX.Element,
     ref?: (elem: HTMLDivElement) => void
 }
 
@@ -38,6 +38,59 @@ interface SliderProps {
     start: string,
     step: string,
     stop: string
+}
+
+interface SelectElemProps {
+    options: string[][],
+    text: string,
+    selected: string
+}
+
+interface InputElemProps {
+    text: string,
+    selected: string
+}
+
+interface CheckboxElemProps {
+    text: string,
+    selected: boolean
+}
+
+
+/*
+    Settings components
+*/
+export function SelectElem(props: SelectElemProps) {
+    return (
+        <div class="select-elem">
+            <label>{props.text}</label>
+            <select>
+                <For each={props.options}>
+                    {(item: string[]) => 
+                        <option value={item[1]} selected={(item[1] === props.selected)}>{item[0]}</option>
+                    }
+                </For>
+            </select>
+        </div>
+    )
+}
+
+export function InputElem(props: InputElemProps) {
+    return (
+        <div class="input-elem">
+            <label>{props.text}</label>
+            <input type="text" value={props.selected}></input>
+        </div>
+    )
+}
+
+export function CheckboxElem(props: CheckboxElemProps) {
+    return (
+        <div class="checkbox-elem">
+            <label>{props.text}</label>
+            <input type="checkbox" checked={props.selected}></input>
+        </div>
+    )
 }
 
 export function Header() {
@@ -201,7 +254,8 @@ export function AccordionContent(props: AccordionProps) {
                 }`}
             >
                 <div class="overflow-hidden">
-                    <div class="pb-4">
+                    <hr></hr>
+                    <div class="pb-4 p-2">
                         {props.children}
                     </div>
                 </div>

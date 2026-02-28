@@ -1,3 +1,8 @@
+/*
+    TODO: Did not really find a way to currently change the way the mock-up data is created, so unfortunately we have to copy it every time the
+    actual non-Mockup data is changed
+*/
+
 // App settings mock-up
 export const app_settings = {
     "_meta": {
@@ -5,6 +10,10 @@ export const app_settings = {
             "controller_loc": [
                 ["leftmost", "leftmost"],
                 ["rightmost", "rightmost"]
+            ],
+            "window_alignment": [
+                ["set", "set"],
+                ["free", "free"]
             ],
             "worker_spawn": "num",
             "saving_frequency": [
@@ -48,7 +57,8 @@ export const app_settings = {
                 "logging": "Debug logging",
                 "backend_init": "Initialize AI backend",
                 "fetch_alg": "Fetch newest algorithms on app startup",
-                "debug_panel": "Debug panel (NOTE: use only for development)"
+                "debug_panel": "Debug panel (NOTE: use only for development)",
+                "window_alignment": "Window alignment"
             },
             "controller-settings": {
                 "monitors-setup": {
@@ -71,22 +81,23 @@ export const app_settings = {
                 "noise": "Noise from Pseudopilot mic (Recommended for improved realism)"
             },
             "plane-settings": {
-                "std_bank_angle": "Standard bank angle",
-                "min_speed": "Minimum aircraft speed",
-                "max_speed": "Maximum aircraft speed",
-                "min_alt": "Minimal allowed aircraft cruise altitude",
-                "max_alt": "Maximal allowed aircraft cruise altitude",
-                "standard_pitch_up": "Standard pitch-up angle",
-                "standard_pitch_down": "Standard pitch-down angle",
-                "standard_accel": "Standard aircraft acceleration"
+                "std_bank_angle": "Standard bank angle (degrees)",
+                "min_speed": "Minimum aircraft speed (knots)",
+                "max_speed": "Maximum aircraft speed (knots)",
+                "min_alt": "Minimal allowed aircraft cruise altitude (feet)",
+                "max_alt": "Maximal allowed aircraft cruise altitude (feet)",
+                "standard_pitch_up": "Standard pitch-up angle (degrees)",
+                "standard_pitch_down": "Standard pitch-down angle (degrees)",
+                "standard_accel": "Standard aircraft acceleration (knots/secs-squared)"
             },
             "environment-settings": {
-                "transition_altitude": "Transition altitude"
+                "transition_altitude": "Transition altitude (feet)"
             }
         }
     },
     "controller_loc": "leftmost",
     "worker_spawn": "2",
+    "window_alignment": "free",
     "saving_frequency": "1min",
     "plane_path_limit": "15",
     "logging": true,

@@ -1,6 +1,6 @@
-import { createSignal } from 'solid-js'
 import { IPCWrapper } from './utils'
 import { AccordionContent, LeftArrowIcon } from './Other'
+import { SelectElem, InputElem, CheckboxElem } from "./Other"
 import {
   controller_settings_Open,
   controller_settings_setOpen,
@@ -17,36 +17,82 @@ import {
   simulation_settings_Open,
   simulation_settings_setOpen
 } from './Storage'
-import { onMount } from "solid-js"
+import { onMount, For, Show, Switch, Match } from "solid-js"
+import { createStore } from "solid-js/store"
 
 import logo from "@assets/sedas-manager-logo.png"
 
+interface setting_item {
+  header: string,
+  setting: string | number | boolean,
+  allowed_value: string | string[][]
+  parent_key: string
+}
+
+interface SettingsMatcherProps {
+  setlist: setting_item[],
+  header: string
+}
+
+function SettingsMatcher(props: SettingsMatcherProps) {
+  return (
+    <For each={props.setlist}>
+      {(item: setting_item) => (
+        <Show when={item.parent_key === props.header}>
+          <Switch>
+            <Match when={Array.isArray(item.allowed_value)}>
+              <SelectElem 
+                options={item.allowed_value as string[][]}
+                text={item.header}
+                selected={item.setting as string}
+              ></SelectElem>
+            </Match>
+            <Match when={item.allowed_value == "num"}>
+              <InputElem
+                text={item.header}
+                selected={item.setting as string}
+              ></InputElem>
+            </Match>
+            <Match when={item.allowed_value == "bool"}>
+              <CheckboxElem
+                text={item.header}
+                selected={item.setting as boolean}
+              ></CheckboxElem>
+            </Match>
+          </Switch>
+        </Show>
+      )}
+    </For>
+  )
+}
+
 function Settings() {
-    let setting_containers: Record<string, (typeof AccordionContent | HTMLDivElement)> = {}
+    // Variables
+    const [settings_list, set_settings_list] = createStore<setting_item[]>([]) // Variable having all the setting info inside to use it in declarative state later on
 
     const redirect_onclick = () => IPCWrapper.send_message("settings", "redirect-to-menu")
     const save_settings = () => {
       let data = [{}]; // TODO: add some data load from frontend later on
       //IPCWrapper.send_message("settings", "save-settings", data)
     }
-    const assign_to_containers = (elem_id: string, elem: HTMLDivElement) => {setting_containers[elem_id] = elem}
+    const assign_to_containers = () => {}
     const loop_layout_config = (
       dict: Record<string, any>,
       app_settings: Record<string, any>,
+      allowed_values_settings: Record<string, any>,
       parent_key: string = "root"
     ) => {
       for (const [key, value] of Object.entries(dict)) {
         if (value !== null && typeof value === "object") {
-          loop_layout_config(value, app_settings, key)
+          loop_layout_config(value, app_settings, allowed_values_settings, key)
         }
         else {
           // Assigning setting value to the main settings box
-          let description: string = value
+          let header: string = value
           let setting: string | number | boolean = app_settings[key]
-          let elem: (typeof AccordionContent | HTMLDivElement) = setting_containers[parent_key]
-          console.log(description)
-          console.log(setting)
-          console.log(elem)
+          let allowed_value: string | string[][] = allowed_values_settings[key]
+
+          set_settings_list((prev) => [...prev, { header, setting, allowed_value, parent_key }])
         }
       }
     }
@@ -56,7 +102,6 @@ function Settings() {
     })
 
     IPCWrapper.on_message("app-data", (data) => {
-      // TODO: Write setting processing
       let app_config: Record<string, string | boolean | number> = {}
       let settings_layout!: Record<string, any>
       for (let key in data![0]){
@@ -67,7 +112,7 @@ function Settings() {
       console.log(app_config)
       console.log("settings layout")
 
-      loop_layout_config(settings_layout["groups"], app_config)
+      loop_layout_config(settings_layout["groups"], app_config, settings_layout["allowed_values"])
     })
 
     return (
@@ -86,29 +131,31 @@ function Settings() {
                         <AccordionContent 
                           title="General Settings"
                           class="l-header mb-1"
-                          ref={(elem: HTMLDivElement) => {assign_to_containers("general-settings", elem)}}
-                          data={[general_settings_Open, general_settings_setOpen]}>
-                          <hr></hr>
+                          data={[general_settings_Open, general_settings_setOpen]}
+                        >
+                          <SettingsMatcher setlist={settings_list} header="general-settings"></SettingsMatcher>
                         </AccordionContent>
 
                         <AccordionContent
                           title="Controller Settings"
                           class="l-header mb-1"
-                          ref={(elem: HTMLDivElement) => assign_to_containers("controller-settings", elem)}
                           data={[controller_settings_Open, controller_settings_setOpen]}>
-                          <hr></hr>
                           <div id="controller-settings-content" class="ml-4 mt-2">
                             <h2 class="s-header mb-1">Monitors setup</h2>
-                            <div ref={(elem: HTMLDivElement) => assign_to_containers("monitors-setup", elem)}>
+                            <div class="px-2 mb-1">
+                              <SettingsMatcher setlist={settings_list} header="monitors-setup"></SettingsMatcher>
                             </div>
                             <h2 class="s-header mb-1">Simulation setup</h2>
-                            <div ref={(elem: HTMLDivElement) => assign_to_containers("simulation-setup", elem)}>
+                            <div class="px-2 mb-1">
+                              <SettingsMatcher setlist={settings_list} header="simulation-setup"></SettingsMatcher>
                             </div>
                             <h2 class="s-header mb-1">Simulation control</h2>
-                            <div ref={(elem: HTMLDivElement) => assign_to_containers("simulation-control", elem)}>
+                            <div class="px-2 mb-1">
+                              <SettingsMatcher setlist={settings_list} header="simulation-control"></SettingsMatcher>
                             </div>
                             <h2 class="s-header mb-1">Plugins</h2>
-                            <div ref={(elem: HTMLDivElement) => assign_to_containers("plugins-control", elem)}>
+                            <div class="px-2 mb-1">
+                              <SettingsMatcher setlist={settings_list} header="plugins-control"></SettingsMatcher>
                             </div>
                           </div>
                         </AccordionContent>
@@ -116,25 +163,25 @@ function Settings() {
                         <AccordionContent 
                           title="Simulation Settings" 
                           class="l-header mb-1"
-                          ref={(elem: HTMLDivElement) => assign_to_containers("simulation-settings", elem)}
-                          data={[simulation_settings_Open, simulation_settings_setOpen]}>
-                          <hr></hr>
+                          data={[simulation_settings_Open, simulation_settings_setOpen]}
+                        >
+                          <SettingsMatcher setlist={settings_list} header="simulation-settings"></SettingsMatcher>
                         </AccordionContent>
 
                         <AccordionContent 
                           title="Plane Settings" 
                           class="l-header mb-1"
-                          ref={(elem: HTMLDivElement) => assign_to_containers("plane-settings", elem)}
-                          data={[plane_settings_Open, plane_settings_setOpen]}>
-                          <hr></hr>
+                          data={[plane_settings_Open, plane_settings_setOpen]}
+                        >
+                          <SettingsMatcher setlist={settings_list} header="plane-settings"></SettingsMatcher>
                         </AccordionContent>
 
                         <AccordionContent 
                           title="Environment Settings" 
                           class="l-header mb-1"
-                          ref={(elem: HTMLDivElement) => assign_to_containers("environment-settings", elem)}
-                          data={[env_settings_Open, env_settings_setOpen]}>
-                          <hr></hr>
+                          data={[env_settings_Open, env_settings_setOpen]}
+                        >
+                          <SettingsMatcher setlist={settings_list} header="environment-settings"></SettingsMatcher>
                         </AccordionContent>
                     </div>
                 </div>

@@ -26,12 +26,14 @@ interface setting_item {
   header: string,
   setting: string | number | boolean,
   allowed_value: string | string[][]
-  parent_key: string
+  parent_key: string,
+  key: string
 }
 
 interface SettingsMatcherProps {
   setlist: setting_item[],
-  header: string
+  header: string,
+  ref: (element: HTMLSelectElement | HTMLInputElement) => void
 }
 
 function SettingsMatcher(props: SettingsMatcherProps) {
@@ -45,18 +47,24 @@ function SettingsMatcher(props: SettingsMatcherProps) {
                 options={item.allowed_value as string[][]}
                 text={item.header}
                 selected={item.setting as string}
+                id={item.key}
+                ref={props.ref}
               ></SelectElem>
             </Match>
             <Match when={item.allowed_value == "num"}>
               <InputElem
                 text={item.header}
                 selected={item.setting as string}
+                id={item.key}
+                ref={props.ref}
               ></InputElem>
             </Match>
             <Match when={item.allowed_value == "bool"}>
               <CheckboxElem
                 text={item.header}
                 selected={item.setting as boolean}
+                id={item.key}
+                ref={props.ref}
               ></CheckboxElem>
             </Match>
           </Switch>
@@ -69,13 +77,10 @@ function SettingsMatcher(props: SettingsMatcherProps) {
 function Settings() {
     // Variables
     const [settings_list, set_settings_list] = createStore<setting_item[]>([]) // Variable having all the setting info inside to use it in declarative state later on
+    const [settings_elems, set_settings_elems] = createStore<(HTMLSelectElement | HTMLInputElement)[]>([])
+    var loaded_settings: Record<string, any>;
 
     const redirect_onclick = () => IPCWrapper.send_message("settings", "redirect-to-menu")
-    const save_settings = () => {
-      let data = [{}]; // TODO: add some data load from frontend later on
-      //IPCWrapper.send_message("settings", "save-settings", data)
-    }
-    const assign_to_containers = () => {}
     const loop_layout_config = (
       dict: Record<string, any>,
       app_settings: Record<string, any>,
@@ -92,9 +97,28 @@ function Settings() {
           let setting: string | number | boolean = app_settings[key]
           let allowed_value: string | string[][] = allowed_values_settings[key]
 
-          set_settings_list((prev) => [...prev, { header, setting, allowed_value, parent_key }])
+          set_settings_list((prev) => [...prev, { header, setting, allowed_value, parent_key, key }])
         }
       }
+    }
+    const add_to_elems_store = (elem: HTMLSelectElement | HTMLInputElement) => {
+      set_settings_elems((prev) => [...prev, elem])
+    }
+    const save_settings = () => {
+      let new_settings: Record<string, any> = structuredClone(loaded_settings);
+
+      settings_elems.forEach((elem: (HTMLSelectElement | HTMLInputElement)) => {
+        let elem_value: boolean | string
+        let id: string = elem.id
+
+        if (elem.type === "checkbox") elem_value = elem.checked
+        else elem_value = elem.value
+
+        // Rewrite settings according to user changes
+        if (new_settings[id] !== elem_value) new_settings[id] = elem_value
+      })
+
+      IPCWrapper.send_message("settings", "save-settings", [new_settings])
     }
 
     onMount(() => {
@@ -102,11 +126,13 @@ function Settings() {
     })
 
     IPCWrapper.on_message("app-data", (data) => {
-      let app_config: Record<string, string | boolean | number> = {}
-      let settings_layout!: Record<string, any>
-      for (let key in data![0]){
-        if (key !== "_meta") app_config[key] = data![0][key]
-        else settings_layout = data![0][key]
+      loaded_settings = data![0]
+
+      let app_config: Record<string, string | boolean | number> = {};
+      let settings_layout!: Record<string, any>;
+      for (let key in loaded_settings){
+        if (key !== "_meta") app_config[key] = loaded_settings[key]
+        else settings_layout = loaded_settings[key]
       }
 
       console.log(app_config)
@@ -133,7 +159,7 @@ function Settings() {
                           class="l-header mb-1"
                           data={[general_settings_Open, general_settings_setOpen]}
                         >
-                          <SettingsMatcher setlist={settings_list} header="general-settings"></SettingsMatcher>
+                          <SettingsMatcher setlist={settings_list} header="general-settings" ref={add_to_elems_store}></SettingsMatcher>
                         </AccordionContent>
 
                         <AccordionContent
@@ -143,19 +169,19 @@ function Settings() {
                           <div id="controller-settings-content" class="ml-4 mt-2">
                             <h2 class="s-header mb-1">Monitors setup</h2>
                             <div class="px-2 mb-1">
-                              <SettingsMatcher setlist={settings_list} header="monitors-setup"></SettingsMatcher>
+                              <SettingsMatcher setlist={settings_list} header="monitors-setup" ref={add_to_elems_store}></SettingsMatcher>
                             </div>
                             <h2 class="s-header mb-1">Simulation setup</h2>
                             <div class="px-2 mb-1">
-                              <SettingsMatcher setlist={settings_list} header="simulation-setup"></SettingsMatcher>
+                              <SettingsMatcher setlist={settings_list} header="simulation-setup" ref={add_to_elems_store}></SettingsMatcher>
                             </div>
                             <h2 class="s-header mb-1">Simulation control</h2>
                             <div class="px-2 mb-1">
-                              <SettingsMatcher setlist={settings_list} header="simulation-control"></SettingsMatcher>
+                              <SettingsMatcher setlist={settings_list} header="simulation-control" ref={add_to_elems_store}></SettingsMatcher>
                             </div>
                             <h2 class="s-header mb-1">Plugins</h2>
                             <div class="px-2 mb-1">
-                              <SettingsMatcher setlist={settings_list} header="plugins-control"></SettingsMatcher>
+                              <SettingsMatcher setlist={settings_list} header="plugins-control" ref={add_to_elems_store}></SettingsMatcher>
                             </div>
                           </div>
                         </AccordionContent>
@@ -165,7 +191,7 @@ function Settings() {
                           class="l-header mb-1"
                           data={[simulation_settings_Open, simulation_settings_setOpen]}
                         >
-                          <SettingsMatcher setlist={settings_list} header="simulation-settings"></SettingsMatcher>
+                          <SettingsMatcher setlist={settings_list} header="simulation-settings" ref={add_to_elems_store}></SettingsMatcher>
                         </AccordionContent>
 
                         <AccordionContent 
@@ -173,7 +199,7 @@ function Settings() {
                           class="l-header mb-1"
                           data={[plane_settings_Open, plane_settings_setOpen]}
                         >
-                          <SettingsMatcher setlist={settings_list} header="plane-settings"></SettingsMatcher>
+                          <SettingsMatcher setlist={settings_list} header="plane-settings" ref={add_to_elems_store}></SettingsMatcher>
                         </AccordionContent>
 
                         <AccordionContent 
@@ -181,7 +207,7 @@ function Settings() {
                           class="l-header mb-1"
                           data={[env_settings_Open, env_settings_setOpen]}
                         >
-                          <SettingsMatcher setlist={settings_list} header="environment-settings"></SettingsMatcher>
+                          <SettingsMatcher setlist={settings_list} header="environment-settings" ref={add_to_elems_store}></SettingsMatcher>
                         </AccordionContent>
                     </div>
                 </div>

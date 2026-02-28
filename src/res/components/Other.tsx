@@ -43,17 +43,23 @@ interface SliderProps {
 interface SelectElemProps {
     options: string[][],
     text: string,
-    selected: string
+    selected: string,
+    id: string,
+    ref: (element: HTMLSelectElement) => void
 }
 
 interface InputElemProps {
     text: string,
-    selected: string
+    selected: string,
+    id: string,
+    ref: (element: HTMLInputElement) => void
 }
 
 interface CheckboxElemProps {
     text: string,
-    selected: boolean
+    selected: boolean,
+    id: string,
+    ref: (element: HTMLInputElement) => void
 }
 
 
@@ -64,7 +70,7 @@ export function SelectElem(props: SelectElemProps) {
     return (
         <div class="select-elem">
             <label>{props.text}</label>
-            <select>
+            <select id={props.id} ref={props.ref}>
                 <For each={props.options}>
                     {(item: string[]) => 
                         <option value={item[1]} selected={(item[1] === props.selected)}>{item[0]}</option>
@@ -79,7 +85,7 @@ export function InputElem(props: InputElemProps) {
     return (
         <div class="input-elem">
             <label>{props.text}</label>
-            <input type="text" value={props.selected}></input>
+            <input type="text" value={props.selected} id={props.id} ref={props.ref}></input>
         </div>
     )
 }
@@ -88,7 +94,7 @@ export function CheckboxElem(props: CheckboxElemProps) {
     return (
         <div class="checkbox-elem">
             <label>{props.text}</label>
-            <input type="checkbox" checked={props.selected}></input>
+            <input type="checkbox" checked={props.selected} id={props.id} ref={props.ref}></input>
         </div>
     )
 }
